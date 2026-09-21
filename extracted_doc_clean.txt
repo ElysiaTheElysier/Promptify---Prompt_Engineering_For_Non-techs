@@ -1,0 +1,1549 @@
+Prompt Eng for AI Engineer
+
+bb
+
+Prompt Eng for AI Engineer
+
+Prompt Eng for Business-Users
+
+Tool kits/ Env
+
+Github, VS code, v.v.
+
+Google AI studio ← delicated tools mà mình phát triển
+
+Mindset / Approach 
+
+Engineer
+
+Business / Specific business function
+
+Codelab
+
+Viết tài liệu hướng dẫn thực hiện cho họ sao cho tường minh← Tuân thủ theo standard nào đó
+
+Viết tài liệu hướng dẫn thực hiện cho họ sao cho tường minh
+
+← Tuân thủ theo standard nào đó: 1) Dễ đọc, dễ hiểu, dễ follow / có flow rõ ràng
+
+2) Cung cấp các tài nguyên để người học thực hành được
+
+TASKs:
+
+(1) OUTPUT: Cần hoàn thiện một tài liệu hướng dẫn, định dạng Google Slide, phù hợp với ngữ cảnh như mô tả ở phần INPUT dưới đây, lưu ý, bài lab này dành cho nhóm nhóm business users học và thực hành Prompt Engineering. ← expectation
+
+(2) INPUT: 
+
+Workshop agenda cho nhóm Business-Users (tại đây) → specific cho 1 workshop cụ thể; và cái này có thể thay đổi khi có workshop mới. ← chứa dynamic context 
+
+Example: 
+
+Hôm nay là workshop cho Agribank, bộ phận Truyền thông
+
+Ngày sau là workhops cho Agribank, bộ phận tín dụng
+
+Main Concept khi cho nhóm Business Users thực hành Prompt Engineering (tại đây)→ baseline cho giảng viên khi soạn thảo bài lab thực hành cho nhóm Business Users nói chung ← chứa static context
+
+Trước và sau
+
+Trước: Chưa có tài liệu hướng dẫn đặc biệt là trên môi trường gemini.google.com và Google AI Studio
+
+Sau: Đã có tài liệu hươngs dẫn đó
+
+Tham khảo các google slide hướng dẫn thực hành cho nhóm AI Engineer + Business Users: ← chứa static context
+
+Bài codelab Day01, Day02, Day03, Day04
+
+Bài Codelab của Thầy từng làm cho nhóm business users: 
+
+DELIVERABLES / TIMELINE
+
+Mốc 1: Em hiểu bài chưa? (hiểu rõ yêu cầu chưa? Có câu hỏi gì ko?) + Chạy thử nội dung nêu tại đây. 
+
+Mốc 2: Khi nào thì có version? Nội dung draft trong Version dự kiến có những cái gì?
+
+FAQ: 
+
+Q1: Sẽ chạy bài lab này trong 1 buổi luôn hay ntn?
+
+A1: Tuỳ vào kết quả test thực tế của Linh; tuy nhiên, ngữ cảnh của workshop sắp tới như sau:
+
+Đối tượng: Cán bộ ngân hàng (none-tech)
+
+Thời lượng toàn bộ chương trình: 4 tiếng, chi tiết thì đọc workshop agenda tại đây (idea của Thầy, dành từ ½ đến ¾ thời gian cho hoạt động handon/codelab).
+
+Bởi vậy, thì có thể rút ngắn bớt số lượng bài codelab nếu có quá dài hoặc thêm bài codeblab nếu cả 5 bài hiện tại tại là quá ngắn.
+
+1️⃣ BRD
+
+Business Requirements Document (BRD) - Prompt Engineering Learning Webapp
+
+1. Executive Summary
+
+Core Problem: Teaching prompt engineering to non-tech (business) users faces challenges due to diverse background domains, demands for personalized/industry-specific coursework, limited instructor resources, and abstract LLM concepts when taught purely through theory without real-time visualization.
+
+Proposed Solution: A lightweight, dedicated web application designed to deliver hands-on prompt engineering training for non-technical users. It allows class managers to upload user rosters via Google Sheets, set user expiration limits, manage class codes, and enable seamless Gmail SSO authentication for students.
+
+Strategic Goals: Democratize LLM and prompt engineering understanding across business functions while maintaining deep conceptual rigor equal to technical training programs.
+
+2. Business Objectives & Value Proposition
+
+Business Objectives:
+
+1. Standardize prompt engineering training across diverse non-technical departments.
+
+2. Reduce instructor setup and operational overhead by automating user onboarding and access control via Google Sheets and Gmail SSO.
+
+3. Accelerate student comprehension of LLM mechanics through interactive, domain-relevant practice environments.
+
+Value Proposition: Provides business users with intuitive, real-time feedback on prompt execution without technical friction, bridging the knowledge gap between tech and non-tech personnel.
+
+3. Success Metrics & KPIs
+
+KPI
+
+Baseline
+
+Target
+
+Measurement
+
+Student Completion Rate
+
+45% (theory lectures)
+
+> 85%
+
+Webapp session analytics
+
+Prompt Mechanics Mastery Score
+
+50% post-class assessment
+
+> 80% post-class assessment
+
+Automated post-course evaluation quiz
+
+Onboarding & Admin Time per Class
+
+60 mins manual setup
+
+< 5 mins via Google Sheet sync
+
+Class Manager time tracking log
+
+Active Practice Sessions
+
+1 session / student
+
+> 5 sessions / student
+
+Application usage telemetry
+
+4. Stakeholders & Target User Profiles
+
+Role
+
+Responsibility
+
+Interest
+
+Class Manager / Admin
+
+Upload roster, configure expiration time, manage access control
+
+Streamlined administration, scalable user provisioning, security control
+
+Student / Business User
+
+Complete modules, test prompts, master LLM operational mechanics
+
+Industry-relevant examples, immediate visual feedback, easy SSO login
+
+Instructor / Trainer
+
+Deliver curriculum, monitor student progress, evaluate prompt quality
+
+High student engagement, deep conceptual retention without tech overhead
+
+Tech / Platform Owner
+
+System uptime, Google API integration, LLM API endpoint management
+
+System stability, cost-effective API consumption, data security
+
+5. Scope Definition
+
+Capability
+
+Category
+
+Rationale
+
+Gmail SSO Authentication
+
+In-Scope
+
+Frictionless, secure login without complex password creation
+
+Google Sheet Roster Sync & Expiration Control
+
+In-Scope
+
+Automates class setup and temporary access provisioning
+
+Class Identification Code (Mã lớp)
+
+In-Scope
+
+Enables cohort segmentation and domain-specific content tailoring
+
+Interactive Prompt Playground
+
+In-Scope
+
+Core visual interface to demonstrate LLM output and behavior
+
+Custom LMS / Video Hosting
+
+Out-of-Scope
+
+Keeps platform lightweight; leverage external video tools
+
+AI Agent Automated Grading
+
+Out-of-Scope
+
+Deferred to Phase 2 to validate foundational core features first
+
+6. High-Level Business Rules & Workflows
+
+Business Rules:
+
+• Access Control: Only users listed in the active Google Sheet with non-expired timestamps can authenticate via Gmail SSO.
+
+• Expiration Enforcement: Upon reaching expiration timestamp, user access automatically reverts to read-only or is revoked.
+
+• Class Mapping: Every student record must be linked to a valid Class ID.
+
+High-Level Workflow:
+
+1. Class Manager updates user info and class code on Google Sheet.
+
+2. Webapp synchronizes user roster and sets access expiration rules.
+
+3. Student logs in via Gmail SSO, enters Class ID, and accesses interactive prompt exercises.
+
+4. Student executes prompts in real-time to observe LLM operational principles.
+
+7. Risks, Assumptions, & Dependencies
+
+Risks:
+
+• Google Sheets API rate limits or auth token expiration disrupting login validation.
+
+• LLM API token costs scaling unpredictably during intensive practical classes.
+
+Assumptions:
+
+• Non-tech business users have active Gmail/Google Workspace accounts.
+
+• Instructors maintain structured Google Sheets for active class rosters.
+
+Dependencies:
+
+• Google OAuth 2.0 and Google Sheets API availability.
+
+• Third-party LLM API availability and performance.
+
+8. Key Inputs for PRD Phase
+
+PRD Handover Summary Box - Key Technical & Design Inputs
+
+• Technical Specifications: Google Sheets API sync logic, OAuth 2.0 SSO flow, token caching strategy.
+
+• User Experience (UX/UI): Roster sync status indicator, student prompt playground layout, expiration notice banner.
+
+• Data Architecture: User profile schema (email, class_id, expiration_timestamp, role), prompt session logs.
+
+• Security & Compliance: LLM API key encryption, input prompt sanitization, session management.
+
+Tài liệu Yêu cầu Kinh doanh (BRD) - Webapp Giảng dạy Prompt Engineering
+
+1. Tóm tắt Điều hành
+
+Vấn đề Cốt lõi: Đào tạo kỹ thuật prompt engineering cho người dùng không thuộc khối công nghệ (business users) gặp khó khăn do sự đa dạng về ngành nghề, nhu cầu cá nhân hóa bài tập, nguồn lực giảng viên hạn chế, và tính chất trừu tượng của LLM khi chỉ giảng dạy lý thuyết thuần túy.
+
+Giải pháp Đề xuất: Xây dựng webapp chuyên biệt hỗ trợ thực hành prompt engineering trực quan. Hệ thống cho phép Quản lý lớp đồng bộ danh sách học viên qua Google Sheet, thiết lập thời hạn truy cập, phân loại theo mã lớp, và hỗ trợ đăng nhập nhanh bằng Gmail SSO.
+
+Mục tiêu Chiến lược: Phổ cập năng lực ứng dụng LLM cho đội ngũ nhân sự nghiệp vụ với chiều sâu kiến thức tương đương khối kỹ thuật trong cùng thời lượng đào tạo.
+
+2. Mục tiêu Kinh doanh & Giá trị Cốt lõi
+
+Mục tiêu Kinh doanh:
+
+1. Chuẩn hóa quy trình đào tạo prompt engineering cho các phòng ban kinh doanh/nghiệp vụ.
+
+2. Tối ưu hóa thời gian vận hành và quản lý lớp học bằng việc tự động hóa cấp quyền truy cập qua Google Sheet và Gmail SSO.
+
+3. Nâng cao khả năng tiếp thu nguyên lý vận hành LLM của học viên thông qua môi trường thực hành tương tác trực quan.
+
+Giá trị Cốt lõi: Cung cấp công cụ thực hành nhận phản hồi tức thì từ mô hình, giúp học viên hiểu sâu nguyên lý LLM mà không gặp rào cản kỹ thuật.
+
+3. Chỉ số Đo lường Hiệu quả (KPIs)
+
+Chỉ số (KPI)
+
+Mức cơ sở
+
+Mục tiêu
+
+Phương pháp đo lường
+
+Tỷ lệ hoàn thành khóa học
+
+45% (lý thuyết)
+
+> 85%
+
+Báo cáo tiến độ trên Webapp
+
+Điểm hiểu biết nguyên lý LLM
+
+50% đánh giá đầu vào
+
+> 80% đánh giá cuối khóa
+
+Bài kiểm tra trắc nghiệm & thực hành
+
+Thời gian tạo & cấp quyền lớp
+
+60 phút thủ công
+
+< 5 phút qua Google Sheet
+
+Nhật ký vận hành của Admin
+
+Tần suất thực hành của học viên
+
+1 lượt / học viên
+
+> 5 lượt / học viên
+
+Hệ thống telemetry theo dõi phiên học
+
+4. Ma trận Bên liên quan & Hồ sơ Người dùng
+
+Vai trò
+
+Trách nhiệm
+
+Mối quan tâm
+
+Quản lý Lớp học (Admin)
+
+Tải danh sách học viên, cài đặt thời hạn truy cập, quản lý mã lớp
+
+Thao tác đơn giản, tự động cấp quyền, quản lý linh hoạt
+
+Học viên (Business User)
+
+Đăng nhập, nhập mã lớp, thực hành viết prompt và xem kết quả
+
+Giao diện dễ dùng, đăng nhập SSO nhanh, bài tập sát thực tế
+
+Giảng viên (Trainer)
+
+Biên soạn bài tập, theo dõi tiến độ và đánh giá kết quả thực hành
+
+Tăng tương tác, học viên hiểu sâu nguyên lý mà không tốn công hỗ trợ kỹ thuật
+
+Quản trị Hệ thống (Tech Owner)
+
+Đảm bảo uptime, tích hợp Google API và quản lý kết nối LLM API
+
+Hệ thống ổn định, tối ưu chi phí API, bảo mật dữ liệu
+
+5. Phạm vi Dự án
+
+Tính năng / Năng lực
+
+Phân loại
+
+Lý do
+
+Đăng nhập Gmail SSO
+
+Trong phạm vi
+
+Tạo trải nghiệm đăng nhập nhanh chóng và bảo mật cho học viên
+
+Quản lý User & Hạn dùng qua Google Sheet
+
+Trong phạm vi
+
+Giúp Admin dễ dàng cập nhật danh sách và tự động ngắt quyền khi hết hạn
+
+Mã định danh Lớp học (Class ID)
+
+Trong phạm vi
+
+Phân loại học viên theo từng lớp và ngành nghề nghiệp vụ cụ thể
+
+Phòng Thực hành Prompt Trực quan
+
+Trong phạm vi
+
+Giao diện cốt lõi giúp học viên quan sát phản hồi từ LLM
+
+LMS Tích hợp / Lưu trữ Video riêng
+
+Ngoài phạm vi
+
+Giữ hệ thống tinh gọn; sử dụng các công cụ video sẵn có
+
+Tự động Chấm điểm bằng AI Agent
+
+Ngoài phạm vi
+
+Dời sang Giai đoạn 2 để kiểm chứng các tính năng cơ bản trước
+
+6. Quy tắc Kinh doanh & Luồng Công việc Tổng quát
+
+Quy tắc Kinh doanh:
+
+• Kiểm soát truy cập: Chỉ những tài khoản Gmail có trong Google Sheet và còn thời hạn mới được phép đăng nhập qua Gmail SSO.
+
+• Xử lý hết hạn: Khi hết thời gian quy định, tài khoản sẽ tự động bị ngắt quyền truy cập hoặc chuyển sang chế độ chỉ xem.
+
+• Liên kết Lớp học: Mỗi học viên phải thuộc ít nhất một Mã định danh lớp học hợp lệ.
+
+Luồng Công việc Tổng quát:
+
+1. Quản lý lớp cập nhật thông tin học viên và mã lớp lên Google Sheet.
+
+2. Webapp đồng bộ dữ liệu và áp dụng quy tắc thời hạn truy cập.
+
+3. Học viên đăng nhập bằng Gmail SSO, nhập Mã lớp và vào giao diện thực hành.
+
+4. Học viên gửi prompt, quan sát phản hồi thực tế từ LLM và rút ra nguyên lý vận hành.
+
+7. Rủi ro, Giả định & Phụ thuộc
+
+Rủi ro:
+
+• Giới hạn tần suất gọi API Google Sheets (Rate limit) làm gián đoạn quá trình xác thực.
+
+• Chi phí API LLM gia tăng nếu học viên thực hành với tần suất cao.
+
+Giả định:
+
+• Học viên đã có tài khoản Gmail/Google Workspace cá nhân hoặc doanh nghiệp.
+
+• Quản lý lớp chủ động duy trì và cập nhật file Google Sheet.
+
+Phụ thuộc:
+
+• Dịch vụ Google OAuth 2.0 và Google Sheets API.
+
+• Kết nối API đến nhà cung cấp mô hình LLM (OpenAI / Gemini API).
+
+8. Thông tin Đầu vào cho Giai đoạn PRD
+
+Khung Tóm tắt Thông tin Chuyển giao PRD - Yêu cầu Kỹ thuật & Thiết kế
+
+• Yêu cầu Kỹ thuật Chi tiết: Cơ chế đồng bộ Google Sheets API, luồng xác thực OAuth 2.0 SSO, chiến lược lưu cache session.
+
+• Thiết kế Giao diện (UX/UI): Trạng thái đồng bộ danh sách, UI không gian thực hành prompt, banner cảnh báo hết hạn tài khoản.
+
+• Cấu trúc Dữ liệu: Schema người dùng (email, class_id, expiration_timestamp, role), nhật ký phiên thực hành prompt.
+
+• An toàn & Bảo mật: Mã hóa API Key LLM, lọc dữ liệu đầu vào (prompt sanitation), quản lý token phiên làm việc.
+
+2️⃣ PRD
+
+Product Requirements Document (PRD) - Prompt Engineering Learning Webapp
+
+Field Name
+
+Primary Assignee
+
+Field Name
+
+Secondary Value
+
+Track Status
+
+Document Author
+
+Person
+
+Target Release
+
+Q4 2026
+
+Planned
+
+Engineering Lead
+
+Person
+
+Review Status
+
+In Review
+
+Pending Approval
+
+UX Design Lead
+
+Person
+
+UX Design Mocks
+
+File
+
+In Progress
+
+Product Manager
+
+Person
+
+Meeting Notes
+
+File
+
+Complete
+
+Last Updated
+
+Date
+
+Document Version
+
+v1.0
+
+Final Draft
+
+Table of Contents
+
+Executive Summary & Press Release
+
+Business Objectives & Success Metrics
+
+User Personas & Critical User Journeys (CUJs)
+
+Functional Requirements & Feature Prioritization
+
+System Architecture & Technical Specifications
+
+UX/UI & Interface Design Guidelines
+
+Security, Risk Management & Mitigation
+
+1. Executive Summary & Press Release
+
+Abstract
+
+Teaching prompt engineering to business (non-technical) users is often hindered by diverse domain backgrounds, a lack of custom tailored coursework, limited instructor support, and the abstract nature of Large Language Models (LLMs) when taught through static lectures. The Prompt Engineering Learning Webapp solves this by delivering an interactive, hands-on learning environment featuring real-time visual feedback, frictionless Gmail SSO login, Google Sheet-based student roster management, and automated access expiration control.
+
+Internal Press Release
+
+FOR IMMEDIATE RELEASE
+
+Empowering Business Operations through Interactive AI Prompt Engineering
+
+Today, we announce the launch of the Prompt Engineering Learning Webapp—a specialized learning platform designed to bridge the gap between abstract LLM concepts and practical business application. For business teams, mastering prompt engineering previously required navigating complex development setups or listening to abstract theory that failed to translate into day-to-day workflow gains.
+
+With the new webapp, business employees can log in instantly with their company Gmail account, enter their specific class identifier, and immediately experiment with LLMs inside an interactive Prompt Playground. Class Managers can onboard an entire cohort in under 5 minutes simply by updating a Google Sheet with student details and expiration dates, completely eliminating administrative friction.
+
+"Our goal is to democratize AI capabilities across non-technical business units without sacrificing conceptual depth," said the Lead Product Manager. "By providing instant feedback on prompt design and automating access management, we empower every department to harness LLMs effectively and securely."
+
+2. Business Objectives & Success Metrics
+
+Strategic Goals
+
+Standardize Training: Establish a consistent, hands-on framework for training prompt engineering across diverse business departments.
+
+Reduce Admin Overhead: Automate user onboarding and temporal access control using Google Sheets synchronization and OAuth 2.0 SSO.
+
+Accelerate Comprehension: Increase practical retention of LLM operational mechanics through real-time feedback loops in an interactive environment.
+
+Metrics & KPIs Key Performance Mapping
+
+Business Goal
+
+Measurement Dimension
+
+Baseline
+
+Target Metric
+
+Tracking Mechanism
+
+Increase Course Completion
+
+Student Completion Rate
+
+45% (static lectures)
+
+> 85%
+
+Webapp session telemetry & completion logs
+
+Elevate Prompt Mechanics Retention
+
+Post-course Assessment Score
+
+50% average score
+
+> 80% average score
+
+Automated post-course evaluation quiz
+
+Streamline Onboarding Setup
+
+Admin Setup Time per Class
+
+60 mins manual setup
+
+< 5 mins via Sheets sync
+
+Class Manager operation time logs
+
+Drive Hands-On Practice
+
+Student Practice Engagement
+
+1 session / student
+
+> 5 sessions / student
+
+Prompt playground execution metrics
+
+3. User Personas & Critical User Journeys (CUJs)
+
+User Personas
+
+Class Manager / Admin (Business Ops): Responsible for managing class rosters, provisioning temporal access, and organizing cohorts across business domains.
+
+Student / Business User (Non-Tech Employee): Seeks to learn practical prompt engineering for sales, marketing, operations, or HR without technical friction.
+
+Instructor / Trainer: Focuses on teaching prompt techniques, monitoring cohort performance, and ensuring high engagement.
+
+Critical User Journeys
+
++-----------------------------------------------------------------------------------+
+
+|                        CUJ 1: Class Roster Provisioning                           |
+
+|  Class Manager adds emails, Class ID & expiration timestamp to Google Sheet       |
+
+|  --> Webapp background worker syncs roster & sets access rules       |
+
++-----------------------------------------------------------------------------------+
+
+                                          |
+
+                                          v
+
++-----------------------------------------------------------------------------------+
+
+|                        CUJ 2: Student Frictionless Login                          |
+
+|  Student clicks "Login with Gmail" --> OAuth 2.0 validates against active Sheet   |
+
+|  --> Student inputs Class ID --> Access granted to Prompt Playground |
+
++-----------------------------------------------------------------------------------+
+
+                                          |
+
+                                          v
+
++-----------------------------------------------------------------------------------+
+
+|                       CUJ 3: Interactive Practice & Expiry                        |
+
+|  Student writes prompts, adjusts parameters & observes live LLM outputs  |
+
+|  --> Expiration date reached --> User shifted to read-only/revoked   |
+
++-----------------------------------------------------------------------------------+
+
+CUJ 1: Class Manager Provisioning & Roster Sync
+
+Class Manager opens the designated Google Sheet roster template.
+
+Manager populates student email addresses, assigns a Class ID (Mã lớp), and sets an Expiration Timestamp.
+
+Webapp automatically syncs the Sheet via Google API background job, establishing user permissions without manual DB updates.
+
+CUJ 2: Student Authentication & Onboarding
+
+Student accesses the webapp URL and selects "Login with Google".
+
+System verifies student email against the synchronized active roster.
+
+Upon validation, the student enters their assigned Class ID to unlock domain-tailored exercises.
+
+CUJ 3: Prompt Practice & Temporal Expiration
+
+Student enters the Interactive Prompt Playground, selects prompt templates, and executes prompts against LLM endpoints.
+
+Visual output panel renders response tokens, execution speed, and prompt structure feedback in real-time.
+
+When Expiration Timestamp passes, system updates access state to read-only or notifies user of expired status.
+
+4. Functional Requirements & Feature Prioritization
+
+The prioritization follows strict impact standards:
+
+P0 (Critical): Core features required for launch.
+
+P1 (High): Important functionality enhancing utility and usability.
+
+P2 (Medium): Value-add enhancements deferred or optional for initial release.
+
+Module
+
+Priority
+
+Requirement Description
+
+User Story
+
+Authentication
+
+P0 - Critical
+
+Gmail SSO via OAuth 2.0: Support one-click login restricted to pre-approved Google Workspace / Gmail accounts.
+
+As a Student, I want to log in using my Google account so that I don't have to manage another password.
+
+Access Control
+
+P0 - Critical
+
+Google Sheet Roster Sync: Periodically sync student records (email, class_id, expiration_timestamp) from configured Google Sheet.
+
+As a Class Manager, I want to add student emails to a Google Sheet so that access is provisioned automatically.
+
+Access Control
+
+P0 - Critical
+
+Temporal Expiration Enforcement: System automatically revokes or restricts access once expiration_timestamp is reached.
+
+As an Admin, I want student access to automatically expire post-course so that API key usage is controlled.
+
+Class Management
+
+P0 - Critical
+
+Class ID (Mã Lớp) Mapping: Prompt exercises and workspace settings map directly to user's assigned Class ID.
+
+As a Student, I want to enter my Class ID so that I can see exercises relevant to my department.
+
+Interactive UI
+
+P0 - Critical
+
+Interactive Prompt Playground: Live workspace allowing students to enter system prompts, user inputs, and view LLM output.
+
+As a Student, I want to execute prompts and see immediate responses so that I can learn LLM mechanics visually.
+
+UI Experience
+
+P1 - High
+
+Expiration Notice Banner: Display a dynamic header banner notifying students of remaining active hours/days.
+
+As a Student, I want to see my remaining access time so that I can complete my assignments on time.
+
+System Admin
+
+P1 - High
+
+Manual Sync Status Indicator: Display last synced timestamp and force-sync button for Class Managers.
+
+As a Class Manager, I want to verify when the Sheet was last synced so that I know new students can log in.
+
+Monitoring
+
+P1 - High
+
+Telemetry & Session Logging: Log execution counts, token usage, and active session duration per student/class.
+
+As an Instructor, I want to track student engagement levels so that I can identify struggling learners.
+
+UI Experience
+
+P2 - Medium
+
+Prompt History & Export: Allow students to download or copy their session prompt logs during active access.
+
+As a Student, I want to save my successful prompts so that I can apply them to my daily work.
+
+5. System Architecture & Technical Specifications
+
+Data Architecture & Schema
+
+ +-------------------------------------------------------+
+
+ |                     USER PROFILE                      |
+
+ +-------------------------------------------------------+
+
+ | email: String (PK)                                    |
+
+ | class_id: String (FK)                                 |
+
+ | role: Enum ['STUDENT', 'CLASS_MANAGER', 'INSTRUCTOR'] |
+
+ | expiration_timestamp: DateTime                        |
+
+ | status: Enum ['ACTIVE', 'EXPIRED', 'REVOKED']         |
+
+ | last_login_at: DateTime                               |
+
+ +-------------------------------------------------------+
+
+                            |
+
+                            | 1:N
+
+                            v
+
+ +-------------------------------------------------------+
+
+ |                  PROMPT SESSION LOG                   |
+
+ +-------------------------------------------------------+
+
+ | session_id: UUID (PK)                                 |
+
+ | user_email: String (FK)                               |
+
+ | class_id: String                                      |
+
+ | system_prompt: Text                                   |
+
+ | user_input: Text                                      |
+
+ | llm_output: Text                                      |
+
+ | token_count: Integer                                  |
+
+ | created_at: DateTime                                  |
+
+ +-------------------------------------------------------+
+
+Technical Handover Specifications
+
+Google Sheets Sync Logic: Uses Google Sheets API v4 with a Redis token caching layer. The sync worker polls the Sheet every 5 minutes and caches active emails with TTL matching the session expiration.
+
+OAuth 2.0 Auth Flow: Token validation executes via Google OpenID Connect. User email is verified against cached Sheet records before JWT issuing.
+
+LLM API Integration: Requests are proxied through an internal backend service (Node.js/Python) to securely inject API keys (OpenAI / Gemini).
+
+Input Sanitization & Security: All user prompt inputs pass through an input filter to prevent prompt injection and restrict unauthorized API abuse.
+
+6. UX/UI & Interface Design Guidelines
+
+Visual Layout & Component Rules
+
+Typography: Clean sans-serif primary stack (Plus Jakarta Sans for headers, Inter for body) designed for high legibility.
+
+Color Palette: Professional Slate palette featuring #0F172A (Primary Dark), #1E293B (Headings), #334155 (Body Text), and #F8FAFC (Surface background).
+
+Prompt Playground Layout: Dual-pane layout. Left pane contains System Context, User Prompt, and Model Parameters; right pane displays Streaming LLM Output, Token Count, and Response Latency.
+
+Banners & Warnings: Subdued amber banner (#FEF3C7 background, #92400E text) displayed when account expiration is within 24 hours.
+
+7. Security, Risk Management & Mitigation
+
+Identified Risk
+
+Risk Severity
+
+Impact Area
+
+Mitigation Strategy
+
+Google Sheets API Rate Limits
+
+Medium
+
+Authentication / Sync Failure
+
+Implement Redis caching for roster state; use exponentially backed-off retry logic on API calls.
+
+Unpredictable LLM API Costs
+
+High
+
+Operational Budget
+
+Enforce token usage caps per student per session; implement rate-limiting per Class ID.
+
+Unauthorized Prompt Exploits
+
+Medium
+
+Security / Compliance
+
+Route API calls through backend proxy; apply prompt sanitization filters before LLM execution.
+
+Expired User Access Retention
+
+High
+
+System Access Control
+
+Middleware checks expiration_timestamp on every request, automatically blocking expired tokens.
+
+Sample Prompt Audit
+
+Tạo cho tôi 1 webapp dạy promt engineering cho người ko có background về engineer
+
+Audit Scorecard
+
+Tiêu chí đánh giá (Dimension)
+
+Điểm số (/20)
+
+Persona Clarity (Rõ ràng về vai trò)
+
+5 / 20
+
+Task Specificity (Cụ thể về nhiệm vụ)
+
+8 / 20
+
+Guardrails & Constraints (Giới hạn & Ràng buộc)
+
+0 / 20
+
+Variable Parameterization (Tham số hóa biến số)
+
+0 / 20
+
+Output Formatting (Định dạng đầu ra)
+
+5 / 20
+
+Tổng điểm (Total Score)
+
+18 / 100
+
+Cảnh báo quan trọng: Yêu cầu quá sơ sài và thiếu chi tiết, khiến mô hình AI dễ đưa ra câu trả lời chung chung hoặc không thể triển khai mã nguồn thực tế.
+
+Thiếu Ràng buộc (Guardrails): Không có giới hạn về công nghệ, phong cách thiết kế UI/UX hay quy định về việc giải thích thuật ngữ cho người không chuyên.
+
+Biến số chưa đóng gói: Chưa tham số hóa các yếu tố như đối tượng người dùng, ngôn ngữ giao diện, hay stack công nghệ thành dạng {{variable}}.
+
+Diagnostic Findings
+
+Persona Clarity (5/20): Chưa gán vai trò chuyên gia cụ thể (VD: Senior Full-Stack Developer hay EdTech Instructional Designer), khiến AI thiếu bối cảnh chuyên môn.
+
+Task Specificity (8/20): Cụm từ "tạo cho tôi 1 webapp" quá mơ hồ, không rõ cần đầu ra là ý tưởng sản phẩm, thiết kế wireframe, hay mã nguồn hoàn chỉnh.
+
+Guardrails & Constraints (0/20): Thiếu hoàn toàn các quy tắc tiêu cực (tiêu chuẩn trải nghiệm người dùng không lập trình, giới hạn phụ thuộc API ngoài, tính thích ứng Responsive).
+
+Variable Parameterization (0/20): Các thành phần có thể tùy biến không được đóng gói trong ngoặc nhọn {{...}}, giảm khả năng tái sử dụng prompt.
+
+Output Formatting (5/20): Chưa yêu cầu định dạng đầu ra rõ ràng như cấu trúc thư mục, khối mã nguồn hay hướng dẫn triển khai từng bước.
+
+Optimized Production Prompt
+
+# ROLE & SYSTEM PERSONA
+
+Bạn là một Chuyên gia Phát triển Phần mềm Full-Stack (Senior Full-Stack Developer) kiêm Chuyên gia Thiết kế Tương tác Giáo dục (EdTech Instructional Designer). Nhiệm vụ của bạn là thiết kế và xây dựng trọn bộ ứng dụng web (Web App) tương tác giúp dạy Kỹ thuật Viết Prompt (Prompt Engineering) dành riêng cho người không có nền tảng kỹ thuật/công nghệ.
+
+# CONTEXT & INPUT VARIABLES
+
+Dưới đây là các tham số đầu vào cho ứng dụng:
+
+<input_parameters>
+
+- Đối tượng người dùng: {{target_audience}} (Người mới bắt đầu, không biết lập trình)
+
+- Cấp độ bài học: {{difficulty_level}} (Cơ bản đến Trung cấp)
+
+- Ngôn ngữ giao diện: {{language}} (Tiếng Việt)
+
+- Tech Stack ưu tiên: {{tech_stack}} (HTML5, Tailwind CSS, JavaScript ES6+ / React)
+
+</input_parameters>
+
+# STEP-BY-STEP TASK INSTRUCTIONS
+
+1. Phân tích Luồng Người Dùng (User Flow): Thiết kế giao diện trực quan, trực tiếp, hỗ trợ học đi đôi với hành (Interactive Sandbox).
+
+2. Xây dựng Cấu trúc Ứng dụng (App Architecture):
+
+   - Trang chủ & Danh sách Bài học: Phân loại theo chủ đề (Cấu trúc Prompt chuẩn, Few-Shot, Chain-of-Thought, Context/Persona).
+
+   - Phòng thực hành Prompt (Prompt Sandbox): Giao diện giả lập cho phép người dùng nhập prompt, xem phản hồi mẫu, và nhận gợi ý sửa lỗi thời gian thực.
+
+   - Thư viện mẫu (Prompt Library): Các template prompt sẵn có cho công việc văn phòng, marketing, sáng tạo nội dung.
+
+3. Cung cấp Mã Nguồn Chi tiết (Full Implementation Code):
+
+   - Viết toàn bộ mã nguồn HTML/CSS/JS (hoặc React Component) có thể chạy trực tiếp.
+
+   - Thêm chú thích giải thích chi tiết cho từng khối chức năng.
+
+# CONSTRAINTS & GUARDRAILS
+
+- Thuật ngữ đơn giản: Tuyệt đối không dùng các thuật ngữ chuyên ngành lập trình phức tạp mà không giải thích.
+
+- Không bắt buộc API Key: Mặc định sử dụng Simulated API Response để người dùng trải nghiệm ngay không cần cấu hình OpenAI API Key.
+
+- Giao diện Responsive: Đảm bảo hiển thị hoàn hảo trên cả máy tính và di động.
+
+# OUTPUT SPECIFICATION
+
+Cung cấp kết quả theo định dạng Markdown cấu trúc chuẩn gồm các phần:
+
+1. Tổng quan Kiến trúc & Tech Stack
+
+2. Sơ đồ Cấu trúc File (Project Structure)
+
+3. Mã Nguồn Chi tiết (HTML/CSS/JS có đầy đủ Comment)
+
+4. Hướng dẫn Chạy & Triển khai (Deployment Guide)
+
+
+
+Prompt Metadata
+
+Danh sách Biến số (Detected Variables): {{target_audience}}, {{difficulty_level}}, {{language}}, {{tech_stack}}
+
+Gemini Model khuyến nghị: Gemini 1.5 Pro (Tối ưu cho bài toán suy luận hệ thống, xử lý mã nguồn dài và thiết kế ứng dụng toàn diện).
+
+Nhiệt độ (Temperature) khuyến nghị: 0.3 (Đảm bảo độ chính xác, nhất quán trong mã nguồn và tuân thủ chặt chẽ cấu trúc được yêu cầu).
+
+Contacts
+
+Danh sách Email
+
+Khang
+
+lethienkhang2002@gmail.com
+
+Duong
+
+duonglh.work@gmail.com
+
+Triet
+
+minhtriet.gect@gmail.com
+
+Duc
+
+Vo Tu Duc
+
+Linh
+
+phamkhanhlinh2108@gmail.com
+
+duonglh.work@gmail.com, lethienkhang2002@gmail.com, minhtriet.gect@gmail.com
+
+FQA
+
+Research about the topic advance prompting using only two tools/platform: Google AI studio and Gemini.Google.com. Must select the best topics ( most accurate and latest). Today is 20 Sep 2026.
+
+Audit Scorecard
+
+Evaluation Dimension
+
+Score
+
+Persona Clarity
+
+5 / 20
+
+Task Specificity
+
+10 / 20
+
+Guardrails & Constraints
+
+10 / 20
+
+Variable Parameterization
+
+3 / 20
+
+Output Formatting
+
+2 / 20
+
+Total Score
+
+30 / 100
+
+Diagnostic Findings
+
+Critical Warning — Missing Output Specification: The draft prompt does not define the required output format, tone, or structure, leading to unpredictable research deliverables.
+
+Missing Guardrails & Verification Rules: While platform limitations are noted, there are no guardrails to prevent hallucinations, unverified feature claims, or outdated documentation reference.
+
+Hardcoded Parameters: Variables such as the research topic ("advance prompting"), platforms, and date ("20 Sep 2026") are hardcoded instead of using parameterized inputs.
+
+Unclear Task Scope: Phrases like "Research about" and "select the best topics" lack objective evaluation criteria and clear step-by-step instructions.
+
+Optimized Production Prompt
+
+<system_persona>
+
+You are an expert AI Research Specialist and Prompt Engineer. Your objective is to conduct rigorous, up-to-date technical research on advanced prompting techniques and synthesize structured, actionable insights.
+
+</system_persona>
+
+<context_and_inputs>
+
+- Research Topic: {{research_topic}}
+
+- Primary Platforms: {{target_tools}}
+
+- Temporal Anchor / Current Date: {{current_date}}
+
+</context_and_inputs>
+
+<task_instructions>
+
+1. Analyze recent features, techniques, and updates related to {{research_topic}} available on {{target_tools}}.
+
+2. Identify and select 3 to 5 key subtopics representing the most accurate and advanced techniques (e.g., System Instructions, Structured Output Enforcement, Multimodal Prompting, Context Caching, Thinking/Reasoning Parameters).
+
+3. For each selected topic, provide:
+
+   a. Technical Definition & Overview
+
+   b. Practical Use Case
+
+   c. Platform Availability (Google AI Studio vs. Gemini Web Interface)
+
+   d. Best Practices & Implementation Tips
+
+4. Organize and format the synthesized research according to the Output Specification.
+
+</task_instructions>
+
+<guardrails_and_constraints>
+
+- Platform Scope: Limit research strictly to tools and capabilities supported within {{target_tools}}.
+
+- Recency & Accuracy: Ensure findings accurately reflect platform capabilities as of {{current_date}}.
+
+- No Hallucinations: Do not assume unreleased or speculative features. State limitations clearly where features are experimental.
+
+- Conciseness: Avoid general filler language; maintain a technical and objective tone.
+
+- Must provide a way to let user to observablity, monitoring and comparision the results when prompting.
+
+</guardrails_and_constraints>
+
+<output_specification>
+
+Deliver the response in Markdown using the following structure:
+
+1. Executive Summary
+
+2. Key Advanced Prompting Topics (Detailed Breakdown)
+
+3. Platform Feature Comparison Table (Google AI Studio vs. Gemini Web Interface)
+
+4. Suggest the lesson plan structure to practice the topic. In the lesson plan structure, suggest the steps or prompt for generate sample data for practice. Must mentioned about expected output and the comparison among topic or skill.
+
+5. Recommended Next Steps for Implementation
+
+</output_specification>
+
+
+
+Prompt Metadata
+
+Detected Input Variables: {{research_topic}} (Default: "Advanced Prompting Techniques"), {{target_tools}} (Default: "Google AI Studio, Gemini.Google.com"), {{current_date}} (Default: "2026-09-20").
+
+Recommended Gemini Model: Gemini 1.5 Pro (suited for complex research synthesis, structured analysis, and technical evaluation).
+
+Recommended Temperature Setting: 0.2 (Low temperature to ensure factual precision, strict adherence to platform constraints, and minimal hallucination).
+
+EXAMPLE 01: 
+
+Research Topic: Advanced Prompt Engineerning technical for Business Users (aka none-tech background users or netcitizen users)
+
+Primary Platforms: Google AI Studio and Gemini.google.com 
+
+Temporal Anchor / Current Date: 20 Sep 2026
+
+~ w Linh
+
+1. Executive Summary
+
+As of September 2026, the landscape of prompt engineering has shifted from highly technical syntax manipulation to strategic communication and context management. For business users (non-technical professionals), mastering advanced prompting on Google’s ecosystem—specifically Google AI Studio and Gemini.google.com—unlocks significant productivity gains.
+
+This research synthesizes the most effective advanced prompting techniques tailored for business workflows. It focuses on leveraging built-in platform features to achieve consistent, high-quality outputs without requiring coding skills. Furthermore, it introduces practical frameworks for observability and monitoring, enabling business users to systematically test, compare, and refine their prompts using A/B testing methodologies and structured evaluation criteria.
+
+2. Key Advanced Prompting Topics (Detailed Breakdown)
+
+2.1. System Instructions & Persona Engineering
+
+Technical Definition & Overview: System Instructions act as a foundational layer of context that dictates the model's behavior, role, tone, and operational boundaries before it processes any user queries.
+
+Practical Use Case: Configuring a "Corporate Communications Assistant" that strictly adheres to the company's brand voice, never uses passive voice, and always formats outputs as ready-to-send emails.
+
+Platform Availability:
+
+Google AI Studio: Native "System Instructions" field in the prompt interface.
+
+Gemini Web Interface: Available via Gems (custom, reusable AI personas).
+
+Best Practices & Implementation Tips:
+
+Use the "Role-Task-Constraint" framework.
+
+Explicitly state what the model should not do (Negative Prompting).
+
+Observability Tip: Test the same query against a base model vs. a model with System Instructions to monitor tone adherence.
+
+2.2. Few-Shot Prompting & Structured Output Enforcement
+
+Technical Definition & Overview: Providing the model with a small set of high-quality examples (input-output pairs) within the prompt to demonstrate the exact desired pattern, format, or logic.
+
+Practical Use Case: Standardizing unstructured data. For example, pasting messy meeting transcripts and forcing the model to output a strict Markdown table containing "Action Item," "Owner," and "Deadline."
+
+Platform Availability:
+
+Google AI Studio: Highly optimized via the "Structured Prompt" interface (allows inserting data tables of examples) and JSON Schema enforcement.
+
+Gemini Web Interface: Achieved manually by typing examples directly into the chat window.
+
+Best Practices & Implementation Tips:
+
+Provide 2 to 3 diverse examples to prevent the model from overfitting to a single edge case.
+
+If using AI Studio, utilize the "Structured Prompt" tab for clean separation of instructions and examples.
+
+2.3. Multimodal Context & Document Analysis
+
+Technical Definition & Overview: Leveraging Gemini's massive context window to process text alongside uploaded files, PDFs, spreadsheets, and images simultaneously.
+
+Practical Use Case: Uploading a 100-page Q3 Financial PDF and a competitor's pricing screenshot, then prompting: "Compare our Q3 revenue growth (from the PDF) against the competitor pricing tiers (from the image). Provide a strategic summary."
+
+Platform Availability:
+
+Google AI Studio: Full support for large file uploads, folders, and Context Caching (which saves costs and time when querying the same large documents repeatedly).
+
+Gemini Web Interface: Native file upload integration, plus Google Workspace Extensions (Drive, Docs, Sheets).
+
+Best Practices & Implementation Tips:
+
+Always ask the model to "cite specific page numbers or sections" when analyzing large documents to reduce hallucinations.
+
+2.4. Chain-of-Thought (CoT) & Step-by-Step Reasoning
+
+Technical Definition & Overview: A technique that forces the AI to articulate its internal reasoning process before delivering the final answer. This drastically reduces logical errors in complex tasks.
+
+Practical Use Case: Evaluating vendor proposals. Instead of asking "Which vendor is better?", prompt the model to: "1. List the pros and cons of each. 2. Weigh them against our $50k budget. 3. Provide a final recommendation based on steps 1 and 2."
+
+Platform Availability: Fully supported on both platforms via prompt phrasing.
+
+Best Practices & Implementation Tips:
+
+Append the phrase "Think step-by-step and show your reasoning before providing the final answer" to complex queries.
+
+3. Platform Feature Comparison Table
+
+Feature / Capability
+
+Google AI Studio (For Advanced/Power Users)
+
+Gemini.google.com (For Everyday Business Users)
+
+Primary Interface
+
+Developer-centric but accessible UI
+
+Consumer/Business Chat UI
+
+System Instructions
+
+Dedicated System Instructions text box
+
+Handled via custom "Gems"
+
+Few-Shot Prompting
+
+Native "Structured Prompts" UI (table format)
+
+Manual text entry in chat
+
+Multimodal Inputs
+
+High capacity (PDFs, Images, Video, Audio)
+
+High capacity + Google Workspace Integration
+
+Context Caching
+
+Yes (Ideal for persistent large documents)
+
+No (Context resets per chat session)
+
+Output Formatting
+
+Strict JSON Schema enforcement available
+
+Markdown, Tables, Export to Docs/Sheets
+
+Observability Tools
+
+Built-in "Compare" feature to test multiple models/prompts side-by-side
+
+Manual comparison required (A/B testing in separate chats)
+
+4. Lesson Plan Structure: Practicing Advanced Prompting
+
+This lesson plan is designed to help business users master Few-Shot Prompting and Observability.
+
+Module: Standardizing Customer Feedback Analysis
+
+Objective: Learn to transform unstructured text into structured data and measure prompt performance.
+
+Step 1: Generate Sample Data (Prompt for the User)
+
+To practice, you first need raw data. Copy and paste this prompt into Gemini to generate a dataset:
+
+"Generate 5 realistic, messy, and unstructured customer reviews for a fictional software product called 'TaskMaster Pro'. Include a mix of positive and negative sentiments, feature requests, and complaints. Do not format them; make them look like raw internet comments."
+
+Step 2: Baseline Prompting (Zero-Shot)
+
+Ask the model to analyze the data using a basic prompt.
+
+"Analyze these reviews and tell me what customers think."
+
+Expected Output: A generic, conversational summary. Hard to export to a spreadsheet.
+
+Step 3: Advanced Prompting (Few-Shot + CoT + System Instruction)
+
+Apply advanced techniques to the same data.
+
+System Instruction: "You are a strict Data Analyst. You only output data in the exact format requested."
+
+Prompt: "Analyze the customer reviews below. Think step-by-step about the core issue in each review. Then, output a Markdown table with the following columns: [Review ID], [Sentiment], [Core Feature Mentioned], [Actionable Recommendation].
+
+Example 1: Input: 'The app crashes every time I try to export to PDF. Fix it!' Output: | 1 | Negative | PDF Export | Investigate crash logs for PDF export module |
+
+Now process the reviews."
+
+Expected Output: A highly structured, professional table that perfectly matches the provided example.
+
+Step 4: Observability, Monitoring, and Comparison
+
+To ensure business users can monitor AI performance, implement the following observability framework:
+
+The Side-by-Side Test (AI Studio): Open Google AI Studio, use the "Compare" feature. Put the Baseline Prompt in Column A and the Advanced Prompt in Column B. Run them simultaneously.
+
+Evaluation Metrics: Grade the outputs based on 3 business criteria:
+
+Format Adherence: Did it output a table? (Yes/No)
+
+Actionability: Can the output be directly handed to the product team? (Scale 1-5)
+
+Tone: Did it drop conversational filler? (Yes/No)
+
+Tracking: Create a Google Sheet titled "Prompt Library & Performance." Log the Prompt Text, the Task, and the Evaluation Scores. When a prompt consistently scores high, lock it in as a standard operating procedure (SOP) or a Gemini Gem.
+
+5. Recommended Next Steps for Implementation
+
+Audit Daily Workflows: Identify 2-3 repetitive text-based tasks (e.g., summarizing weekly meetings, drafting client updates, categorizing expenses).
+
+Create Your First Gem: Go to Gemini.google.com and create a custom Gem for one of these tasks. Populate the "Instructions" with a strict System Persona and Few-Shot examples.
+
+Transition to AI Studio for Heavy Lifting: For tasks involving massive documents (e.g., reading 50+ page contracts), log into Google AI Studio. Upload the document and utilize the "System Instructions" and "Temperature" sliders (set to 0.1 for factual extraction) to ensure high-accuracy, hallucination-free outputs.
+
+Establish a Prompt Registry: Begin using a shared document or spreadsheet within your team to log successful prompts, noting the exact phrasing that yielded the best structured output.
+
+First-Meeting
+
+PROTOTYPE KICKOFF & DECISION NOTE
+
+V0.1 — Tài liệu dùng cho buổi họp đầu 
+
+Mục tiêu buổi họp: không viết lại BRD/PRD; chốt các quyết định còn mở để có thể bắt đầu prototype nhanh và đúng hướng.
+
+1. Những gì đã được BRD/PRD chốt
+
+·       Target user: Business / non-tech users.
+
+·       Core value: môi trường hands-on để học Prompt Engineering qua thực hành và phản hồi trực quan.
+
+·       P0 hiện tại: Google Login, Google Sheet roster/expiry, Class ID và Interactive Prompt Playground.
+
+·       Instructor cần theo dõi hoạt động thực hành của học viên.
+
+·       Không xây full LMS/video platform trong giai đoạn đầu.
+
+·       AI Agent Automated Grading đang được đặt ngoài phạm vi MVP/để Phase 2.
+
+2. Các quyết định cần chốt trong kickoff
+
+Decision
+
+Câu hỏi cần chốt
+
+Đề xuất ban đầu
+
+D1. Learning UI
+
+Guided Notebook hay Playground thuần?
+
+Đề xuất hybrid: Notebook cho guided lesson + Playground cho free practice.
+
+D2. API Key Strategy
+
+Managed Key hay Bring Your Own Key (BYOK)?
+
+Prototype nên thiết kế để có thể test cả 2 mode; quyết định production dựa trên UX, cost và scale.
+
+D3. Prompt Feedback
+
+V0.1 có scoring không?
+
+Đề xuất checklist/rule-based feedback trước; LLM Judge/score 0–100 để phase sau.
+
+D4. Prototype Scope
+
+Build full P0 hay một vertical slice?
+
+Đề xuất vertical slice đủ end-to-end để test với người thật.
+
+D5. Scale & Logging
+
+Cần test tải/usage đến mức nào?
+
+Chốt target concurrent users, token/request, rate-limit, latency và cost cần đo.
+
+3. Vertical slice đề xuất cho Prototype V0.1
+
+Mục tiêu: Có một flow chạy được từ đầu đến cuối để test learning experience.
+
+·       1. Login / Mock Login → Class ID: Học viên đăng nhập và vào đúng lớp/bộ bài thực hành.
+
+·       2. Guided Notebook theo từng cell/bước: Mỗi bài được chia thành các cell (Scenario → Prompt → Run → Output → Gợi ý/Concept → Sửa Prompt → Run lại → Compare).
+
+·       3. Lab 1 — Prompt cơ bản (Zero-shot): Học viên được giao một business task và tự viết prompt không có ví dụ mẫu nhằm tạo baseline quan sát phản hồi của AI khi instruction còn đơn giản.
+
+·       4. Lab 2 — Cải thiện cấu trúc Prompt: Từ prompt ban đầu, học viên lần lượt bổ sung Role, Context, Task cụ thể, Constraints, Output Format và chạy lại để quan sát sự thay đổi của output.
+
+·       5. Lab 3 — One-shot → Few-shot / Brand Voice: Tạo progression từ Zero-shot → One-shot → Few-shot trên cùng một task để so sánh tác động của ví dụ mẫu đến tone, structure và consistency.
+
+·       6. Lab 4 — Grounding / Document Checking: Cung cấp policy/document làm nguồn tham chiếu để thấy rõ sự khác biệt giữa AI tự trả lời từ kiến thức sẵn có và AI trả lời dựa trên evidence được cung cấp.
+
+·       7. Before / After / Progression Comparison: Hiển thị toàn bộ quá trình cải thiện (Output 0 → Output 1 → Output 2 → Output 3) giúp người học trực quan hóa ảnh hưởng của từng thay đổi trong prompt.
+
+·       8. Basic Feedback / Self-check: Cung cấp bộ tiêu chí kiểm tra nhanh sau mỗi bài (Task, Context, Constraint, Output Format, Examples/Evidence) mà chưa nhất thiết cần AI Judge 0–100 ở V0.1.
+
+·       9. Prompt History tối thiểu: Lưu lịch sử prompt và output trong session để học viên theo dõi tiến trình cải thiện.
+
+·       10. Free Playground: Cho phép học viên áp dụng trực tiếp task công việc thực tế sau khi hoàn thành guided lesson.
+
+       Cốt lõi Vertical Slice: Zero-shot → Structured Prompt → One-shot → Few-shot → Grounding → Free Practice
+
+4. Learning UI đề xuất: Notebook-style
+
+Mỗi bài học chạy theo một chuỗi có hướng dẫn, người học chỉ cần cuộn xuống và làm từng bước:
+
+Scenario → Prompt Cell → Run → Output → Concept/Hint → Sửa Prompt → Run lại → Compare → Self-check
+
+Lý do cần discuss: PRD hiện mô tả playground dạng dual-pane; notebook-style là thay đổi UX quan trọng nên cần xác nhận feasibility trước khi build.
+
+5. Chia vai trò sơ bộ
+
+ — Product / Learning / Validation
+
+— Engineering / Architecture
+
+• Learning flow & notebook spec
+
+• 3 lab + scenario + expected outcome
+
+• Prompt feedback rubric
+
+• User test plan & success metrics
+
+• Ghi nhận feedback/decision sau test
+
+• Frontend/backend architecture
+
+• LLM API integration
+
+• Managed Key vs BYOK feasibility
+
+• Auth/storage/logging/rate-limit
+
+• Load test, deployment, security
+
+6. Câu hỏi cần note để hỏi trong buổi kickoff
+
+A. Learning / UX
+
+·       Notebook-style guided lesson có phù hợp hơn playground thuần với non-tech users không?
+
+·       Có nên tách rõ Guided Notebook (học có hướng dẫn) và Free Playground (tự do thử) không?
+
+·       Before/After comparison nên hiển thị như thế nào để người học thấy rõ “prompt thay đổi → output thay đổi”?
+
+·       V0.1 có cần prompt scoring không, hay checklist/self-check là đủ để validate learning experience?
+
+B. API / Architecture
+
+·       Với workshop khoảng 50–200 người cùng lúc, Managed API Key có rủi ro gì về rate limit, latency và cost?
+
+·       Có nên thiết kế architecture ngay từ đầu để switch giữa Managed Key và BYOK không?
+
+·       Nếu BYOK, có cách nào onboarding API key đủ đơn giản cho người hoàn toàn non-tech?
+
+·       API key nên được xử lý/lưu thế nào để tránh expose key ở frontend?
+
+·       Mức logging tối thiểu cần có để đo request, token, latency, error và cost/student là gì?
+
+C. Prototype Scope / Timeline
+
+·       Vertical slice nhỏ nhất nào đủ để test với người thật nhưng vẫn phản ánh đúng product?
+
+·       Trong các P0 hiện có, feature nào có thể mock ở V0.1 và feature nào bắt buộc phải chạy thật?
+
+·       Có cần Google OAuth + Google Sheet sync thật ngay ở V0.1 hay ưu tiên learning flow trước?
+
+·       Deadline hợp lý cho bản prototype đầu tiên là khi nào và mức “done” mong muốn là demo hay user-testable?
+
+·       Ai sẽ phụ trách phần nào và checkpoint review giữa hai người nên đặt ở đâu?
+
+D. Success Criteria / Testing
+
+·       Prototype cần chứng minh điều gì để được coi là thành công?
+
+·       Nên test với bao nhiêu non-tech users ở vòng đầu?
+
+·       Metric nào quan trọng nhất: completion, time-to-first-prompt, số lần retry, learning gain hay support requests?
+
+·       Sau prototype, decision nào phải có đủ dữ liệu để chốt: UI, API strategy, scoring hay scope production?
+
+7. Kết quả mong muốn sau buổi kickoff
+
+·       Chốt UI direction: Notebook / Playground / Hybrid.
+
+·       Chốt API strategy cần prototype: Managed / BYOK / hỗ trợ cả hai.
+
+·       Chốt vertical slice V0.1 và danh sách feature mock vs feature chạy thật.
+
+·       Chốt owner cho từng phần việc.
+
+·       Chốt deadline/checkpoint cho prototype đầu tiên.
+
+·       Chốt 3–5 success metrics sẽ đo khi test với non-tech users.
