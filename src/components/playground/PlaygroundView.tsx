@@ -189,16 +189,6 @@ export const PlaygroundView: React.FC<Props> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {onOpenTutorial && (
-              <button
-                onClick={onOpenTutorial}
-                className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1.5"
-                title="Xem lại quy trình làm bài (Guided Walkthrough)"
-              >
-                <Compass className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Xem lại hướng dẫn</span>
-              </button>
-            )}
             <button
               onClick={() => setUserPrompt(currentLab.baselinePrompt)}
               className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"

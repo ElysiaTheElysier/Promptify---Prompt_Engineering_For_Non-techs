@@ -3,7 +3,6 @@ import {
   ArrowLeft, 
   BookOpen, 
   Columns, 
-  HelpCircle, 
   Bookmark, 
   History, 
   ChevronRight,
@@ -19,7 +18,7 @@ interface Props {
   currentMode: UIMode;
   onSelectMode: (mode: UIMode) => void;
   onBackToDashboard: () => void;
-  onOpenTutorial: () => void;
+  onOpenTutorial?: () => void;
   onOpenPromptLibrary: () => void;
   onOpenHistory: () => void;
   apiConfig: ApiConfig;
@@ -111,16 +110,6 @@ export const LessonHeaderBar: React.FC<Props> = ({
           >
             <Bookmark className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden lg:inline">Thư viện</span>
-          </button>
-
-          {/* Tutorial button */}
-          <button
-            onClick={onOpenTutorial}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition cursor-pointer"
-            title="Xem lại hướng dẫn thao tác"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden lg:inline">Hướng dẫn</span>
           </button>
         </div>
       </div>

@@ -289,20 +289,8 @@ export const HybridView: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Nút hành động (Tiếp tục & Hướng dẫn) */}
+          {/* Nút hành động (Tiếp tục) */}
           <div className="flex items-center gap-2.5">
-            {onOpenTutorial && (
-              <button
-                type="button"
-                onClick={onOpenTutorial}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200 transition"
-                title="Xem lại quy trình làm bài (Guided Walkthrough)"
-              >
-                <Compass className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Xem lại hướng dẫn</span>
-              </button>
-            )}
-
             {/* Nút Tiếp tục (chỉ hiện khi đã chạy có kết quả) */}
             {output && !isRunning && (
               <button

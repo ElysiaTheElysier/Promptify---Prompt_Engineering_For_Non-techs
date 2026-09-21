@@ -489,7 +489,6 @@ export const App: React.FC = () => {
               currentMode={preferredLessonMode}
               onSelectMode={setPreferredLessonMode}
               onBackToDashboard={() => setCurrentView('dashboard')}
-              onOpenTutorial={() => setIsTutorialOpen(true)}
               onOpenPromptLibrary={() => setIsPromptLibraryModalOpen(true)}
               onOpenHistory={() => setCurrentView('history')}
               apiConfig={apiConfig}
@@ -504,7 +503,6 @@ export const App: React.FC = () => {
                 onRecordRun={handleRecordRun}
                 onOpenCompare={(lab) => setActiveCompareLab(lab)}
                 onActiveContextChange={handleActiveContextChange}
-                onOpenTutorial={() => setIsTutorialOpen(true)}
                 initialLabId={activeLabId}
               />
             ) : (
@@ -514,7 +512,6 @@ export const App: React.FC = () => {
                 onRecordRun={handleRecordRun}
                 onOpenCompare={(lab) => setActiveCompareLab(lab)}
                 onActiveContextChange={handleActiveContextChange}
-                onOpenTutorial={() => setIsTutorialOpen(true)}
                 initialLabId={activeLabId}
               />
             )}
@@ -531,7 +528,6 @@ export const App: React.FC = () => {
               onRecordRun={handleRecordRun}
               onOpenCompare={(lab) => setActiveCompareLab(lab)}
               onActiveContextChange={handleActiveContextChange}
-              onOpenTutorial={() => setIsTutorialOpen(true)}
               initialPrompt={playgroundPrompt}
             />
           </div>

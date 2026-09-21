@@ -343,21 +343,6 @@ export const AiCoach: React.FC<Props> = ({
               <p className="text-xs text-emerald-800 font-medium">
                 Nếu cần gợi ý hoặc kiểm tra câu lệnh, hãy bấm vào tôi nhé! ✨
               </p>
-              {onOpenTutorial && (
-                <div className="pt-2 border-t border-slate-100 mt-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenTutorial();
-                    }}
-                    className="text-[11px] font-bold text-emerald-700 hover:text-emerald-950 flex items-center gap-1 hover:underline"
-                  >
-                    <Compass className="w-3.5 h-3.5" />
-                    <span>Xem lại hướng dẫn làm bài</span>
-                  </button>
-                </div>
-              )}
             </div>
           </div>
           

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -184,6 +184,89 @@ export const GuidedWalkthrough: React.FC<Props> = ({
     ],
   });
 
+  // Callback ref đảm bảo khi popover DOM node mount, useFloating lập tức update
+  const setFloatingRef = useCallback((node: HTMLDivElement | null) => {
+    refs.setFloating(node);
+    if (node) {
+      update();
+    }
+  }, [refs, update]);
+
+  // Hàm tính toán style định vị thông minh, tuyệt đối không bao giờ để dính ở (0, 0)
+  const getPopoverStyle = useCallback((): React.CSSProperties => {
+    if (!targetRect) return {};
+
+    // 1. CHUYÊN BIỆT CHO BÉ AI COACH (BƯỚC 6)
+    // Bé AI Coach luôn cố định ở góc dưới bên phải màn hình
+    if (isCoachStep) {
+      const spaceAbove = targetRect.top;
+      const rightFromScreenEdge = Math.max(16, window.innerWidth - targetRect.right);
+
+      if (spaceAbove >= 360) {
+        // Đặt phía trên Bé AI Coach, căn phải theo mép phải của target
+        return {
+          position: 'fixed',
+          bottom: `${Math.max(16, window.innerHeight - targetRect.top + 16)}px`,
+          right: `${rightFromScreenEdge}px`,
+          zIndex: 70,
+          opacity: isPositionReady ? 1 : 0,
+          visibility: isPositionReady ? 'visible' : 'hidden',
+          transition: 'opacity 150ms ease',
+        };
+      } else {
+        // Màn hình hẹp chiều dọc: Đặt sang bên trái Bé AI Coach
+        return {
+          position: 'fixed',
+          bottom: `${Math.max(16, window.innerHeight - targetRect.bottom)}px`,
+          right: `${Math.max(16, window.innerWidth - targetRect.left + 16)}px`,
+          zIndex: 70,
+          opacity: isPositionReady ? 1 : 0,
+          visibility: isPositionReady ? 'visible' : 'hidden',
+          transition: 'opacity 150ms ease',
+        };
+      }
+    }
+
+    // 2. CHO CÁC BƯỚC KHÁC: DÙNG FLOATING UI NẾU CÓ TỌA ĐỘ HỢP LỆ (KHÔNG PHẢI 0,0)
+    const hasValidTransform = Boolean(
+      floatingStyles.transform && 
+      floatingStyles.transform !== 'none' && 
+      !floatingStyles.transform.includes('(0px, 0px)') &&
+      !floatingStyles.transform.includes('(0, 0)')
+    );
+
+    if (hasValidTransform) {
+      return {
+        ...floatingStyles,
+        zIndex: 70,
+        opacity: isPositionReady ? 1 : 0,
+        visibility: isPositionReady ? 'visible' : 'hidden',
+        transition: 'opacity 150ms ease',
+      };
+    }
+
+    // 3. FALLBACK AN TOÀN TUYỆT ĐỐI NẾU FLOATING UI CHƯA KỊP TÍNH TOÁN:
+    // Neo ngay gần targetRect theo nửa trên/dưới của viewport, KHÔNG BAO GIỜ để dính ở góc (0, 0)
+    const isTopHalf = targetRect.top < window.innerHeight / 2;
+    const computedTop = isTopHalf
+      ? Math.min(window.innerHeight - 380, targetRect.bottom + 16)
+      : Math.max(16, targetRect.top - 360);
+    const computedLeft = Math.min(
+      Math.max(16, targetRect.left + targetRect.width / 2 - 195),
+      window.innerWidth - 410
+    );
+
+    return {
+      position: 'fixed',
+      top: `${computedTop}px`,
+      left: `${computedLeft}px`,
+      zIndex: 70,
+      opacity: isPositionReady ? 1 : 0,
+      visibility: isPositionReady ? 'visible' : 'hidden',
+      transition: 'opacity 150ms ease',
+    };
+  }, [targetRect, isCoachStep, floatingStyles, isPositionReady]);
+
   // Quy trình: 1. Xác định target -> 2. Scroll target vào giữa -> 3. Lấy rect mới -> 4. Render spotlight + popover
   useEffect(() => {
     if (!isOpen) return;
@@ -191,7 +274,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
     setIsPositionReady(false);
 
     const selector = isCoachStep 
-      ? '[data-tour="ai-coach"], [data-tour="tour-coach"]' 
+      ? '[data-tour="ai-coach"]' 
       : `[data-tour="${currentStep.targetId}"]`;
     const el = document.querySelector(selector) as HTMLElement | null;
 
@@ -234,6 +317,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
             right: rect.right,
           });
           refs.setReference(el);
+          update();
         } else {
           setTargetRect(null);
           refs.setReference(null);
@@ -248,7 +332,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
       refs.setReference(null);
       setIsPositionReady(true);
     }
-  }, [isOpen, currentStepIndex, currentStep.targetId, isCoachStep, isMobile, refs]);
+  }, [isOpen, currentStepIndex, currentStep.targetId, isCoachStep, isMobile, refs, update]);
 
   // Cập nhật tọa độ spotlight theo reference khi scroll hoặc resize
   useEffect(() => {
@@ -448,29 +532,29 @@ export const GuidedWalkthrough: React.FC<Props> = ({
           </div>
         </div>
       ) : targetRect ? (
-        /* Layout Desktop: Định vị chính xác qua Floating UI với Arrow */
+        /* Layout Desktop: Định vị chính xác qua Smart Positioning & Floating UI */
         <div
-          ref={refs.setFloating}
-          style={{
-            ...floatingStyles,
-            zIndex: 70,
-            opacity: isPositionReady ? 1 : 0,
-            visibility: isPositionReady ? 'visible' : 'hidden',
-            transition: 'opacity 150ms ease',
-          }}
+          ref={setFloatingRef}
+          style={getPopoverStyle()}
           onClick={(e) => e.stopPropagation()}
           className="max-w-[390px] w-[390px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden font-sans animate-scaleIn"
         >
-          {/* Mũi tên Arrow của Floating UI chỉ về target */}
-          <FloatingArrow
-            ref={arrowRef}
-            context={context}
-            fill={arrowFill}
-            stroke="#E2E8F0"
-            strokeWidth={1}
-            width={14}
-            height={8}
-          />
+          {/* Mũi tên chỉ về target */}
+          {isCoachStep ? (
+            <div 
+              className="absolute -bottom-2 right-10 w-4 h-4 bg-slate-50 border-r border-b border-slate-200 rotate-45 pointer-events-none" 
+            />
+          ) : (
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              fill={arrowFill}
+              stroke="#E2E8F0"
+              strokeWidth={1}
+              width={14}
+              height={8}
+            />
+          )}
 
           {/* Header Popover */}
           <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">

@@ -225,20 +225,6 @@ export const NotebookCell: React.FC<Props> = ({
                 {stageName}
               </span>
 
-              {onOpenTutorial && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenTutorial();
-                  }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold border border-emerald-200 transition"
-                  title="Xem lại quy trình làm bài (Guided Walkthrough)"
-                >
-                  <Compass className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Xem lại hướng dẫn</span>
-                </button>
-              )}
             </div>
           </div>
 
