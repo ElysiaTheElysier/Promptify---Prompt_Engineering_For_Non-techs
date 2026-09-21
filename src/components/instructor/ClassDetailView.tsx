@@ -12,7 +12,8 @@ import {
   Calendar,
   Sparkles,
   Zap,
-  TrendingUp
+  TrendingUp,
+  HelpCircle
 } from 'lucide-react';
 import { InstructorClass } from '../../types/instructor';
 import { LearnerTableView } from './LearnerTableView';
@@ -20,9 +21,10 @@ import { LearnerTableView } from './LearnerTableView';
 interface Props {
   cohortClass: InstructorClass;
   onBack: () => void;
+  onOpenTutorial?: () => void;
 }
 
-export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
+export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack, onOpenTutorial }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -49,7 +51,7 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
       )}
 
       {/* Class Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+      <div data-tour="class-detail-header" className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-2">
             <button
@@ -96,6 +98,17 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
 
           {/* Quick Class Actions */}
           <div className="flex flex-wrap items-center gap-2.5 self-start lg:self-center">
+            {onOpenTutorial && (
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs transition cursor-pointer"
+                title="Xem lại hướng dẫn chi tiết lớp"
+              >
+                <HelpCircle className="w-4 h-4 text-emerald-600" />
+                <span>Xem lại hướng dẫn</span>
+              </button>
+            )}
+
             <button
               onClick={() => showToast('Đã xuất báo cáo tiến độ lớp dạng Excel/CSV (Mock)!')}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition cursor-pointer"
@@ -194,7 +207,7 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
       </div>
 
       {/* Progress by Lesson / Technique (5 Labs) */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+      <div data-tour="class-detail-roadmap" className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-emerald-600" />
@@ -244,7 +257,7 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
       </div>
 
       {/* Embedded Learner Table for this class */}
-      <div className="space-y-3">
+      <div data-tour="class-detail-learners" className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Users className="w-5 h-5 text-indigo-600" />

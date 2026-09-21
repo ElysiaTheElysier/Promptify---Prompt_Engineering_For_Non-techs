@@ -7,7 +7,8 @@ import {
   AlertCircle, 
   Clock, 
   ChevronRight,
-  Activity
+  Activity,
+  HelpCircle
 } from 'lucide-react';
 import { InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { INSTRUCTOR_CLASSES, INSTRUCTOR_STATS, INSTRUCTOR_ACTIVITIES } from '../../data/instructorData';
@@ -15,9 +16,10 @@ import { INSTRUCTOR_CLASSES, INSTRUCTOR_STATS, INSTRUCTOR_ACTIVITIES } from '../
 interface Props {
   onSelectClass: (cohortClass: InstructorClass) => void;
   onNavigate: (view: InstructorViewMode) => void;
+  onOpenTutorial?: () => void;
 }
 
-export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate }) => {
+export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate, onOpenTutorial }) => {
   // Lớp cần chú ý nhất (tiến độ hoàn thành thấp nhất / nhiều học viên chưa bắt đầu nhất)
   const primaryClass = [...INSTRUCTOR_CLASSES].sort((a, b) => a.avgProgressPercent - b.avgProgressPercent)[0];
   const otherClasses = INSTRUCTOR_CLASSES.filter((c) => c.id !== primaryClass.id);
@@ -28,7 +30,7 @@ export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate
   return (
     <div className="space-y-8">
       {/* 1. COMPACT HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200/70">
+      <div data-tour="instructor-dashboard-header" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200/70">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
             Tổng quan Điều phối Lớp học
@@ -38,16 +40,31 @@ export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate
           </p>
         </div>
 
-        <button
-          onClick={() => onNavigate('learners')}
-          className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer self-start sm:self-auto"
-        >
-          Xem toàn bộ 86 học viên →
-        </button>
+        <div className="flex items-center gap-3 text-xs self-start sm:self-auto">
+          {onOpenTutorial && (
+            <>
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-800 transition cursor-pointer"
+                title="Xem lại hướng dẫn sử dụng Dashboard"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>Xem lại hướng dẫn</span>
+              </button>
+              <span className="text-slate-300">·</span>
+            </>
+          )}
+          <button
+            onClick={() => onNavigate('learners')}
+            className="font-semibold text-slate-600 hover:text-slate-900 hover:underline cursor-pointer"
+          >
+            Xem toàn bộ 86 học viên →
+          </button>
+        </div>
       </div>
 
       {/* 2. THREE SMALL KPI CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div data-tour="instructor-summary-stats" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* KPI 1: Active Classes */}
         <div className="bg-white rounded-xl border border-slate-200/80 p-4 flex items-center justify-between shadow-2xs">
           <div>
@@ -88,7 +105,7 @@ export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate
       </div>
 
       {/* 3. PRIMARY CLASS REQUIRING ATTENTION (FEATURED CARD) */}
-      <section className="space-y-3">
+      <section data-tour="instructor-priority-class" className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
             Lớp học cần ưu tiên chú ý
@@ -172,7 +189,7 @@ export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate
       </section>
 
       {/* 4. OTHER CLASSES AS COMPACT ROWS */}
-      <section className="space-y-3">
+      <section data-tour="instructor-other-classes" className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
             Các lớp khác đang diễn ra ({otherClasses.length})
@@ -235,7 +252,7 @@ export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate
       </section>
 
       {/* 5. RECENT ACTIVITY AT THE BOTTOM */}
-      <section className="space-y-3 pt-2">
+      <section data-tour="instructor-recent-activity" className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-slate-400" />

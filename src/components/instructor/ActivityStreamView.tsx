@@ -9,12 +9,17 @@ import {
   Clock, 
   Filter, 
   Users,
-  Sparkles
+  Sparkles,
+  HelpCircle
 } from 'lucide-react';
 import { InstructorActivity, InstructorActionType } from '../../types/instructor';
 import { INSTRUCTOR_ACTIVITIES, INSTRUCTOR_CLASSES } from '../../data/instructorData';
 
-export const ActivityStreamView: React.FC = () => {
+interface ActivityStreamViewProps {
+  onOpenTutorial?: () => void;
+}
+
+export const ActivityStreamView: React.FC<ActivityStreamViewProps> = ({ onOpenTutorial }) => {
   const [selectedClassId, setSelectedClassId] = useState<string>('ALL');
   const [selectedActionType, setSelectedActionType] = useState<string>('ALL');
 
@@ -85,20 +90,38 @@ export const ActivityStreamView: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Filters Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-emerald-600" />
-            <div>
-              <h2 className="text-sm font-bold text-slate-900">
-                Nhật ký hoạt động thời gian thực (Activity Stream)
-              </h2>
-              <p className="text-xs text-slate-500">
-                Theo dõi từng thao tác học tập, chạy prompt và hoàn thành bài lab của học viên
-              </p>
-            </div>
+      {/* Header with Title and Tutorial Button */}
+      <div data-tour="activity-header" className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
+            <Activity className="w-5 h-5" />
           </div>
+          <div>
+            <h2 className="text-base font-bold text-slate-900">
+              Nhật ký hoạt động thời gian thực (Activity Stream)
+            </h2>
+            <p className="text-xs text-slate-500">
+              Theo dõi từng thao tác học tập, chạy prompt và hoàn thành bài lab của học viên
+            </p>
+          </div>
+        </div>
+
+        {onOpenTutorial && (
+          <button
+            onClick={onOpenTutorial}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer self-start sm:self-auto"
+            title="Xem lại hướng dẫn nhật ký hoạt động"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Xem lại hướng dẫn</span>
+          </button>
+        )}
+      </div>
+
+      {/* Filters Bar */}
+      <div data-tour="activity-filters" className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          <span className="text-xs font-semibold text-slate-700">Bộ lọc sự kiện:</span>
 
           {/* Class Filter */}
           <div className="flex items-center gap-2">
@@ -184,7 +207,7 @@ export const ActivityStreamView: React.FC = () => {
       </div>
 
       {/* Activity Timeline List */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
+      <div data-tour="activity-stream-list" className="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
         {filteredActivities.length === 0 ? (
           <div className="p-12 text-center text-slate-400">
             <Activity className="w-8 h-8 mx-auto text-slate-300 mb-2" />

@@ -10,7 +10,8 @@ import {
   Users,
   Sparkles,
   Zap,
-  ArrowUpDown
+  ArrowUpDown,
+  HelpCircle
 } from 'lucide-react';
 import { InstructorLearner } from '../../types/instructor';
 import { INSTRUCTOR_LEARNERS, INSTRUCTOR_CLASSES } from '../../data/instructorData';
@@ -20,11 +21,13 @@ interface Props {
   initialClassId?: string;
   onSelectLearner?: (learner: InstructorLearner) => void;
   showClassFilter?: boolean;
+  onOpenTutorial?: () => void;
 }
 
 export const LearnerTableView: React.FC<Props> = ({ 
   initialClassId,
-  showClassFilter = true 
+  showClassFilter = true,
+  onOpenTutorial
 }) => {
   const [selectedClassId, setSelectedClassId] = useState<string>(initialClassId || 'ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'not_started' | 'in_progress' | 'completed'>('ALL');
@@ -101,7 +104,7 @@ export const LearnerTableView: React.FC<Props> = ({
     <div className="space-y-4">
       {/* Controls Bar: Search & Status Filters & Class Dropdown */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div data-tour="learners-search-filter" className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search box */}
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -114,28 +117,41 @@ export const LearnerTableView: React.FC<Props> = ({
             />
           </div>
 
-          {/* Class filter dropdown if enabled */}
-          {showClassFilter && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 whitespace-nowrap font-medium">Lớp đào tạo:</span>
-              <select
-                value={selectedClassId}
-                onChange={(e) => setSelectedClassId(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+          {/* Class filter dropdown & Tutorial button */}
+          <div className="flex items-center gap-2">
+            {onOpenTutorial && (
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs transition cursor-pointer"
+                title="Xem lại hướng dẫn quản lý học viên"
               >
-                <option value="ALL">Tất cả lớp học ({INSTRUCTOR_LEARNERS.length} học viên mẫu)</option>
-                {INSTRUCTOR_CLASSES.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {cls.name} ({cls.totalLearners} học viên)
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+                <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Xem lại hướng dẫn</span>
+              </button>
+            )}
+
+            {showClassFilter && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 whitespace-nowrap font-medium">Lớp đào tạo:</span>
+                <select
+                  value={selectedClassId}
+                  onChange={(e) => setSelectedClassId(e.target.value)}
+                  className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                >
+                  <option value="ALL">Tất cả lớp học ({INSTRUCTOR_LEARNERS.length} học viên mẫu)</option>
+                  {INSTRUCTOR_CLASSES.map((cls) => (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name} ({cls.totalLearners} học viên)
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Status filter tabs */}
-        <div className="flex flex-wrap gap-2 pt-1 border-t border-slate-100">
+        <div data-tour="learners-status-tabs" className="flex flex-wrap gap-2 pt-1 border-t border-slate-100">
           <button
             onClick={() => setStatusFilter('ALL')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
@@ -186,7 +202,7 @@ export const LearnerTableView: React.FC<Props> = ({
       </div>
 
       {/* Main Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+      <div data-tour="learners-table-rows" className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
