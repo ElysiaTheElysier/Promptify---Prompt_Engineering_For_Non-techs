@@ -92,7 +92,7 @@ export const LearnerTableView: React.FC<Props> = ({
     <div className="space-y-3">
       {/* GitHub-style Controls Bar: Search & Status Filter Tabs */}
       <div className="space-y-3 pt-1">
-        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div data-tour="learners-search-filter" className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search box */}
           <div className="relative flex-1 max-w-sm">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -111,10 +111,10 @@ export const LearnerTableView: React.FC<Props> = ({
               <button
                 onClick={onOpenTutorial}
                 className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer"
-                title="Xem hướng dẫn quản lý học viên"
+                title="Xem lại hướng dẫn quản lý học viên"
               >
                 <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Hướng dẫn tab này</span>
+                <span>Xem lại hướng dẫn</span>
               </button>
             )}
 
@@ -139,7 +139,7 @@ export const LearnerTableView: React.FC<Props> = ({
         </div>
 
         {/* GitHub-style subnav filter tabs */}
-        <div className="flex items-center gap-4 text-xs border-b border-slate-200">
+        <div data-tour="learners-status-tabs" className="flex items-center gap-4 text-xs border-b border-slate-200">
           <button
             onClick={() => setStatusFilter('ALL')}
             className={`pb-2 transition cursor-pointer font-medium ${
@@ -187,7 +187,7 @@ export const LearnerTableView: React.FC<Props> = ({
       </div>
 
       {/* GitHub-style Flat Data Table (Clean, Scan Fast, No Card-Inside-Card) */}
-      <div className="border border-slate-200 rounded-md overflow-hidden bg-white text-xs">
+      <div data-tour="learners-table-rows" className="border border-slate-200 rounded-md overflow-hidden bg-white text-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

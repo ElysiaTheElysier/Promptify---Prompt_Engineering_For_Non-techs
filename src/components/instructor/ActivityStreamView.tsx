@@ -27,7 +27,7 @@ export const ActivityStreamView: React.FC<Props> = ({ onOpenTutorial }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-4 px-2 sm:px-0">
       {/* 1. Header (Linear Style: Clean & Calm) */}
-      <div className="pb-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+      <div data-tour="activity-header" className="pb-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
             Nhật ký hoạt động
@@ -41,16 +41,16 @@ export const ActivityStreamView: React.FC<Props> = ({ onOpenTutorial }) => {
           <button
             onClick={onOpenTutorial}
             className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer self-start sm:self-auto"
-            title="Xem hướng dẫn nhật ký hoạt động"
+            title="Xem lại hướng dẫn nhật ký hoạt động"
           >
             <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Hướng dẫn tab này</span>
+            <span>Xem lại hướng dẫn</span>
           </button>
         )}
       </div>
 
       {/* 2. Filter Bar (GitHub Style: Flat Filters) */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-200 pb-3">
+      <div data-tour="activity-filters" className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-200 pb-3">
         <div className="flex items-center gap-2">
           <span className="text-slate-500">Lọc theo lớp:</span>
           <select
@@ -85,7 +85,7 @@ export const ActivityStreamView: React.FC<Props> = ({ onOpenTutorial }) => {
       </div>
 
       {/* 3. Flat Activity List (GitHub Style: Clean Rows with Thin Dividers, No Badges/Pills) */}
-      <div className="border-t border-b border-slate-200 divide-y divide-slate-100 text-xs text-slate-600">
+      <div data-tour="activity-stream-list" className="border-t border-b border-slate-200 divide-y divide-slate-100 text-xs text-slate-600">
         {filteredActivities.length === 0 ? (
           <div className="py-8 text-center text-slate-400">
             Không có hoạt động nào phù hợp với bộ lọc

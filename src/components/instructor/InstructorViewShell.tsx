@@ -6,7 +6,7 @@ import { InstructorDashboard } from './InstructorDashboard';
 import { ClassDetailView } from './ClassDetailView';
 import { LearnerTableView } from './LearnerTableView';
 import { ActivityStreamView } from './ActivityStreamView';
-import { InstructorTutorial } from './InstructorTutorial';
+import { InstructorWalkthrough } from './InstructorWalkthrough';
 import { ArrowRight, HelpCircle } from 'lucide-react';
 
 interface Props {
@@ -18,36 +18,27 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
   const [currentView, setCurrentView] = useState<InstructorViewMode>('dashboard');
   const [selectedClass, setSelectedClass] = useState<InstructorClass | null>(INSTRUCTOR_CLASSES[0]);
 
-  // Quản lý hướng dẫn (Tutorial) cho từng tab
+  // Quản lý Spotlight Walkthrough cho từng tab
   const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
   const [tutorialView, setTutorialView] = useState<InstructorViewMode>('dashboard');
-
-  // Tuỳ chọn tự động hiện tutorial khi đổi tab (mặc định bật)
-  const [autoShowTutorial, setAutoShowTutorial] = useState<boolean>(() => {
-    const saved = localStorage.getItem('promptify_instructor_auto_tutorial');
-    return saved !== null ? saved === 'true' : true;
-  });
-
-  const handleToggleAutoShow = (enabled: boolean) => {
-    setAutoShowTutorial(enabled);
-    localStorage.setItem('promptify_instructor_auto_tutorial', String(enabled));
-  };
 
   const handleOpenTutorial = (view?: InstructorViewMode) => {
     setTutorialView(view || currentView);
     setIsTutorialOpen(true);
   };
 
-  // Tự động mở tutorial khi chuyển sang tab khác
+  // Chỉ tự động mở walkthrough khi vào tab lần đầu tiên (nếu chưa hoàn thành)
   useEffect(() => {
-    if (autoShowTutorial) {
+    const completedKey = `promptify_instructor_tutorial_${currentView}_completed`;
+    const isCompleted = localStorage.getItem(completedKey) === 'true';
+    if (!isCompleted) {
       setTutorialView(currentView);
       const timer = setTimeout(() => {
         setIsTutorialOpen(true);
-      }, 300);
+      }, 350);
       return () => clearTimeout(timer);
     }
-  }, [currentView, autoShowTutorial]);
+  }, [currentView]);
 
   const handleSelectClass = (cls: InstructorClass) => {
     setSelectedClass(cls);
@@ -79,7 +70,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
         {/* VIEW 2: CLASSES LIST */}
         {currentView === 'classes' && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-slate-200">
+            <div data-tour="classes-header" className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                   Danh sách Lớp học Đang phụ trách
@@ -92,15 +83,15 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
               <button
                 onClick={() => handleOpenTutorial('classes')}
                 className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer self-start sm:self-auto"
-                title="Xem hướng dẫn danh sách lớp học"
+                title="Xem lại hướng dẫn danh sách lớp học"
               >
                 <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Hướng dẫn tab này</span>
+                <span>Xem lại hướng dẫn</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {INSTRUCTOR_CLASSES.map((cls) => (
+            <div data-tour="classes-list-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {INSTRUCTOR_CLASSES.map((cls, idx) => (
                 <div
                   key={cls.id}
                   className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-4"
@@ -141,6 +132,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
                   </div>
 
                   <button
+                    {...(idx === 0 ? { 'data-tour': 'classes-detail-btn' } : {})}
                     onClick={() => handleSelectClass(cls)}
                     className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white font-semibold text-xs transition cursor-pointer"
                   >
@@ -165,7 +157,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
         {/* VIEW 4: LEARNERS TABLE (ALL CLASSES) */}
         {currentView === 'learners' && (
           <div className="space-y-4">
-            <div>
+            <div data-tour="learners-header">
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                 Quản lý & Theo dõi Toàn bộ Học viên
               </h1>
@@ -188,13 +180,11 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
         )}
       </main>
 
-      {/* Tutorial Modal */}
-      <InstructorTutorial
+      {/* Guided Spotlight Walkthrough */}
+      <InstructorWalkthrough
         isOpen={isTutorialOpen}
         currentView={tutorialView}
         onClose={() => setIsTutorialOpen(false)}
-        autoShow={autoShowTutorial}
-        onToggleAutoShow={handleToggleAutoShow}
       />
 
       {/* Footer */}

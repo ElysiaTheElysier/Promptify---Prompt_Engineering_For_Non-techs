@@ -33,7 +33,7 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack, onOpenTu
       )}
 
       {/* 1. Header (Linear Style: Clean Breadcrumb & Typography) */}
-      <div className="space-y-3 pb-4 border-b border-slate-200">
+      <div data-tour="class-detail-header" className="space-y-3 pb-4 border-b border-slate-200">
         <button
           onClick={onBack}
           className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition cursor-pointer"
@@ -63,10 +63,10 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack, onOpenTu
               <button
                 onClick={onOpenTutorial}
                 className="flex items-center gap-1 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 rounded-md font-medium transition cursor-pointer"
-                title="Xem hướng dẫn chi tiết lớp"
+                title="Xem lại hướng dẫn chi tiết lớp"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
-                <span>Hướng dẫn tab này</span>
+                <span>Xem lại hướng dẫn</span>
               </button>
             )}
             <button
@@ -107,7 +107,7 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack, onOpenTu
       </div>
 
       {/* 3. Progress by Lesson / Technique (Linear Style: Clean Linear Roadmap Rows) */}
-      <section className="space-y-3 pt-2">
+      <section data-tour="class-detail-roadmap" className="space-y-3 pt-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
           Tiến độ theo 5 kỹ thuật Prompting
         </span>
@@ -140,7 +140,7 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack, onOpenTu
       </section>
 
       {/* 4. Learner Management within this class (GitHub Style Flat Table) */}
-      <section className="space-y-3 pt-4 border-t border-slate-200">
+      <section data-tour="class-detail-learners" className="space-y-3 pt-4 border-t border-slate-200">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
           Học viên trong lớp ({cohortClass.totalLearners})
         </span>

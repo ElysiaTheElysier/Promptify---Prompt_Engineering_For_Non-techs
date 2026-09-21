@@ -57,7 +57,7 @@ export const InstructorNavbar: React.FC<Props> = ({
           </div>
 
           {/* 2. Navigation Tabs (Reduced visual weight, clean underline indicator) */}
-          <nav className="hidden md:flex items-center gap-6 text-xs flex-shrink-0 h-16">
+          <nav data-tour="instructor-nav-tabs" className="hidden md:flex items-center gap-6 text-xs flex-shrink-0 h-16">
             <button
               onClick={() => onNavigate('dashboard')}
               className={`h-full flex items-center gap-1.5 border-b-2 transition-all cursor-pointer font-medium ${
@@ -119,6 +119,7 @@ export const InstructorNavbar: React.FC<Props> = ({
 
             {/* Quick Switch to Learner View (Subtle, no loud gradient) */}
             <button
+              data-tour="instructor-switch-role"
               onClick={onSwitchToLearner}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 hover:text-white font-medium text-xs transition cursor-pointer"
               title="Chuyển sang giao diện Học viên để làm bài thực hành"
