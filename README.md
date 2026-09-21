@@ -1,76 +1,78 @@
-# Promptify (PromptLab) — Prompt Engineering for Non-techs & Business Users
+# Promptify (PromptLab)
 
-> **Nền tảng thực hành & đào tạo kỹ năng Prompt Engineering qua các tình huống nghiệp vụ thực tế dành cho cán bộ ngân hàng & người làm văn phòng.**
-
----
-
-## 📖 Giới thiệu (Overview)
-
-**Promptify (PromptLab)** được thiết kế đặc thù cho người dùng khối nghiệp vụ (Business / Non-tech Users) như cán bộ Truyền thông, Thẩm định Tín dụng, Vận hành & CSKH (điển hình tại Agribank và các tổ chức doanh nghiệp).
-
-Người học không cần kiến thức lập trình phức tạp, không bị quá tải bởi thông số kỹ thuật (token, latency, temperature), mà tập trung vào việc **điều khiển AI giải quyết công việc hàng ngày**:
-- Chuẩn hóa báo cáo, xuất bảng biểu Markdown để copy sang Excel.
-- Áp dụng công thức cấu trúc 5 thành tố chuyên nghiệp (Role, Context, Task, Constraint, Format).
-- Định hình văn phong chuẩn mực ngân hàng bằng ví dụ mẫu (One-shot, Few-shot).
-- Đối chiếu quy chế, tài liệu chính sách để buộc AI chống bịa đặt (Grounding).
+> **Học Prompt Engineering qua các tình huống công việc thực tế**  
+> *Nền tảng đào tạo kỹ năng Prompt AI cho cán bộ & chuyên viên nghiệp vụ (Non-tech / Business Users)*
 
 ---
 
-## 🚀 Các Tính Năng Nổi Bật (Core Features)
+## 📖 Giới thiệu sản phẩm
 
-### 1. Luồng Trải Nghiệm Học Tập Hoàn Chỉnh (Complete Learning Flow)
-- **Landing & Mock Google Login**: Đăng nhập nhanh 1-click với các tài khoản mẫu cán bộ Agribank (*Linh Phạm* - Ban Truyền thông, *Minh Trần* - Khối Tín dụng).
-- **Chọn & Tham gia lớp học (Class Selection)**: Quản lý lớp học theo khối ngành (Banking, Enterprise), mã lớp, thời hạn sử dụng và tiến độ học tập. Hỗ trợ tham gia lớp mới bằng mã.
-- **Learner Dashboard 5-giây**: Trả lời ngay lập tức 3 câu hỏi của học viên:
-  1. *Tôi đang ở lớp nào?*
-  2. *Tôi đã học tới đâu?*
-  3. *Tôi nên làm gì tiếp theo?* (CTA nổi bật: Tiếp tục bài đang học).
+**Promptify** là nền tảng học và thực hành Prompt Engineering được thiết kế riêng cho người dùng khối nghiệp vụ (Truyền thông, Tín dụng, Vận hành, CSKH,... tại ngân hàng và doanh nghiệp). 
 
-### 2. Lộ trình 5 bước tinh thông Prompt (Learning Path)
-1. **Zero-shot**: Nhận diện điểm yếu của câu lệnh sơ sài.
-2. **Structured Prompt**: Khung Vai trò - Ngữ cảnh - Nhiệm vụ - Ràng buộc - Định dạng.
-3. **One-shot**: Định hình văn phong chuẩn mực bằng 1 ví dụ mẫu.
-4. **Few-shot & Grounding**: Học từ nhiều ví dụ và đối chiếu tài liệu chính sách để chống bịa đặt thông tin.
-5. **Thực hành tự do (Free Playground)**: Tự do áp dụng vào nghiệp vụ thực tế.
-
-### 3. Không gian làm bài Đa giao diện (Dual Workspace)
-- **Sổ tay tuần tự (Notebook Mode)**: Trải nghiệm như Google Colab / Jupyter Notebook nhưng được tinh gọn tối đa cho dân văn phòng.
-- **Tích hợp song song (Hybrid Mode)**: Đề bài, dữ liệu mẫu bên trái — ô soạn thảo prompt và kết quả bên phải.
-- **Breadcrumb Navigation**: Nút `← Quay lại Lớp học` giúp người học không bao giờ bị mắc kẹt.
-
-### 4. Thử nghiệm, Đối chiếu & Đánh giá Nghiệp vụ
-- **Control Data & Prompt Versioning**: Giữ cố định dữ liệu đầu vào để thử nhiều lần (Lần thử 1, Lần thử 2,...).
-- **A/B Side-by-Side Comparison**: Đối chiếu trước/sau kiểu Google AI Studio, làm nổi bật các thành tố vừa bổ sung (Role, Constraint, Format...) và giải thích vì sao output tốt hơn.
-- **5 Tiêu chí Đánh giá Nghiệp vụ (Business Rubric)**: Định dạng bảng, Độ đầy đủ, Tính hành động ngay, Tính bám sát dữ liệu (Groundedness), và Phù hợp văn phong ngân hàng.
-
-### 5. Công cụ thực hành & Đồng hành thông minh
-- **Bé Trợ Lý AI Cute (AI Coach)**: Linh vật đồng hành xuyên suốt các bài thực hành, chủ động gợi ý cách cải tiến prompt theo ngữ cảnh từng bài.
-- **Guided Visual Walkthrough**: Hướng dẫn Onboarding 8 bước tương tác bằng Floating UI thông minh, tự động bật khi người học vào bài lần đầu.
-- **Thư viện Prompt Chuẩn Nghiệp vụ (SOP Library)**: Lưu trữ, tra cứu và mở ngay vào Playground.
-- **Lịch sử Câu lệnh (Prompt History)**: Xem lại chi tiết prompt và output qua từng lần thử, hỗ trợ xuất file Markdown báo cáo.
-- **Reset nhanh về Landing Page**: Bấm vào logo PromptLab góc trên bên trái để reset toàn bộ hệ thống về ban đầu.
+Sản phẩm tập trung giải quyết các bài toán công việc thực tế mà không đòi hỏi kiến thức lập trình hay cấu hình kỹ thuật phức tạp:
+- Chuẩn hóa báo cáo, xuất bảng biểu Markdown để đưa vào Excel.
+- Áp dụng công thức cấu trúc câu lệnh chuẩn mực (Role, Context, Task, Constraint, Format).
+- Định hình văn phong thương hiệu bằng ví dụ mẫu.
+- Đối chiếu quy chế, tài liệu chính sách để AI trả lời chuẩn xác, chống bịa đặt.
 
 ---
 
-## 🛠️ Công Nghệ Sử Dụng (Tech Stack)
+## ✨ Tính năng phiên bản v1 (Features v1)
 
-- **Frontend**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Smart Positioning**: `@floating-ui/react` (chống che khuất target khi spotlight tutorial)
-- **AI Integration**: Hỗ trợ cả 2 chế độ:
-  - Chế độ **Mô phỏng (Simulated Engine)**: Sẵn sàng chạy offline/workshop không cần mạng.
-  - Chế độ **Gemini API Trực tiếp**: Kết nối trực tiếp mô hình Google Gemini 1.5 Flash.
+1. **Landing Page & Đăng nhập Google**
+   - Màn hình chào đón chuẩn doanh nghiệp.
+   - Hỗ trợ đăng nhập Google và chọn nhanh tài khoản mẫu cán bộ Agribank để thử nghiệm.
+
+2. **Quản lý & Tham gia lớp học (Class Selection)**
+   - Hiển thị danh sách lớp theo khối phòng ban, ngành nghề, mã lớp, thời hạn sử dụng và tiến độ học tập.
+   - Hỗ trợ học viên tham gia lớp mới bằng mã lớp.
+
+3. **Learner Dashboard 5-giây**
+   - Giúp người học nắm bắt ngay trong 5 giây: Lớp đang học, tiến độ hoàn thành và nút hành động chính *"Tiếp tục bài đang học"*.
+
+4. **Lộ trình học 5 cấp độ (Learning Path)**
+   - **Bài 1 (Zero-shot):** Nhận diện điểm yếu của câu lệnh sơ sài.
+   - **Bài 2 (Structured Prompt):** Áp dụng khung 5 thành tố chuyên nghiệp.
+   - **Bài 3 (One-shot):** Định hình văn phong chuẩn mực ngân hàng bằng ví dụ mẫu.
+   - **Bài 4 (Few-shot & Grounding):** Buộc AI đối chiếu tài liệu quy định, chống bịa đặt.
+   - **Bài 5 (Thực hành tự do):** Tự do giải quyết bài toán nghiệp vụ riêng.
+
+5. **Không gian làm bài đa giao diện (Dual Workspace)**
+   - **Tích hợp song song (Hybrid Mode):** Vừa xem đề bài bên trái vừa soạn thảo prompt và xem kết quả bên phải.
+   - **Sổ tay tuần tự (Notebook Mode):** Trải nghiệm bài học tuần tự tối giản theo phong cách notebook.
+   - Thanh Breadcrumb điều hướng an toàn, không bị kẹt trong bài học.
+
+6. **Dữ liệu kiểm soát & Quản lý phiên bản (Prompt Versioning)**
+   - Giữ cố định dữ liệu đầu vào để người học thử nhiều lần (Lần thử 1, Lần thử 2,...).
+   - Tự động nhận diện các thành phần câu lệnh vừa bổ sung.
+
+7. **Đối chiếu Trước / Sau (A/B Side-by-Side Compare)**
+   - Tự động gợi ý so sánh sau lần chạy thứ 2.
+   - Hiển thị song song prompt cũ - mới, output cũ - mới và giải thích lý do output tốt hơn.
+
+8. **Bộ 5 tiêu chí đánh giá nghiệp vụ (Business Evaluation)**
+   - Tự động đánh giá: Đúng định dạng bảng, Độ đầy đủ, Tính hành động ngay, Tính bám sát dữ liệu (Groundedness), Văn phong chuẩn mực.
+
+9. **Trợ lý AI & Hướng dẫn Onboarding**
+   - Linh vật Bé Trợ lý AI gợi ý cách tối ưu câu lệnh theo từng bài.
+   - Tutorial Spotlight 8 bước tự động kích hoạt khi học viên vào bài học lần đầu.
+
+10. **Thư viện Prompt Chuẩn & Lịch sử câu lệnh**
+    - Kho prompt chuẩn nghiệp vụ (SOP Library) có nhãn Khuyên dùng, hỗ trợ copy và mở ngay vào Playground.
+    - Lịch sử lưu lại chi tiết prompt và output qua từng lần thử, cho phép xuất file Markdown.
+
+11. **Reset nhanh qua Logo**
+    - Bấm vào logo PromptLab góc trên bên trái để reset toàn bộ hệ thống về Landing page ban đầu.
 
 ---
 
-## 💻 Cài Đặt & Chạy Cục Bộ (Getting Started)
+## 💻 Hướng dẫn cài đặt & Chạy dự án (Getting Started)
 
 ### Yêu cầu:
 - Node.js >= 18
-- npm hoặc yarn/pnpm
+- npm
 
-### Các bước:
+### Các bước thực hiện:
 
 ```bash
 # 1. Clone repository
@@ -79,21 +81,11 @@ git clone https://github.com/ElysiaTheElysier/Promptify---Prompt_Engineering_For
 # 2. Di chuyển vào thư mục dự án
 cd Promptify---Prompt_Engineering_For_Non-techs
 
-# 3. Cài đặt các gói phụ thuộc
+# 3. Cài đặt thư viện phụ thuộc
 npm install
 
-# 4. Khởi chạy dev server
+# 4. Khởi chạy môi trường phát triển
 npm run dev
-
-# 5. Mở trình duyệt tại:
-# http://localhost:5173
 ```
 
----
-
-## 👥 Tác Giả & Bản Quyền
-
-- **Dự án**: Prompt Engineering for AI Engineer vs Business Users
-- **Nhóm nghiên cứu & phát triển**: Linh Phạm, Khang, Dương, Triết
-- **Định hướng triển khai**: Agribank (Ban Truyền thông & Khối Tín dụng) và Doanh nghiệp.
-- **License**: MIT
+Mở trình duyệt và truy cập: **`http://localhost:5173`**
