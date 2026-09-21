@@ -12,7 +12,7 @@ export interface TutorialStep {
 }
 
 /**
- * Sinh danh sách 8 bước hướng dẫn làm bài chuẩn trong PromptLab,
+ * Sinh danh sách 8 bước hướng dẫn làm bài chuẩn trong Promptify,
  * được cá nhân hóa câu từ theo Mode (Notebook / Hybrid / Playground) và theo Lab cụ thể.
  */
 export function getTutorialSteps(mode: UIMode, lab: LabStep): TutorialStep[] {

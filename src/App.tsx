@@ -31,7 +31,7 @@ import { PromptLibraryModal } from './components/common/PromptLibraryModal';
 export const App: React.FC = () => {
   // 1. Quản lý Đăng nhập & Học viên
   const [currentLearner, setCurrentLearner] = useState<Learner | null>(() => {
-    const saved = localStorage.getItem('promptlab_learner');
+    const saved = localStorage.getItem('promptify_learner');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -44,14 +44,14 @@ export const App: React.FC = () => {
 
   // 2. Quản lý Màn hình ứng dụng (App View)
   const [currentView, setCurrentView] = useState<AppView>(() => {
-    const saved = localStorage.getItem('promptlab_view') as AppView;
+    const saved = localStorage.getItem('promptify_view') as AppView;
     if (saved && saved !== 'landing') return saved;
     return 'landing';
   });
 
   // 3. Quản lý Lớp học được chọn
   const [selectedCohort, setSelectedCohort] = useState<ClassCohort>(() => {
-    const saved = localStorage.getItem('promptlab_cohort');
+    const saved = localStorage.getItem('promptify_cohort');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -69,7 +69,7 @@ export const App: React.FC = () => {
 
   // 5. Quản lý Tiến độ ghi danh (Enrollments)
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>(() => {
-    const saved = localStorage.getItem('promptlab_enrollments');
+    const saved = localStorage.getItem('promptify_enrollments');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -91,7 +91,7 @@ export const App: React.FC = () => {
 
   // 9. Cấu hình AI API
   const [apiConfig, setApiConfig] = useState<ApiConfig>(() => {
-    const saved = localStorage.getItem('promptlab_api_config');
+    const saved = localStorage.getItem('promptify_api_config');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -109,7 +109,7 @@ export const App: React.FC = () => {
 
   // 10. Lịch sử Telemetry
   const [history, setHistory] = useState<PromptRun[]>(() => {
-    const saved = localStorage.getItem('promptlab_history');
+    const saved = localStorage.getItem('promptify_history');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -143,30 +143,30 @@ export const App: React.FC = () => {
   // Persist storage
   useEffect(() => {
     if (currentLearner) {
-      localStorage.setItem('promptlab_learner', JSON.stringify(currentLearner));
+      localStorage.setItem('promptify_learner', JSON.stringify(currentLearner));
     } else {
-      localStorage.removeItem('promptlab_learner');
+      localStorage.removeItem('promptify_learner');
     }
   }, [currentLearner]);
 
   useEffect(() => {
-    localStorage.setItem('promptlab_view', currentView);
+    localStorage.setItem('promptify_view', currentView);
   }, [currentView]);
 
   useEffect(() => {
-    localStorage.setItem('promptlab_cohort', JSON.stringify(selectedCohort));
+    localStorage.setItem('promptify_cohort', JSON.stringify(selectedCohort));
   }, [selectedCohort]);
 
   useEffect(() => {
-    localStorage.setItem('promptlab_enrollments', JSON.stringify(enrollments));
+    localStorage.setItem('promptify_enrollments', JSON.stringify(enrollments));
   }, [enrollments]);
 
   useEffect(() => {
-    localStorage.setItem('promptlab_api_config', JSON.stringify(apiConfig));
+    localStorage.setItem('promptify_api_config', JSON.stringify(apiConfig));
   }, [apiConfig]);
 
   useEffect(() => {
-    localStorage.setItem('promptlab_history', JSON.stringify(history));
+    localStorage.setItem('promptify_history', JSON.stringify(history));
   }, [history]);
 
   // Active context change handler
@@ -230,12 +230,12 @@ export const App: React.FC = () => {
   // Xử lý Reset toàn bộ luồng về Landing Page ban đầu (Xóa toàn bộ session & cờ đã xem tutorial)
   const handleResetAll = () => {
     // 1. Xóa toàn bộ dữ liệu localStorage
-    localStorage.removeItem('promptlab_learner');
-    localStorage.removeItem('promptlab_view');
-    localStorage.removeItem('promptlab_tutorial_completed');
-    localStorage.removeItem('promptlab_cohort');
-    localStorage.removeItem('promptlab_enrollments');
-    localStorage.removeItem('promptlab_history');
+    localStorage.removeItem('promptify_learner');
+    localStorage.removeItem('promptify_view');
+    localStorage.removeItem('promptify_tutorial_completed');
+    localStorage.removeItem('promptify_cohort');
+    localStorage.removeItem('promptify_enrollments');
+    localStorage.removeItem('promptify_history');
 
     // 2. Reset toàn bộ React state
     setCurrentLearner(null);
@@ -265,7 +265,7 @@ export const App: React.FC = () => {
   // Tự động kích hoạt tutorial khi vào bài học lần đầu tiên (hoặc sau khi reset)
   useEffect(() => {
     if (currentView === 'lesson') {
-      const isCompleted = localStorage.getItem('promptlab_tutorial_completed') === 'true';
+      const isCompleted = localStorage.getItem('promptify_tutorial_completed') === 'true';
       if (!isCompleted) {
         const timer = setTimeout(() => {
           setIsTutorialOpen(true);
@@ -322,7 +322,7 @@ export const App: React.FC = () => {
     }
     setCurrentView('lesson');
     // Nếu chưa hoàn thành tutorial, bật sau 500ms
-    const isCompleted = localStorage.getItem('promptlab_tutorial_completed') === 'true';
+    const isCompleted = localStorage.getItem('promptify_tutorial_completed') === 'true';
     if (!isCompleted) {
       setTimeout(() => {
         setIsTutorialOpen(true);
@@ -485,7 +485,7 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="font-bold text-slate-700">
-              PromptLab • Hệ thống Đào tạo & Thực hành Prompt Engineering Chuẩn Doanh nghiệp
+              Promptify • Hệ thống Đào tạo & Thực hành Prompt Engineering Chuẩn Doanh nghiệp
             </p>
             <p className="text-slate-600">
               {selectedCohort.organization} • {selectedCohort.department} • Khóa học: {selectedCohort.name} ({selectedCohort.classCode})

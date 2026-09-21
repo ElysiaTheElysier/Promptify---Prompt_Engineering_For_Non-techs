@@ -60,7 +60,7 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-lg tracking-tight text-white font-display">
-                  PromptLab
+                  Promptify
                 </span>
                 <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
                   Doanh nghiệp
@@ -214,7 +214,7 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
       {/* Simple Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500 bg-slate-950/40">
         <p>
-          PromptLab © 2026 • Chương trình Đào tạo Kỹ năng Prompt Engineering cho Cán bộ Nghiệp vụ (Agribank & Corporate)
+          Promptify © 2026 • Chương trình Đào tạo Kỹ năng Prompt Engineering cho Cán bộ Nghiệp vụ (Agribank & Corporate)
         </p>
       </footer>
     </div>

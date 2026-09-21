@@ -275,12 +275,12 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   };
 
   const handleSkip = () => {
-    localStorage.setItem('promptlab_tutorial_completed', 'true');
+    localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 
   const handleComplete = () => {
-    localStorage.setItem('promptlab_tutorial_completed', 'true');
+    localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 

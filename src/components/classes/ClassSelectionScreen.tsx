@@ -83,7 +83,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-base tracking-tight text-white font-display group-hover:text-emerald-300 transition">
-                  PromptLab
+                  Promptify
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   ↺ Reset về Landing

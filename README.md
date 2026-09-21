@@ -1,4 +1,4 @@
-# Promptify (PromptLab)
+# Promptify
 
 > **Học Prompt Engineering qua các tình huống công việc thực tế**  
 > *Nền tảng đào tạo kỹ năng Prompt AI cho cán bộ & chuyên viên nghiệp vụ (Non-tech / Business Users)*

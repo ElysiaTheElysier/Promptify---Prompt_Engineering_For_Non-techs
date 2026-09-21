@@ -138,7 +138,7 @@ export const LearnerDashboard: React.FC<Props> = ({
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                 {completedCount === 0 ? 'Bước tiếp theo' : 'Tiếp tục lộ trình'}
               </span>
-              {localStorage.getItem('promptlab_tutorial_completed') !== 'true' && (
+              {localStorage.getItem('promptify_tutorial_completed') !== 'true' && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 animate-pulse flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-amber-600" />
                   <span>Kèm hướng dẫn lần đầu</span>

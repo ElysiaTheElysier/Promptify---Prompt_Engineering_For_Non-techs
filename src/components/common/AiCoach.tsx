@@ -88,9 +88,8 @@ export const AiCoach: React.FC<Props> = ({
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // Chỉ hiện bubble giới thiệu ở lần đầu (lưu trạng thái để không làm phiền)
   const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(() => {
-    return localStorage.getItem('promptlab_coach_intro_dismissed') !== 'true';
+    return localStorage.getItem('promptify_coach_intro_dismissed') !== 'true';
   });
 
   const [inputText, setInputText] = useState<string>('');
@@ -154,13 +153,13 @@ export const AiCoach: React.FC<Props> = ({
   const handleDismissBubble = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowSpeechBubble(false);
-    localStorage.setItem('promptlab_coach_intro_dismissed', 'true');
+    localStorage.setItem('promptify_coach_intro_dismissed', 'true');
   };
 
   const handleOpenCoach = () => {
     setIsOpen(true);
     setShowSpeechBubble(false);
-    localStorage.setItem('promptlab_coach_intro_dismissed', 'true');
+    localStorage.setItem('promptify_coach_intro_dismissed', 'true');
   };
 
   // 1. "Gợi ý cho bước này" (Không đưa đáp án hoàn chỉnh nếu chưa thử)

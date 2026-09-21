@@ -53,7 +53,7 @@ export const Header: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-base tracking-tight font-display text-white">
-                  PromptLab
+                  Promptify
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
                   Thử nghiệm

@@ -242,7 +242,7 @@ Căn cứ: Chỉ lấy số liệu có trong tờ trình, nghiêm cấm ngoại 
   }
 ];
 
-const SOP_STORAGE_KEY = 'promptlab_saved_library';
+const SOP_STORAGE_KEY = 'promptify_saved_library';
 
 /**
  * Lấy danh sách các Prompt đã lưu trong thư viện

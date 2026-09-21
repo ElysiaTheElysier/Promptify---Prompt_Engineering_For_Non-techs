@@ -51,7 +51,7 @@ export const ProductNavbar: React.FC<Props> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-base tracking-tight font-display text-white group-hover:text-emerald-300 transition">
-                  PromptLab
+                  Promptify
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap flex items-center gap-1 group-hover:bg-rose-500/20 group-hover:text-rose-300 group-hover:border-rose-500/30 transition">
                   <span>↺ Reset về Landing</span>
