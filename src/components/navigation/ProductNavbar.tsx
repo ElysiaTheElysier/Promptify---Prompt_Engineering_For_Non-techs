@@ -10,7 +10,8 @@ import {
   LogOut, 
   RefreshCw,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  GraduationCap
 } from 'lucide-react';
 import { AppView, ClassCohort, Learner } from '../../types';
 
@@ -23,6 +24,7 @@ interface Props {
   onLogout: () => void;
   onOpenTutorial: () => void;
   onResetAll?: () => void;
+  onSwitchToInstructor?: () => void;
 }
 
 export const ProductNavbar: React.FC<Props> = ({
@@ -34,6 +36,7 @@ export const ProductNavbar: React.FC<Props> = ({
   onLogout,
   onOpenTutorial,
   onResetAll,
+  onSwitchToInstructor,
 }) => {
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
@@ -154,6 +157,18 @@ export const ProductNavbar: React.FC<Props> = ({
               <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
               <span className="hidden sm:inline">Xem lại hướng dẫn</span>
             </button>
+
+            {/* Chuyển sang Giao diện Giảng viên (Instructor View) */}
+            {onSwitchToInstructor && (
+              <button
+                onClick={onSwitchToInstructor}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold border border-indigo-500/40 transition cursor-pointer whitespace-nowrap shadow-xs"
+                title="Chuyển sang Cổng Quản lý Lớp học & Workshop dành cho Giảng viên"
+              >
+                <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+                <span className="hidden sm:inline">Giao diện Giảng viên</span>
+              </button>
+            )}
 
             {/* Learner Avatar & Logout */}
             <div className="flex items-center gap-2 pl-2 border-l border-slate-800">

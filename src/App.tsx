@@ -27,6 +27,8 @@ import { HybridView } from './components/hybrid/HybridView';
 import { AiCoach } from './components/common/AiCoach';
 import { GuidedWalkthrough } from './components/common/GuidedWalkthrough';
 import { PromptLibraryModal } from './components/common/PromptLibraryModal';
+import { InstructorViewShell } from './components/instructor/InstructorViewShell';
+import { CURRENT_INSTRUCTOR } from './data/instructorData';
 
 export const App: React.FC = () => {
   // 1. Quản lý Đăng nhập & Học viên
@@ -40,6 +42,13 @@ export const App: React.FC = () => {
       }
     }
     return null; // Chưa đăng nhập mặc định để hiển thị Landing Screen
+  });
+
+  // 1.1 Quản lý Vai trò (Learner vs Instructor / Class Manager)
+  const [userRole, setUserRole] = useState<'LEARNER' | 'INSTRUCTOR'>(() => {
+    const saved = localStorage.getItem('promptify_role');
+    if (saved === 'INSTRUCTOR') return 'INSTRUCTOR';
+    return 'LEARNER';
   });
 
   // 2. Quản lý Màn hình ứng dụng (App View)
@@ -169,6 +178,10 @@ export const App: React.FC = () => {
     localStorage.setItem('promptify_history', JSON.stringify(history));
   }, [history]);
 
+  useEffect(() => {
+    localStorage.setItem('promptify_role', userRole);
+  }, [userRole]);
+
   // Active context change handler
   const handleActiveContextChange = (lab: LabStep, prompt?: string, runCount?: number) => {
     setActiveLab(lab);
@@ -214,17 +227,49 @@ export const App: React.FC = () => {
     }
   };
 
-  // Xử lý Đăng nhập
+  // Xử lý Đăng nhập Học viên
   const handleLogin = (learner: Learner) => {
     setCurrentLearner(learner);
+    setUserRole('LEARNER');
     // Sau login, đưa user tới màn chọn lớp để xác nhận lớp học
     setCurrentView('class_select');
+  };
+
+  // Xử lý Đăng nhập vai trò Giảng viên / Quản lý lớp
+  const handleLoginAsInstructor = () => {
+    const instructorLearner: Learner = {
+      id: CURRENT_INSTRUCTOR.id,
+      name: CURRENT_INSTRUCTOR.name,
+      email: CURRENT_INSTRUCTOR.email,
+      role: 'INSTRUCTOR',
+      organization: CURRENT_INSTRUCTOR.organization,
+      department: CURRENT_INSTRUCTOR.department,
+      avatarInitials: CURRENT_INSTRUCTOR.avatarInitials
+    };
+    setCurrentLearner(instructorLearner);
+    setUserRole('INSTRUCTOR');
+    setCurrentView('dashboard');
   };
 
   // Xử lý Đăng xuất
   const handleLogout = () => {
     setCurrentLearner(null);
+    setUserRole('LEARNER');
     setCurrentView('landing');
+  };
+
+  // Chuyển đổi qua lại giữa Học viên và Giảng viên
+  const handleSwitchToLearner = () => {
+    if (currentLearner?.role === 'INSTRUCTOR') {
+      setCurrentLearner(DEMO_LEARNERS[0]);
+    }
+    setUserRole('LEARNER');
+    setCurrentView('dashboard');
+  };
+
+  const handleSwitchToInstructor = () => {
+    setUserRole('INSTRUCTOR');
+    setCurrentView('dashboard');
   };
 
   // Xử lý Reset toàn bộ luồng về Landing Page ban đầu (Xóa toàn bộ session & cờ đã xem tutorial)
@@ -232,6 +277,7 @@ export const App: React.FC = () => {
     // 1. Xóa toàn bộ dữ liệu localStorage
     localStorage.removeItem('promptify_learner');
     localStorage.removeItem('promptify_view');
+    localStorage.removeItem('promptify_role');
     localStorage.removeItem('promptify_tutorial_completed');
     localStorage.removeItem('promptify_cohort');
     localStorage.removeItem('promptify_enrollments');
@@ -239,6 +285,7 @@ export const App: React.FC = () => {
 
     // 2. Reset toàn bộ React state
     setCurrentLearner(null);
+    setUserRole('LEARNER');
     setCurrentView('landing');
     setSelectedCohort(CLASS_COHORTS[0]);
     setEnrollments(DEFAULT_ENROLLMENTS);
@@ -349,10 +396,25 @@ export const App: React.FC = () => {
 
   // 1. Màn hình Landing & Login (khi chưa đăng nhập hoặc view === 'landing')
   if (!currentLearner || currentView === 'landing') {
-    return <LandingLoginScreen onLogin={handleLogin} />;
+    return (
+      <LandingLoginScreen 
+        onLogin={handleLogin} 
+        onLoginAsInstructor={handleLoginAsInstructor}
+      />
+    );
   }
 
-  // 2. Màn hình Chọn lớp / Tham gia lớp (sau khi đăng nhập)
+  // 2. Màn hình Dành riêng cho Giảng viên / Quản lý lớp (Instructor View)
+  if (userRole === 'INSTRUCTOR') {
+    return (
+      <InstructorViewShell
+        onSwitchToLearner={handleSwitchToLearner}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  // 3. Màn hình Chọn lớp / Tham gia lớp (sau khi đăng nhập)
   if (currentView === 'class_select') {
     return (
       <ClassSelectionScreen
@@ -367,7 +429,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // 3. Không gian chính của học viên (Product Shell)
+  // 4. Không gian chính của học viên (Product Shell)
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#334155] flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
       {/* Product Top Navbar */}
@@ -380,6 +442,7 @@ export const App: React.FC = () => {
         onLogout={handleLogout}
         onOpenTutorial={handleOpenTutorial}
         onResetAll={handleResetAll}
+        onSwitchToInstructor={handleSwitchToInstructor}
       />
 
       {/* Main Content Area based on currentView */}

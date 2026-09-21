@@ -7,18 +7,21 @@ import {
   CheckCircle2, 
   Users, 
   BookOpen, 
-  FileSpreadsheet,
-  Lock,
-  ChevronRight
+  FileSpreadsheet, 
+  Lock, 
+  ChevronRight,
+  GraduationCap
 } from 'lucide-react';
 import { Learner } from '../../types';
 import { DEMO_LEARNERS } from '../../data/classesData';
+import { CURRENT_INSTRUCTOR } from '../../data/instructorData';
 
 interface Props {
   onLogin: (learner: Learner) => void;
+  onLoginAsInstructor?: () => void;
 }
 
-export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
+export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstructor }) => {
   const [customEmail, setCustomEmail] = useState<string>('');
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
 
@@ -177,6 +180,34 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
 
               {/* Quick Demo Learner Selector (Great for workshop testing) */}
               <div className="space-y-2">
+                {/* Instructor Demo Account */}
+                {onLoginAsInstructor && (
+                  <button
+                    onClick={onLoginAsInstructor}
+                    className="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-indigo-950/60 to-slate-800/80 hover:from-indigo-900/80 hover:to-slate-800 border border-indigo-500/40 hover:border-indigo-400 transition text-left group shadow-xs"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs group-hover:scale-105 transition shadow-xs">
+                        <GraduationCap className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-indigo-200 group-hover:text-white transition">
+                            {CURRENT_INSTRUCTOR.name}
+                          </span>
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
+                            Instructor View
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {CURRENT_INSTRUCTOR.department}
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:text-indigo-200 group-hover:translate-x-0.5 transition" />
+                  </button>
+                )}
+
                 {DEMO_LEARNERS.map((learner) => (
                   <button
                     key={learner.id}
