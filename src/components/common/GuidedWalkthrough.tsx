@@ -27,6 +27,7 @@ interface Props {
   onClose: () => void;
   currentMode: UIMode;
   activeLab: LabStep;
+  initialStepIndex?: number;
 }
 
 interface ElementRect {
@@ -40,13 +41,16 @@ interface ElementRect {
 
 /**
  * Heuristic tính toán hướng ưu tiên ban đầu dựa trên vị trí của target trong viewport:
- * - Target ở góc phải/dưới (như AI Coach) -> ưu tiên 'left' hoặc 'left-end'
+ * - Với AI Coach ở góc phải dưới -> ưu tiên tuyệt đối 'top' (fallback 'left')
  * - Target ở cạnh phải -> ưu tiên 'left'
  * - Target ở nửa dưới -> ưu tiên 'top'
  * - Target ở nửa trên -> ưu tiên 'bottom'
  * - Target ở cạnh trái -> ưu tiên 'right'
  */
-function determinePlacementHeuristic(el: HTMLElement | null): Placement {
+function determinePlacementHeuristic(el: HTMLElement | null, targetId?: string): Placement {
+  if (targetId === 'ai-coach' || targetId === 'tour-coach') {
+    return 'top';
+  }
   if (!el) return 'bottom';
   const rect = el.getBoundingClientRect();
   const vw = window.innerWidth;
@@ -60,9 +64,9 @@ function determinePlacementHeuristic(el: HTMLElement | null): Placement {
   const isTopSide = rect.top < vh * 0.3;
   const isLeftSide = centerX < vw * 0.45;
 
-  // Trường hợp đặc biệt: AI Coach ở góc phải dưới
+  // Trường hợp đặc biệt: Target ở góc phải dưới (như AI Coach)
   if (isRightSide && isBottomSide) {
-    return 'left-end';
+    return 'top';
   }
   // Target ở cạnh phải
   if (isRightSide) {
@@ -81,7 +85,7 @@ function determinePlacementHeuristic(el: HTMLElement | null): Placement {
     return 'right';
   }
 
-  return 'right';
+  return 'bottom';
 }
 
 /**
@@ -96,8 +100,17 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   onClose,
   currentMode,
   activeLab,
+  initialStepIndex = 0,
 }) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(() => {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const stepParam = urlParams?.get('step');
+    if (stepParam) {
+      const parsed = parseInt(stepParam, 10);
+      if (!isNaN(parsed) && parsed >= 1) return parsed - 1;
+    }
+    return initialStepIndex;
+  });
   const [targetRect, setTargetRect] = useState<ElementRect | null>(null);
   const [targetEl, setTargetEl] = useState<HTMLElement | null>(null);
   const [isPositionReady, setIsPositionReady] = useState<boolean>(false);
@@ -111,6 +124,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   );
   const currentStep = steps[currentStepIndex] || steps[0];
   const isLastStep = currentStepIndex === steps.length - 1;
+  const isCoachStep = currentStep.targetId === 'ai-coach' || currentStep.targetId === 'tour-coach';
 
   // Lắng nghe thay đổi kích thước màn hình
   useEffect(() => {
@@ -121,12 +135,13 @@ export const GuidedWalkthrough: React.FC<Props> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Tính hướng placement ưu tiên cho step hiện tại
-  const initialPlacement = useMemo(() => {
-    return determinePlacementHeuristic(targetEl);
-  }, [targetEl]);
+  // Tính hướng placement ưu tiên cho step hiện tại (AI Coach ưu tiên top)
+  const initialPlacement = useMemo<Placement>(() => {
+    if (isCoachStep) return 'top';
+    return determinePlacementHeuristic(targetEl, currentStep.targetId);
+  }, [targetEl, currentStep.targetId, isCoachStep]);
 
-  // Cấu hình Floating UI với các middleware chuyên nghiệp
+  // Cấu hình Floating UI với strategy: 'fixed' để định vị chuẩn xác tuyệt đối trong viewport
   const {
     refs,
     floatingStyles,
@@ -134,25 +149,28 @@ export const GuidedWalkthrough: React.FC<Props> = ({
     placement,
     update,
   } = useFloating({
+    strategy: 'fixed',
     placement: initialPlacement,
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(20), // Khoảng cách an toàn 20px với target
+      offset(18), // Khoảng cách an toàn 16-20px với target
       flip({
-        fallbackPlacements: [
-          'left',
-          'left-end',
-          'left-start',
-          'top',
-          'top-start',
-          'top-end',
-          'right',
-          'right-start',
-          'right-end',
-          'bottom',
-          'bottom-start',
-          'bottom-end',
-        ],
+        fallbackPlacements: isCoachStep
+          ? ['left', 'top-end', 'top-start', 'left-start', 'left-end']
+          : [
+              'bottom',
+              'bottom-start',
+              'bottom-end',
+              'top',
+              'top-start',
+              'top-end',
+              'left',
+              'left-start',
+              'left-end',
+              'right',
+              'right-start',
+              'right-end',
+            ],
         fallbackStrategy: 'bestFit',
         padding: 16,
       }),
@@ -172,18 +190,36 @@ export const GuidedWalkthrough: React.FC<Props> = ({
 
     setIsPositionReady(false);
 
-    const selector = `[data-tour="${currentStep.targetId}"]`;
+    const selector = isCoachStep 
+      ? '[data-tour="ai-coach"], [data-tour="tour-coach"]' 
+      : `[data-tour="${currentStep.targetId}"]`;
     const el = document.querySelector(selector) as HTMLElement | null;
 
     if (el) {
       setTargetEl(el);
+      refs.setReference(el);
 
-      // Cuộn target vào tầm nhìn trước
-      el.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: isMobile ? 'start' : 'center', 
-        inline: 'nearest' 
-      });
+      // Nếu target không phải nút fixed AI Coach thì cuộn target vào tầm nhìn
+      if (!isCoachStep) {
+        el.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: isMobile ? 'start' : 'center', 
+          inline: 'nearest' 
+        });
+      }
+
+      // Đặt tọa độ ban đầu ngay lập tức
+      const initRect = el.getBoundingClientRect();
+      if (initRect.width > 0 && initRect.height > 0) {
+        setTargetRect({
+          left: initRect.left,
+          top: initRect.top,
+          width: initRect.width,
+          height: initRect.height,
+          bottom: initRect.bottom,
+          right: initRect.right,
+        });
+      }
 
       // Chờ hiệu ứng scroll hoàn tất (180ms) để lấy tọa độ viewport chuẩn xác nhất
       const timer = setTimeout(() => {
@@ -212,7 +248,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
       refs.setReference(null);
       setIsPositionReady(true);
     }
-  }, [isOpen, currentStepIndex, currentStep.targetId, isMobile, refs]);
+  }, [isOpen, currentStepIndex, currentStep.targetId, isCoachStep, isMobile, refs]);
 
   // Cập nhật tọa độ spotlight theo reference khi scroll hoặc resize
   useEffect(() => {
@@ -419,7 +455,8 @@ export const GuidedWalkthrough: React.FC<Props> = ({
             ...floatingStyles,
             zIndex: 70,
             opacity: isPositionReady ? 1 : 0,
-            transition: 'opacity 150ms ease, transform 150ms ease',
+            visibility: isPositionReady ? 'visible' : 'hidden',
+            transition: 'opacity 150ms ease',
           }}
           onClick={(e) => e.stopPropagation()}
           className="max-w-[390px] w-[390px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden font-sans animate-scaleIn"

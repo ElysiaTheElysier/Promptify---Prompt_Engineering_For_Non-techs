@@ -33,6 +33,10 @@ import { CURRENT_INSTRUCTOR } from './data/instructorData';
 export const App: React.FC = () => {
   // 1. Quản lý Đăng nhập & Học viên
   const [currentLearner, setCurrentLearner] = useState<Learner | null>(() => {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    if (urlParams?.get('demo') === 'learner') {
+      return DEMO_LEARNERS[0];
+    }
     const saved = localStorage.getItem('promptify_learner');
     if (saved) {
       try {
@@ -46,6 +50,9 @@ export const App: React.FC = () => {
 
   // 1.1 Quản lý Vai trò (Learner vs Instructor / Class Manager)
   const [userRole, setUserRole] = useState<'LEARNER' | 'INSTRUCTOR'>(() => {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    if (urlParams?.get('role') === 'instructor') return 'INSTRUCTOR';
+    if (urlParams?.get('role') === 'learner') return 'LEARNER';
     const saved = localStorage.getItem('promptify_role');
     if (saved === 'INSTRUCTOR') return 'INSTRUCTOR';
     return 'LEARNER';
@@ -53,6 +60,10 @@ export const App: React.FC = () => {
 
   // 2. Quản lý Màn hình ứng dụng (App View)
   const [currentView, setCurrentView] = useState<AppView>(() => {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const viewParam = urlParams?.get('view') as AppView;
+    if (viewParam) return viewParam;
+    if (urlParams?.get('demo') === 'learner') return 'dashboard';
     const saved = localStorage.getItem('promptify_view') as AppView;
     if (saved && saved !== 'landing') return saved;
     return 'landing';
@@ -133,7 +144,10 @@ export const App: React.FC = () => {
   const [activeCompareLab, setActiveCompareLab] = useState<LabStep | null>(null);
   const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
   const [isPromptLibraryModalOpen, setIsPromptLibraryModalOpen] = useState<boolean>(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(() => {
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    return urlParams?.get('tutorial') === 'true';
+  });
 
   // Ngữ cảnh học tập hiện tại để Bé Trợ Lý AI Cute đồng hành
   const [activeLab, setActiveLab] = useState<LabStep>(LABS_DATA[0]);

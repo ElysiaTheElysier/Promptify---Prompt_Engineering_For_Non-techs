@@ -104,6 +104,7 @@ export const LessonHeaderBar: React.FC<Props> = ({
 
           {/* Quick Library button */}
           <button
+            data-tour="tour-library"
             onClick={onOpenPromptLibrary}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30 transition cursor-pointer"
             title="Mở Thư viện Prompt Mẫu"

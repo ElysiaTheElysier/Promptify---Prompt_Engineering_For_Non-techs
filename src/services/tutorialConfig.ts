@@ -167,8 +167,8 @@ export function getTutorialSteps(mode: UIMode, lab: LabStep): TutorialStep[] {
       stepNumber: 6,
       totalSteps: 8,
       title: '6. Cải Thiện Prompt Với Trợ Lý AI',
-      targetId: 'tour-coach',
-      description: 'Nếu kết quả chưa tối ưu, bạn có thể chỉnh sửa prompt bằng cách thêm Vai trò (Role), Ngữ cảnh (Context) hoặc Định dạng bảng. Hãy bấm vào Bé Trợ Lý ở góc phải dưới nếu muốn xin gợi ý sư phạm.',
+      targetId: 'ai-coach',
+      description: 'Nếu kết quả chưa tối ưu, bạn có thể chỉnh sửa prompt bằng cách thêm Vai trò (Role), Ngữ cảnh (Context) hoặc Định dạng bảng. Hãy bấm vào Bé AI Coach ở góc phải dưới để nhận gợi ý tức thì.',
       labAdvice: labSpecificAdvice.coach,
     },
 

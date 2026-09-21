@@ -321,26 +321,26 @@ export const HybridView: React.FC<Props> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* CỘT TRÁI (35%): CHỈ GIỮ "BƯỚC ĐANG LÀM" - STICKY DESKTOP */}
         <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-4">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-scenario">
+          <div className="bg-white rounded-xl p-5 border border-slate-200 space-y-4" data-tour="tour-scenario">
             {/* Tiêu đề bài */}
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider font-mono">
                 Nhiệm vụ Bài {currentLab.order}
               </span>
-              <h2 className="text-lg font-bold text-slate-900 leading-snug">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 leading-snug">
                 {currentLab.title}
               </h2>
             </div>
 
             {/* Tình huống ngắn */}
-            <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
+            <div className="space-y-1 text-xs text-slate-600 leading-relaxed">
               <span className="font-semibold text-slate-800 block">Tình huống:</span>
               <p>{currentLab.scenario}</p>
             </div>
 
-            {/* Một câu "Bạn cần làm gì" nổi bật */}
-            <div className="p-3 bg-emerald-50/80 rounded-xl text-xs text-emerald-950 leading-relaxed">
-              <strong>Bạn cần làm gì:</strong> {currentLab.taskGoal}
+            {/* Một câu "Bạn cần làm gì" */}
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200/80 text-xs text-slate-800 leading-relaxed">
+              <strong className="text-slate-900">Bạn cần làm gì:</strong> {currentLab.taskGoal}
             </div>
 
             {/* Accordion "Dữ liệu đầu vào cố định (Control Data)" */}
@@ -351,33 +351,33 @@ export const HybridView: React.FC<Props> = ({
               >
                 <button
                   onClick={() => setShowDataAccordion(!showDataAccordion)}
-                  className="w-full flex items-center justify-between text-xs font-semibold text-indigo-950 hover:text-indigo-900 py-1"
+                  className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 hover:text-slate-900 py-1 cursor-pointer"
                 >
                   <span className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                    <strong>Dữ liệu đầu vào cố định (Control Data)</strong>
+                    <FileText className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Dữ liệu đầu vào cố định</span>
                   </span>
-                  <div className="flex items-center gap-1 text-[11px] text-indigo-600">
+                  <div className="flex items-center gap-1 text-[11px] text-slate-500">
                     <span className="hidden sm:inline">{showDataAccordion ? 'Thu gọn' : 'Xem dữ liệu'}</span>
                     {showDataAccordion ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   </div>
                 </button>
 
                 {showDataAccordion && (
-                  <div className="mt-2 space-y-2 animate-fadeIn bg-indigo-50/30 p-2.5 rounded-xl border border-indigo-100">
+                  <div className="mt-2 space-y-2 animate-fadeIn bg-slate-50/80 p-2.5 rounded-lg border border-slate-200/80">
                     <p className="text-[11px] text-slate-500 italic leading-relaxed">
                       💡 <strong>Nguyên lý:</strong> Dữ liệu này được giữ nguyên cố định qua mọi lần thử để bạn thấy rõ: Cùng một dữ liệu, khi sửa prompt thì output sẽ thay đổi tương ứng.
                     </p>
                     <div className="flex justify-end">
                       <button
                         onClick={handleCopySampleData}
-                        className="text-[11px] text-indigo-700 hover:text-indigo-900 font-semibold flex items-center gap-1"
+                        className="text-[11px] text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 cursor-pointer"
                       >
                         {isDataCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                         {isDataCopied ? 'Đã sao chép' : 'Sao chép dữ liệu'}
                       </button>
                     </div>
-                    <pre className="p-2.5 bg-white rounded-lg text-xs font-mono text-slate-700 whitespace-pre-wrap max-h-48 overflow-y-auto border border-slate-200">
+                    <pre className="p-2.5 bg-white rounded-md text-xs font-mono text-slate-700 whitespace-pre-wrap max-h-48 overflow-y-auto border border-slate-200">
                       {currentLab.sampleInputContext}
                     </pre>
                   </div>
@@ -417,18 +417,18 @@ export const HybridView: React.FC<Props> = ({
         {/* CỘT PHẢI (65%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
         <div className="lg:col-span-8 space-y-5">
           {/* Vùng soạn thảo Prompt chính */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-prompt">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 space-y-4" data-tour="tour-prompt">
             {/* Header của ô thực hành */}
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-bold text-slate-900">
-                Ô Soạn thảo Prompt
+              <h3 className="text-sm font-semibold text-slate-900">
+                Soạn thảo Câu lệnh (Prompt)
               </h3>
 
               {/* Nút nạp nhanh tinh tế, không lấn át */}
               <div className="flex items-center gap-2 text-xs">
                 <button
                   onClick={() => setPromptText(currentLab.baselinePrompt)}
-                  className="text-slate-500 hover:text-slate-800 transition"
+                  className="text-slate-500 hover:text-slate-800 transition cursor-pointer"
                   title="Nạp prompt sơ sài ban đầu"
                 >
                   Nạp câu lệnh thô
@@ -436,7 +436,7 @@ export const HybridView: React.FC<Props> = ({
                 <span className="text-slate-300">|</span>
                 <button
                   onClick={() => setPromptText(currentLab.improvedPrompt)}
-                  className="text-emerald-700 hover:text-emerald-900 font-medium transition"
+                  className="text-emerald-700 hover:text-emerald-900 font-medium transition cursor-pointer"
                   title="Nạp prompt đã thêm cấu trúc chuẩn"
                 >
                   Nạp câu lệnh chuẩn
@@ -465,7 +465,7 @@ export const HybridView: React.FC<Props> = ({
               value={promptText}
               onChange={(e) => setPromptText(e.target.value)}
               placeholder="Nhập câu lệnh của bạn tại đây..."
-              className="w-full p-4 text-xs sm:text-sm font-mono text-slate-900 bg-slate-50/50 rounded-xl border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 leading-relaxed transition"
+              className="w-full p-3.5 text-xs sm:text-sm font-mono text-slate-900 bg-slate-50/50 rounded-lg border border-slate-200 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 leading-relaxed transition"
             />
 
             {/* Huy hiệu học tập nhận diện trực tiếp từ prompt */}
@@ -475,16 +475,16 @@ export const HybridView: React.FC<Props> = ({
             <div className="border-t border-slate-100 pt-3">
               <button
                 onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-                className="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition"
+                className="text-xs font-medium text-slate-400 hover:text-slate-700 flex items-center gap-1.5 transition cursor-pointer"
               >
-                <Settings2 className="w-3.5 h-3.5" />
+                <Settings2 className="w-3.5 h-3.5 text-slate-400" />
                 <span>Thiết lập nâng cao (Vai trò hệ thống)</span>
                 {showAdvancedSettings ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
 
               {showAdvancedSettings && (
-                <div className="mt-2.5 p-3 bg-slate-50 rounded-xl space-y-1.5 animate-fadeIn">
-                  <label className="text-xs font-semibold text-slate-700 block">
+                <div className="mt-2.5 p-3 bg-slate-50 rounded-lg space-y-1.5 animate-fadeIn border border-slate-200/70">
+                  <label className="text-xs font-medium text-slate-700 block">
                     Vai trò hệ thống (Chỉ dẫn ngầm cho AI):
                   </label>
                   <input
@@ -492,7 +492,7 @@ export const HybridView: React.FC<Props> = ({
                     value={systemText}
                     onChange={(e) => setSystemText(e.target.value)}
                     placeholder="Ví dụ: Bạn là chuyên viên phân tích ngân hàng..."
-                    className="w-full px-3 py-2 text-xs bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 font-mono"
+                    className="w-full px-3 py-2 text-xs bg-white rounded-md border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 font-mono"
                   />
                 </div>
               )}
@@ -503,7 +503,7 @@ export const HybridView: React.FC<Props> = ({
               onClick={handleRun}
               disabled={isRunning || !promptText.trim()}
               data-tour="tour-run"
-              className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white font-bold text-sm shadow-sm hover:shadow transition flex items-center justify-center gap-2"
+              className="w-full py-3 px-5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
             >
               <Play className={`w-4 h-4 ${isRunning ? 'animate-spin' : 'fill-white'}`} />
               <span>{isRunning ? 'Đang chạy câu lệnh...' : 'Chạy Prompt'}</span>
@@ -514,10 +514,10 @@ export const HybridView: React.FC<Props> = ({
           {(output || isRunning || (selectedVersionNumber > 0 && currentLabVersions.length > 0)) && (
             <div className="space-y-4 animate-fadeIn">
               {/* Output xuất hiện ngay dưới prompt */}
-              <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-3" data-tour="tour-output">
+              <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 space-y-3" data-tour="tour-output">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-slate-900">
+                    <h3 className="text-sm font-semibold text-slate-900">
                       Kết quả từ AI
                     </h3>
                     <span className="text-xs text-slate-500 font-medium">
@@ -535,7 +535,7 @@ export const HybridView: React.FC<Props> = ({
                             setIsSaveModalOpen(true);
                           }
                         }}
-                        className="text-[11px] font-semibold text-amber-900 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 px-2.5 py-0.5 rounded-lg border border-amber-300 transition flex items-center gap-1 shadow-2xs"
+                        className="text-[11px] font-semibold text-amber-900 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 px-2.5 py-0.5 rounded-md border border-amber-300 transition flex items-center gap-1 cursor-pointer"
                         title="Lưu phiên bản này thành Prompt chuẩn (SOP)"
                       >
                         <BookmarkPlus className="w-3 h-3 text-amber-600" />
@@ -547,7 +547,7 @@ export const HybridView: React.FC<Props> = ({
                   {(output || selectedVersionNumber > 0) && (
                     <button
                       onClick={handleCopyOutput}
-                      className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition"
+                      className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition cursor-pointer"
                     >
                       {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                       <span>{isCopied ? 'Đã sao chép' : 'Sao chép kết quả'}</span>
@@ -555,7 +555,7 @@ export const HybridView: React.FC<Props> = ({
                   )}
                 </div>
 
-                <div className="p-4 bg-slate-50 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed overflow-x-auto min-h-[140px]">
+                <div className="p-4 bg-slate-50 rounded-lg border border-slate-200/70 text-xs sm:text-sm text-slate-800 leading-relaxed overflow-x-auto min-h-[140px]">
                   {isRunning ? (
                     <div className="flex items-center gap-2 text-slate-500 py-6">
                       <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
