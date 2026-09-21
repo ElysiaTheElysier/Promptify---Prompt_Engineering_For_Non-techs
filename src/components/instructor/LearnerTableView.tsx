@@ -1,17 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Search, 
-  Filter, 
-  ChevronRight, 
-  CheckCircle2, 
-  Clock, 
-  AlertCircle, 
-  ExternalLink,
-  Users,
-  Sparkles,
-  Zap,
-  ArrowUpDown
-} from 'lucide-react';
+import { Search } from 'lucide-react';
 import { InstructorLearner } from '../../types/instructor';
 import { INSTRUCTOR_LEARNERS, INSTRUCTOR_CLASSES } from '../../data/instructorData';
 import { LearnerDetailModal } from './LearnerDetailModal';
@@ -70,27 +58,28 @@ export const LearnerTableView: React.FC<Props> = ({
     };
   }, [selectedClassId]);
 
-  const getStatusBadge = (status: InstructorLearner['status']) => {
+  // Clean status indicator (GitHub style: dot + plain text)
+  const renderStatus = (status: InstructorLearner['status']) => {
     switch (status) {
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span className="inline-flex items-center gap-1.5 text-slate-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             Hoàn thành
           </span>
         );
       case 'in_progress':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-            <Clock className="w-3 h-3 text-indigo-600" />
+          <span className="inline-flex items-center gap-1.5 text-slate-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
             Đang học
           </span>
         );
       case 'not_started':
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-            <AlertCircle className="w-3 h-3 text-amber-600" />
+          <span className="inline-flex items-center gap-1.5 text-amber-800 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
             Chưa bắt đầu
           </span>
         );
@@ -98,35 +87,35 @@ export const LearnerTableView: React.FC<Props> = ({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Controls Bar: Search & Status Filters & Class Dropdown */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+    <div className="space-y-3">
+      {/* GitHub-style Controls Bar: Search & Status Filter Tabs */}
+      <div className="space-y-3 pt-1">
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search box */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo họ tên, email, mã nhân viên..."
+              placeholder="Lọc theo tên, email, mã nhân viên..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-md text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition"
             />
           </div>
 
-          {/* Class filter dropdown if enabled */}
+          {/* Class selector dropdown */}
           {showClassFilter && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 whitespace-nowrap font-medium">Lớp đào tạo:</span>
+              <span className="text-xs text-slate-500 whitespace-nowrap">Lớp:</span>
               <select
                 value={selectedClassId}
                 onChange={(e) => setSelectedClassId(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                className="bg-white border border-slate-300 text-slate-700 text-xs rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 cursor-pointer"
               >
-                <option value="ALL">Tất cả lớp học ({INSTRUCTOR_LEARNERS.length} học viên mẫu)</option>
+                <option value="ALL">Tất cả lớp ({INSTRUCTOR_LEARNERS.length} học viên)</option>
                 {INSTRUCTOR_CLASSES.map((cls) => (
                   <option key={cls.id} value={cls.id}>
-                    {cls.name} ({cls.totalLearners} học viên)
+                    {cls.name} ({cls.totalLearners})
                   </option>
                 ))}
               </select>
@@ -134,79 +123,74 @@ export const LearnerTableView: React.FC<Props> = ({
           )}
         </div>
 
-        {/* Status filter tabs */}
-        <div className="flex flex-wrap gap-2 pt-1 border-t border-slate-100">
+        {/* GitHub-style subnav filter tabs */}
+        <div className="flex items-center gap-4 text-xs border-b border-slate-200">
           <button
             onClick={() => setStatusFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+            className={`pb-2 transition cursor-pointer font-medium ${
               statusFilter === 'ALL'
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'border-b-2 border-slate-900 text-slate-900 font-semibold'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            Tất cả ({counts.all})
+            Tất cả <span className="text-slate-400 text-[11px] ml-1">({counts.all})</span>
           </button>
 
           <button
             onClick={() => setStatusFilter('not_started')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2 transition cursor-pointer font-medium ${
               statusFilter === 'not_started'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-amber-50 hover:text-amber-800'
+                ? 'border-b-2 border-slate-900 text-slate-900 font-semibold'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-            Chưa bắt đầu ({counts.not_started})
+            Chưa bắt đầu <span className="text-slate-400 text-[11px] ml-1">({counts.not_started})</span>
           </button>
 
           <button
             onClick={() => setStatusFilter('in_progress')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2 transition cursor-pointer font-medium ${
               statusFilter === 'in_progress'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-indigo-50 hover:text-indigo-800'
+                ? 'border-b-2 border-slate-900 text-slate-900 font-semibold'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
-            Đang học ({counts.in_progress})
+            Đang học <span className="text-slate-400 text-[11px] ml-1">({counts.in_progress})</span>
           </button>
 
           <button
             onClick={() => setStatusFilter('completed')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2 transition cursor-pointer font-medium ${
               statusFilter === 'completed'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
+                ? 'border-b-2 border-slate-900 text-slate-900 font-semibold'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-            Hoàn thành ({counts.completed})
+            Hoàn thành <span className="text-slate-400 text-[11px] ml-1">({counts.completed})</span>
           </button>
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+      {/* GitHub-style Flat Data Table (Clean, Scan Fast, No Card-Inside-Card) */}
+      <div className="border border-slate-200 rounded-md overflow-hidden bg-white text-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3.5 px-4">Học viên</th>
-                <th className="py-3.5 px-4">Lớp & Phòng ban</th>
-                <th className="py-3.5 px-4 text-center">Tiến độ bài học</th>
-                <th className="py-3.5 px-4 text-center">Số lần thử</th>
-                <th className="py-3.5 px-4 text-center">Trạng thái</th>
-                <th className="py-3.5 px-4">Hoạt động gần nhất</th>
-                <th className="py-3.5 px-4 text-right">Hành động</th>
+              <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-medium text-slate-500">
+                <th className="py-2.5 px-4 font-medium">Học viên</th>
+                <th className="py-2.5 px-4 font-medium">Lớp / Phòng ban</th>
+                <th className="py-2.5 px-4 font-medium">Tiến độ</th>
+                <th className="py-2.5 px-4 font-medium text-center">Lần thử</th>
+                <th className="py-2.5 px-4 font-medium">Trạng thái</th>
+                <th className="py-2.5 px-4 font-medium">Hoạt động cuối</th>
+                <th className="py-2.5 px-4 font-medium text-right">Chi tiết</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
+            <tbody className="divide-y divide-slate-100">
               {filteredLearners.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    <Users className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    <p className="font-semibold text-slate-600">Không tìm thấy học viên nào phù hợp</p>
-                    <p className="text-xs text-slate-400 mt-1">Hãy thử đổi từ khóa tìm kiếm hoặc bỏ bộ lọc trạng thái</p>
+                  <td colSpan={7} className="py-8 text-center text-slate-400">
+                    Không tìm thấy học viên nào phù hợp
                   </td>
                 </tr>
               ) : (
@@ -219,90 +203,63 @@ export const LearnerTableView: React.FC<Props> = ({
                       onClick={() => setSelectedLearner(learner)}
                       className="hover:bg-slate-50/80 transition cursor-pointer group"
                     >
-                      {/* Learner Info */}
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
-                            {learner.avatarInitials}
-                          </div>
-                          <div>
-                            <div className="font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                              {learner.name}
-                            </div>
-                            <div className="text-[11px] text-slate-500 font-medium">
-                              {learner.email} • <span className="font-mono text-slate-400">{learner.employeeCode}</span>
-                            </div>
-                          </div>
+                      {/* Name & Email */}
+                      <td className="py-2.5 px-4">
+                        <div className="font-medium text-slate-900 group-hover:text-emerald-700 transition">
+                          {learner.name}
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-mono">
+                          {learner.email} · {learner.employeeCode}
                         </div>
                       </td>
 
                       {/* Class & Department */}
-                      <td className="py-3.5 px-4">
-                        <div className="font-medium text-slate-800 line-clamp-1 max-w-[200px]" title={learner.className}>
-                          {learner.className}
-                        </div>
-                        <div className="text-[11px] text-slate-500 line-clamp-1">
-                          {learner.department}
-                        </div>
+                      <td className="py-2.5 px-4 text-slate-600">
+                        <div className="line-clamp-1 max-w-[180px]">{learner.className}</div>
+                        <div className="text-[11px] text-slate-400 line-clamp-1">{learner.department}</div>
                       </td>
 
-                      {/* Progress bar */}
-                      <td className="py-3.5 px-4">
-                        <div className="max-w-[140px] mx-auto space-y-1">
-                          <div className="flex items-center justify-between text-[11px]">
-                            <span className="font-bold text-slate-700">{learner.completedLabIds.length}/5 bài</span>
-                            <span className="text-slate-500 font-medium">{progressPercent}%</span>
+                      {/* Progress: Clean Inline Ratio */}
+                      <td className="py-2.5 px-4">
+                        <div className="space-y-1 w-24">
+                          <div className="flex justify-between text-[11px] text-slate-600">
+                            <span>{learner.completedLabIds.length}/5 bài</span>
+                            <span className="text-slate-400">{progressPercent}%</span>
                           </div>
-                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                progressPercent === 100 
-                                  ? 'bg-emerald-500' 
-                                  : progressPercent > 0 
-                                  ? 'bg-indigo-500' 
-                                  : 'bg-slate-300'
-                              }`}
+                          <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-600 rounded-full"
                               style={{ width: `${progressPercent}%` }}
                             />
                           </div>
                         </div>
                       </td>
 
-                      {/* Prompt Attempts count */}
-                      <td className="py-3.5 px-4 text-center">
-                        <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded-full text-xs ${
-                          learner.promptAttemptsTotal > 10 
-                            ? 'bg-emerald-50 text-emerald-700' 
-                            : learner.promptAttemptsTotal > 0 
-                            ? 'bg-slate-100 text-slate-700' 
-                            : 'bg-slate-50 text-slate-400'
-                        }`}>
-                          <Zap className="w-3 h-3" />
-                          {learner.promptAttemptsTotal}
-                        </span>
+                      {/* Attempts Count */}
+                      <td className="py-2.5 px-4 text-center font-mono text-slate-600">
+                        {learner.promptAttemptsTotal > 0 ? learner.promptAttemptsTotal : '—'}
                       </td>
 
                       {/* Status */}
-                      <td className="py-3.5 px-4 text-center">
-                        {getStatusBadge(learner.status)}
+                      <td className="py-2.5 px-4">
+                        {renderStatus(learner.status)}
                       </td>
 
                       {/* Last Active */}
-                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                      <td className="py-2.5 px-4 text-slate-400 text-[11px]">
                         {learner.lastActive}
                       </td>
 
                       {/* Actions */}
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-2.5 px-4 text-right">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedLearner(learner);
                           }}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-medium text-xs transition cursor-pointer"
+                          className="text-slate-400 hover:text-slate-800 text-xs font-medium cursor-pointer"
                         >
-                          <span>Chi tiết</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
+                          Xem →
                         </button>
                       </td>
                     </tr>
@@ -313,10 +270,10 @@ export const LearnerTableView: React.FC<Props> = ({
           </table>
         </div>
 
-        {/* Footer info */}
-        <div className="bg-slate-50/80 px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-          <span>Hiển thị <strong>{filteredLearners.length}</strong> học viên</span>
-          <span className="text-[11px]">Bấm vào từng học viên để xem chi tiết 5 bài lab và mẫu prompt</span>
+        {/* Footer */}
+        <div className="bg-slate-50/60 px-4 py-2 border-t border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+          <span>{filteredLearners.length} học viên</span>
+          <span>Bấm vào học viên để kiểm tra chi tiết 5 bài lab và câu lệnh prompt</span>
         </div>
       </div>
 
@@ -328,4 +285,3 @@ export const LearnerTableView: React.FC<Props> = ({
     </div>
   );
 };
-
