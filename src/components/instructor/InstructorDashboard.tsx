@@ -3,18 +3,13 @@ import {
   Building2, 
   Users, 
   CheckCircle2, 
-  Clock, 
   ArrowRight, 
-  Activity, 
-  AlertTriangle, 
-  Zap, 
-  Sparkles, 
-  Calendar,
+  AlertCircle, 
+  Clock, 
   ChevronRight,
-  TrendingUp,
-  BookOpen
+  Activity
 } from 'lucide-react';
-import { InstructorClass, InstructorDashboardStats, InstructorViewMode } from '../../types/instructor';
+import { InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { INSTRUCTOR_CLASSES, INSTRUCTOR_STATS, INSTRUCTOR_ACTIVITIES } from '../../data/instructorData';
 
 interface Props {
@@ -23,245 +18,260 @@ interface Props {
 }
 
 export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate }) => {
+  // Lớp cần chú ý nhất (tiến độ hoàn thành thấp nhất / nhiều học viên chưa bắt đầu nhất)
+  const primaryClass = [...INSTRUCTOR_CLASSES].sort((a, b) => a.avgProgressPercent - b.avgProgressPercent)[0];
+  const otherClasses = INSTRUCTOR_CLASSES.filter((c) => c.id !== primaryClass.id);
+
+  const primaryNotStarted = primaryClass.totalLearners - primaryClass.startedLearners;
+  const primaryInProgress = primaryClass.startedLearners - primaryClass.completedLearners;
+
   return (
-    <div className="space-y-6">
-      {/* 1. Top Summary Banner & 5-Second Clarity Headline */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-radial from-emerald-500/10 to-transparent pointer-events-none" />
-        
-        <div className="max-w-3xl space-y-2 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Trung tâm Điều phối Đào tạo AI & Workshop Giảng viên</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Tổng quan Tiến độ Giảng dạy & Đào tạo Promptify
+    <div className="space-y-8">
+      {/* 1. COMPACT HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200/70">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            Tổng quan Điều phối Lớp học
           </h1>
-          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-            Theo dõi tức thì số lượng học viên đang thực hành, mức độ hoàn thành từng kỹ thuật Prompting và hỗ trợ kịp thời các cán bộ gặp khó khăn.
+          <p className="text-xs text-slate-500 mt-1">
+            Giám sát tiến độ học tập và can thiệp kịp thời các lớp đào tạo Prompt Engineering
           </p>
         </div>
 
-        {/* 4 Core Summary Cards (In line with 5-second clarity) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6 relative z-10">
-          {/* Card 1: Active Classes */}
-          <div className="bg-slate-800/80 backdrop-blur-xs border border-slate-700/80 rounded-2xl p-4 sm:p-5 space-y-1">
-            <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-              <span>Lớp đang diễn ra</span>
-              <Building2 className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white">
-              {INSTRUCTOR_STATS.activeClasses}
-            </div>
-            <p className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-              ● Đang trong giờ đào tạo
-            </p>
-          </div>
+        <button
+          onClick={() => onNavigate('learners')}
+          className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer self-start sm:self-auto"
+        >
+          Xem toàn bộ 86 học viên →
+        </button>
+      </div>
 
-          {/* Card 2: Total Learners */}
-          <div className="bg-slate-800/80 backdrop-blur-xs border border-slate-700/80 rounded-2xl p-4 sm:p-5 space-y-1">
-            <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-              <span>Tổng số học viên</span>
-              <Users className="w-4 h-4 text-indigo-400" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white">
-              {INSTRUCTOR_STATS.totalLearners}
-            </div>
-            <p className="text-[11px] text-slate-400">
-              Cán bộ Agribank & DN
-            </p>
+      {/* 2. THREE SMALL KPI CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* KPI 1: Active Classes */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-4 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-xs text-slate-500 font-medium block">Lớp đang hoạt động</span>
+            <span className="text-2xl font-bold text-slate-900 block mt-0.5">{INSTRUCTOR_STATS.activeClasses}</span>
           </div>
-
-          {/* Card 3: Learners Started */}
-          <div className="bg-slate-800/80 backdrop-blur-xs border border-slate-700/80 rounded-2xl p-4 sm:p-5 space-y-1">
-            <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-              <span>Đã bắt đầu học</span>
-              <Zap className="w-4 h-4 text-amber-400" />
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white">
-              {INSTRUCTOR_STATS.startedLearners}
-            </div>
-            <p className="text-[11px] text-amber-300 font-medium">
-              {Math.round((INSTRUCTOR_STATS.startedLearners / INSTRUCTOR_STATS.totalLearners) * 100)}% đã chạy bài lab
-            </p>
+          <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+            <Building2 className="w-4 h-4" />
           </div>
+        </div>
 
-          {/* Card 4: Learners Completed */}
-          <div className="bg-slate-800/80 backdrop-blur-xs border border-slate-700/80 rounded-2xl p-4 sm:p-5 space-y-1">
-            <div className="flex items-center justify-between text-slate-400 text-xs font-medium">
-              <span>Đã hoàn thành</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        {/* KPI 2: Total Learners */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-4 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-xs text-slate-500 font-medium block">Tổng học viên</span>
+            <span className="text-2xl font-bold text-slate-900 block mt-0.5">{INSTRUCTOR_STATS.totalLearners}</span>
+          </div>
+          <div className="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center">
+            <Users className="w-4 h-4" />
+          </div>
+        </div>
+
+        {/* KPI 3: Completed Learners */}
+        <div className="bg-white rounded-xl border border-slate-200/80 p-4 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-xs text-slate-500 font-medium block">Đã hoàn thành</span>
+            <div className="flex items-baseline gap-1.5 mt-0.5">
+              <span className="text-2xl font-bold text-emerald-600">{INSTRUCTOR_STATS.completedLearners}</span>
+              <span className="text-xs text-slate-400 font-medium">
+                ({Math.round((INSTRUCTOR_STATS.completedLearners / INSTRUCTOR_STATS.totalLearners) * 100)}%)
+              </span>
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400">
-              {INSTRUCTOR_STATS.completedLearners}
-            </div>
-            <p className="text-[11px] text-slate-400 font-medium">
-              {Math.round((INSTRUCTOR_STATS.completedLearners / INSTRUCTOR_STATS.totalLearners) * 100)}% hoàn tất 5 bài
-            </p>
+          </div>
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <CheckCircle2 className="w-4 h-4" />
           </div>
         </div>
       </div>
 
-      {/* 2. Grid: Class Cards Overview (Left 8 Cols) + Quick Activity Stream (Right 4 Cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Left: Class Cards Overview */}
-        <div className="lg:col-span-8 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-emerald-600" />
-              <h2 className="text-base font-bold text-slate-900">
-                Các lớp đang quản lý ({INSTRUCTOR_CLASSES.length})
-              </h2>
-            </div>
-            <button
-              onClick={() => onNavigate('learners')}
-              className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
-            >
-              Xem danh sách toàn bộ học viên →
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {INSTRUCTOR_CLASSES.map((cls) => {
-              const notStarted = cls.totalLearners - cls.startedLearners;
-
-              return (
-                <div
-                  key={cls.id}
-                  className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition space-y-4"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-slate-900">
-                          {cls.name}
-                        </h3>
-                        <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                          {cls.classCode}
-                        </span>
-                      </div>
-                      <div className="text-xs text-slate-500 font-medium mt-0.5">
-                        {cls.organization} • {cls.department}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 self-start sm:self-center">
-                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        ● Đang diễn ra
-                      </span>
-                      <span className="text-[11px] font-medium px-2 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200">
-                        {cls.timeRemainingText}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Progress & Stats Bar */}
-                  <div className="bg-slate-50/80 rounded-xl p-3.5 space-y-2 border border-slate-100">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-slate-700">
-                        Tiến độ trung bình lớp: <strong className="text-emerald-700">{cls.avgProgressPercent}%</strong>
-                      </span>
-                      <span className="text-slate-500">
-                        {cls.completedLearners}/{cls.totalLearners} hoàn thành (5/5 lab)
-                      </span>
-                    </div>
-
-                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
-                        style={{ width: `${cls.avgProgressPercent}%` }}
-                      />
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1">
-                      <span>Tổng: <strong>{cls.totalLearners}</strong> học viên</span>
-                      <span className="text-amber-700">Chưa học: <strong>{notStarted}</strong></span>
-                      <span className="text-indigo-600">Đang học: <strong>{cls.startedLearners - cls.completedLearners}</strong></span>
-                      <span className="text-emerald-700 font-semibold">Hoàn thành: <strong>{cls.completedLearners}</strong></span>
-                    </div>
-                  </div>
-
-                  {/* Bottom Action */}
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Khai giảng: {cls.startDate}</span>
-                    </div>
-
-                    <button
-                      onClick={() => onSelectClass(cls)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white font-semibold text-xs transition cursor-pointer shadow-xs"
-                    >
-                      <span>Xem chi tiết lớp này</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* 3. PRIMARY CLASS REQUIRING ATTENTION (FEATURED CARD) */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Lớp học cần ưu tiên chú ý
+          </span>
+          <span className="text-xs text-amber-700 font-medium flex items-center gap-1">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+            Tiến độ hoàn thành thấp nhất ({primaryClass.avgProgressPercent}%)
+          </span>
         </div>
 
-        {/* Right: Quick Alerts & Activity Preview */}
-        <div className="lg:col-span-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-indigo-600" />
-              <h2 className="text-base font-bold text-slate-900">
-                Hoạt động mới nhất
+        <div className="bg-white rounded-2xl border-2 border-amber-200/90 p-6 shadow-sm hover:shadow-md transition space-y-5">
+          {/* Header of Featured Card */}
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                  Cần hỗ trợ
+                </span>
+                <span className="font-mono text-xs font-semibold text-slate-400">
+                  {primaryClass.classCode}
+                </span>
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                {primaryClass.name}
               </h2>
+              <p className="text-xs text-slate-500">
+                {primaryClass.organization} • {primaryClass.department}
+              </p>
             </div>
-            <button
-              onClick={() => onNavigate('activity')}
-              className="text-xs font-semibold text-indigo-600 hover:underline cursor-pointer"
-            >
-              Xem tất cả →
-            </button>
+
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200/60 self-start">
+              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <span>Thời hạn: {primaryClass.timeRemainingText}</span>
+            </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
-            {INSTRUCTOR_ACTIVITIES.slice(0, 5).map((act) => (
-              <div key={act.id} className="p-3.5 hover:bg-slate-50/70 transition space-y-1">
-                <div className="flex items-center justify-between gap-1">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] flex items-center justify-center">
-                      {act.learnerAvatar}
-                    </div>
-                    <span className="font-bold text-xs text-slate-900">{act.learnerName}</span>
-                  </div>
-                  <span className="text-[10px] text-slate-400">{act.timeAgo}</span>
-                </div>
+          {/* Progress Bar (Visual Priority #2) */}
+          <div className="space-y-2 pt-1">
+            <div className="flex items-baseline justify-between text-xs">
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-extrabold text-slate-900">{primaryClass.avgProgressPercent}%</span>
+                <span className="text-slate-500">tiến độ hoàn thành trung bình</span>
+              </div>
+              <span className="font-semibold text-slate-700">
+                {primaryClass.completedLearners}/{primaryClass.totalLearners} học viên hoàn tất
+              </span>
+            </div>
 
-                <p className="text-xs text-slate-700 leading-snug pl-8">
-                  {act.detail}
-                </p>
-                <div className="text-[10px] text-slate-400 pl-8 font-medium">
-                  {act.className}
+            <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-500"
+                style={{ width: `${primaryClass.avgProgressPercent}%` }}
+              />
+            </div>
+
+            {/* Lean metrics breakdown */}
+            <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 pt-1">
+              <span className="text-amber-700 font-medium">
+                Chưa bắt đầu: <strong>{primaryNotStarted}</strong> học viên
+              </span>
+              <span className="text-slate-600">
+                Đang học: <strong>{primaryInProgress}</strong> học viên
+              </span>
+              <span className="text-emerald-700 font-medium">
+                Đã xong: <strong>{primaryClass.completedLearners}</strong> học viên
+              </span>
+            </div>
+          </div>
+
+          {/* Single Primary CTA */}
+          <div className="pt-2 flex justify-end">
+            <button
+              onClick={() => onSelectClass(primaryClass)}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white font-semibold text-xs transition cursor-pointer shadow-xs"
+            >
+              <span>Xem chi tiết lớp này</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. OTHER CLASSES AS COMPACT ROWS */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Các lớp khác đang diễn ra ({otherClasses.length})
+          </span>
+          <button
+            onClick={() => onNavigate('classes')}
+            className="text-xs font-medium text-slate-500 hover:text-slate-800 cursor-pointer"
+          >
+            Tất cả lớp học →
+          </button>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs divide-y divide-slate-100 overflow-hidden">
+          {otherClasses.map((cls) => (
+            <div
+              key={cls.id}
+              className="p-4 sm:p-5 hover:bg-slate-50/70 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            >
+              {/* Left Info */}
+              <div className="space-y-1 min-w-[260px] max-w-md">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[11px] text-slate-400">{cls.classCode}</span>
+                  <span className="text-xs text-slate-400">•</span>
+                  <span className="text-xs text-slate-500">{cls.department}</span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  {cls.name}
+                </h3>
+              </div>
+
+              {/* Middle: Progress Bar */}
+              <div className="flex-1 max-w-xs space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-700">{cls.avgProgressPercent}%</span>
+                  <span className="text-slate-400 text-[11px]">
+                    {cls.completedLearners}/{cls.totalLearners} học viên
+                  </span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                    style={{ width: `${cls.avgProgressPercent}%` }}
+                  />
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Quick Alert Card */}
-          <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-              <span>Ghi chú Điều phối viên:</span>
+              {/* Right: Single CTA Button */}
+              <div className="flex items-center justify-end">
+                <button
+                  onClick={() => onSelectClass(cls)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs transition cursor-pointer"
+                >
+                  <span>Xem chi tiết</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                </button>
+              </div>
             </div>
-            <p className="text-xs text-amber-900/80 leading-relaxed">
-              Hiện có <strong>19 học viên</strong> chưa đăng nhập hoặc chưa bắt đầu Lab 1. Hãy nhắc nhở trong nhóm Zalo/Teams của lớp để kịp tiến độ buổi workshop.
-            </p>
-            <button
-              onClick={() => onNavigate('learners')}
-              className="text-xs font-bold text-amber-800 hover:underline cursor-pointer pt-1 block"
-            >
-              Lọc danh sách học viên chưa bắt đầu →
-            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. RECENT ACTIVITY AT THE BOTTOM */}
+      <section className="space-y-3 pt-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-slate-400" />
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              Hoạt động gần nhất
+            </span>
           </div>
+          <button
+            onClick={() => onNavigate('activity')}
+            className="text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer"
+          >
+            Xem toàn bộ nhật ký →
+          </button>
         </div>
 
-      </div>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs divide-y divide-slate-100 overflow-hidden">
+          {INSTRUCTOR_ACTIVITIES.slice(0, 4).map((act) => (
+            <div key={act.id} className="p-3.5 sm:px-5 flex items-center justify-between gap-4 text-xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0">
+                  {act.learnerAvatar}
+                </div>
+                <div className="truncate">
+                  <span className="font-bold text-slate-900">{act.learnerName}</span>{' '}
+                  <span className="text-slate-600">{act.detail}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 flex-shrink-0 text-slate-400 text-[11px]">
+                <span className="hidden md:inline text-slate-500">{act.className}</span>
+                <span>{act.timeAgo}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };
