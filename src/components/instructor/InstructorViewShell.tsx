@@ -171,3 +171,4 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
     </div>
   );
 };
+

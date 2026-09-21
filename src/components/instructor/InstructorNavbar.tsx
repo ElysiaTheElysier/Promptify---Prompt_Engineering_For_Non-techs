@@ -171,3 +171,4 @@ export const InstructorNavbar: React.FC<Props> = ({
     </header>
   );
 };
+

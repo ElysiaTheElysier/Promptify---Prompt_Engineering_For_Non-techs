@@ -71,3 +71,4 @@ export interface InstructorDashboardStats {
   startedLearners: number;
   completedLearners: number;
 }
+

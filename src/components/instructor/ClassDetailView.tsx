@@ -263,3 +263,4 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
     </div>
   );
 };
+

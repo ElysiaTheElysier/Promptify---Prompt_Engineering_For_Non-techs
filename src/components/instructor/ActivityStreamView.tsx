@@ -235,3 +235,4 @@ export const ActivityStreamView: React.FC = () => {
     </div>
   );
 };
+

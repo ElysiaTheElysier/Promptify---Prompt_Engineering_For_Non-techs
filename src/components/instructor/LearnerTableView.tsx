@@ -328,3 +328,4 @@ export const LearnerTableView: React.FC<Props> = ({
     </div>
   );
 };
+
