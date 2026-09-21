@@ -7,7 +7,8 @@ import {
   Activity, 
   ArrowLeftRight, 
   LogOut,
-  GraduationCap
+  GraduationCap,
+  HelpCircle
 } from 'lucide-react';
 import { InstructorViewMode } from '../../types/instructor';
 import { CURRENT_INSTRUCTOR } from '../../data/instructorData';
@@ -17,13 +18,15 @@ interface Props {
   onNavigate: (view: InstructorViewMode) => void;
   onSwitchToLearner: () => void;
   onLogout: () => void;
+  onOpenTutorial?: () => void;
 }
 
 export const InstructorNavbar: React.FC<Props> = ({
   currentView,
   onNavigate,
   onSwitchToLearner,
-  onLogout
+  onLogout,
+  onOpenTutorial
 }) => {
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
@@ -101,7 +104,19 @@ export const InstructorNavbar: React.FC<Props> = ({
           </nav>
 
           {/* 3. Actions & Role Switcher */}
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Tutorial button for current tab */}
+            {onOpenTutorial && (
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 font-medium text-xs transition cursor-pointer"
+                title="Xem lại hướng dẫn thao tác cho tab hiện tại"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Hướng dẫn</span>
+              </button>
+            )}
+
             {/* Quick Switch to Learner View (Subtle, no loud gradient) */}
             <button
               onClick={onSwitchToLearner}
@@ -162,6 +177,15 @@ export const InstructorNavbar: React.FC<Props> = ({
           >
             Nhật ký
           </button>
+          {onOpenTutorial && (
+            <button
+              onClick={onOpenTutorial}
+              className="px-2 py-1 text-emerald-400 font-medium flex items-center gap-1"
+            >
+              <HelpCircle className="w-3 h-3" />
+              <span>HD</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

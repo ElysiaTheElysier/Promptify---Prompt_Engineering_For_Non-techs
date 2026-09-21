@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { Search, HelpCircle } from 'lucide-react';
 import { InstructorLearner } from '../../types/instructor';
 import { INSTRUCTOR_LEARNERS, INSTRUCTOR_CLASSES } from '../../data/instructorData';
 import { LearnerDetailModal } from './LearnerDetailModal';
@@ -8,11 +8,13 @@ interface Props {
   initialClassId?: string;
   onSelectLearner?: (learner: InstructorLearner) => void;
   showClassFilter?: boolean;
+  onOpenTutorial?: () => void;
 }
 
 export const LearnerTableView: React.FC<Props> = ({ 
   initialClassId,
-  showClassFilter = true 
+  showClassFilter = true,
+  onOpenTutorial
 }) => {
   const [selectedClassId, setSelectedClassId] = useState<string>(initialClassId || 'ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'not_started' | 'in_progress' | 'completed'>('ALL');
@@ -103,24 +105,37 @@ export const LearnerTableView: React.FC<Props> = ({
             />
           </div>
 
-          {/* Class selector dropdown */}
-          {showClassFilter && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 whitespace-nowrap">Lớp:</span>
-              <select
-                value={selectedClassId}
-                onChange={(e) => setSelectedClassId(e.target.value)}
-                className="bg-white border border-slate-300 text-slate-700 text-xs rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+          {/* Class selector dropdown & Tutorial button */}
+          <div className="flex items-center gap-2">
+            {onOpenTutorial && (
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer"
+                title="Xem hướng dẫn quản lý học viên"
               >
-                <option value="ALL">Tất cả lớp ({INSTRUCTOR_LEARNERS.length} học viên)</option>
-                {INSTRUCTOR_CLASSES.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {cls.name} ({cls.totalLearners})
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+                <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Hướng dẫn tab này</span>
+              </button>
+            )}
+
+            {showClassFilter && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 whitespace-nowrap">Lớp:</span>
+                <select
+                  value={selectedClassId}
+                  onChange={(e) => setSelectedClassId(e.target.value)}
+                  className="bg-white border border-slate-300 text-slate-700 text-xs rounded-md px-2.5 py-1.5 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                >
+                  <option value="ALL">Tất cả lớp ({INSTRUCTOR_LEARNERS.length} học viên)</option>
+                  {INSTRUCTOR_CLASSES.map((cls) => (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name} ({cls.totalLearners})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* GitHub-style subnav filter tabs */}

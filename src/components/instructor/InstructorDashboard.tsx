@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, SlidersHorizontal } from 'lucide-react';
+import { ChevronRight, SlidersHorizontal, HelpCircle } from 'lucide-react';
 import { InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { INSTRUCTOR_CLASSES, INSTRUCTOR_STATS, INSTRUCTOR_ACTIVITIES } from '../../data/instructorData';
 import { InstructorDashboardOriginal } from './InstructorDashboardOriginal';
@@ -7,9 +7,10 @@ import { InstructorDashboardOriginal } from './InstructorDashboardOriginal';
 interface Props {
   onSelectClass: (cohortClass: InstructorClass) => void;
   onNavigate: (view: InstructorViewMode) => void;
+  onOpenTutorial?: () => void;
 }
 
-export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate }) => {
+export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate, onOpenTutorial }) => {
   // Hỗ trợ A/B comparison giữa bản thử nghiệm mới (Linear / Stripe / GitHub style) và bản cũ
   const [useOriginalView, setUseOriginalView] = useState<boolean>(false);
 
@@ -52,6 +53,19 @@ export const InstructorDashboard: React.FC<Props> = ({ onSelectClass, onNavigate
         </div>
 
         <div className="flex items-center gap-3 text-xs self-start sm:self-auto">
+          {onOpenTutorial && (
+            <>
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-medium transition cursor-pointer"
+                title="Xem hướng dẫn sử dụng Dashboard"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>Hướng dẫn tab này</span>
+              </button>
+              <span className="text-slate-300">·</span>
+            </>
+          )}
           <button
             onClick={() => setUseOriginalView(true)}
             className="text-slate-400 hover:text-slate-600 transition cursor-pointer"

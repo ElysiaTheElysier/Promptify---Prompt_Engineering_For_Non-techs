@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { INSTRUCTOR_CLASSES } from '../../data/instructorData';
 import { InstructorNavbar } from './InstructorNavbar';
@@ -6,7 +6,8 @@ import { InstructorDashboard } from './InstructorDashboard';
 import { ClassDetailView } from './ClassDetailView';
 import { LearnerTableView } from './LearnerTableView';
 import { ActivityStreamView } from './ActivityStreamView';
-import { Building2, ArrowRight } from 'lucide-react';
+import { InstructorTutorial } from './InstructorTutorial';
+import { ArrowRight, HelpCircle } from 'lucide-react';
 
 interface Props {
   onSwitchToLearner: () => void;
@@ -16,6 +17,37 @@ interface Props {
 export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogout }) => {
   const [currentView, setCurrentView] = useState<InstructorViewMode>('dashboard');
   const [selectedClass, setSelectedClass] = useState<InstructorClass | null>(INSTRUCTOR_CLASSES[0]);
+
+  // Quản lý hướng dẫn (Tutorial) cho từng tab
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
+  const [tutorialView, setTutorialView] = useState<InstructorViewMode>('dashboard');
+
+  // Tuỳ chọn tự động hiện tutorial khi đổi tab (mặc định bật)
+  const [autoShowTutorial, setAutoShowTutorial] = useState<boolean>(() => {
+    const saved = localStorage.getItem('promptify_instructor_auto_tutorial');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const handleToggleAutoShow = (enabled: boolean) => {
+    setAutoShowTutorial(enabled);
+    localStorage.setItem('promptify_instructor_auto_tutorial', String(enabled));
+  };
+
+  const handleOpenTutorial = (view?: InstructorViewMode) => {
+    setTutorialView(view || currentView);
+    setIsTutorialOpen(true);
+  };
+
+  // Tự động mở tutorial khi chuyển sang tab khác
+  useEffect(() => {
+    if (autoShowTutorial) {
+      setTutorialView(currentView);
+      const timer = setTimeout(() => {
+        setIsTutorialOpen(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [currentView, autoShowTutorial]);
 
   const handleSelectClass = (cls: InstructorClass) => {
     setSelectedClass(cls);
@@ -30,6 +62,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
         onNavigate={setCurrentView}
         onSwitchToLearner={onSwitchToLearner}
         onLogout={onLogout}
+        onOpenTutorial={() => handleOpenTutorial(currentView)}
       />
 
       {/* Main Content Area */}
@@ -39,13 +72,14 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
           <InstructorDashboard
             onSelectClass={handleSelectClass}
             onNavigate={setCurrentView}
+            onOpenTutorial={() => handleOpenTutorial('dashboard')}
           />
         )}
 
         {/* VIEW 2: CLASSES LIST */}
         {currentView === 'classes' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                   Danh sách Lớp học Đang phụ trách
@@ -54,6 +88,15 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
                   Chọn một lớp để theo dõi tiến độ chi tiết từng học viên và các bài lab
                 </p>
               </div>
+
+              <button
+                onClick={() => handleOpenTutorial('classes')}
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer self-start sm:self-auto"
+                title="Xem hướng dẫn danh sách lớp học"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Hướng dẫn tab này</span>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -115,6 +158,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
           <ClassDetailView
             cohortClass={selectedClass}
             onBack={() => setCurrentView('classes')}
+            onOpenTutorial={() => handleOpenTutorial('class_detail')}
           />
         )}
 
@@ -129,25 +173,29 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
                 Tìm kiếm, lọc trạng thái và bấm vào từng học viên để xem chi tiết câu lệnh prompt đã chạy
               </p>
             </div>
-            <LearnerTableView showClassFilter={true} />
+            <LearnerTableView 
+              showClassFilter={true} 
+              onOpenTutorial={() => handleOpenTutorial('learners')}
+            />
           </div>
         )}
 
         {/* VIEW 5: ACTIVITY STREAM */}
         {currentView === 'activity' && (
           <div className="space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                Nhật ký Hoạt động Thời gian thực
-              </h1>
-              <p className="text-xs text-slate-500 mt-1">
-                Dòng hoạt động trực tiếp của học viên trong toàn bộ các lớp đào tạo
-              </p>
-            </div>
-            <ActivityStreamView />
+            <ActivityStreamView onOpenTutorial={() => handleOpenTutorial('activity')} />
           </div>
         )}
       </main>
+
+      {/* Tutorial Modal */}
+      <InstructorTutorial
+        isOpen={isTutorialOpen}
+        currentView={tutorialView}
+        onClose={() => setIsTutorialOpen(false)}
+        autoShow={autoShowTutorial}
+        onToggleAutoShow={handleToggleAutoShow}
+      />
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-12">
@@ -171,4 +219,3 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
     </div>
   );
 };
-

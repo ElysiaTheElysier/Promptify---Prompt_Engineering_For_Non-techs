@@ -1,8 +1,13 @@
 import React, { useState, useMemo } from 'react';
+import { HelpCircle } from 'lucide-react';
 import { InstructorActivity, InstructorActionType } from '../../types/instructor';
 import { INSTRUCTOR_ACTIVITIES, INSTRUCTOR_CLASSES } from '../../data/instructorData';
 
-export const ActivityStreamView: React.FC = () => {
+interface Props {
+  onOpenTutorial?: () => void;
+}
+
+export const ActivityStreamView: React.FC<Props> = ({ onOpenTutorial }) => {
   const [selectedClassId, setSelectedClassId] = useState<string>('ALL');
   const [selectedActionType, setSelectedActionType] = useState<string>('ALL');
 
@@ -22,13 +27,26 @@ export const ActivityStreamView: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-4 px-2 sm:px-0">
       {/* 1. Header (Linear Style: Clean & Calm) */}
-      <div className="pb-4 border-b border-slate-200 space-y-1">
-        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
-          Nhật ký hoạt động
-        </h1>
-        <p className="text-sm text-slate-500">
-          Dòng sự kiện tương tác thời gian thực của học viên trong các buổi học
-        </p>
+      <div className="pb-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+            Nhật ký hoạt động
+          </h1>
+          <p className="text-sm text-slate-500">
+            Dòng sự kiện tương tác thời gian thực của học viên trong các buổi học
+          </p>
+        </div>
+
+        {onOpenTutorial && (
+          <button
+            onClick={onOpenTutorial}
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-medium rounded-md transition cursor-pointer self-start sm:self-auto"
+            title="Xem hướng dẫn nhật ký hoạt động"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Hướng dẫn tab này</span>
+          </button>
+        )}
       </div>
 
       {/* 2. Filter Bar (GitHub Style: Flat Filters) */}

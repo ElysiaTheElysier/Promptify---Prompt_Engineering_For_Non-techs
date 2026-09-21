@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, HelpCircle } from 'lucide-react';
 import { InstructorClass } from '../../types/instructor';
 import { LearnerTableView } from './LearnerTableView';
 
 interface Props {
   cohortClass: InstructorClass;
   onBack: () => void;
+  onOpenTutorial?: () => void;
 }
 
-export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
+export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack, onOpenTutorial }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -58,6 +59,16 @@ export const ClassDetailView: React.FC<Props> = ({ cohortClass, onBack }) => {
 
           {/* Clean Action Buttons */}
           <div className="flex items-center gap-2 text-xs flex-shrink-0">
+            {onOpenTutorial && (
+              <button
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1 px-3 py-1.5 border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 rounded-md font-medium transition cursor-pointer"
+                title="Xem hướng dẫn chi tiết lớp"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>Hướng dẫn tab này</span>
+              </button>
+            )}
             <button
               onClick={() => showToast('Đã xuất báo cáo tiến độ lớp dạng file CSV (Mock).')}
               className="px-3 py-1.5 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 font-medium transition cursor-pointer"
