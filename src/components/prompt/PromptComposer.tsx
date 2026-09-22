@@ -55,8 +55,13 @@ export const PromptComposer: React.FC<Props> = ({
 
     {supportMode === 'sample' && (
       <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-950 animate-fadeIn">
-        <p className="font-semibold">Prompt mẫu để tham khảo, không tự chèn vào bài làm</p>
-        <pre className="mt-2 max-h-40 overflow-y-auto whitespace-pre-wrap font-sans leading-relaxed">{samplePrompt}</pre>
+        <p className="font-semibold">Prompt mẫu tham khảo</p>
+        <p className="mt-1 text-amber-800">Đây là một cách làm tốt, không phải đáp án duy nhất.</p>
+        {samplePrompt.trim() ? (
+          <pre className="mt-3 max-h-72 overflow-y-auto whitespace-pre-wrap rounded-lg border border-amber-200/80 bg-white/70 p-3 font-sans leading-relaxed text-slate-800">{samplePrompt}</pre>
+        ) : (
+          <p className="mt-3 rounded-lg border border-amber-200/80 bg-white/70 p-3 text-slate-600">Lesson này chưa có prompt mẫu.</p>
+        )}
       </div>
     )}
 

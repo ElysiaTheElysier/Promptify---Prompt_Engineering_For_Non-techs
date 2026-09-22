@@ -42,7 +42,7 @@ export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[
     conceptExplanation: lesson.concept_content || '',
     systemInstruction: lesson.system_instruction || undefined,
     baselinePrompt: lesson.baseline_prompt || '',
-    improvedPrompt: lesson.improved_prompt || lesson.starter_prompt || '',
+    improvedPrompt: lesson.improved_prompt || '',
     starterPrompt: lesson.starter_prompt || undefined,
     promptPlaceholder: lesson.prompt_placeholder || undefined,
     sampleInputContext: lesson.sample_input_context || undefined,
