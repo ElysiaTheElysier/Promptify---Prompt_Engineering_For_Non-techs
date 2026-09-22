@@ -185,16 +185,18 @@ async function callGeminiWithFallback(
 
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
-        const modelPayload = model.startsWith('gemini-3')
-          ? payload
-          : {
-              ...payload,
-              generationConfig: payload.generationConfig
-                ? Object.fromEntries(Object.entries(payload.generationConfig).filter(([key]) => (
-                    key !== 'thinkingConfig' && (!model.startsWith('gemma-') || (key !== 'responseMimeType' && key !== 'responseSchema'))
-                  )))
-                : undefined,
-            };
+        const supportsThinking = model.startsWith('gemini-2.5') || model.startsWith('gemini-3');
+        const supportsJsonSchema = !model.startsWith('gemma-');
+        const modelPayload = {
+          ...payload,
+          generationConfig: payload.generationConfig
+            ? Object.fromEntries(Object.entries(payload.generationConfig).filter(([key]) => {
+                if (key === 'thinkingConfig') return supportsThinking;
+                if (key === 'responseSchema' || key === 'responseMimeType') return supportsJsonSchema;
+                return true;
+              }))
+            : undefined,
+        };
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -409,8 +411,11 @@ Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trư
       contents: [{ role: 'user', parts: [{ text: evaluationPrompt }] }],
       generationConfig: {
         temperature: 0.1,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 4096,
         responseMimeType: 'application/json',
+        thinkingConfig: {
+          thinkingBudget: 0,
+        },
         responseSchema: {
           type: 'OBJECT',
           properties: {
@@ -435,16 +440,15 @@ Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trư
     };
     const { data } = await callGeminiWithFallback(geminiApiKey, payload, { allowJudgeGemmaFallback: true });
     const parts = data.candidates?.[0]?.content?.parts || [];
-    const textPart = parts.find((p: any) => !p.thought && typeof p.text === 'string' && p.text.trim()) || parts[parts.length - 1];
-    rawText = textPart?.text || '{}';
+    const textParts = parts.filter((p: any) => !p.thought && typeof p.text === 'string' && p.text.trim());
+    rawText = textParts.map((p: any) => p.text).join('\n') || (parts[parts.length - 1]?.text ?? '{}');
   }
 
   try {
     return parseAiEvaluationText(rawText);
   } catch (parseErr) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('[AI Judge] Evaluation validation failed:', parseErr instanceof Error ? parseErr.message : 'Unknown validation error');
-    }
+    console.error('[AI Judge] Evaluation parsing failed. Raw response was:\n', rawText);
+    console.error('[AI Judge] Parse error details:', parseErr instanceof Error ? parseErr.message : parseErr);
     throw new AiServerError(
       parseErr instanceof AiEvaluationValidationError
         ? `AI Judge trả về evaluation không hợp lệ: ${parseErr.message}`
