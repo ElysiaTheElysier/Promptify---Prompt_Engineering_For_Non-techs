@@ -30,6 +30,8 @@ export interface PromptAnalysis {
   missingTypes: PromptComponentType[];
 }
 
+export type PromptComponentStatus = 'has' | 'missing' | 'weak';
+
 export const ALL_PROMPT_COMPONENTS: PromptComponentType[] = [
   'role',
   'context',
@@ -118,7 +120,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 2. ROLE
   {
     type: 'role',
-    regex: /(?:bạn\s+là(?:\s+một)?|hãy\s+đóng\s+vai(?:\s+là)?|trong\s+vai\s+trò(?:\s+của|\s+là)?|bạn\s+đang\s+là|đóng\s+vai|với\s+tư\s+cách\s+là|vai\s+trò\s+của\s+bạn\s+là|you\s+are(?:\s+an?|\s+the)?|act\s+as(?:\s+an?|\s+the)?|your\s+role\s+is(?:\s+to\s+be)?|assuming\s+the\s+role\s+of|as\s+an?\s+[a-zA-Z\s]+expert)[^.\n\r,;]+/gi,
+    regex: /(?:vai\s+trò\s*:|bạn\s+là(?:\s+một)?|hãy\s+đóng\s+vai(?:\s+là)?|trong\s+vai\s+trò(?:\s+của|\s+là)?|bạn\s+đang\s+là|đóng\s+vai|với\s+tư\s+cách\s+là|vai\s+trò\s+của\s+bạn\s+là|you\s+are(?:\s+an?|\s+the)?|act\s+as(?:\s+an?|\s+the)?|your\s+role\s+is(?:\s+to\s+be)?|assuming\s+the\s+role\s+of|as\s+an?\s+[a-zA-Z\s]+expert)[^.\n\r,;]+/gi,
     confidence: 0.9,
     reason: 'Nhận diện chỉ định vai trò chuyên gia'
   },
@@ -126,7 +128,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 3. OUTPUT FORMAT
   {
     type: 'output_format',
-    regex: /(?:output\s+format:|format\s*(?:as|:)?|trả\s+về|trình\s+bày(?:\s+kết\s+quả)?|định\s+dạng(?:\s+đầu\s+ra|\s+kết\s+quả)?|dưới\s+dạng\s+bảng|dạng\s+bảng|dưới\s+dạng\s+markdown|theo\s+bảng\s+markdown|định\s+dạng\s+json|dạng\s+json|gồm\s+các\s+cột|danh\s+sách\s+gạch\s+đầu\s+dòng|bullet\s+points?|output\s+as|return\s+as|in\s+a\s+table|as\s+a\s+table|json\s+schema|markdown\s+table|columns?:)[^.\n\r]*/gi,
+    regex: /(?:đầu\s+ra\s+mong\s+muốn\s*:|output\s+format:|format\s*(?:as|:)?|trả\s+về|trình\s+bày(?:\s+kết\s+quả)?|định\s+dạng(?:\s+đầu\s+ra|\s+kết\s+quả)?|dưới\s+dạng\s+bảng|dạng\s+bảng|dưới\s+dạng\s+markdown|theo\s+bảng\s+markdown|định\s+dạng\s+json|dạng\s+json|gồm\s+các\s+cột|danh\s+sách\s+gạch\s+đầu\s+dòng|bullet\s+points?|output\s+as|return\s+as|in\s+a\s+table|as\s+a\s+table|json\s+schema|markdown\s+table|columns?:)[^.\n\r]*/gi,
     confidence: 0.9,
     reason: 'Nhận diện yêu cầu định dạng đầu ra'
   },
@@ -142,7 +144,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 5. CONSTRAINT
   {
     type: 'constraint',
-    regex: /(?:constraints?:|yêu\s+cầu\s+bắt\s+buộc:|chỉ(?:\s+tập\s+trung|\s+nêu|\s+phân\s+tích)?|không\s+được|không\s+sử\s+dụng|tối\s+đa|không\s+vượt\s+quá|phải\s+(?:ngắn\s+gọn|đảm\s+bảo|tuân\s+thủ)|tránh(?:\s+dùng|\s+đưa)?|lưu\s+ý\s+không|tuyệt\s+đối\s+không|ngắn\s+gọn\s+trong|không\s+bịa\s+đặt|không\s+viết\s+lan\s+man|only|must\s+not|must\s+ensure|do\s+not|no\s+more\s+than|avoid|limit\s+to|strictly\s+within)[^.\n\r,;]*/gi,
+    regex: /(?:ràng\s+buộc\s*:|constraints?:|yêu\s+cầu\s+bắt\s+buộc:|chỉ(?:\s+tập\s+trung|\s+nêu|\s+phân\s+tích)?|không\s+được|không\s+sử\s+dụng|tối\s+đa|không\s+vượt\s+quá|phải\s+(?:ngắn\s+gọn|đảm\s+bảo|tuân\s+thủ)|tránh(?:\s+dùng|\s+đưa)?|lưu\s+ý\s+không|tuyệt\s+đối\s+không|ngắn\s+gọn\s+trong|không\s+bịa\s+đặt|không\s+viết\s+lan\s+man|only|must\s+not|must\s+ensure|do\s+not|no\s+more\s+than|avoid|limit\s+to|strictly\s+within)[^.\n\r,;]*/gi,
     confidence: 0.85,
     reason: 'Nhận diện quy định ràng buộc nghiệp vụ'
   },
@@ -150,7 +152,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 6. TASK
   {
     type: 'task',
-    regex: /(?:hãy\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|phân\s+loại|đề\s+xuất|tìm|kiểm\s+tra|đánh\s+giá|xây\s+dựng|tạo|lập|soạn\s+thảo|trích\s+xuất|tổng\s+hợp|nhóm)|nhiệm\s+vụ(?:\s+của\s+bạn)?\s+là|yêu\s+cầu\s+bạn|vui\s+lòng\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|đánh\s+giá|lập)|analyze|summarize|compare|classify|write|identify|propose|evaluate|draft|extract|generate|create|review|your\s+task\s+is\s+to)[^.\n\r]*/gi,
+    regex: /(?:nhiệm\s+vụ\s*:|hãy\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|phân\s+loại|đề\s+xuất|tìm|kiểm\s+tra|đánh\s+giá|xây\s+dựng|tạo|lập|soạn\s+thảo|trích\s+xuất|tổng\s+hợp|nhóm)|nhiệm\s+vụ(?:\s+của\s+bạn)?\s+là|yêu\s+cầu\s+bạn|vui\s+lòng\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|đánh\s+giá|lập)|analyze|summarize|compare|classify|write|identify|propose|evaluate|draft|extract|generate|create|review|your\s+task\s+is\s+to)[^.\n\r]*/gi,
     confidence: 0.85,
     reason: 'Nhận diện động từ hành động nghiệp vụ'
   },
@@ -252,4 +254,24 @@ export function analyzePromptStructure(prompt: string): PromptAnalysis {
     detectedTypes,
     missingTypes
   };
+}
+
+/**
+ * A detected label alone is not enough for learning feedback. This keeps the
+ * analyzer local and makes incomplete scaffold entries visible as "Chưa rõ".
+ */
+export function getPromptComponentStatus(
+  analysis: PromptAnalysis,
+  type: PromptComponentType,
+): PromptComponentStatus {
+  const spans = analysis.components.filter((component) => component.type === type);
+  if (spans.length === 0) return 'missing';
+
+  const hasPlaceholderOrShortContent = spans.some((span) => {
+    const content = span.text
+      .replace(/^(vai trò|bối cảnh|nhiệm vụ|ràng buộc|đầu ra mong muốn|định dạng(?: đầu ra)?|role|context|task|constraints?)\s*:\s*/i, '')
+      .trim();
+    return /\[[^\]]*\]|\{\{[^}]*\}\}|\.\.\./.test(content) || content.length < 12 || span.confidence < 0.82;
+  });
+  return hasPlaceholderOrShortContent ? 'weak' : 'has';
 }

@@ -1,7 +1,8 @@
 import { 
   analyzePromptStructure, 
   ALL_PROMPT_COMPONENTS, 
-  COMPONENT_METADATA 
+  COMPONENT_METADATA,
+  getPromptComponentStatus,
 } from '../src/services/promptStructureAnalyzer';
 
 console.log('=== TEST: Prompt Structure Analyzer ===\n');
@@ -132,8 +133,15 @@ assert(fullEnRes.detectedTypes.includes('output_format'), 'Full EN includes outp
 assert(fullEnRes.detectedTypes.includes('example'), 'Full EN includes example');
 assert(fullEnRes.detectedTypes.includes('grounding'), 'Full EN includes grounding');
 
-// 6. Test Performance (Zero Latency Benchmark)
-console.log('\n--- Case 6: Local Performance Benchmark ---');
+// 6. Test learner-facing checklist status (has / missing / weak)
+console.log('\n--- Case 6: Checklist status for learner scaffolds ---');
+const scaffoldRes = analyzePromptStructure('Vai trò: [AI là ai?]\nNhiệm vụ: Hãy tóm tắt hồ sơ vay vốn.');
+assert(getPromptComponentStatus(scaffoldRes, 'role') === 'weak', 'Placeholder role is reported as weak, not complete');
+assert(getPromptComponentStatus(scaffoldRes, 'task') === 'has', 'Concrete task is reported as present');
+assert(getPromptComponentStatus(scaffoldRes, 'output_format') === 'missing', 'Absent output format is reported as missing');
+
+// 7. Test Performance (Zero Latency Benchmark)
+console.log('\n--- Case 7: Local Performance Benchmark ---');
 const startTime = performance.now();
 for (let i = 0; i < 500; i++) {
   analyzePromptStructure(fullVnPrompt);
@@ -143,8 +151,8 @@ const avgTime = elapsed / 500;
 console.log(`500 iterations took ${elapsed.toFixed(2)}ms (average: ${avgTime.toFixed(3)}ms per call)`);
 assert(avgTime < 5, 'Analyzer runs in < 5ms per call (real-time 60fps typing capability)');
 
-// 7. Test Metadata & Business Explanations
-console.log('\n--- Case 7: Business Metadata Integrity ---');
+// 8. Test Metadata & Business Explanations
+console.log('\n--- Case 8: Business Metadata Integrity ---');
 for (const comp of ALL_PROMPT_COMPONENTS) {
   const meta = COMPONENT_METADATA[comp];
   assert(!!meta.label && !!meta.businessImpact && !!meta.shortLabel, `Metadata for ${comp} has label and business impact`);

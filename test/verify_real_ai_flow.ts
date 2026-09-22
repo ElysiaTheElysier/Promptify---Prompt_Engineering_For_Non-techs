@@ -3,6 +3,8 @@ import { mapAiEvaluationToRubricAudit } from '../src/services/llmService';
 import { dbService } from '../src/services/dbService';
 import { LABS_DATA } from '../src/data/labsData';
 import { AiEvaluationResult } from '../src/types/database';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 async function runTests() {
   console.log('=== TEST SUITE: REAL AI LEARNING FLOW & EVALUATION ===\n');
@@ -20,6 +22,15 @@ async function runTests() {
     }
   }
   console.log(`✓ Tất cả bài tập đã cấu hình scaffold/placeholder (${passedPlaceholders}/${LABS_DATA.length} labs có promptPlaceholder).`);
+
+  const hybridViewSource = readFileSync(resolve(process.cwd(), 'src/components/hybrid/HybridView.tsx'), 'utf8');
+  if (/setPromptText\(currentLab\.(?:starterPrompt|baselinePrompt|improvedPrompt)/.test(hybridViewSource)) {
+    throw new Error('HybridView vẫn tự động nạp prompt hoàn chỉnh vào editor!');
+  }
+  if (!hybridViewSource.includes("useState<PromptSupportMode>('structure')")) {
+    throw new Error('Mức hỗ trợ mặc định chưa phải Gợi ý cấu trúc!');
+  }
+  console.log('✓ Editor không prefill prompt hoàn chỉnh và mặc định dùng Gợi ý cấu trúc.');
 
   // 2. Test apiServerService validation
   console.log('\nTest 2: Kiểm tra validation của Server API endpoints');

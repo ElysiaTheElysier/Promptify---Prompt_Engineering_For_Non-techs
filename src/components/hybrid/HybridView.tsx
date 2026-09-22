@@ -7,12 +7,10 @@ import {
   Copy, 
   Check, 
   GitCompare, 
-  FileText, 
   Sparkles, 
   Award, 
   ArrowRight,
   Settings2,
-  HelpCircle,
   RotateCcw,
   BookmarkPlus,
   Compass,
@@ -28,6 +26,8 @@ import { detectPromptComponents, evaluateBusinessMetrics } from '../../services/
 import { dbService } from '../../services/dbService';
 import { InlineCompareCard } from '../common/InlineCompareCard';
 import { PromptStructurePanel } from '../prompt/PromptStructurePanel';
+import { PromptComposer, PromptSupportMode } from '../prompt/PromptComposer';
+import { LessonBriefPanel } from '../lesson/LessonBriefPanel';
 import { 
   analyzePromptStructure, 
   PromptAnalysis, 
@@ -88,8 +88,9 @@ export const HybridView: React.FC<Props> = ({
   const [runCountsByLab, setRunCountsByLab] = useState<Record<string, number>>({});
   const currentLabRunCount = runCountsByLab[currentLab.id] || 0;
 
-  // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
-  const [promptText, setPromptText] = useState<string>(currentLab.starterPrompt || '');
+  // Prompt always starts empty: learners author the response instead of editing a prefilled example.
+  const [promptText, setPromptText] = useState<string>('');
+  const [supportMode, setSupportMode] = useState<PromptSupportMode>('structure');
   const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
   const [output, setOutput] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
@@ -100,8 +101,6 @@ export const HybridView: React.FC<Props> = ({
   const [isDataCopied, setIsDataCopied] = useState<boolean>(false);
 
   // Accordions (mặc định đóng theo đúng yêu cầu để giảm visual noise)
-  const [showDataAccordion, setShowDataAccordion] = useState<boolean>(false);
-  const [showHintsAccordion, setShowHintsAccordion] = useState<boolean>(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
   const [showTechDetails, setShowTechDetails] = useState<boolean>(false);
   const [showScoreBreakdown, setShowScoreBreakdown] = useState<boolean>(false);
@@ -120,7 +119,7 @@ export const HybridView: React.FC<Props> = ({
 
   // Phân tích cấu trúc Prompt 7 thành phần & inline highlight
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(currentLab.starterPrompt || ''));
+  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(''));
   const [selectedSpan, setSelectedSpan] = useState<PromptSpan | null>(null);
   const [currentSpanIndexByType, setCurrentSpanIndexByType] = useState<Record<string, number>>({});
 
@@ -165,9 +164,28 @@ export const HybridView: React.FC<Props> = ({
     }
   };
 
+  const insertPromptBlock = (template: string) => {
+    const textarea = textareaRef.current;
+    const start = textarea?.selectionStart ?? promptText.length;
+    const end = textarea?.selectionEnd ?? promptText.length;
+    const prefix = promptText.slice(0, start);
+    const suffix = promptText.slice(end);
+    const separator = prefix && !prefix.endsWith('\n') ? '\n' : '';
+    const nextPrompt = `${prefix}${separator}${template}${suffix}`;
+    const caret = prefix.length + separator.length + template.length;
+
+    setPromptText(nextPrompt);
+    setSelectedSpan(null);
+    requestAnimationFrame(() => {
+      textarea?.focus();
+      textarea?.setSelectionRange(caret, caret);
+    });
+  };
+
   // Đồng bộ khi chuyển bài lab
   useEffect(() => {
-    setPromptText(currentLab.starterPrompt || '');
+    setPromptText('');
+    setSupportMode('structure');
     setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
     setOutput('');
     setScoreResult(null);
@@ -176,14 +194,12 @@ export const HybridView: React.FC<Props> = ({
     setMetrics(null);
     setCurrentStep(1);
     setSelectedVersionNumber(0);
-    setShowDataAccordion(false);
-    setShowHintsAccordion(false);
     setShowAdvancedSettings(false);
     setShowTechDetails(false);
     setShowScoreBreakdown(false);
     setSelectedSpan(null);
     setCurrentSpanIndexByType({});
-    setPromptAnalysis(analyzePromptStructure(currentLab.starterPrompt || ''));
+    setPromptAnalysis(analyzePromptStructure(''));
   }, [currentLabIndex]);
 
   // Tải lịch sử các lần chạy thật (Prompt Attempts) từ Supabase DB / LocalStore
@@ -400,11 +416,8 @@ export const HybridView: React.FC<Props> = ({
 
   const handleNextStepOrLab = () => {
     if (currentStep === 1) {
-      // Giữ nguyên prompt của học viên để họ tiếp tục cải tiến dựa trên AI Feedback
-      // Chỉ nạp gợi ý nếu ô hiện tại chưa có nội dung
-      if (!promptText.trim()) {
-        setPromptText(currentLab.improvedPrompt);
-      }
+      // Never inject a complete sample into learner work; step two keeps the learner's own draft.
+      setSupportMode('structure');
       setCurrentStep(2);
     } else if (currentLabIndex < labs.length - 1) {
       // Chuyển sang bài tiếp theo
@@ -512,171 +525,41 @@ export const HybridView: React.FC<Props> = ({
 
       {/* 2. BỐ CỤC CHÍNH (HYBRID 35% - 65%) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* CỘT TRÁI (35%): CHỈ GIỮ "BƯỚC ĐANG LÀM" - STICKY DESKTOP */}
-        <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-4">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-scenario">
-            {/* Tiêu đề bài */}
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
-                Nhiệm vụ Bài {currentLab.order}
-              </span>
-              <h2 className="text-lg font-bold text-slate-900 leading-snug">
-                {currentLab.title}
-              </h2>
-            </div>
-
-            {/* Tình huống ngắn */}
-            <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-              <span className="font-semibold text-slate-800 block">Tình huống:</span>
-              <p>{currentLab.scenario}</p>
-            </div>
-
-            {/* Một câu "Bạn cần làm gì" nổi bật */}
-            <div className="p-3 bg-emerald-50/80 rounded-xl text-xs text-emerald-950 leading-relaxed">
-              <strong>Bạn cần làm gì:</strong> {currentLab.taskGoal}
-            </div>
-
-            {/* Accordion "Dữ liệu đầu vào cố định (Control Data)" */}
-            {currentLab.sampleInputContext && (
-              <div 
-                data-tour="tour-data"
-                className="border-t border-slate-100 pt-3"
-              >
-                <button
-                  onClick={() => setShowDataAccordion(!showDataAccordion)}
-                  className="w-full flex items-center justify-between text-xs font-semibold text-indigo-950 hover:text-indigo-900 py-1"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-indigo-600" />
-                    <strong>Dữ liệu đầu vào cố định (Control Data)</strong>
-                  </span>
-                  <div className="flex items-center gap-1 text-[11px] text-indigo-600">
-                    <span className="hidden sm:inline">{showDataAccordion ? 'Thu gọn' : 'Xem dữ liệu'}</span>
-                    {showDataAccordion ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  </div>
-                </button>
-
-                {showDataAccordion && (
-                  <div className="mt-2 space-y-2 animate-fadeIn bg-indigo-50/30 p-2.5 rounded-xl border border-indigo-100">
-                    <p className="text-[11px] text-slate-500 italic leading-relaxed">
-                      💡 <strong>Nguyên lý:</strong> Dữ liệu này được giữ nguyên cố định qua mọi lần thử để bạn thấy rõ: Cùng một dữ liệu, khi sửa prompt thì output sẽ thay đổi tương ứng.
-                    </p>
-                    <div className="flex justify-end">
-                      <button
-                        onClick={handleCopySampleData}
-                        className="text-[11px] text-indigo-700 hover:text-indigo-900 font-semibold flex items-center gap-1"
-                      >
-                        {isDataCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                        {isDataCopied ? 'Đã sao chép' : 'Sao chép dữ liệu'}
-                      </button>
-                    </div>
-                    <pre className="p-2.5 bg-white rounded-lg text-xs font-mono text-slate-700 whitespace-pre-wrap max-h-48 overflow-y-auto border border-slate-200">
-                      {currentLab.sampleInputContext}
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Accordion "Gợi ý & Mẹo viết prompt" (Mặc định đóng) */}
-            <div className="border-t border-slate-100 pt-3">
-              <button
-                onClick={() => setShowHintsAccordion(!showHintsAccordion)}
-                className="w-full flex items-center justify-between text-xs font-semibold text-slate-700 hover:text-slate-900 py-1"
-              >
-                <span className="flex items-center gap-1.5">
-                  <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                  Gợi ý & Mẹo nâng cấp ({showHintsAccordion ? 'Thu gọn' : 'Bấm để xem'})
-                </span>
-                {showHintsAccordion ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-              </button>
-
-              {showHintsAccordion && (
-                <div className="mt-2 space-y-2 text-xs text-slate-600 animate-fadeIn">
-                  <p className="italic text-slate-700 bg-slate-50 p-2 rounded">
-                    "{currentLab.conceptExplanation}"
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 text-slate-600 pl-1">
-                    {currentLab.hints.map((hint, i) => (
-                      <li key={i}>{hint}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
+        {/* 1. Read: concise brief; data and advanced guidance stay collapsed. */}
+        <div className="lg:col-span-4 lg:sticky lg:top-20">
+          <LessonBriefPanel lab={currentLab} onCopyData={handleCopySampleData} isDataCopied={isDataCopied} />
         </div>
 
         {/* CỘT PHẢI (65%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
         <div className="lg:col-span-8 space-y-5">
           {/* Vùng soạn thảo Prompt chính */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-prompt">
-            {/* Header của ô thực hành */}
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-bold text-slate-900">
-                Ô Soạn thảo Prompt
-              </h3>
-
-              {/* Nút nạp nhanh tinh tế, không lấn át */}
-              <div className="flex items-center gap-2 text-xs">
-                <button
-                  onClick={() => {
-                    setPromptText(currentLab.baselinePrompt);
-                    setSelectedSpan(null);
-                  }}
-                  className="text-slate-500 hover:text-slate-800 transition"
-                  title="Nạp prompt sơ sài ban đầu"
-                >
-                  Nạp câu lệnh thô
-                </button>
-                <span className="text-slate-300">|</span>
-                <button
-                  onClick={() => {
-                    setPromptText(currentLab.improvedPrompt);
-                    setSelectedSpan(null);
-                  }}
-                  className="text-emerald-700 hover:text-emerald-900 font-medium transition"
-                  title="Nạp prompt đã thêm cấu trúc chuẩn"
-                >
-                  Nạp câu lệnh chuẩn
-                </button>
-              </div>
-            </div>
-
-            {/* Thanh chuyển đổi phiên bản câu lệnh (Lần thử 1 | Lần thử 2 | Lần thử 3...) */}
-            {currentLabVersions.length > 0 && (
-              <PromptVersionBar
-                versions={currentLabVersions}
-                selectedVersionNumber={selectedVersionNumber}
-                onSelectVersion={(vNum) => setSelectedVersionNumber(vNum)}
-                onRestorePrompt={(restored) => {
-                  setPromptText(restored);
-                  setSelectedSpan(null);
-                }}
-                onOpenCompare={() => setIsABModalOpen(true)}
-                onSaveToLibrary={(ver) => {
-                  setVersionToSave(ver);
-                  setIsSaveModalOpen(true);
-                }}
-              />
-            )}
-
-            {/* Ô Prompt lớn là thành phần chính */}
-            <textarea
-              ref={textareaRef}
-              rows={8}
-              value={promptText}
-              onChange={(e) => {
-                setPromptText(e.target.value);
-                if (errorMessage) setErrorMessage(null);
-              }}
-              placeholder={currentLab.promptPlaceholder || "Nhập câu lệnh của bạn tại đây..."}
-              className="w-full p-4 text-xs sm:text-sm font-mono text-slate-900 bg-slate-50/50 rounded-xl border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 leading-relaxed transition"
+            <PromptComposer
+              promptText={promptText}
+              supportMode={supportMode}
+              promptPlaceholder={supportMode === 'structure'
+                ? 'Vai trò: ...\nBối cảnh: ...\nNhiệm vụ: ...\nRàng buộc: ...\nĐầu ra mong muốn: ...'
+                : 'Tự viết prompt của bạn tại đây...'}
+              samplePrompt={currentLab.improvedPrompt}
+              textareaRef={textareaRef}
+              onChange={(value) => { setPromptText(value); if (errorMessage) setErrorMessage(null); }}
+              onSupportModeChange={setSupportMode}
+              onInsertBlock={insertPromptBlock}
+              history={currentLabVersions.length > 0 ? (
+                <PromptVersionBar
+                  versions={currentLabVersions}
+                  selectedVersionNumber={selectedVersionNumber}
+                  onSelectVersion={(vNum) => setSelectedVersionNumber(vNum)}
+                  onRestorePrompt={(restored) => { setPromptText(restored); setSelectedSpan(null); }}
+                  onOpenCompare={() => setIsABModalOpen(true)}
+                  onSaveToLibrary={(ver) => { setVersionToSave(ver); setIsSaveModalOpen(true); }}
+                />
+              ) : undefined}
             />
 
-            {/* Phân tích cấu trúc Prompt 7 thành phần & Trọng tâm bài học */}
             <PromptStructurePanel
               analysis={promptAnalysis}
+              promptText={promptText}
               focusComponents={currentLab.focusComponents}
               selectedSpan={selectedSpan}
               onSelectComponent={handleSelectComponent}
@@ -747,7 +630,7 @@ export const HybridView: React.FC<Props> = ({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold text-slate-900">
-                      Kết quả từ AI
+                      3. Kết quả AI & chấm điểm
                     </h3>
                     <span className="text-xs text-slate-500 font-medium">
                       (Lần thử {selectedVersionNumber > 0 ? selectedVersionNumber : currentLabRunCount})
@@ -824,14 +707,6 @@ export const HybridView: React.FC<Props> = ({
                   </div>
                 )}
               </div>
-
-              {/* Đối chiếu Trước & Sau: Tự động xuất hiện sau khi user đã chạy ít nhất 2 lần trong cùng một bài */}
-              <InlineCompareCard
-                lab={currentLab}
-                runCount={currentLabRunCount}
-                currentPrompt={promptText}
-                onOpenFullCompare={() => setIsABModalOpen(true)}
-              />
 
               {/* Trạng thái AI đang đánh giá Rubric (không che khuất kết quả) */}
               {runStatus === 'evaluating' && !aiEvaluation && (
@@ -1028,6 +903,14 @@ export const HybridView: React.FC<Props> = ({
 
                 return null;
               })()}
+
+              {/* Compare/revise follows output and evaluation in the learning flow. */}
+              <InlineCompareCard
+                lab={currentLab}
+                runCount={currentLabRunCount}
+                currentPrompt={promptText}
+                onOpenFullCompare={() => setIsABModalOpen(true)}
+              />
             </div>
           )}
         </div>
