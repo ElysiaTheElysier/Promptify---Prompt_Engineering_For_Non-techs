@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Building2, 
   Home, 
   Map, 
   Sliders, 
@@ -13,6 +12,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { AppView, ClassCohort, Learner } from '../../types';
+import { PromptifyMark } from '../common/PromptifyMark';
 
 interface Props {
   currentView: AppView;
@@ -43,9 +43,7 @@ export const ProductNavbar: React.FC<Props> = ({
           <div 
             className="flex items-center gap-2.5 flex-shrink-0 select-none"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-md">
-              <Building2 className="w-5 h-5 text-slate-950 font-bold" />
-            </div>
+            <PromptifyMark />
             <div>
               <span className="font-extrabold text-base tracking-tight font-display text-white">
                 Promptify

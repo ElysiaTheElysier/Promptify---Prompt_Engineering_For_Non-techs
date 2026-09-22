@@ -3,7 +3,6 @@ import {
   BookOpen, 
   Sliders, 
   Columns, 
-  Building2, 
   Cpu, 
   History, 
   UserCheck, 
@@ -13,6 +12,7 @@ import {
   Bookmark
 } from 'lucide-react';
 import { UIMode, ClassCohort, ApiConfig, PromptRun } from '../../types';
+import { PromptifyMark } from './PromptifyMark';
 
 interface Props {
   currentMode: UIMode;
@@ -47,9 +47,7 @@ export const Header: React.FC<Props> = ({
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Brand & Logo */}
           <div className="flex items-center gap-2.5 flex-shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-md">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
+            <PromptifyMark />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-base tracking-tight font-display text-white">

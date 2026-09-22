@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { ClassCohort, Learner, Enrollment } from '../../types';
 import { CLASS_COHORTS, DEFAULT_ENROLLMENTS } from '../../data/classesData';
+import { PromptifyMark } from '../common/PromptifyMark';
 
 interface Props {
   learner?: Learner | null;
@@ -77,9 +78,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
           <div 
             className="flex items-center gap-3 select-none"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md">
-              <Building2 className="w-5 h-5" />
-            </div>
+            <PromptifyMark />
             <div>
               <span className="font-extrabold text-base tracking-tight text-white font-display">
                 Promptify

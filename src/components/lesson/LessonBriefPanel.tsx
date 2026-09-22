@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Check, ChevronDown, ChevronUp, Copy, FileText, HelpCircle, Target } from 'lucide-react';
 import { LabStep } from '../../types';
 import { COMPONENT_METADATA } from '../../services/promptStructureAnalyzer';
+import { MarkdownView } from '../common/MarkdownView';
 
 interface Props {
   lab: LabStep;
@@ -19,6 +20,10 @@ export const LessonBriefPanel: React.FC<Props> = ({ lab, onCopyData, isDataCopie
     lab.rubricCriteria.guardrails,
     lab.expectedOutputFormat,
   ].filter((item, index, items) => item && items.indexOf(item) === index).slice(0, 5);
+  const normalizeTaskMarkdown = (content: string) => content
+    .replace(/\s+(?=\d+\.\s)/g, '\n')
+    .replace(/:\s*-\s*/g, ':\n- ')
+    .replace(/\s+-\s+(?=[A-ZÀ-Ỹ])/g, '\n- ');
 
   return (
     <aside className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm space-y-5" data-tour="tour-scenario">
@@ -40,7 +45,11 @@ export const LessonBriefPanel: React.FC<Props> = ({ lab, onCopyData, isDataCopie
       <div className="space-y-2">
         <p className="text-xs font-semibold text-slate-800">Nhiệm vụ</p>
         <ul className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
-          {taskBullets.map((item, index) => <li key={index} className="flex gap-2"><span className="text-emerald-600">•</span><span>{item}</span></li>)}
+          {taskBullets.map((item, index) => (
+            <li key={index} className="pl-0.5">
+              <MarkdownView content={normalizeTaskMarkdown(item)} className="[&>p]:my-0 [&_ul]:mt-1 [&_ol]:mt-1" />
+            </li>
+          ))}
         </ul>
       </div>
 
