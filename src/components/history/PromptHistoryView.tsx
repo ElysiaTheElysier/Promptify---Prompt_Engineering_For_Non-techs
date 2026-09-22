@@ -170,7 +170,7 @@ export const PromptHistoryView: React.FC<Props> = ({
                       {item.versionTag}
                     </span>
                     <span className="text-slate-400">
-                      • {item.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
+                      • {item.mode === 'openai' ? 'OpenAI' : item.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
                     </span>
                   </div>
 
@@ -270,4 +270,3 @@ export const PromptHistoryView: React.FC<Props> = ({
     </div>
   );
 };
-

@@ -87,6 +87,50 @@ async function callOpenAiJudge(apiKey: string, prompt: string): Promise<string> 
   return outputText;
 }
 
+async function callOpenAiGenerate(
+  apiKey: string,
+  prompt: string,
+  context?: string,
+): Promise<{ output: string; model: string; tokens?: number }> {
+  const model = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
+  const input = context?.trim()
+    ? `[DỮ LIỆU ĐẦU VÀO / NGỮ CẢNH CỐ ĐỊNH]:\n${context.trim()}\n\n---\n[CÂU LỆNH YÊU CẦU CỦA NGƯỜI DÙNG]:\n${prompt.trim()}`
+    : prompt.trim();
+  const response = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      instructions: 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ và doanh nghiệp. Thực hiện chính xác, súc tích và đúng trọng tâm yêu cầu; không bịa dữ kiện ngoài nguồn.',
+      input,
+      max_output_tokens: 2048,
+      store: false,
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+
+  if (!response.ok) {
+    console.error(`[OpenAI Generate] HTTP ${response.status}.`);
+    throw new AiServerError(
+      response.status === 401 || response.status === 403
+        ? 'OPENAI_API_KEY trên máy chủ không hợp lệ hoặc không có quyền dùng model đã cấu hình.'
+        : response.status === 429
+          ? 'OpenAI đang vượt giới hạn sử dụng. Vui lòng thử lại.'
+          : 'OpenAI tạm thời không khả dụng. Vui lòng thử lại.',
+      response.status === 429 ? 503 : 502,
+    );
+  }
+
+  const data = await response.json() as any;
+  const output = data.output_text
+    || data.output?.flatMap((item: any) => item.content || []).find((item: any) => item.type === 'output_text')?.text;
+  if (!output) throw new AiServerError('OpenAI không trả về nội dung hợp lệ.', 502);
+  return { output, model, tokens: data.usage?.total_tokens };
+}
+
 /**
  * Trích xuất JSON an toàn ngay cả khi mô hình trả về chuỗi có ký tự nháy hoặc cấu trúc lỗi
  */
@@ -207,56 +251,21 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
     throw new AiServerError('Câu lệnh prompt không được để trống.', 400);
   }
 
-  const apiKey = getGeminiApiKey();
+  const apiKey = getOpenAiApiKey();
   if (!apiKey) {
-    throw new AiServerError('Máy chủ chưa cấu hình GEMINI_API_KEY cho môi trường deployment.', 503);
+    throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY cho môi trường deployment.', 503);
   }
 
   const startTime = performance.now();
-
-  const userParts: { text: string }[] = [];
-  if (context && context.trim()) {
-    userParts.push({ text: `[DỮ LIỆU ĐẦU VÀO / NGỮ CẢNH CỐ ĐỊNH]:\n${context.trim()}\n\n---\n[CÂU LỆNH YÊU CẦU CỦA NGƯỜI DÙNG]:\n${prompt.trim()}` });
-  } else {
-    userParts.push({ text: prompt.trim() });
-  }
-
-  const payload = {
-    contents: [
-      {
-        role: 'user',
-        parts: userParts
-      }
-    ],
-    systemInstruction: {
-      parts: [
-        {
-          text: 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng và doanh nghiệp. Hãy thực hiện chính xác, súc tích và đúng trọng tâm yêu cầu được đưa ra trong câu lệnh của người dùng.'
-        }
-      ]
-    },
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 2048,
-    }
-  };
-
-  const { data, model: usedModel } = await callGeminiWithFallback(apiKey, payload);
-  const candidate = data.candidates?.[0];
-  const outputText = candidate?.content?.parts?.[0]?.text;
-
-  if (!outputText) {
-    throw new Error('Mô hình không trả về nội dung hợp lệ.');
-  }
+  const result = await callOpenAiGenerate(apiKey, prompt, context);
 
   const latencyMs = Math.round(performance.now() - startTime);
-  const tokens = data.usageMetadata?.totalTokenCount || Math.ceil(outputText.length / 4);
 
   return {
-    output: outputText,
-    model: usedModel,
+    output: result.output,
+    model: result.model,
     latencyMs,
-    tokens
+    tokens: result.tokens || Math.ceil(result.output.length / 4),
   };
 }
 
@@ -278,13 +287,6 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
     throw new AiServerError('Learner prompt không được để trống khi đánh giá.', 400);
   }
 
-  const apiKey = getGeminiApiKey();
-  if (!apiKey) {
-    throw new AiServerError('Máy chủ chưa cấu hình GEMINI_API_KEY cho AI Evaluation.', 503);
-  }
-
-  const model = getGeminiModel();
-
   const rubricDescription = lessonRubric 
     ? typeof lessonRubric === 'string' ? lessonRubric : JSON.stringify(lessonRubric, null, 2)
     : 'Yêu cầu chuẩn: Đúng vai trò, bám sát dữ liệu đầu vào, xuất bảng hoặc định dạng chuẩn, không đàm thoại lan man.';
@@ -303,31 +305,9 @@ AI OUTPUT: ${generatedOutput || '(Không có output)'}
 Chỉ trả JSON hợp lệ, không markdown:
 {"scores":{"taskCompletion":0,"groundedness":0,"formatAdherence":0,"constraintCompliance":0,"businessUsability":0},"strengths":["1–3 ý ngắn"],"improvements":["1–3 ý ngắn"],"nextHint":"một hành động cụ thể"}`;
 
-  const payload = {
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: evaluationPrompt }]
-      }
-    ],
-    generationConfig: {
-      temperature: 0.1, // Thấp để đảm bảo tính khách quan và nhất quán
-      maxOutputTokens: 600, // Tối ưu token để phản hồi dưới 1 giây
-      responseMimeType: 'application/json',
-      thinkingConfig: {
-        thinkingBudget: 0,
-      },
-    }
-  };
-
   const openAiApiKey = getOpenAiApiKey();
-  let rawText: string;
-  if (openAiApiKey) {
-    rawText = await callOpenAiJudge(openAiApiKey, evaluationPrompt);
-  } else {
-    const { data } = await callGeminiWithFallback(apiKey, payload, { allowJudgeGemmaFallback: true });
-    rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-  }
+  if (!openAiApiKey) throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY cho AI Evaluation.', 503);
+  const rawText = await callOpenAiJudge(openAiApiKey, evaluationPrompt);
 
   try {
     const parsed = parseJsonSafely(rawText);

@@ -930,12 +930,7 @@ export const App: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4 text-[11px] text-slate-600">
-            <button
-              onClick={() => setIsApiModalOpen(true)}
-              className="text-emerald-700 font-medium hover:underline cursor-pointer"
-            >
-              Cấu hình AI ({apiConfig.mode === 'simulated' ? 'Mô phỏng' : 'Gemini API'})
-            </button>
+            <span className="text-emerald-700 font-medium">AI máy chủ (OpenAI)</span>
             <span>•</span>
             <button
               onClick={() => setCurrentView('history')}

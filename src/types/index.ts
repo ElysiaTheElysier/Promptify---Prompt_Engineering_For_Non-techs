@@ -118,7 +118,7 @@ export interface PromptRun {
   output: string;
   tokenCount: number;
   latencyMs: number;
-  mode: 'simulated' | 'gemini';
+  mode: 'simulated' | 'gemini' | 'openai';
   versionTag: 'baseline' | 'improved' | 'custom';
 }
 
@@ -206,5 +206,4 @@ export interface SavedPromptTemplate {
   isRecommended?: boolean;     // Được chuyên gia / giảng viên đánh dấu khuyên dùng
   sampleOutputSnippet?: string;
 }
-
 

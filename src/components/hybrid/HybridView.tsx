@@ -694,7 +694,7 @@ export const HybridView: React.FC<Props> = ({
 
                     {showTechDetails && (
                       <span className="text-[11px] font-mono text-slate-500">
-                        {metrics.latency}ms · {metrics.tokens} tokens · {metrics.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
+                        {metrics.latency}ms · {metrics.tokens} tokens · {metrics.mode === 'openai' ? 'OpenAI' : metrics.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
                       </span>
                     )}
                   </div>
