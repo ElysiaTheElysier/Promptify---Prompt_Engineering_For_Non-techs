@@ -6,6 +6,7 @@ export interface GenerateRequestBody {
   classId?: string;
   prompt: string;
   context?: string;
+  apiKey?: string;
 }
 
 export interface GenerateResponseBody {
@@ -24,6 +25,7 @@ export interface EvaluateRequestBody {
   lessonRubric?: any;
   learnerPrompt: string;
   generatedOutput: string;
+  apiKey?: string;
 }
 
 export class AiServerError extends Error {
@@ -171,10 +173,10 @@ async function callGeminiWithFallback(
   options: { allowJudgeGemmaFallback?: boolean } = {},
 ): Promise<{ data: any; model: string }> {
   const candidateModels = options.allowJudgeGemmaFallback
-    ? ['gemini-3-flash-preview', 'gemma-4-26b-a4b-it']
-    : ['gemini-3-flash-preview', getGeminiModel(), 'gemini-flash-lite-latest'];
+    ? ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-3-flash-preview', 'gemma-4-26b-a4b-it']
+    : [getGeminiModel(), 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-flash-lite-latest'];
   // Loại bỏ model trùng lặp
-  const models = Array.from(new Set(candidateModels));
+  const models = Array.from(new Set(candidateModels.filter(Boolean)));
   let lastError: Error | null = null;
 
   for (let i = 0; i < models.length; i++) {
@@ -225,12 +227,15 @@ async function callGeminiWithFallback(
           console.error(`[Gemini API] Model ${model} trả về HTTP ${response.status}.`);
           // Giữ lỗi 503 có thể retry nếu các model fallback không tồn tại cho project này.
           if (!(lastError instanceof AiServerError && lastError.statusCode === 503 && response.status === 404)) {
+            const isLeaked = response.status === 403 && upstreamMessage?.toLowerCase().includes('leaked');
             lastError = new AiServerError(
               response.status === 400
                 ? `Gemini từ chối request${upstreamMessage ? `: ${upstreamMessage}` : '.'}`
-                : response.status === 401 || response.status === 403
-                  ? 'GEMINI_API_KEY trên máy chủ không hợp lệ hoặc không có quyền dùng model đã cấu hình.'
-                  : 'Không thể nhận phản hồi hợp lệ từ dịch vụ AI.',
+                : isLeaked
+                  ? 'API Key của bạn đã bị vô hiệu hóa do Google phát hiện rò rỉ (leaked key). Vui lòng cập nhật API Key mới trong Cài đặt.'
+                  : response.status === 401 || response.status === 403
+                    ? `GEMINI_API_KEY không hợp lệ hoặc bị từ chối (${upstreamMessage || 'Permission Denied'}).`
+                    : 'Không thể nhận phản hồi hợp lệ từ dịch vụ AI.',
               response.status === 400 ? 400 : 502,
             );
           }
@@ -263,28 +268,70 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
     throw new AiServerError('Câu lệnh prompt không được để trống.', 400);
   }
 
-  const apiKey = getOpenAiApiKey();
-  if (!apiKey) {
-    throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY cho môi trường deployment.', 503);
-  }
+  const requestedApiKey = body.apiKey && body.apiKey.trim();
+  const openAiApiKey = (requestedApiKey?.startsWith('sk-') ? requestedApiKey : '') || getOpenAiApiKey();
+  const geminiApiKey = (requestedApiKey && !requestedApiKey.startsWith('sk-') ? requestedApiKey : '') || getGeminiApiKey();
 
   const startTime = performance.now();
-  const result = await callOpenAiGenerate(apiKey, prompt, context);
 
-  const latencyMs = Math.round(performance.now() - startTime);
+  // 1. Sử dụng OpenAI nếu có OpenAI key
+  if (openAiApiKey) {
+    const result = await callOpenAiGenerate(openAiApiKey, prompt, context);
+    const latencyMs = Math.round(performance.now() - startTime);
+    return {
+      output: result.output,
+      model: result.model,
+      latencyMs,
+      tokens: result.tokens || Math.ceil(result.output.length / 4),
+    };
+  }
 
-  return {
-    output: result.output,
-    model: result.model,
-    latencyMs,
-    tokens: result.tokens || Math.ceil(result.output.length / 4),
-  };
+  // 2. Sử dụng Google Gemini nếu có Gemini key
+  if (geminiApiKey) {
+    const userParts: { text: string }[] = [];
+    if (context && context.trim()) {
+      userParts.push({ text: `[DỮ LIỆU ĐẦU VÀO / NGỮ CẢNH CỐ ĐỊNH]:\n${context.trim()}\n\n---\n[CÂU LỆNH YÊU CẦU CỦA NGƯỜI DÙNG]:\n${prompt.trim()}` });
+    } else {
+      userParts.push({ text: prompt.trim() });
+    }
+
+    const payload = {
+      contents: [{ role: 'user', parts: userParts }],
+      systemInstruction: {
+        parts: [{ text: 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng và doanh nghiệp. Hãy thực hiện chính xác, súc tích và đúng trọng tâm yêu cầu được đưa ra trong câu lệnh của người dùng.' }]
+      },
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 2048,
+      }
+    };
+
+    const { data, model: usedModel } = await callGeminiWithFallback(geminiApiKey, payload);
+    const candidate = data.candidates?.[0];
+    const outputText = candidate?.content?.parts?.[0]?.text;
+    if (!outputText) {
+      throw new Error('Mô hình không trả về nội dung hợp lệ.');
+    }
+    const latencyMs = Math.round(performance.now() - startTime);
+    const tokens = data.usageMetadata?.totalTokenCount || Math.ceil(outputText.length / 4);
+
+    return {
+      output: outputText,
+      model: usedModel,
+      latencyMs,
+      tokens
+    };
+  }
+
+  throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY hoặc GEMINI_API_KEY cho môi trường deployment.', 503);
 }
 
 /**
  * Xử lý yêu cầu POST /api/evaluate
  * Đánh giá khách quan câu lệnh và kết quả AI sinh ra dựa trên 5 tiêu chí Rubric MVP (0-2 điểm mỗi tiêu chí)
  */
+import { detectPiiEntities } from './labComplianceService';
+
 export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<AiEvaluationResult> {
   const {
     scenario,
@@ -297,6 +344,43 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
 
   if (!learnerPrompt || !learnerPrompt.trim()) {
     throw new AiServerError('Learner prompt không được để trống khi đánh giá.', 400);
+  }
+
+  // 1. KIỂM TRA ZERO-TOLERANCE VỀ RÒ RỈ THÔNG TIN PII (LAB 01 & NGHỊ ĐỊNH 13)
+  const isPiiLesson = 
+    (scenario && scenario.toLowerCase().includes('pii')) ||
+    (taskRequirement && taskRequirement.toLowerCase().includes('pii')) ||
+    (lessonRubric && JSON.stringify(lessonRubric).toLowerCase().includes('pii'));
+
+  const piiCheck = detectPiiEntities(learnerPrompt);
+  if (isPiiLesson && piiCheck.hasPii) {
+    return {
+      scores: {
+        taskCompletion: 1,
+        groundedness: 0,
+        formatAdherence: 1,
+        constraintCompliance: 0,
+        businessUsability: 0
+      },
+      total: 2,
+      strengths: ['Đã nắm được cấu trúc nhiệm vụ ban đầu.'],
+      improvements: [
+        `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại thông tin PII thật trong câu lệnh (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`,
+        'Vi phạm quy chuẩn an toàn dữ liệu khách hàng Agribank: Tuyệt đối không gửi CCCD, SĐT, STK thật lên AI mà chưa khử định danh!'
+      ],
+      nextHint: 'Bấm nút "Tự động Bút xóa PII 1-chạm" để hệ thống tự động ẩn danh hóa toàn bộ thông tin nhạy cảm thành biến giữ chỗ an toàn.'
+    };
+  }
+
+  const requestedApiKey = body.apiKey && body.apiKey.trim();
+  const openAiApiKey = (requestedApiKey?.startsWith('sk-') ? requestedApiKey : '') || getOpenAiApiKey();
+  const geminiApiKey = (requestedApiKey && !requestedApiKey.startsWith('sk-') ? requestedApiKey : '') || getGeminiApiKey();
+
+  if (!openAiApiKey && !geminiApiKey) {
+    throw new AiServerError(
+      'Chưa cấu hình API_KEY trên máy chủ. Vui lòng thiết lập biến môi trường OPENAI_API_KEY hoặc GEMINI_API_KEY để thực hiện AI Evaluation.',
+      503
+    );
   }
 
   const rubricDescription = lessonRubric 
@@ -314,17 +398,33 @@ LESSON RUBRIC: ${rubricDescription}
 LEARNER PROMPT: ${learnerPrompt}
 AI OUTPUT: ${generatedOutput || '(Không có output)'}
 
-Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trường và không dùng điểm mặc định.`;
+Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trường và không dùng điểm mặc định:
+{"scores":{"taskCompletion":0,"groundedness":0,"formatAdherence":0,"constraintCompliance":0,"businessUsability":0},"strengths":["1–3 ý ngắn"],"improvements":["1–3 ý ngắn"],"nextHint":"một hành động cụ thể"}`;
 
-  const openAiApiKey = getOpenAiApiKey();
-  if (!openAiApiKey) throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY cho AI Evaluation.', 503);
-  const rawText = await callOpenAiJudge(openAiApiKey, evaluationPrompt);
+  let rawText: string;
+  if (openAiApiKey) {
+    rawText = await callOpenAiJudge(openAiApiKey, evaluationPrompt);
+  } else {
+    const payload = {
+      contents: [{ role: 'user', parts: [{ text: evaluationPrompt }] }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 600,
+        responseMimeType: 'application/json',
+        thinkingConfig: {
+          thinkingBudget: 0,
+        },
+      }
+    };
+    const { data } = await callGeminiWithFallback(geminiApiKey, payload, { allowJudgeGemmaFallback: true });
+    rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  }
 
   try {
     return parseAiEvaluationText(rawText);
   } catch (parseErr) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[OpenAI Judge] Evaluation validation failed:', parseErr instanceof Error ? parseErr.message : 'Unknown validation error');
+      console.warn('[AI Judge] Evaluation validation failed:', parseErr instanceof Error ? parseErr.message : 'Unknown validation error');
     }
     throw new AiServerError(
       parseErr instanceof AiEvaluationValidationError

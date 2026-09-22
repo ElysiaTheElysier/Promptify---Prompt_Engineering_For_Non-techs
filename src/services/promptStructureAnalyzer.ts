@@ -54,49 +54,49 @@ export const COMPONENT_METADATA: Record<PromptComponentType, {
     shortLabel: 'Vai trò',
     explanation: 'Xác định tư cách và vị trí chuyên môn của AI.',
     businessImpact: 'Giúp AI chọn góc nhìn chuyên gia và văn phong phù hợp với tiêu chuẩn nghiệp vụ.',
-    exampleSnippet: 'Bạn là chuyên viên thẩm định tín dụng doanh nghiệp Agribank...'
+    exampleSnippet: 'Bạn là Chuyên gia Truyền thông & Báo chí Agribank với 10 năm kinh nghiệm gắn bó cùng người nông dân Tam nông.'
   },
   context: {
     label: 'Bối cảnh (Context)',
     shortLabel: 'Bối cảnh',
     explanation: 'Cung cấp dữ liệu đầu vào và tình huống làm việc thực tế.',
     businessImpact: 'Giúp câu trả lời bám đúng tình huống công việc và dữ liệu thực tế.',
-    exampleSnippet: 'Dưới đây là hồ sơ báo cáo tài chính quý 4 của công ty CP Nông nghiệp...'
+    exampleSnippet: 'Dưới đây là trích lục hồ sơ vay vốn và biên bản hỗ trợ khẩn cấp sau bão lũ tại Chi nhánh Trấn Yên.'
   },
   task: {
     label: 'Nhiệm vụ (Task)',
     shortLabel: 'Nhiệm vụ',
     explanation: 'Chỉ rõ hành động cụ thể AI cần làm.',
     businessImpact: 'Làm rõ hành vi nghiệp vụ cốt lõi mà AI thực sự cần thực hiện.',
-    exampleSnippet: 'Hãy phân tích các rủi ro tài chính chính và tóm tắt thành 3 phát hiện...'
+    exampleSnippet: 'Hãy phác thảo 03 góc tiếp cận tiêu đề và đoạn mở đầu ngắn gọn (30-50 từ) cho bài phóng sự trên website.'
   },
   constraint: {
     label: 'Ràng buộc (Constraint)',
     shortLabel: 'Ràng buộc',
     explanation: 'Giới hạn phạm vi, độ dài hoặc điều cấm.',
     businessImpact: 'Kiểm soát phạm vi, giảm output ngoài phạm vi hoặc không phù hợp yêu cầu.',
-    exampleSnippet: 'Không quá 300 từ, tuyệt đối không tự suy diễn các số liệu chưa có...'
+    exampleSnippet: 'Tuyệt đối không dùng từ ngữ quảng cáo giật gân (siêu rẻ, bùng nổ, hot deal); độ dài thông cáo dưới 300 từ.'
   },
   output_format: {
     label: 'Định dạng (Output Format)',
     shortLabel: 'Định dạng',
     explanation: 'Yêu cầu hình thức biểu diễn kết quả.',
     businessImpact: 'Giúp kết quả sẵn sàng để đưa vào báo cáo, email hoặc bảng tính.',
-    exampleSnippet: 'Trình bày kết quả dưới dạng bảng Markdown gồm các cột: Chỉ tiêu, Kết quả, Đánh giá...'
+    exampleSnippet: 'Trình bày kết quả dưới dạng bảng Markdown gồm 4 cột: [Chỉ tiêu], [Số liệu], [Đơn vị], [Đánh giá an toàn].'
   },
   example: {
     label: 'Ví dụ (Example)',
     shortLabel: 'Ví dụ',
     explanation: 'Đưa ra mẫu đầu vào hoặc đầu ra mong đợi.',
     businessImpact: 'Cho AI thấy mẫu output hoặc phong cách mong muốn để mô phỏng chính xác.',
-    exampleSnippet: 'Ví dụ: Tỷ số thanh toán hiện hành = 1.4 -> Đạt chuẩn thanh khoản...'
+    exampleSnippet: 'Mẫu tham chiếu: "🌾 Có một mái ấm vững chãi để mùa đông nay bớt lạnh hơn... Ước mơ của bác Mùa A Súa nay đã thành hiện thực."'
   },
   grounding: {
     label: 'Bằng chứng (Grounding)',
     shortLabel: 'Bằng chứng',
     explanation: 'Buộc câu trả lời phải neo chặt vào tài liệu được cung cấp.',
     businessImpact: 'Buộc câu trả lời bám vào dữ liệu/bằng chứng được cung cấp, triệt tiêu ảo giác.',
-    exampleSnippet: 'Chỉ sử dụng dữ liệu được cung cấp, trích dẫn nguồn số trang từ tài liệu...'
+    exampleSnippet: 'Chỉ sử dụng dữ liệu trong trích lục đã cấp; toàn bộ thông tin nhạy cảm đã ẩn danh bằng biến {{TEN_KH}}, {{SO_CCCD}}.'
   }
 };
 
@@ -120,7 +120,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 2. ROLE
   {
     type: 'role',
-    regex: /(?:vai\s+trò\s*:|bạn\s+là(?:\s+một)?|hãy\s+đóng\s+vai(?:\s+là)?|trong\s+vai\s+trò(?:\s+của|\s+là)?|bạn\s+đang\s+là|đóng\s+vai|với\s+tư\s+cách\s+là|vai\s+trò\s+của\s+bạn\s+là|you\s+are(?:\s+an?|\s+the)?|act\s+as(?:\s+an?|\s+the)?|your\s+role\s+is(?:\s+to\s+be)?|assuming\s+the\s+role\s+of|as\s+an?\s+[a-zA-Z\s]+expert)[^.\n\r,;]+/gi,
+    regex: /(?:vai\s+trò(?:\s*:|\s+của\s+bạn\s+là)?|role\s*:?|bạn\s+là(?:\s+một)?|hãy\s+đóng\s+vai(?:\s+là)?|trong\s+vai\s+trò(?:\s+của|\s+là)?|bạn\s+đang\s+là|đóng\s+vai|với\s+tư\s+cách\s+là|you\s+are(?:\s+an?|\s+the)?|act\s+as(?:\s+an?|\s+the)?|your\s+role\s+is(?:\s+to\s+be)?|assuming\s+the\s+role\s+of|as\s+an?\s+[a-zA-Z\s]+expert)[^.\n\r,;]+/gi,
     confidence: 0.9,
     reason: 'Nhận diện chỉ định vai trò chuyên gia'
   },
@@ -144,7 +144,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 5. CONSTRAINT
   {
     type: 'constraint',
-    regex: /(?:ràng\s+buộc\s*:|constraints?:|yêu\s+cầu\s+bắt\s+buộc:|chỉ(?:\s+tập\s+trung|\s+nêu|\s+phân\s+tích)?|không\s+được|không\s+sử\s+dụng|tối\s+đa|không\s+vượt\s+quá|phải\s+(?:ngắn\s+gọn|đảm\s+bảo|tuân\s+thủ)|tránh(?:\s+dùng|\s+đưa)?|lưu\s+ý\s+không|tuyệt\s+đối\s+không|ngắn\s+gọn\s+trong|không\s+bịa\s+đặt|không\s+viết\s+lan\s+man|only|must\s+not|must\s+ensure|do\s+not|no\s+more\s+than|avoid|limit\s+to|strictly\s+within)[^.\n\r,;]*/gi,
+    regex: /(?:ràng\s+buộc(?:\s*:|\s+bắt\s+buộc)?|constraints?:|yêu\s+cầu\s+bắt\s+buộc:|chỉ(?:\s+tập\s+trung|\s+nêu|\s+phân\s+tích)?|không\s+được|không\s+sử\s+dụng|tối\s+đa|không\s+vượt\s+quá|phải\s+(?:ngắn\s+gọn|đảm\s+bảo|tuân\s+thủ)|tránh(?:\s+dùng|\s+đưa)?|lưu\s+ý\s+không|tuyệt\s+đối\s+không|ngắn\s+gọn\s+trong|không\s+bịa\s+đặt|không\s+viết\s+lan\s+man|only|must\s+not|must\s+ensure|do\s+not|no\s+more\s+than|avoid|limit\s+to|strictly\s+within)[^.\n\r,;]*/gi,
     confidence: 0.85,
     reason: 'Nhận diện quy định ràng buộc nghiệp vụ'
   },
@@ -152,7 +152,7 @@ const HEURISTIC_RULES: RulePattern[] = [
   // 6. TASK
   {
     type: 'task',
-    regex: /(?:nhiệm\s+vụ\s*:|hãy\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|phân\s+loại|đề\s+xuất|tìm|kiểm\s+tra|đánh\s+giá|xây\s+dựng|tạo|lập|soạn\s+thảo|trích\s+xuất|tổng\s+hợp|nhóm)|nhiệm\s+vụ(?:\s+của\s+bạn)?\s+là|yêu\s+cầu\s+bạn|vui\s+lòng\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|đánh\s+giá|lập)|analyze|summarize|compare|classify|write|identify|propose|evaluate|draft|extract|generate|create|review|your\s+task\s+is\s+to)[^.\n\r]*/gi,
+    regex: /(?:nhiệm\s+vụ(?:\s*:|\s+của\s+bạn\s+là|\s+chính)?|task\s*:?|hãy\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|phân\s+loại|đề\s+xuất|tìm|kiểm\s+tra|đánh\s+giá|xây\s+dựng|tạo|lập|soạn\s+thảo|trích\s+xuất|tổng\s+hợp|nhóm)|yêu\s+cầu\s+bạn|vui\s+lòng\s+(?:phân\s+tích|viết|tóm\s+tắt|so\s+sánh|đánh\s+giá|lập)|analyze|summarize|compare|classify|write|identify|propose|evaluate|draft|extract|generate|create|review|your\s+task\s+is\s+to)[^.\n\r]*/gi,
     confidence: 0.85,
     reason: 'Nhận diện động từ hành động nghiệp vụ'
   },
@@ -182,23 +182,31 @@ export function analyzePromptStructure(prompt: string): PromptAnalysis {
     };
   }
 
+  // Chuẩn hóa xuống LF (\n) để đồng bộ 100% với cách trình duyệt tính offset trong HTMLTextAreaElement
+  const normalizedPrompt = prompt.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const rawSpans: PromptSpan[] = [];
 
-  // Quét từng rule trên prompt gốc
+  // Quét từng rule trên prompt đã chuẩn hóa
   for (const rule of HEURISTIC_RULES) {
     const regex = new RegExp(rule.regex.source, rule.regex.flags);
     let match: RegExpExecArray | null;
 
-    while ((match = regex.exec(prompt)) !== null) {
-      const matchText = match[0].trim();
-      if (matchText.length >= 3) {
-        const start = match.index;
-        const end = match.index + match[0].length;
+    while ((match = regex.exec(normalizedPrompt)) !== null) {
+      const rawMatch = match[0];
+      const cleanText = rawMatch.trim();
+
+      if (cleanText.length >= 3) {
+        // Cắt bỏ khoảng trắng thừa đầu và đuôi để highlight ôm khít từng ký tự chữ
+        const leadingSpaces = rawMatch.length - rawMatch.trimStart().length;
+        const trailingSpaces = rawMatch.length - rawMatch.trimEnd().length;
+        const start = match.index + leadingSpaces;
+        const end = match.index + rawMatch.length - trailingSpaces;
+
         rawSpans.push({
           type: rule.type,
           start,
           end,
-          text: prompt.slice(start, end),
+          text: cleanText,
           confidence: rule.confidence,
           reason: rule.reason
         });

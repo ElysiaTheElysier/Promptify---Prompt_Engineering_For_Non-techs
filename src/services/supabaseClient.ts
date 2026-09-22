@@ -1,5 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Polyfill minimal WebSocket for Node 20 test runners if native WebSocket is absent
+if (typeof globalThis.WebSocket === 'undefined') {
+  (globalThis as any).WebSocket = class DummyWebSocket {};
+}
+
 // Safe environment variable access for both Vite browser runtime and Node test runner
 const nodeEnv = typeof globalThis !== 'undefined' && (globalThis as any).process?.env;
 const env: Record<string, string | undefined> = 

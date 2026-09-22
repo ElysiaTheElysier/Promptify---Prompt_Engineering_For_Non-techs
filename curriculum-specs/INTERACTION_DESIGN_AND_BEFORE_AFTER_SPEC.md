@@ -37,7 +37,7 @@ Mục tiêu tối thượng: **Học viên không cần biết kỹ thuật vẫ
 - **Hành vi học viên:** Học viên bấm 1 nút *"Nạp câu lệnh thô thường dùng"* rồi bấm nút *"Chạy thử nghiệm"*.
 - **Trải nghiệm quan sát:**
   - AI phản hồi với một kết quả "dở tệ" hoặc chứa đựng nguy cơ thực tế:
-    - *Lab 1:* AI in thẳng số CCCD và số tài khoản lên bài viết $\rightarrow$ Hệ thống hiện cảnh báo đỏ **Vi phạm Nghị định 13**.
+    - *Lab 1:* AI in thẳng số CCCD và số tài khoản lên bài viết → Hệ thống hiện cảnh báo đỏ **Vi phạm Nghị định 13**.
     - *Lab 2:* AI viết một bài quảng cáo nhố nhăng như bán hàng online ("siêu rẻ, bùng nổ deal khủng") làm mất uy tín ngân hàng.
     - *Lab 3:* AI cuống cuồng thanh minh "chúng tôi không vỡ nợ, giám đốc không trốn" làm người dân càng hoang mang.
     - *Lab 4:* AI khuyên chung chung giáo điều, không tính được số tiền lãi thiệt hại hơn 10 triệu đồng.
@@ -51,7 +51,7 @@ Mục tiêu tối thượng: **Học viên không cần biết kỹ thuật vẫ
 - **Hành vi học viên:** Học viên bấm nút *"Nạp giải pháp tối ưu"* (hoặc tự sửa theo gợi ý của Bé Trợ Lý AI) rồi bấm nút *"Chạy thử nghiệm"*.
 - **Trải nghiệm quan sát:**
   - Kết quả sinh ra lột xác 180 độ: Ngôn từ mộc mạc chuẩn Tam nông, an toàn 100% về dữ liệu, bảng biểu Markdown tinh gọn copy sang Excel trong 1 click, trích dẫn đầy đủ điều luật bảo vệ người dân.
-  - Điểm số Rubric nhảy vọt từ 20đ $\rightarrow$ 95đ.
+  - Điểm số Rubric nhảy vọt từ 20đ → 95đ.
 
 ---
 
@@ -100,13 +100,13 @@ Khi bấm vào, màn hình mở ra **Bảng So Sánh 2 Cột Trực Quan**:
 
 | Bài Lab | Kết Quả TRƯỚC (Before) - Lần 1 | Kết Quả SAU (After) - Lần 2 | Khoảnh khắc "Aha!" của Học viên |
 | :---: | :--- | :--- | :--- |
-| **Lab 01** | AI in thẳng số CCCD và SĐT khách hàng lên bài viết $\rightarrow$ **Vi phạm pháp luật bảo mật**. | Bản thảo ẩn danh hóa an toàn 100%, 3 góc tiếp cận tiêu đề lay động cảm xúc. | *"Thì ra chỉ cần bôi đen tên thật là AI vẫn viết bài siêu hay mà ngân hàng an toàn tuyệt đối!"* |
-| **Lab 02** | Bài viết giật gân rẻ tiền: *"Bùng nổ deal sốc 100 tỷ, siêu rẻ"* $\rightarrow$ **Mất uy tín Agribank**. | Bài viết mộc mạc ấm áp: *"Có một mái nhà vững chãi sau bão giông"*, số liệu 100 tỷ chuẩn xác. | *"Thêm Bìa bối cảnh Tam nông và từ cấm là AI đổi giọng văn từ bán hàng online sang chuẩn mực ngân hàng ngay!"* |
-| **Lab 03** | AI hoảng loạn thanh minh: *"Chúng tôi không vỡ nợ, giám đốc không trốn"* $\rightarrow$ **Đổ thêm dầu vào lửa**. | Báo cáo 4 mắt: Thông cáo đanh thép 240 từ trích dẫn cam kết thanh khoản Nhà nước và cơ quan Công an. | *"Không cho AI trả lời vội, bắt suy nghĩ qua 4 bước pháp lý là văn bản đanh thép chuẩn mực ngay!"* |
-| **Lab 04** | Câu khuyên lý thuyết sáo rỗng: *"Bác đừng rút, ngân hàng uy tín lắm"* $\rightarrow$ **Khách không nghe**. | Trợ lý tra Thông tư 04 tính ra khách mất hơn 10.5 triệu tiền lãi, đưa 3 câu thoại ân cần tại quầy. | *"AI biết tự mở Thông tư ra tính tiền lãi thiệt hại để thuyết phục bà con thấu tình đạt lý!"* |
-| **Lab 05** | Để Temp 0.8: Số liệu lãi suất nhảy múa lung tung mỗi lần bấm, lúc 5.2%, lúc 5.5% $\rightarrow$ **Rủi ro kiểm toán**. | Vặn Temp về 0.0: Bảng số liệu cố định 100% qua 10 lần chạy; vặn Temp lên 0.8 ra chùm slogan ca dao tuyệt đỉnh. | *"Biết núm vặn nhiệt độ này rồi thì không bao giờ sợ AI chém gió sai số liệu kế toán nữa!"* |
-| **Lab 06** | AI viết 5 đoạn văn xuôi dài dòng chào hỏi chúc tụng $\rightarrow$ **Không thể dán vào Excel**. | AI xuất duy nhất 1 bảng Markdown 6 cột thẳng tắp, bôi đen copy dán vào Excel vừa in từng ô. | *"Chỉ cần đóng thẻ XML và vẽ khuôn cột là AI thành máy trích xuất dữ liệu cho Excel trong 3 giây!"* |
-| **Lab 07** | AI bị bẫy override trong hồ sơ thầu lừa: xóa nợ xấu Nhóm 2 và giục duyệt vay 5 tỷ $\rightarrow$ **Thảm họa rủi ro**. | AI phát hiện ngay dấu hiệu gian lận lệnh hệ thống, vạch trần khoản nợ 45 ngày và yêu cầu tra CIC. | *"Biết cách lập vùng cách ly dữ liệu thì không kẻ xấu nào lừa được AI của mình nữa!"* |
+| **Lab 01** | AI in thẳng số CCCD và SĐT khách hàng lên bài viết → **Vi phạm pháp luật bảo mật**. | Bản thảo ẩn danh hóa an toàn 100%, 3 góc tiếp cận tiêu đề lay động cảm xúc. | *"Thì ra chỉ cần bôi đen tên thật là AI vẫn viết bài siêu hay mà ngân hàng an toàn tuyệt đối!"* |
+| **Lab 02** | Bài viết giật gân rẻ tiền: *"Bùng nổ deal sốc 100 tỷ, siêu rẻ"* → **Mất uy tín Agribank**. | Bài viết mộc mạc ấm áp: *"Có một mái nhà vững chãi sau bão giông"*, số liệu 100 tỷ chuẩn xác. | *"Thêm Bìa bối cảnh Tam nông và từ cấm là AI đổi giọng văn từ bán hàng online sang chuẩn mực ngân hàng ngay!"* |
+| **Lab 03** | AI hoảng loạn thanh minh: *"Chúng tôi không vỡ nợ, giám đốc không trốn"* → **Đổ thêm dầu vào lửa**. | Báo cáo 4 mắt: Thông cáo đanh thép 240 từ trích dẫn cam kết thanh khoản Nhà nước và cơ quan Công an. | *"Không cho AI trả lời vội, bắt suy nghĩ qua 4 bước pháp lý là văn bản đanh thép chuẩn mực ngay!"* |
+| **Lab 04** | Câu khuyên lý thuyết sáo rỗng: *"Bác đừng rút, ngân hàng uy tín lắm"* → **Khách không nghe**. | Trợ lý tra Thông tư 04 tính ra khách mất hơn 10.5 triệu tiền lãi, đưa 3 câu thoại ân cần tại quầy. | *"AI biết tự mở Thông tư ra tính tiền lãi thiệt hại để thuyết phục bà con thấu tình đạt lý!"* |
+| **Lab 05** | Để Temp 0.8: Số liệu lãi suất nhảy múa lung tung mỗi lần bấm, lúc 5.2%, lúc 5.5% → **Rủi ro kiểm toán**. | Vặn Temp về 0.0: Bảng số liệu cố định 100% qua 10 lần chạy; vặn Temp lên 0.8 ra chùm slogan ca dao tuyệt đỉnh. | *"Biết núm vặn nhiệt độ này rồi thì không bao giờ sợ AI chém gió sai số liệu kế toán nữa!"* |
+| **Lab 06** | AI viết 5 đoạn văn xuôi dài dòng chào hỏi chúc tụng → **Không thể dán vào Excel**. | AI xuất duy nhất 1 bảng Markdown 6 cột thẳng tắp, bôi đen copy dán vào Excel vừa in từng ô. | *"Chỉ cần đóng thẻ XML và vẽ khuôn cột là AI thành máy trích xuất dữ liệu cho Excel trong 3 giây!"* |
+| **Lab 07** | AI bị bẫy override trong hồ sơ thầu lừa: xóa nợ xấu Nhóm 2 và giục duyệt vay 5 tỷ → **Thảm họa rủi ro**. | AI phát hiện ngay dấu hiệu gian lận lệnh hệ thống, vạch trần khoản nợ 45 ngày và yêu cầu tra CIC. | *"Biết cách lập vùng cách ly dữ liệu thì không kẻ xấu nào lừa được AI của mình nữa!"* |
 | **Lab 08** | Hỏi sự vụ ngắn: AI đưa ra giải pháp rời rạc, chắp vá, 3 phòng ban cãi cọ nhau. | Lùi lại 1 bước tìm nguyên lý rồi mới lập kế hoạch đồng bộ 3 bên; AI tự động viết luôn bộ prompt cho quầy. | *"Tư duy lùi một bước giúp giải quyết vấn đề từ gốc rễ và để AI tự viết prompt cho mình dùng cả năm!"* |
 
 ---

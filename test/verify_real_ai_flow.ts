@@ -137,15 +137,42 @@ async function runTests() {
   }
   console.log('✓ Đã lưu Lần thử 2 (V2) vào prompt_attempts:', attempt2.id);
 
-  // Truy vấn danh sách attempts của bài học
-  const attempts = await dbService.getPromptAttempts(testLearnerId, testClassId, testLessonId);
-  if (attempts.length < 2) {
-    throw new Error(`Kỳ vọng ít nhất 2 attempts, thực tế tìm thấy: ${attempts.length}`);
+  // Test 5: Kiểm tra flow khi AI Judge thất bại ban đầu và Thử đánh giá lại (Retry Evaluation)
+  console.log('\nTest 5: Kiểm tra Retry Evaluation (Không fake score, update đúng attempt cũ)');
+  const attemptWithoutEval = await dbService.recordPromptAttempt({
+    learner_id: testLearnerId,
+    class_id: testClassId,
+    lesson_id: testLessonId,
+    attempt_number: 3,
+    prompt_text: 'Lần thử thứ 3 gặp sự cố mạng khi evaluate...',
+    ai_output: 'Nội dung output sinh ra bình thường...',
+    evaluation_json: null, // Không tạo fake score khi Judge lỗi!
+    model: 'gemini-2.5-flash',
+    latency_ms: 950
+  });
+
+  if (!attemptWithoutEval || attemptWithoutEval.evaluation_json !== null) {
+    throw new Error('Lỗi: attempt khi evaluate fail phải có evaluation_json là null (không được fake score)!');
   }
-  if (attempts[0].attempt_number !== 1 || attempts[1].attempt_number !== 2) {
-    throw new Error('Thứ tự sắp xếp attempt không đúng!');
+  console.log('✓ Đã lưu Lần thử 3 với evaluation_json = null (không bịa điểm giả):', attemptWithoutEval.id);
+
+  // Người dùng bấm "Thử đánh giá lại" thành công -> update đúng attempt ID này
+  const updateOk = await dbService.updatePromptAttemptEvaluation(attemptWithoutEval.id, mockAiEval);
+  if (!updateOk) {
+    throw new Error('Cập nhật evaluation_json cho attempt cũ thất bại!');
   }
-  console.log(`✓ Đã truy vấn thành công ${attempts.length} lần thử cho bài ${testLessonId}, phục vụ Compare Mode dữ liệu thật.`);
+  console.log('✓ Đã update thành công kết quả AI Judge vào attempt:', attemptWithoutEval.id);
+
+  // Kiểm tra lại danh sách attempts
+  const updatedAttempts = await dbService.getPromptAttempts(testLearnerId, testClassId, testLessonId);
+  const reloadedAttempt = updatedAttempts.find(a => a.id === attemptWithoutEval.id);
+  if (!reloadedAttempt || !reloadedAttempt.evaluation_json || reloadedAttempt.evaluation_json.total !== mockAiEval.total) {
+    throw new Error('Dữ liệu attempt sau khi re-evaluate không khớp!');
+  }
+  if (updatedAttempts.length !== 3) {
+    throw new Error(`Kỳ vọng tổng số 3 attempts (không bị duplicate), thực tế: ${updatedAttempts.length}`);
+  }
+  console.log('✓ Xác nhận attempt được cập nhật tại chỗ, không sinh duplicate attempt.');
 
   console.log('\n=== TẤT CẢ TEST ĐÃ VƯỢT QUA XUẤT SẮC ===');
 }

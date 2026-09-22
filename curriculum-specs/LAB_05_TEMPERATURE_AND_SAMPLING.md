@@ -69,12 +69,12 @@ Học viên phải thực hành cấu hình tham số trực tiếp:
   - Lãi suất: `"5.2%/năm"` (tháng 1-6) và `"biên độ 2.5%"`
   - Hạn mức tín chấp: `"200 triệu"`
   - Phí trả nợ trước hạn: `"Miễn 100%"` (3 tháng cuối)
-- **Đánh giá:** Nếu ở Temp thấp mà AI tự ý bịa thêm con số ngoài văn bản $\rightarrow$ **Trừ 40đ**.
+- **Đánh giá:** Nếu ở Temp thấp mà AI tự ý bịa thêm con số ngoài văn bản → **Trừ 40đ**.
 
 ### Test Case 2: Kiểm Tra Độ Đa Dạng Ngôn Ngữ Ở Nhiệt Độ Cao (Creativity Diversity Test)
 - **Mục tiêu:** Ở `temperature: 0.8`, 5 câu khẩu hiệu không được lặp lại khuôn mẫu từ ngữ sáo rỗng.
 - **Kỳ vọng:** Xuất hiện các từ ngữ giàu hình tượng nông nghiệp: *"mùa vàng"*, *"hạt ngọc"*, *"bội thu"*, *"ấm no"*, *"đồng hành"*.
-- **Đánh giá:** Cả 5 câu giống hệt nhau về cấu trúc $\rightarrow$ **Trừ 20đ** (chưa tận dụng được Temperature).
+- **Đánh giá:** Cả 5 câu giống hệt nhau về cấu trúc → **Trừ 20đ** (chưa tận dụng được Temperature).
 
 ### Test Case 3: Kiểm Tra Giới Hạn Dừng (Stop Sequences Test)
 - **Mục tiêu:** Khi thiết lập ký tự dừng `[HẾT]`, AI phải dừng ngay lập tức, không được viết thêm lời chào hỏi thừa thãi.

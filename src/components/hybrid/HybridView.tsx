@@ -7,38 +7,40 @@ import {
   Copy, 
   Check, 
   GitCompare, 
+  FileText, 
   Sparkles, 
   Award, 
   ArrowRight,
   Settings2,
+  HelpCircle,
   RotateCcw,
   BookmarkPlus,
   Compass,
   AlertCircle,
-  ThumbsUp,
+  TrendingUp,
+  ShieldAlert,
   CheckCircle2,
-  Lightbulb
+  Lightbulb,
+  AlertTriangle
 } from 'lucide-react';
-import { LabStep, ApiConfig, PromptRun, PromptVersion, RubricAudit } from '../../types';
+import { detectPiiEntities, sanitizePii } from '../../services/labComplianceService';
+import { LabStep, ApiConfig, PromptRun, PromptVersion, RubricAudit, LabAssistanceState } from '../../types';
 import { AiEvaluationResult } from '../../types/database';
+import { AssistanceConfirmModal } from '../lesson/AssistanceConfirmModal';
 import { executePromptStream, evaluatePromptLive, mapAiEvaluationToRubricAudit } from '../../services/llmService';
 import { detectPromptComponents, evaluateBusinessMetrics } from '../../services/businessEvaluationService';
 import { dbService } from '../../services/dbService';
-import { InlineCompareCard } from '../common/InlineCompareCard';
-import { PromptStructurePanel } from '../prompt/PromptStructurePanel';
-import { PromptComposer, PromptSupportMode } from '../prompt/PromptComposer';
 import { LessonBriefPanel } from '../lesson/LessonBriefPanel';
+import { PromptComposer } from '../prompt/PromptComposer';
 import { 
   analyzePromptStructure, 
   PromptAnalysis, 
   PromptSpan, 
   PromptComponentType 
 } from '../../services/promptStructureAnalyzer';
-import { PromptVersionBar } from '../common/PromptVersionBar';
 import { ABCompareModal } from '../common/ABCompareModal';
 import { SavePromptModal } from '../common/SavePromptModal';
 import { MarkdownView } from '../common/MarkdownView';
-import { validateAiEvaluationPayload } from '../../services/aiEvaluationContract';
 
 interface Props {
   labs: LabStep[];
@@ -51,6 +53,7 @@ interface Props {
   onSelectLab?: (labId: string) => void;
   currentLearnerId?: string;
   currentClassId?: string;
+  onOpenApiModal?: () => void;
 }
 
 export const HybridView: React.FC<Props> = ({
@@ -64,6 +67,7 @@ export const HybridView: React.FC<Props> = ({
   onSelectLab,
   currentLearnerId,
   currentClassId,
+  onOpenApiModal,
 }) => {
   // Chỉ số bài lab hiện tại (0 -> labs.length - 1)
   const [currentLabIndex, setCurrentLabIndex] = useState<number>(() => {
@@ -84,6 +88,12 @@ export const HybridView: React.FC<Props> = ({
     }
   }, [initialLabId, labs]);
 
+  useEffect(() => {
+    if (currentLab?.id && onSelectLab) {
+      onSelectLab(currentLab.id);
+    }
+  }, [currentLab?.id, onSelectLab]);
+
   // Tiến trình bước trong bài (1: Prompt ban đầu -> 2: Cải tiến cấu trúc -> 3: Hoàn thành)
   const [currentStep, setCurrentStep] = useState<number>(1);
 
@@ -91,27 +101,30 @@ export const HybridView: React.FC<Props> = ({
   const [runCountsByLab, setRunCountsByLab] = useState<Record<string, number>>({});
   const currentLabRunCount = runCountsByLab[currentLab.id] || 0;
 
-  // Prompt always starts empty: learners author the response instead of editing a prefilled example.
-  const [promptText, setPromptText] = useState<string>('');
-  const [supportMode, setSupportMode] = useState<PromptSupportMode>('structure');
+  // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
+  const [promptText, setPromptText] = useState<string>(currentLab.starterPrompt || '');
   const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
   const [output, setOutput] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [runStatus, setRunStatus] = useState<'idle' | 'generating' | 'evaluating' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const [aiEvaluation, setAiEvaluation] = useState<AiEvaluationResult | null>(null);
+  const [lastEvaluatedPrompt, setLastEvaluatedPrompt] = useState<string | null>(null);
+  const [evaluationError, setEvaluationError] = useState<string | null>(null);
+  const [isRetryingEvaluation, setIsRetryingEvaluation] = useState<boolean>(false);
+  const [currentAttemptId, setCurrentAttemptId] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isDataCopied, setIsDataCopied] = useState<boolean>(false);
 
   // Accordions (mặc định đóng theo đúng yêu cầu để giảm visual noise)
+  const [showDataAccordion, setShowDataAccordion] = useState<boolean>(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
   const [showTechDetails, setShowTechDetails] = useState<boolean>(false);
   const [showScoreBreakdown, setShowScoreBreakdown] = useState<boolean>(false);
 
   // Kết quả sau khi chạy
   const [scoreResult, setScoreResult] = useState<RubricAudit | null>(null);
-  const [metrics, setMetrics] = useState<{ tokens: number; latency: number; mode: string; model: string } | null>(null);
+  const [metrics, setMetrics] = useState<{ tokens: number; latency: number; mode: string } | null>(null);
 
   // Quản lý các phiên bản câu lệnh (Prompt Versioning) theo từng lab
   const [versionsByLab, setVersionsByLab] = useState<Record<string, PromptVersion[]>>({});
@@ -121,11 +134,108 @@ export const HybridView: React.FC<Props> = ({
   const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false);
   const [versionToSave, setVersionToSave] = useState<PromptVersion | null>(null);
 
+  // Quản lý trạng thái mở khóa Gợi ý / Lời giải theo từng bài lab
+  const [assistanceByLab, setAssistanceByLab] = useState<Record<string, LabAssistanceState>>(() => {
+    try {
+      const saved = localStorage.getItem('promptify_lab_assistance');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('promptify_lab_assistance', JSON.stringify(assistanceByLab));
+    } catch (e) {
+      console.warn('[HybridView] Không thể lưu trạng thái trợ giúp vào localStorage:', e);
+    }
+  }, [assistanceByLab]);
+
+  const currentLabAssistance = assistanceByLab[currentLab.id] || {
+    hasViewedHints: false,
+    hasViewedSolution: false,
+  };
+
+  const [assistanceModalState, setAssistanceModalState] = useState<{
+    isOpen: boolean;
+    type: 'hint' | 'solution';
+  }>({
+    isOpen: false,
+    type: 'hint',
+  });
+
+  const handleRequestViewHints = () => {
+    if (currentLabAssistance.hasViewedHints) return;
+    setAssistanceModalState({ isOpen: true, type: 'hint' });
+  };
+
+  const handleRequestViewSolution = () => {
+    if (currentLabAssistance.hasViewedSolution) return;
+    setAssistanceModalState({ isOpen: true, type: 'solution' });
+  };
+
+  const handleConfirmAssistance = () => {
+    const type = assistanceModalState.type;
+    setAssistanceByLab(prev => {
+      const existing = prev[currentLab.id] || { hasViewedHints: false, hasViewedSolution: false };
+      if (type === 'hint') {
+        return {
+          ...prev,
+          [currentLab.id]: {
+            ...existing,
+            hasViewedHints: true,
+            hintsUnlockedAt: new Date().toISOString(),
+          }
+        };
+      } else {
+        return {
+          ...prev,
+          [currentLab.id]: {
+            ...existing,
+            hasViewedSolution: true,
+            solutionUnlockedAt: new Date().toISOString(),
+          }
+        };
+      }
+    });
+    setAssistanceModalState(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleCancelAssistance = () => {
+    setAssistanceModalState(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleLoadSolutionPrompt = (solPrompt: string) => {
+    setPromptText(solPrompt);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
   // Phân tích cấu trúc Prompt 7 thành phần & inline highlight
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(''));
+  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(currentLab.starterPrompt || ''));
   const [selectedSpan, setSelectedSpan] = useState<PromptSpan | null>(null);
   const [currentSpanIndexByType, setCurrentSpanIndexByType] = useState<Record<string, number>>({});
+
+  // Lắng nghe sự kiện áp dụng đề xuất từ Chat Assistant hoặc modal ngoài
+  useEffect(() => {
+    const handleApplySuggestion = (e: any) => {
+      if (e.detail?.prompt !== undefined) {
+        setPromptText(e.detail.prompt);
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.classList.add('ring-4', 'ring-emerald-500');
+          setTimeout(() => {
+            textareaRef.current?.classList.remove('ring-4', 'ring-emerald-500');
+          }, 1500);
+        }
+      }
+    };
+    window.addEventListener('promptify:apply-suggestion', handleApplySuggestion);
+    return () => window.removeEventListener('promptify:apply-suggestion', handleApplySuggestion);
+  }, []);
 
   // Debounce phân tích cấu trúc prompt (500ms) để không lag UI khi gõ và 0 LLM call
   useEffect(() => {
@@ -159,52 +269,64 @@ export const HybridView: React.FC<Props> = ({
     setSelectedSpan(targetSpan);
 
     if (textareaRef.current) {
-      textareaRef.current.focus();
+      const textarea = textareaRef.current;
+      textarea.focus();
+
+      const textInDom = textarea.value;
+      let selStart = targetSpan.start;
+      let selEnd = targetSpan.end;
+
+      // Kiểm tra xem đoạn ký tự thực tế tại [selStart, selEnd] trong textarea có khớp đúng targetSpan.text không
+      const currentSlice = textInDom.slice(selStart, selEnd);
+      if (currentSlice !== targetSpan.text) {
+        // Nếu bị lệch (do khác biệt ký tự xuống dòng \r\n vs \n), tự động tìm vị trí khớp 100%
+        const searchRangeStart = Math.max(0, selStart - 50);
+        const searchRangeEnd = Math.min(textInDom.length, selEnd + 50);
+        const localRegion = textInDom.slice(searchRangeStart, searchRangeEnd);
+        const localIdx = localRegion.indexOf(targetSpan.text);
+
+        if (localIdx !== -1) {
+          selStart = searchRangeStart + localIdx;
+          selEnd = selStart + targetSpan.text.length;
+        } else {
+          const globalIdx = textInDom.indexOf(targetSpan.text);
+          if (globalIdx !== -1) {
+            selStart = globalIdx;
+            selEnd = globalIdx + targetSpan.text.length;
+          }
+        }
+      }
+
       try {
-        textareaRef.current.setSelectionRange(targetSpan.start, targetSpan.end);
+        textarea.setSelectionRange(selStart, selEnd);
       } catch (err) {
         console.error('Error selecting text range:', err);
       }
     }
   };
 
-  const insertPromptBlock = (template: string) => {
-    const textarea = textareaRef.current;
-    const start = textarea?.selectionStart ?? promptText.length;
-    const end = textarea?.selectionEnd ?? promptText.length;
-    const prefix = promptText.slice(0, start);
-    const suffix = promptText.slice(end);
-    const separator = prefix && !prefix.endsWith('\n') ? '\n' : '';
-    const nextPrompt = `${prefix}${separator}${template}${suffix}`;
-    const caret = prefix.length + separator.length + template.length;
-
-    setPromptText(nextPrompt);
-    setSelectedSpan(null);
-    requestAnimationFrame(() => {
-      textarea?.focus();
-      textarea?.setSelectionRange(caret, caret);
-    });
-  };
-
   // Đồng bộ khi chuyển bài lab
   useEffect(() => {
-    setPromptText('');
-    setSupportMode('structure');
+    setPromptText(currentLab.starterPrompt || '');
     setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
     setOutput('');
     setScoreResult(null);
     setAiEvaluation(null);
-    setErrorMessage(null);
+    setLastEvaluatedPrompt(null);
     setEvaluationError(null);
+    setIsRetryingEvaluation(false);
+    setCurrentAttemptId(null);
+    setErrorMessage(null);
     setMetrics(null);
     setCurrentStep(1);
     setSelectedVersionNumber(0);
+    setShowDataAccordion(false);
     setShowAdvancedSettings(false);
     setShowTechDetails(false);
     setShowScoreBreakdown(false);
     setSelectedSpan(null);
     setCurrentSpanIndexByType({});
-    setPromptAnalysis(analyzePromptStructure(''));
+    setPromptAnalysis(analyzePromptStructure(currentLab.starterPrompt || ''));
   }, [currentLabIndex]);
 
   // Tải lịch sử các lần chạy thật (Prompt Attempts) từ Supabase DB / LocalStore
@@ -215,31 +337,21 @@ export const HybridView: React.FC<Props> = ({
         .then((attempts) => {
           if (!isMounted || !attempts || attempts.length === 0) return;
 
-          const mappedVersions: PromptVersion[] = attempts.map((attempt) => {
-            let storedEvaluation: AiEvaluationResult | null = null;
-            if (attempt.evaluation_json) {
-              try {
-                storedEvaluation = validateAiEvaluationPayload(attempt.evaluation_json);
-              } catch (error) {
-                console.warn('[HybridView] Bỏ qua evaluation_json cũ không đúng contract:', error);
-              }
-            }
-            return {
-              id: attempt.id,
-              versionNumber: attempt.attempt_number,
-              labId: attempt.lesson_id,
-              promptText: attempt.prompt_text,
-              systemInstruction: systemText,
-              output: attempt.ai_output,
-              techniqueUsed: currentLab.badge,
-              detectedChanges: detectPromptComponents(attempt.prompt_text),
-              timestamp: attempt.created_at ? new Date(attempt.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
-              businessEvaluation: evaluateBusinessMetrics(attempt.prompt_text, attempt.ai_output, currentLab.sampleInputContext),
-              aiEvaluation: storedEvaluation,
-              tokenCount: Math.round(attempt.ai_output.length / 3.8),
-              latencyMs: attempt.latency_ms,
-            };
-          });
+          const mappedVersions: PromptVersion[] = attempts.map(a => ({
+            id: a.id,
+            versionNumber: a.attempt_number,
+            labId: a.lesson_id,
+            promptText: a.prompt_text,
+            systemInstruction: systemText,
+            output: a.ai_output,
+            techniqueUsed: currentLab.badge,
+            detectedChanges: detectPromptComponents(a.prompt_text),
+            timestamp: a.created_at ? new Date(a.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
+            businessEvaluation: evaluateBusinessMetrics(a.prompt_text, a.ai_output, currentLab.sampleInputContext),
+            aiEvaluation: a.evaluation_json,
+            tokenCount: Math.round(a.ai_output.length / 3.8),
+            latencyMs: a.latency_ms
+          }));
 
           setVersionsByLab(prev => ({
             ...prev,
@@ -251,15 +363,11 @@ export const HybridView: React.FC<Props> = ({
             [currentLab.id]: mappedVersions.length
           }));
 
-          const latest = mappedVersions[mappedVersions.length - 1];
-          if (latest) {
-            setSelectedVersionNumber(latest.versionNumber);
-            setOutput(latest.output);
-            if (latest.aiEvaluation) {
-              setAiEvaluation(latest.aiEvaluation);
-              setScoreResult(mapAiEvaluationToRubricAudit(latest.aiEvaluation));
-            }
-          }
+          // Khởi tạo ở trạng thái soạn thảo mới: KHÔNG tự động nạp kết quả chấm cũ vào ô lệnh
+          setSelectedVersionNumber(0);
+          setAiEvaluation(null);
+          setLastEvaluatedPrompt(null);
+          setScoreResult(null);
         })
         .catch(err => {
           console.warn('[HybridView] Lỗi tải prompt_attempts:', err);
@@ -284,7 +392,6 @@ export const HybridView: React.FC<Props> = ({
     setIsRunning(true);
     setRunStatus('generating');
     setErrorMessage(null);
-    setEvaluationError(null);
     setOutput('');
 
     // Tăng số lượt chạy của bài lab hiện tại
@@ -312,13 +419,13 @@ export const HybridView: React.FC<Props> = ({
       setMetrics({
         tokens: result.tokenCount,
         latency: result.latencyMs,
-        mode: result.mode,
-        model: result.model,
+        mode: result.mode
       });
 
       // 2. GỌI AI EVALUATION ĐỘC LẬP THEO RUBRIC MVP (POST /api/evaluate)
       setRunStatus('evaluating');
-      let evalResult: AiEvaluationResult;
+      setEvaluationError(null);
+      let evalResult: AiEvaluationResult | null = null;
       try {
         evalResult = await evaluatePromptLive({
           lessonId: currentLab.id,
@@ -328,28 +435,38 @@ export const HybridView: React.FC<Props> = ({
           taskRequirement: currentLab.taskGoal,
           lessonRubric: currentLab.rubricCriteria,
           learnerPrompt: promptText,
-          generatedOutput: result.output
+          generatedOutput: result.output,
+          lab: currentLab,
+          apiKey: apiConfig.geminiApiKey
         });
       } catch (judgeErr: any) {
-        console.warn('[HybridView] AI Judge failed:', judgeErr);
+        console.warn('[HybridView] AI Judge evaluation failed:', judgeErr);
+        evalResult = null;
+        setEvaluationError(
+          judgeErr?.message || 'Không thể đánh giá lúc này. Máy chủ AI chấm điểm phản hồi chậm hoặc tạm thời gián đoạn.'
+        );
+      }
+
+      if (evalResult) {
+        // Gắn cờ trạng thái trợ giúp (xem gợi ý / lời giải) vào kết quả đánh giá để giảng viên nắm được
+        evalResult.assistanceState = currentLabAssistance;
+        setAiEvaluation(evalResult);
+        setLastEvaluatedPrompt(promptText);
+        const evaluatedScore = mapAiEvaluationToRubricAudit(evalResult);
+        setScoreResult(evaluatedScore);
+
+        // Cập nhật bước tiến trình nếu đang ở bước 1 hoặc bước 2
+        if (currentStep === 1) {
+          setCurrentStep(2);
+        } else if (currentStep === 2 && evalResult.total >= 7) {
+          setCurrentStep(3);
+        }
+      } else {
         setAiEvaluation(null);
+        setLastEvaluatedPrompt(null);
         setScoreResult(null);
-        setEvaluationError(judgeErr.message || 'Vui lòng thử lại.');
-        setRunStatus('idle');
-        return;
       }
-
-      setAiEvaluation(evalResult);
-      const evaluatedScore = mapAiEvaluationToRubricAudit(evalResult);
-      setScoreResult(evaluatedScore);
       setRunStatus('idle');
-
-      // Cập nhật bước tiến trình nếu đang ở bước 1
-      if (currentStep === 1) {
-        setCurrentStep(2);
-      } else if (currentStep === 2 && evalResult.total >= 7) {
-        setCurrentStep(3);
-      }
 
       onRecordRun({
         id: `run-${Date.now()}`,
@@ -364,12 +481,14 @@ export const HybridView: React.FC<Props> = ({
         versionTag: promptText.length > 250 ? 'improved' : 'baseline'
       });
 
-      // 3. PERSIST ATTEMPT VÀO SUPABASE DATABASE (Bảng prompt_attempts)
+      // 3. PERSIST ATTEMPT VÀO DATABASE (Bảng prompt_attempts)
       const labVers = versionsByLab[currentLab.id] || [];
       const newVerNum = labVers.length + 1;
+      let persistedAttemptId: string | null = null;
 
       if (currentLearnerId && currentClassId) {
-        await dbService.recordPromptAttempt({
+        try {
+          const recorded = await dbService.recordPromptAttempt({
             learner_id: currentLearnerId,
             class_id: currentClassId,
             lesson_id: currentLab.id,
@@ -380,15 +499,22 @@ export const HybridView: React.FC<Props> = ({
             prompt_text: promptText,
             ai_output: result.output,
             evaluation_json: evalResult,
-            model: result.model,
+            model: result.model || 'gemini-2.5-flash',
             latency_ms: result.latencyMs
-        });
+          });
+          if (recorded?.id) {
+            persistedAttemptId = recorded.id;
+            setCurrentAttemptId(recorded.id);
+          }
+        } catch (dbErr) {
+          console.warn('[HybridView] Lỗi lưu attempt vào DB:', dbErr);
+        }
       }
 
       // 4. LƯU PHIÊN BẢN (PROMPT VERSIONING CHO COMPARE MODE)
       const bizEval = evaluateBusinessMetrics(promptText, result.output, currentLab.sampleInputContext);
       const newVer: PromptVersion = {
-        id: `ver-${currentLab.id}-${newVerNum}-${Date.now()}`,
+        id: persistedAttemptId || `ver-${currentLab.id}-${newVerNum}-${Date.now()}`,
         versionNumber: newVerNum,
         labId: currentLab.id,
         promptText,
@@ -418,10 +544,26 @@ export const HybridView: React.FC<Props> = ({
     }
   };
 
+  /**
+   * Đánh giá lại câu lệnh (Retry Evaluation) khi lần chấm điểm trước gặp sự cố
+   * Cập nhật kết quả vào đúng attempt đã lưu mà không cần chạy lại mô hình sinh văn bản
+   */
   const handleRetryEvaluation = async () => {
-    if (!promptText.trim() || !output.trim()) return;
-    setRunStatus('evaluating');
+    const activeVer = selectedVersionNumber > 0 
+      ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber) 
+      : null;
+    const targetPrompt = activeVer ? activeVer.promptText : promptText;
+    const targetOutput = activeVer ? activeVer.output : output;
+    const targetAttemptId = activeVer?.id || currentAttemptId;
+
+    if (!targetPrompt.trim() || !targetOutput.trim()) {
+      setEvaluationError('Không tìm thấy nội dung câu lệnh hoặc kết quả để đánh giá lại.');
+      return;
+    }
+
+    setIsRetryingEvaluation(true);
     setEvaluationError(null);
+
     try {
       const evalResult = await evaluatePromptLive({
         lessonId: currentLab.id,
@@ -430,46 +572,71 @@ export const HybridView: React.FC<Props> = ({
         controlData: currentLab.sampleInputContext,
         taskRequirement: currentLab.taskGoal,
         lessonRubric: currentLab.rubricCriteria,
-        learnerPrompt: promptText,
-        generatedOutput: output,
+        learnerPrompt: targetPrompt,
+        generatedOutput: targetOutput,
+        lab: currentLab,
+        apiKey: apiConfig.geminiApiKey
       });
-      setAiEvaluation(evalResult);
-      setScoreResult(mapAiEvaluationToRubricAudit(evalResult));
 
-      if (currentLearnerId && currentClassId) {
-        await dbService.recordPromptAttempt({
-          learner_id: currentLearnerId,
-          class_id: currentClassId,
-          lesson_id: currentLab.id,
-          lesson_ref_id: /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(currentLab.id) ? currentLab.id : null,
-          attempt_number: (versionsByLab[currentLab.id]?.length || 0) + 1,
-          prompt_text: promptText,
-          ai_output: output,
-          evaluation_json: evalResult,
-          model: metrics?.model || 'openai',
-          latency_ms: metrics?.latency || 0,
+      evalResult.assistanceState = currentLabAssistance;
+      setAiEvaluation(evalResult);
+      const evaluatedScore = mapAiEvaluationToRubricAudit(evalResult);
+      setScoreResult(evaluatedScore);
+
+      // Cập nhật version trong state versionsByLab
+      setVersionsByLab(prev => {
+        const labVers = prev[currentLab.id] || [];
+        const updated = labVers.map(v => {
+          if (activeVer && v.versionNumber === activeVer.versionNumber) {
+            return { ...v, aiEvaluation: evalResult };
+          }
+          if (!activeVer && v.versionNumber === selectedVersionNumber) {
+            return { ...v, aiEvaluation: evalResult };
+          }
+          return v;
         });
+        return {
+          ...prev,
+          [currentLab.id]: updated
+        };
+      });
+
+      // Cập nhật database cho đúng attempt ID đã lưu
+      if (targetAttemptId) {
+        try {
+          await dbService.updatePromptAttemptEvaluation(targetAttemptId, evalResult);
+        } catch (dbErr) {
+          console.warn('[HybridView] Lỗi cập nhật re-evaluation vào DB:', dbErr);
+        }
       }
-    } catch (judgeErr: any) {
-      console.warn('[HybridView] AI Judge retry failed:', judgeErr);
+
+      // Cập nhật tiến trình nếu hoàn thành đạt chuẩn
+      if (currentStep === 1) {
+        setCurrentStep(2);
+      } else if (currentStep === 2 && evalResult.total >= 7) {
+        setCurrentStep(3);
+      }
+    } catch (err: any) {
+      console.warn('[HybridView] Retry evaluation failed:', err);
+      setEvaluationError(err?.message || 'Không thể đánh giá lúc này. Vui lòng thử lại sau giây lát.');
       setAiEvaluation(null);
       setScoreResult(null);
-      setEvaluationError(judgeErr.message || 'Vui lòng thử lại.');
     } finally {
-      setRunStatus('idle');
+      setIsRetryingEvaluation(false);
     }
   };
 
   const handleNextStepOrLab = () => {
     if (currentStep === 1) {
-      // Never inject a complete sample into learner work; step two keeps the learner's own draft.
-      setSupportMode('structure');
+      // Giữ nguyên prompt của học viên để họ tiếp tục cải tiến dựa trên AI Feedback
+      // Chỉ nạp gợi ý nếu ô hiện tại chưa có nội dung
+      if (!promptText.trim()) {
+        setPromptText(currentLab.improvedPrompt);
+      }
       setCurrentStep(2);
     } else if (currentLabIndex < labs.length - 1) {
       // Chuyển sang bài tiếp theo
-      const nextIndex = currentLabIndex + 1;
-      setCurrentLabIndex(nextIndex);
-      onSelectLab?.(labs[nextIndex].id);
+      setCurrentLabIndex(currentLabIndex + 1);
     } else {
       // Đã hoàn thành toàn bộ bài lab
       setCurrentStep(3);
@@ -487,6 +654,37 @@ export const HybridView: React.FC<Props> = ({
       navigator.clipboard.writeText(currentLab.sampleInputContext);
       setIsDataCopied(true);
       setTimeout(() => setIsDataCopied(false), 1500);
+    }
+  };
+
+  // Tự động Bút xóa PII 1-chạm (One-Click Sanitize)
+  const handleAutoSanitizePii = () => {
+    const sanitized = sanitizePii(promptText);
+    setPromptText(sanitized);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.classList.add('ring-4', 'ring-emerald-500');
+      setTimeout(() => {
+        textareaRef.current?.classList.remove('ring-4', 'ring-emerald-500');
+      }, 1500);
+    }
+    setAiEvaluation(null);
+    setScoreResult(null);
+  };
+
+  // Tự động nâng cấp câu lệnh chuẩn mực (Auto-Fix All)
+  const handleApplyAutoFixAll = () => {
+    if (currentLab.improvedPrompt) {
+      setPromptText(currentLab.improvedPrompt);
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        textareaRef.current.classList.add('ring-4', 'ring-emerald-500');
+        setTimeout(() => {
+          textareaRef.current?.classList.remove('ring-4', 'ring-emerald-500');
+        }, 1500);
+      }
+      setAiEvaluation(null);
+      setScoreResult(null);
     }
   };
 
@@ -515,11 +713,7 @@ export const HybridView: React.FC<Props> = ({
             <div className="relative">
               <select
                 value={currentLabIndex}
-                onChange={(e) => {
-                  const nextIndex = Number(e.target.value);
-                  setCurrentLabIndex(nextIndex);
-                  onSelectLab?.(labs[nextIndex].id);
-                }}
+                onChange={(e) => setCurrentLabIndex(Number(e.target.value))}
                 className="appearance-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm py-1.5 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none transition"
               >
                 {labs.map((lab, index) => (
@@ -577,106 +771,89 @@ export const HybridView: React.FC<Props> = ({
 
       {/* 2. BỐ CỤC CHÍNH (HYBRID 35% - 65%) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* 1. Read: concise brief; data and advanced guidance stay collapsed. */}
-        <div className="lg:col-span-4 lg:sticky lg:top-20">
-          <LessonBriefPanel lab={currentLab} onCopyData={handleCopySampleData} isDataCopied={isDataCopied} />
+        {/* CỘT TRÁI (35%): TÌNH HUỐNG & MỤC TIÊU - STICKY DESKTOP */}
+        <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-4">
+          <LessonBriefPanel
+            lab={currentLab}
+            showDataAccordion={showDataAccordion}
+            setShowDataAccordion={setShowDataAccordion}
+            isDataCopied={isDataCopied}
+            onCopySampleData={handleCopySampleData}
+            hasViewedHints={currentLabAssistance.hasViewedHints}
+            hasViewedSolution={currentLabAssistance.hasViewedSolution}
+            onRequestViewHints={handleRequestViewHints}
+            onRequestViewSolution={handleRequestViewSolution}
+            onLoadSolutionPrompt={handleLoadSolutionPrompt}
+          />
         </div>
 
         {/* CỘT PHẢI (65%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
         <div className="lg:col-span-8 space-y-5">
-          {/* Vùng soạn thảo Prompt chính */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-prompt">
-            <PromptComposer
-              promptText={promptText}
-              supportMode={supportMode}
-              promptPlaceholder={supportMode === 'structure'
-                ? 'Vai trò: ...\nBối cảnh: ...\nNhiệm vụ: ...\nRàng buộc: ...\nĐầu ra mong muốn: ...'
-                : 'Tự viết prompt của bạn tại đây...'}
-              samplePrompt={currentLab.improvedPrompt}
-              textareaRef={textareaRef}
-              onChange={(value) => {
-                setPromptText(value);
-                if (errorMessage) setErrorMessage(null);
-                if (evaluationError) setEvaluationError(null);
-              }}
-              onSupportModeChange={setSupportMode}
-              onInsertBlock={insertPromptBlock}
-              history={currentLabVersions.length > 0 ? (
-                <PromptVersionBar
-                  versions={currentLabVersions}
-                  selectedVersionNumber={selectedVersionNumber}
-                  onSelectVersion={(vNum) => setSelectedVersionNumber(vNum)}
-                  onRestorePrompt={(restored) => { setPromptText(restored); setSelectedSpan(null); }}
-                  onOpenCompare={() => setIsABModalOpen(true)}
-                  onSaveToLibrary={(ver) => { setVersionToSave(ver); setIsSaveModalOpen(true); }}
-                />
-              ) : undefined}
-            />
-
-            <PromptStructurePanel
-              analysis={promptAnalysis}
-              promptText={promptText}
-              focusComponents={currentLab.focusComponents}
-              selectedSpan={selectedSpan}
-              onSelectComponent={handleSelectComponent}
-            />
-
-            {/* Thiết lập nâng cao (Mặc định đóng) */}
-            <div className="border-t border-slate-100 pt-3">
-              <button
-                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-                className="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition"
-              >
-                <Settings2 className="w-3.5 h-3.5" />
-                <span>Thiết lập nâng cao (Vai trò hệ thống)</span>
-                {showAdvancedSettings ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-              </button>
-
-              {showAdvancedSettings && (
-                <div className="mt-2.5 p-3 bg-slate-50 rounded-xl space-y-1.5 animate-fadeIn">
-                  <label className="text-xs font-semibold text-slate-700 block">
-                    Vai trò hệ thống (Chỉ dẫn ngầm cho AI):
-                  </label>
-                  <input
-                    type="text"
-                    value={systemText}
-                    onChange={(e) => setSystemText(e.target.value)}
-                    placeholder="Ví dụ: Bạn là chuyên viên phân tích ngân hàng..."
-                    className="w-full px-3 py-2 text-xs bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 font-mono"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Thông báo lỗi nếu có */}
-            {errorMessage && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2 animate-fadeIn">
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-semibold">{errorMessage}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Một CTA chính duy nhất: CHẠY PROMPT */}
-            <button
-              onClick={handleRun}
-              disabled={isRunning || !promptText.trim()}
-              data-tour="tour-run"
-              className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white font-bold text-sm shadow-sm hover:shadow transition flex items-center justify-center gap-2"
-            >
-              <Play className={`w-4 h-4 ${isRunning ? 'animate-spin' : 'fill-white'}`} />
-              <span>
-                {runStatus === 'generating' 
-                  ? 'Đang tạo câu trả lời...' 
-                  : runStatus === 'evaluating' 
-                  ? 'AI đang đánh giá câu lệnh...' 
-                  : isRunning 
-                  ? 'Đang xử lý...' 
-                  : 'Chạy Prompt'}
-              </span>
-            </button>
-          </div>
+          <PromptComposer
+            lab={currentLab}
+            promptText={promptText}
+            setPromptText={setPromptText}
+            systemText={systemText}
+            setSystemText={setSystemText}
+            showAdvancedSettings={showAdvancedSettings}
+            setShowAdvancedSettings={setShowAdvancedSettings}
+            isRunning={isRunning}
+            runStatus={runStatus}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            onRun={handleRun}
+            versions={currentLabVersions}
+            selectedVersionNumber={selectedVersionNumber}
+            onSelectVersion={(vNum) => {
+              setSelectedVersionNumber(vNum);
+              const ver = currentLabVersions.find(v => v.versionNumber === vNum);
+              if (ver) {
+                if (ver.id) {
+                  setCurrentAttemptId(ver.id);
+                }
+                setPromptText(ver.promptText);
+                setOutput(ver.output);
+                if (ver.aiEvaluation) {
+                  setAiEvaluation(ver.aiEvaluation);
+                  setLastEvaluatedPrompt(ver.promptText);
+                  setScoreResult(mapAiEvaluationToRubricAudit(ver.aiEvaluation));
+                  setEvaluationError(null);
+                } else {
+                  setAiEvaluation(null);
+                  setLastEvaluatedPrompt(null);
+                  setScoreResult(null);
+                  setEvaluationError('Lần thử này chưa có kết quả đánh giá AI.');
+                }
+              }
+            }}
+            onRestorePrompt={(restored) => {
+              setPromptText(restored);
+              setSelectedSpan(null);
+              setAiEvaluation(null);
+              setLastEvaluatedPrompt(null);
+            }}
+            onOpenCompare={() => setIsABModalOpen(true)}
+            onSaveToLibrary={(ver) => {
+              setVersionToSave(ver);
+              setIsSaveModalOpen(true);
+            }}
+            promptAnalysis={promptAnalysis}
+            selectedSpan={selectedSpan}
+            onSelectComponent={handleSelectComponent}
+            textareaRef={textareaRef}
+            apiConfig={apiConfig}
+            onOpenApiModal={onOpenApiModal}
+            aiEvaluation={aiEvaluation}
+            lastEvaluatedPromptText={lastEvaluatedPrompt}
+            onManualPromptChange={() => {
+              setAiEvaluation(null);
+              setLastEvaluatedPrompt(null);
+              setScoreResult(null);
+              if (selectedVersionNumber !== 0) {
+                setSelectedVersionNumber(0);
+              }
+            }}
+          />
 
           {/* VÙNG KẾT QUẢ SAU KHI RUN HOẶC KHI CHỌN VERSION */}
           {(output || isRunning || (selectedVersionNumber > 0 && currentLabVersions.length > 0)) && (
@@ -686,7 +863,7 @@ export const HybridView: React.FC<Props> = ({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold text-slate-900">
-                      3. Kết quả AI & chấm điểm
+                      Kết quả từ AI
                     </h3>
                     <span className="text-xs text-slate-500 font-medium">
                       (Lần thử {selectedVersionNumber > 0 ? selectedVersionNumber : currentLabRunCount})
@@ -724,7 +901,27 @@ export const HybridView: React.FC<Props> = ({
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed overflow-x-auto min-h-[140px]">
-                  {runStatus === 'generating' && !output ? (
+                  {errorMessage ? (
+                    <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-2 animate-fadeIn">
+                      <div className="font-semibold flex items-center gap-1.5 text-rose-900 text-sm">
+                        <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                        <span>Không thể kết nối dịch vụ AI</span>
+                      </div>
+                      <p className="text-rose-700 leading-relaxed">{errorMessage}</p>
+                      {onOpenApiModal && (
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={onOpenApiModal}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-300 rounded-lg text-xs font-semibold text-rose-800 hover:bg-rose-100 transition shadow-2xs"
+                          >
+                            <Settings2 className="w-3.5 h-3.5" />
+                            Cập nhật API Key trong Cài đặt
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : runStatus === 'generating' && !output ? (
                     <div className="flex items-center gap-2 text-slate-500 py-6">
                       <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
                       <span>Đang nhận phản hồi từ mô hình...</span>
@@ -757,21 +954,14 @@ export const HybridView: React.FC<Props> = ({
 
                     {showTechDetails && (
                       <span className="text-[11px] font-mono text-slate-500">
-                        {metrics.latency}ms · {metrics.tokens} tokens · {metrics.mode === 'openai' ? 'OpenAI' : metrics.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
+                        {metrics.latency}ms · {metrics.tokens} tokens · {metrics.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
                       </span>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Trạng thái AI đang đánh giá Rubric (không che khuất kết quả) */}
-              {runStatus === 'evaluating' && !aiEvaluation && (
-                <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
-                  <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0" />
-                  <span className="font-semibold">AI đang phân tích và chấm điểm câu lệnh theo 5 tiêu chí Rubric...</span>
-                </div>
-              )}
-
+              {/* Thông báo lỗi khi AI Judge không thể đánh giá */}
               {evaluationError && runStatus !== 'evaluating' && !aiEvaluation && output && (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900 animate-fadeIn">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -794,6 +984,18 @@ export const HybridView: React.FC<Props> = ({
                 </div>
               )}
 
+              {/* Trạng thái AI đang đánh giá Rubric (không che khuất kết quả) */}
+              {(runStatus === 'evaluating' || isRetryingEvaluation) && !aiEvaluation && (
+                <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
+                  <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                  <span className="font-semibold">
+                    {isRetryingEvaluation 
+                      ? 'Đang kết nối lại AI Judge để chấm điểm câu lệnh...' 
+                      : 'AI đang phân tích và chấm điểm câu lệnh theo 5 tiêu chí Rubric...'}
+                  </span>
+                </div>
+              )}
+
               {/* Card chấm điểm & AI Feedback phía dưới output */}
               {(() => {
                 const activeAiEval = (selectedVersionNumber > 0 
@@ -801,8 +1003,49 @@ export const HybridView: React.FC<Props> = ({
                   : null) || aiEvaluation;
 
                 if (activeAiEval) {
+                  const targetPromptForAudit = selectedVersionNumber > 0 
+                    ? (currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.promptText || promptText) 
+                    : promptText;
+                  const piiCheck = detectPiiEntities(targetPromptForAudit);
+                  const isPiiLesson = Boolean(currentLab.id?.includes('1') || currentLab.title?.toLowerCase().includes('pii'));
+                  const showPiiRedCard = isPiiLesson && piiCheck.hasPii;
+
                   return (
                     <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3.5 animate-fadeIn">
+                      {/* CẢNH BÁO THẺ ĐỎ PII VI PHẠM NGHỊ ĐỊNH 13 */}
+                      {showPiiRedCard && (
+                        <div className="p-4 bg-rose-50 border-2 border-rose-400 rounded-xl space-y-2.5 animate-fadeIn">
+                          <div className="flex items-start gap-2.5">
+                            <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                            <div className="space-y-1">
+                              <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wide">
+                                Thẻ Đỏ: Rò rỉ Thông Tin PII Thật (Vi Phạm Nghị Định 13/2023/NĐ-CP)
+                              </h4>
+                              <p className="text-xs text-rose-800 leading-relaxed">
+                                Phát hiện {piiCheck.piiItems.length} thông tin định danh cá nhân thật chưa qua Bút xóa PII: {' '}
+                                <span className="font-semibold text-rose-950 font-mono">
+                                  {piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}
+                                </span>. Điểm căn cứ & bảo mật bị khóa về 0 điểm.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-rose-200">
+                            <span className="text-[11px] font-semibold text-rose-700">
+                              Áp dụng ngay Bút xóa PII để thay thế bằng biến giữ chỗ an toàn:
+                            </span>
+                            <button
+                              type="button"
+                              onClick={handleAutoSanitizePii}
+                              className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition cursor-pointer"
+                              title="Tự động thay thế CCCD, SĐT, STK bằng biến {{BIẾN}}"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                              <span>Tự động Bút xóa PII 1-chạm</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <Award className="w-4 h-4 text-emerald-600" />
@@ -820,37 +1063,60 @@ export const HybridView: React.FC<Props> = ({
                           </span>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
-                          className="text-xs text-slate-500 hover:text-slate-800 font-medium transition"
-                        >
-                          {showScoreBreakdown ? 'Thu gọn' : 'Xem chi tiết'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
+                            className="text-xs text-slate-500 hover:text-slate-800 font-medium transition cursor-pointer"
+                          >
+                            {showScoreBreakdown ? 'Thu gọn' : 'Xem chi tiết'}
+                          </button>
+                        </div>
                       </div>
 
-                      {/* 5 tiêu chí Rubric chi tiết */}
+                      {/* 5 tiêu chí Rubric chi tiết (Thang điểm 10 chuẩn mực) */}
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-[11px] text-slate-500 block mb-0.5">Hoàn thành nhiệm vụ</span>
-                          <span className="font-bold text-slate-800">{activeAiEval.scores.taskCompletion}/2</span>
-                        </div>
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-[11px] text-slate-500 block mb-0.5">Độ chuẩn xác / Căn cứ</span>
-                          <span className="font-bold text-slate-800">{activeAiEval.scores.groundedness}/2</span>
-                        </div>
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-[11px] text-slate-500 block mb-0.5">Tuân thủ cấu trúc</span>
-                          <span className="font-bold text-slate-800">{activeAiEval.scores.formatAdherence}/2</span>
-                        </div>
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-[11px] text-slate-500 block mb-0.5">Tuân thủ ràng buộc</span>
-                          <span className="font-bold text-slate-800">{activeAiEval.scores.constraintCompliance}/2</span>
-                        </div>
-                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                          <span className="text-[11px] text-slate-500 block mb-0.5">Tính ứng dụng thực tế</span>
-                          <span className="font-bold text-slate-800">{activeAiEval.scores.businessUsability}/2</span>
-                        </div>
+                        {[
+                          { label: 'Hoàn thành nhiệm vụ', score: activeAiEval.scores.taskCompletion },
+                          { label: 'Độ chuẩn xác / Căn cứ', score: activeAiEval.scores.groundedness },
+                          { label: 'Tuân thủ cấu trúc', score: activeAiEval.scores.formatAdherence },
+                          { label: 'Tuân thủ ràng buộc', score: activeAiEval.scores.constraintCompliance },
+                          { label: 'Tính ứng dụng thực tế', score: activeAiEval.scores.businessUsability },
+                        ].map((item, idx) => {
+                          const score10 = item.score * 5; // Quy đổi thang điểm 10 chuẩn mực
+                          const isPassed = score10 >= 8;
+                          const isPartial = score10 >= 5 && score10 < 8;
+                          return (
+                            <div key={idx} className="p-2.5 bg-slate-50/90 rounded-xl border border-slate-200/90 flex flex-col justify-between">
+                              <div>
+                                <span className="text-[11px] text-slate-500 block mb-1 font-medium truncate" title={item.label}>
+                                  {item.label}
+                                </span>
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="font-bold text-slate-900 text-sm">{score10}/10</span>
+                                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                    isPassed 
+                                      ? 'bg-emerald-100 text-emerald-800' 
+                                      : isPartial 
+                                      ? 'bg-amber-100 text-amber-800' 
+                                      : 'bg-rose-100 text-rose-800'
+                                  }`}>
+                                    {isPassed ? 'Đạt chuẩn' : isPartial ? 'Cần sửa' : 'Chưa đạt'}
+                                  </span>
+                                </div>
+                              </div>
+                              {/* Thanh tiến trình vi mô */}
+                              <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    isPassed ? 'bg-emerald-500' : isPartial ? 'bg-amber-500' : 'bg-rose-500'
+                                  }`}
+                                  style={{ width: `${Math.max(score10 * 10, 8)}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       {/* Điểm làm tốt, cần cải thiện */}
@@ -872,11 +1138,11 @@ export const HybridView: React.FC<Props> = ({
                           {activeAiEval.improvements && activeAiEval.improvements.length > 0 && (
                             <div>
                               <span className="text-[11px] font-semibold text-amber-700 flex items-center gap-1 mb-1">
-                                <ThumbsUp className="w-3.5 h-3.5 text-amber-600" /> Cần cải thiện:
+                                <TrendingUp className="w-3.5 h-3.5 text-amber-600" /> Cần cải thiện:
                               </span>
                               <ul className="text-slate-600 pl-4 list-disc space-y-0.5">
                                 {activeAiEval.improvements.map((s: string, idx: number) => (
-                                  <li key={idx}>{s}</li>
+                                  <li key={idx}>{s.replace(/^[🚨✨💡📌\s*]+/, '')}</li>
                                 ))}
                               </ul>
                             </div>
@@ -909,70 +1175,33 @@ export const HybridView: React.FC<Props> = ({
                   );
                 }
 
-                if (scoreResult) {
+                // Nếu không có kết quả đánh giá AI (hoặc đánh giá lỗi), hiển thị trạng thái lỗi rõ ràng kèm nút "Thử đánh giá lại"
+                if (runStatus !== 'evaluating' && !isRetryingEvaluation) {
                   return (
-                    <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2 animate-fadeIn">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Award className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs font-bold text-slate-800">
-                            AI Feedback:
-                          </span>
-                          <span className={`px-2 py-0.5 rounded-full font-bold text-xs ${
-                            scoreResult.totalScore >= 80 
-                              ? 'bg-emerald-100 text-emerald-800' 
-                              : scoreResult.totalScore >= 50 
-                              ? 'bg-amber-100 text-amber-800' 
-                              : 'bg-rose-100 text-rose-800'
-                          }`}>
-                            {Math.round(scoreResult.totalScore / 10)} / 10 điểm
-                          </span>
-                        </div>
-
-                        <button
-                          onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
-                          className="text-xs text-slate-500 hover:text-slate-800"
-                        >
-                          {showScoreBreakdown ? 'Thu gọn' : 'Xem tiêu chí'}
-                        </button>
-                      </div>
-
-                      <p className="text-xs text-slate-600">
-                        {scoreResult.actionableAdvice}
-                      </p>
-
-                      {showScoreBreakdown && (
-                        <div className="pt-2 mt-2 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs animate-fadeIn">
-                          <div className="p-2 bg-slate-50 rounded">
-                            <span className="text-[11px] text-slate-500 block">Rõ vai trò</span>
-                            <span className="font-bold text-slate-800">{scoreResult.personaScore}/20</span>
-                          </div>
-                          <div className="p-2 bg-slate-50 rounded">
-                            <span className="text-[11px] text-slate-500 block">Nhiệm vụ</span>
-                            <span className="font-bold text-slate-800">{scoreResult.taskScore}/20</span>
-                          </div>
-                          <div className="p-2 bg-slate-50 rounded">
-                            <span className="text-[11px] text-slate-500 block">Ràng buộc</span>
-                            <span className="font-bold text-slate-800">{scoreResult.guardrailsScore}/20</span>
-                          </div>
-                          <div className="p-2 bg-slate-50 rounded">
-                            <span className="text-[11px] text-slate-500 block">Tham số hóa</span>
-                            <span className="font-bold text-slate-800">{scoreResult.variableScore}/20</span>
-                          </div>
-                          <div className="p-2 bg-slate-50 rounded">
-                            <span className="text-[11px] text-slate-500 block">Định dạng</span>
-                            <span className="font-bold text-slate-800">{scoreResult.formatScore}/20</span>
+                    <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 space-y-3 animate-fadeIn">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                        <div className="flex items-start gap-2.5">
+                          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="text-xs font-bold text-amber-900">
+                              Không thể đánh giá lúc này
+                            </h4>
+                            <p className="text-xs text-amber-800 mt-1 leading-relaxed">
+                              {evaluationError || 'Hệ thống AI Judge chưa thể hoàn tất chấm điểm cho câu lệnh này do kết nối bị gián đoạn.'}
+                            </p>
+                            <p className="text-[11px] text-amber-700/80 mt-1">
+                              Kết quả sinh văn bản từ AI ở trên vẫn được lưu trữ nguyên vẹn. Bạn có thể bấm nút bên cạnh để thử đánh giá lại mà không cần chạy lại toàn bộ mô hình.
+                            </p>
                           </div>
                         </div>
-                      )}
-
-                      <div className="pt-2 flex justify-end">
                         <button
-                          onClick={handleNextStepOrLab}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
+                          type="button"
+                          onClick={handleRetryEvaluation}
+                          disabled={isRetryingEvaluation || isRunning}
+                          className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:bg-slate-200 text-white font-bold text-xs shadow-xs transition"
                         >
-                          <span>{currentStep === 1 ? 'Chuyển sang Bước 2 (Cải tiến prompt)' : currentLabIndex < labs.length - 1 ? 'Sang bài tiếp theo' : 'Hoàn thành khóa học'}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <RotateCcw className={`w-3.5 h-3.5 ${isRetryingEvaluation ? 'animate-spin' : ''}`} />
+                          <span>Thử đánh giá lại</span>
                         </button>
                       </div>
                     </div>
@@ -981,14 +1210,6 @@ export const HybridView: React.FC<Props> = ({
 
                 return null;
               })()}
-
-              {/* Compare/revise follows output and evaluation in the learning flow. */}
-              <InlineCompareCard
-                lab={currentLab}
-                runCount={currentLabRunCount}
-                currentPrompt={promptText}
-                onOpenFullCompare={() => setIsABModalOpen(true)}
-              />
             </div>
           )}
         </div>
@@ -1015,6 +1236,16 @@ export const HybridView: React.FC<Props> = ({
           version={versionToSave}
         />
       )}
+
+      {/* Modal Xác nhận mở khóa Gợi ý / Lời giải */}
+      <AssistanceConfirmModal
+        isOpen={assistanceModalState.isOpen}
+        type={assistanceModalState.type}
+        labTitle={currentLab.title}
+        labOrder={currentLab.order}
+        onConfirm={handleConfirmAssistance}
+        onCancel={handleCancelAssistance}
+      />
     </div>
   );
 };

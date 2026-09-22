@@ -1,5 +1,6 @@
 import { LabStep, PromptComponentType } from '../types';
 import { CourseCurriculumModule, CourseCurriculumLesson } from '../types/database';
+import { SEED_LABS_DATA } from '../data/curriculumSeed';
 
 const ALLOWED_COMPONENTS = new Set<PromptComponentType>([
   'role',
@@ -17,9 +18,9 @@ const rubricText = (lesson: CourseCurriculumLesson, index: number, fallback: str
 };
 
 /**
- * Adapter tạm thời giữa curriculum chuẩn hóa trong database và LabStep mà UI học
- * hiện tại đang sử dụng. Dữ liệu DB luôn được ưu tiên; LABS_DATA chỉ là fallback
- * khi khóa học chưa có curriculum hoặc migration chưa được triển khai.
+ * Adapter chuẩn hóa giữa curriculum trong database và LabStep mà UI học sử dụng.
+ * Kế thừa đầy đủ các trường phong phú (Before/After outputs, comparison highlights, mini challenges)
+ * từ SEED_LABS_DATA để đảm bảo trải nghiệm sư phạm tốt nhất.
  */
 export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[] {
   const lessons = modules
@@ -29,35 +30,43 @@ export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[
       .filter((lesson) => lesson.status === 'published')
       .sort((a, b) => a.position - b.position));
 
-  return lessons.map((lesson, index) => ({
-    id: lesson.id,
-    order: index + 1,
-    title: lesson.title,
-    badge: lesson.badge || `Bài ${index + 1}`,
-    focusSkill: lesson.focus_skill || 'Kỹ nghệ prompt thực hành',
-    scenario: lesson.scenario || '',
-    taskGoal: lesson.task_goal || '',
-    conceptTag: lesson.lesson_key,
-    conceptTitle: lesson.concept_title || lesson.title,
-    conceptExplanation: lesson.concept_content || '',
-    systemInstruction: lesson.system_instruction || undefined,
-    baselinePrompt: lesson.baseline_prompt || '',
-    improvedPrompt: lesson.improved_prompt || '',
-    starterPrompt: lesson.starter_prompt || undefined,
-    promptPlaceholder: lesson.prompt_placeholder || undefined,
-    sampleInputContext: lesson.sample_input_context || undefined,
-    hints: lesson.hints,
-    expectedOutputFormat: lesson.expected_output_format || '',
-    rubricCriteria: {
-      persona: rubricText(lesson, 0, 'Đúng vai trò và bối cảnh nghiệp vụ.'),
-      task: rubricText(lesson, 1, 'Hoàn thành đúng nhiệm vụ.'),
-      guardrails: rubricText(lesson, 2, 'Tuân thủ các chốt chặn và dữ liệu nguồn.'),
-      format: rubricText(lesson, 3, 'Đúng định dạng đầu ra.'),
-    },
-    focusComponents: lesson.focus_components.filter(
-      (component): component is PromptComponentType => ALLOWED_COMPONENTS.has(component as PromptComponentType),
-    ),
-    simulatedBaselineOutput: 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt baseline để tạo kết quả thực tế.',
-    simulatedImprovedOutput: 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt cải thiện để tạo kết quả thực tế.',
-  }));
+  return lessons.map((lesson, index) => {
+    const seedLab = SEED_LABS_DATA.find(
+      (l) => l.id === lesson.id || l.conceptTag.toLowerCase() === lesson.lesson_key.toLowerCase()
+    );
+
+    return {
+      id: lesson.id,
+      order: index + 1,
+      title: lesson.title.startsWith('Bài') ? lesson.title : `Bài ${index + 1}: ${lesson.title}`,
+      badge: lesson.badge || `Lab ${String(index + 1).padStart(2, '0')}`,
+      focusSkill: lesson.focus_skill || 'Kỹ nghệ prompt thực hành',
+      scenario: lesson.scenario || '',
+      taskGoal: lesson.task_goal || '',
+      conceptTag: lesson.lesson_key,
+      conceptTitle: lesson.concept_title || lesson.title,
+      conceptExplanation: lesson.concept_content || '',
+      systemInstruction: lesson.system_instruction || undefined,
+      baselinePrompt: lesson.baseline_prompt || '',
+      improvedPrompt: lesson.improved_prompt || lesson.starter_prompt || '',
+      starterPrompt: lesson.starter_prompt || undefined,
+      promptPlaceholder: lesson.prompt_placeholder || undefined,
+      sampleInputContext: lesson.sample_input_context || undefined,
+      hints: lesson.hints,
+      expectedOutputFormat: lesson.expected_output_format || '',
+      rubricCriteria: {
+        persona: rubricText(lesson, 0, 'Đúng vai trò và bối cảnh nghiệp vụ.'),
+        task: rubricText(lesson, 1, 'Hoàn thành đúng nhiệm vụ.'),
+        guardrails: rubricText(lesson, 2, 'Tuân thủ các chốt chặn và dữ liệu nguồn.'),
+        format: rubricText(lesson, 3, 'Đúng định dạng đầu ra.'),
+      },
+      focusComponents: lesson.focus_components.filter(
+        (component): component is PromptComponentType => ALLOWED_COMPONENTS.has(component as PromptComponentType),
+      ),
+      comparisonHighlights: seedLab?.comparisonHighlights,
+      miniChallenge: seedLab?.miniChallenge,
+      simulatedBaselineOutput: seedLab?.simulatedBaselineOutput || 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt baseline để tạo kết quả thực tế.',
+      simulatedImprovedOutput: seedLab?.simulatedImprovedOutput || 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt cải thiện để tạo kết quả thực tế.',
+    };
+  });
 }

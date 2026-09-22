@@ -14,7 +14,7 @@
   - Khi bạn chat qua lại quá nhiều lượt (Multi-turn Chat) để sửa lỗi, bối cảnh ban đầu sẽ bị trôi dạt (Context Drift), khiến AI dần quên mất quy định ban đầu và bắt đầu sinh văn bản ngẫu nhiên hoặc lặp từ.
 - **In-Context Learning (Học trong Bối cảnh):**
   - Khác với việc phải "dạy lại mô hình" (Fine-tuning - việc của kỹ sư IT), dân văn phòng hoàn toàn có thể điều khiển AI thông qua **In-Context Learning**: Cung cấp nguyên liệu và luật chơi trực tiếp ngay trong lời nhắc.
-  - **Sức mạnh của Ví dụ Mẫu (Few-Shot Prompting):** Với LLM, việc bạn đưa ra 1-2 ví dụ mẫu thực tế (Inputs $\rightarrow$ Outputs) có hiệu quả định hình văn phong gấp 10 lần việc bạn viết hàng trang tài liệu mô tả dài dòng. AI sẽ tự động học được: độ dài câu, nhịp ngắt dòng, mật độ emoji, và phong cách xưng hô từ ví dụ mẫu.
+  - **Sức mạnh của Ví dụ Mẫu (Few-Shot Prompting):** Với LLM, việc bạn đưa ra 1-2 ví dụ mẫu thực tế (Inputs → Outputs) có hiệu quả định hình văn phong gấp 10 lần việc bạn viết hàng trang tài liệu mô tả dài dòng. AI sẽ tự động học được: độ dài câu, nhịp ngắt dòng, mật độ emoji, và phong cách xưng hô từ ví dụ mẫu.
 - **Phân tách Tĩnh (Static) và Động (Dynamic):**
   - **Static Context (Bối cảnh Tĩnh):** Những quy chuẩn không bao giờ đổi theo ngày (Sứ mệnh Agribank, giọng văn Tam nông mộc mạc, đối tượng độc giả, danh sách từ cấm kỵ).
   - **Dynamic Context (Bối cảnh Động):** Dữ liệu thay đổi theo từng sự kiện/bài viết (Số liệu báo cáo tháng này, thông tin hội nghị hôm nay, gói tín dụng mới).
@@ -93,14 +93,14 @@ Hãy xuất bản 01 bài đăng Fanpage hoàn chỉnh:
   - Quy mô gói tín dụng: `"10.000 tỷ"` hoặc `"10.000 tỷ đồng"`
   - Mức lãi suất: `"0.5%/năm"` hoặc `"0.5%"`
   - Số lượng cán bộ chung tay: `"40.000 cán bộ"` hoặc `"40.000 cán bộ, nhân viên"`
-- **Đánh giá:** Sai lệch hoặc thiếu sót bất kỳ con số nào $\rightarrow$ **Trừ 10đ/lỗi**.
+- **Đánh giá:** Sai lệch hoặc thiếu sót bất kỳ con số nào → **Trừ 10đ/lỗi**.
 
 ### Test Case 2: Kiểm Tra Bộ Lọc Từ Cấm (Negative Constraint / Blacklist Test)
 - **Mục tiêu:** Đảm bảo tính trang trọng, loại bỏ triệt để giọng văn bán hàng online.
 - **Danh sách từ cấm quét tự động:**
   - `["siêu rẻ", "bùng nổ", "cơn sốt", "hot deal", "vô địch", "thần tốc", "giá sốc", "quá đã", "rẻ nhất"]`
 - **Kỳ vọng:** KHÔNG ĐƯỢC CHỨA bất kỳ từ nào trong danh sách trên.
-- **Đánh giá:** Bắt gặp 1 từ trong blacklist $\rightarrow$ **Trừ 25đ**.
+- **Đánh giá:** Bắt gặp 1 từ trong blacklist → **Trừ 25đ**.
 
 ### Test Case 3: Kiểm Tra Phong Cách Định Dạng Di Động (Mobile Layout Test)
 - **Mục tiêu:** Bài đăng Fanpage phải đọc tốt trên smartphone của người dân và cán bộ.

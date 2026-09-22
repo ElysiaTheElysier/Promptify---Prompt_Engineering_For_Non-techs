@@ -71,6 +71,28 @@ export const LessonHeaderBar: React.FC<Props> = ({
 
         {/* Right: Quick Actions */}
         <div className="flex items-center gap-2">
+          {/* Cấu hình Động cơ AI */}
+          <button
+            onClick={onOpenApiModal}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+              apiConfig?.mode === 'simulated'
+                ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/50'
+                : 'bg-indigo-950/40 text-indigo-300 border-indigo-800/60 hover:bg-indigo-900/50'
+            }`}
+            title="Cài đặt Động cơ AI (Google Gemini API thật hoặc Mô phỏng)"
+          >
+            {apiConfig?.mode === 'simulated' ? (
+              <>
+                <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                <span>AI: Mô phỏng</span>
+              </>
+            ) : (
+              <>
+                <Key className="w-3.5 h-3.5 text-indigo-400" />
+                <span>AI: Gemini ({apiConfig?.model || '2.5-flash'})</span>
+              </>
+            )}
+          </button>
 
           {/* Quick Library button */}
           <button

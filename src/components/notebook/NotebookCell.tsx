@@ -19,7 +19,6 @@ import {
 import { LabStep, ApiConfig, PromptRun, PromptVersion } from '../../types';
 import { executePromptStream, evaluatePromptRubric } from '../../services/llmService';
 import { detectPromptComponents, evaluateBusinessMetrics } from '../../services/businessEvaluationService';
-import { InlineCompareCard } from '../common/InlineCompareCard';
 import { LearningBadges } from '../common/LearningBadges';
 import { MiniChallengeCard } from '../common/MiniChallengeCard';
 import { PromptVersionBar } from '../common/PromptVersionBar';
@@ -243,13 +242,16 @@ export const NotebookCell: React.FC<Props> = ({
           </div>
 
           {/* Tình huống nghiệp vụ súc tích */}
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {lab.scenario}
-          </p>
+          <div className="text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50/70 p-3 rounded-xl border border-slate-200/70">
+            <MarkdownView content={lab.scenario} />
+          </div>
 
           {/* Một câu "Bạn cần làm gì" */}
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs sm:text-sm text-slate-800 font-medium">
-            🎯 <strong>Bạn cần làm gì:</strong> {lab.taskGoal}
+          <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200/70 text-xs sm:text-sm text-emerald-950 font-medium">
+            <div className="font-bold text-emerald-900 mb-1 flex items-center gap-1.5">
+              <span>🎯 Bạn cần làm gì:</span>
+            </div>
+            <MarkdownView content={lab.taskGoal} />
           </div>
 
           {/* Dữ liệu đầu vào cố định (Control Data) */}
@@ -554,14 +556,6 @@ export const NotebookCell: React.FC<Props> = ({
                 )}
               </div>
             )}
-
-            {/* 6. ĐỐI CHIẾU TRƯỚC / SAU (CHỈ HIỆN KHI ĐÃ CHẠY ÍT NHẤT 2 LẦN) */}
-            <InlineCompareCard
-              lab={lab}
-              runCount={runCount}
-              currentPrompt={promptInput}
-              onOpenFullCompare={() => setIsABModalOpen(true)}
-            />
 
             {/* Mini Challenge tùy chọn ở cuối bài */}
             <MiniChallengeCard

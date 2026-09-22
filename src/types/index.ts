@@ -49,6 +49,20 @@ export interface MiniChallenge {
   tip?: string;
 }
 
+export interface SolutionStep {
+  stepNumber: number;
+  title: string;
+  explanation: string;
+  snippet?: string;
+}
+
+export interface LabAssistanceState {
+  hasViewedHints: boolean;
+  hasViewedSolution: boolean;
+  hintsUnlockedAt?: string;
+  solutionUnlockedAt?: string;
+}
+
 export interface LabStep {
   id: string;
   order: number;
@@ -60,9 +74,11 @@ export interface LabStep {
   conceptTag: string;
   conceptTitle: string;
   conceptExplanation: string;
+  theoryContent?: string;
   systemInstruction?: string;
   baselinePrompt: string;
   improvedPrompt: string;
+  solutionSteps?: SolutionStep[];
   starterPrompt?: string;
   promptPlaceholder?: string;
   sampleInputContext?: string;

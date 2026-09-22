@@ -5,13 +5,32 @@ import { validateAiEvaluationPayload } from './aiEvaluationContract';
 
 async function getAuthenticatedApiHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) {
-    throw new Error('Bạn cần đăng nhập và được ghi danh để sử dụng chức năng AI.');
+  if (session?.access_token) {
+    return {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    };
   }
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${session.access_token}`,
-  };
+
+  // Hỗ trợ phiên tài khoản mẫu (Demo Learner) khi chưa có Supabase OAuth session
+  if (typeof localStorage !== 'undefined') {
+    const savedLearnerStr = localStorage.getItem('promptify_learner');
+    if (savedLearnerStr) {
+      try {
+        const savedLearner = JSON.parse(savedLearnerStr);
+        if (savedLearner?.email) {
+          return {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer demo-token:${encodeURIComponent(savedLearner.email)}`,
+          };
+        }
+      } catch {
+        // fallback
+      }
+    }
+  }
+
+  throw new Error('Bạn cần đăng nhập hoặc chọn tài khoản mẫu để sử dụng chức năng AI.');
 }
 
 /**
@@ -44,19 +63,100 @@ export function mapAiEvaluationToRubricAudit(evalResult: AiEvaluationResult): Ru
   };
 }
 
+import { detectPiiEntities, auditLabCompliance } from './labComplianceService';
+
 /**
  * Đánh giá fallback cục bộ nếu máy chủ gặp sự cố
  */
-export function evaluatePromptRubric(promptText: string): RubricAudit {
+export function evaluatePromptRubric(
+  promptText: string, 
+  lab?: LabStep | { id?: string; title?: string; taskGoal?: string }
+): RubricAudit {
   const text = promptText.toLowerCase();
-  
-  let personaScore = text.includes('bạn là') || text.includes('vai trò') ? 15 : 5;
-  let taskScore = text.includes('hãy') || text.includes('phân tích') || text.includes('nhiệm vụ') ? 15 : 8;
-  let guardrailsScore = text.includes('tuyệt đối không') || text.includes('không được') || text.includes('chỉ') ? 15 : 5;
-  let variableScore = text.includes('{{') || text.includes('dữ liệu') ? 15 : 5;
-  let formatScore = text.includes('bảng') || text.includes('markdown') ? 15 : 5;
 
-  const totalScore = personaScore + taskScore + guardrailsScore + variableScore + formatScore;
+  // 0. Kiểm tra Zero-tolerance về PII nếu là bài Lab 1 hoặc có chứa dữ liệu PII
+  const piiCheck = detectPiiEntities(promptText);
+  const isPiiLesson = Boolean(
+    (lab?.id && (lab.id.includes('1') || lab.id.includes('pii'))) ||
+    (lab?.title && lab.title.toLowerCase().includes('pii')) ||
+    promptText.includes('Nguyễn Văn Tèo') ||
+    promptText.includes('034091002847')
+  );
+  const isPiiViolation = isPiiLesson && piiCheck.hasPii;
+  
+  // 1. Vai trò (Role / Persona) - max 20
+  let personaScore = 5;
+  let personaNote = 'Chưa thiết lập vai trò chuyên môn rõ ràng.';
+  if (text.includes('bạn là') || text.includes('vai trò') || text.includes('chuyên viên') || text.includes('chuyên gia')) {
+    personaScore = 20;
+    personaNote = 'Xuất sắc: Thiết lập vai trò chuyên gia đúng ngữ cảnh nghiệp vụ.';
+  } else if (text.includes('đóng vai') || text.includes('tư cách')) {
+    personaScore = 15;
+    personaNote = 'Khá: Đã có định vị vai trò nhưng có thể cụ thể hóa chức danh.';
+  }
+
+  // 2. Nhiệm vụ (Task / Goal) - max 20
+  let taskScore = 8;
+  let taskNote = 'Nhiệm vụ còn sơ sài hoặc chưa rõ động từ hành động.';
+  if (text.includes('hãy') || text.includes('phân tích') || text.includes('nhiệm vụ') || text.includes('trích xuất') || text.includes('soạn thảo')) {
+    taskScore = 20;
+    taskNote = 'Rõ ràng: Đầy đủ mục tiêu và động từ hành động nghiệp vụ.';
+  }
+
+  // 3. Ràng buộc & Tiêu cực (Constraints / Guardrails) - max 20
+  let guardrailsScore = 5;
+  let guardrailsNote = 'Thiếu ràng buộc tiêu cực hoặc giới hạn hành vi (rất dễ bị AI bịa đặt hoặc văn phong đàm thoại).';
+  if (isPiiViolation) {
+    guardrailsScore = 0;
+    guardrailsNote = 'THẺ ĐỎ: Vi phạm nghiêm trọng an toàn dữ liệu khách hàng Agribank (gửi PII thật lên AI).';
+  } else if (text.includes('tuyệt đối không') || text.includes('không được') || text.includes('chỉ') || text.includes('không dùng') || text.includes('nguyên tắc')) {
+    guardrailsScore = 20;
+    guardrailsNote = 'Vững chắc: Có hàng rào kiểm soát chặt chẽ, chống ảo giác và ngôn từ cảm tính.';
+  } else if (text.includes('lưu ý') || text.includes('giới hạn') || text.includes('dưới')) {
+    guardrailsScore = 14;
+    guardrailsNote = 'Đã có giới hạn nhưng nên bổ sung thêm nguyên tắc cấm đoán (Negative Prompting).';
+  }
+
+  // 4. Bám sát Dữ liệu / Biến số (Groundedness / Variable) - max 20
+  let variableScore = 5;
+  let variableNote = 'Dữ liệu đầu vào chưa được neo chặt hoặc còn để lộ thông tin nhạy cảm.';
+  if (isPiiViolation) {
+    variableScore = 0;
+    variableNote = `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại ${piiCheck.piiItems.length} thông tin PII thật chưa khử (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`;
+  } else if ((text.includes('{{') && text.includes('}}')) || (text.includes('[') && text.includes(']') && text.includes('khách_hàng'))) {
+    variableScore = 20;
+    variableNote = 'Chuẩn hóa: Đã ẩn danh hóa dữ liệu bằng biến giữ chỗ an toàn và neo chặt vào bối cảnh.';
+  } else if (text.includes('dữ liệu') || text.includes('trích lục') || text.includes('hồ sơ') || text.includes('tài liệu')) {
+    variableScore = 15;
+    variableNote = 'Đã dẫn xuất dữ liệu đầu vào, khuyến khích dùng biến giữ chỗ {{BIẾN}} để tăng bảo mật.';
+  }
+
+  // 5. Định dạng đầu ra (Format Adherence) - max 20
+  let formatScore = 5;
+  let formatNote = 'Chưa chỉ định khuôn dạng đầu ra cụ thể, kết quả có thể khó tái sử dụng.';
+  if (text.includes('bảng') || text.includes('markdown') || text.includes('cột') || text.includes('3 góc') || text.includes('gồm:')) {
+    formatScore = 20;
+    formatNote = 'Chuẩn xác: Yêu cầu định dạng bảng biểu hoặc danh sách mục sẵn sàng ứng dụng.';
+  } else if (text.includes('đoạn văn') || text.includes('danh sách') || text.includes('tiêu đề')) {
+    formatScore = 15;
+    formatNote = 'Đã có yêu cầu định dạng, có thể cụ thể hóa tên từng cột hoặc khuôn mẫu.';
+  }
+
+  const totalScore = isPiiViolation 
+    ? Math.min(30, personaScore + taskScore + formatScore)
+    : (personaScore + taskScore + guardrailsScore + variableScore + formatScore);
+  
+  let actionableAdvice = '';
+  if (isPiiViolation) {
+    actionableAdvice = 'THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại thông tin PII thật trong câu lệnh. Bấm nút "Tự động Bút xóa PII 1-chạm" để khử định danh trước khi nộp bài!';
+  } else if (totalScore >= 80) {
+    actionableAdvice = 'Prompt đạt chuẩn cấp độ Chuyên gia! Đầy đủ vai trò, kiểm soát rủi ro và định dạng tối ưu.';
+  } else if (totalScore >= 50) {
+    actionableAdvice = 'Prompt mức Khá. Hãy bổ sung thêm các ràng buộc tiêu cực (Không suy diễn, Không dùng từ cảm tính) và yêu cầu khuôn bảng biểu Markdown.';
+  } else {
+    actionableAdvice = 'Prompt còn ở mức cơ bản. Cần bổ sung Vai trò (Role), Ràng buộc (Constraints) và mẫu Định dạng cụ thể để AI không suy đoán ngẫu nhiên.';
+  }
+
   return {
     personaScore,
     taskScore,
@@ -64,18 +164,145 @@ export function evaluatePromptRubric(promptText: string): RubricAudit {
     variableScore,
     formatScore,
     totalScore,
-    personaNote: 'Vai trò chuyên môn.',
-    taskNote: 'Mô tả nhiệm vụ.',
-    guardrailsNote: 'Ràng buộc tiêu cực.',
-    variableNote: 'Dữ liệu đầu vào.',
-    formatNote: 'Định dạng đầu ra.',
-    actionableAdvice: totalScore >= 70 ? 'Prompt đã khá tốt!' : 'Nên bổ sung thêm vai trò và định dạng bảng.'
+    personaNote,
+    taskNote,
+    guardrailsNote,
+    variableNote,
+    formatNote,
+    actionableAdvice
+  };
+}
+
+/**
+ * Đánh giá heuristic chuyển đổi sang AiEvaluationResult (0-10 điểm)
+ */
+export function evaluatePromptHeuristic(
+  promptText: string, 
+  outputText: string = '', 
+  lab?: LabStep | { id?: string; title?: string; taskGoal?: string }
+): AiEvaluationResult {
+  const piiCheck = detectPiiEntities(promptText);
+  const isPiiLesson = Boolean(
+    (lab?.id && (lab.id.includes('1') || lab.id.includes('pii'))) ||
+    (lab?.title && lab.title.toLowerCase().includes('pii')) ||
+    promptText.includes('Nguyễn Văn Tèo') ||
+    promptText.includes('034091002847')
+  );
+
+  if (isPiiLesson && piiCheck.hasPii) {
+    return {
+      scores: {
+        taskCompletion: 1,
+        groundedness: 0,
+        formatAdherence: 1,
+        constraintCompliance: 0,
+        businessUsability: 0
+      },
+      total: 2,
+      strengths: ['Đã tiếp nhận yêu cầu bài toán và thiết lập khung sườn.'],
+      improvements: [
+        `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại ${piiCheck.piiItems.length} thông tin PII thật (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`,
+        'Vi phạm quy chuẩn an toàn dữ liệu khách hàng Agribank: Tuyệt đối không gửi CCCD, SĐT, STK thật lên AI mà chưa khử định danh!'
+      ],
+      nextHint: 'Bấm nút "Tự động Bút xóa PII 1-chạm" để hệ thống tự động ẩn danh hóa toàn bộ thông tin nhạy cảm thành biến giữ chỗ an toàn.'
+    };
+  }
+
+  const audit = evaluatePromptRubric(promptText, lab);
+  const taskCompletion = Math.min(2, Math.max(0, Math.round(audit.taskScore / 10)));
+  const groundedness = Math.min(2, Math.max(0, Math.round(audit.variableScore / 10)));
+  const formatAdherence = Math.min(2, Math.max(0, Math.round(audit.formatScore / 10)));
+  const constraintCompliance = Math.min(2, Math.max(0, Math.round(audit.guardrailsScore / 10)));
+  const businessUsability = Math.min(2, Math.max(0, Math.round(audit.personaScore / 10)));
+
+  const total = taskCompletion + groundedness + formatAdherence + constraintCompliance + businessUsability;
+
+  const strengths: string[] = [];
+  const improvements: string[] = [];
+
+  if (businessUsability >= 2) strengths.push('Thiết lập vai trò chuyên môn và góc nhìn nghiệp vụ rõ ràng.');
+  else improvements.push('Nên bổ sung thêm vai trò chuyên môn cụ thể (VD: Chuyên viên Truyền thông, Thẩm định viên).');
+
+  if (taskCompletion >= 2) strengths.push('Nhiệm vụ cốt lõi được mô tả rõ ràng, đầy đủ động từ hành động.');
+  else improvements.push('Cần làm rõ hành động cụ thể AI cần làm (Hãy trích xuất, Soạn thảo, Phân tích).');
+
+  if (groundedness >= 2) strengths.push('Bám sát dữ liệu thực tế và áp dụng biến giữ chỗ chuẩn hóa.');
+  else improvements.push('Hãy neo chặt vào dữ liệu đầu vào hoặc dùng biến giữ chỗ {{BIẾN}} thay cho dữ liệu thật.');
+
+  if (constraintCompliance >= 2) strengths.push('Có hàng rào ràng buộc chặt chẽ, ngăn ngừa ảo giác hiệu quả.');
+  else improvements.push('Nên bổ sung ràng buộc tiêu cực (Tuyệt đối không suy diễn, Không dùng từ cảm tính).');
+
+  if (formatAdherence >= 2) strengths.push('Yêu cầu định dạng đầu ra chuẩn (bảng Markdown/danh sách cấu trúc).');
+  else improvements.push('Nên chỉ định khuôn dạng đầu ra cụ thể (bảng biểu Markdown hoặc số mục ngắn gọn).');
+
+  return {
+    scores: {
+      taskCompletion,
+      groundedness,
+      formatAdherence,
+      constraintCompliance,
+      businessUsability,
+    },
+    total,
+    strengths,
+    improvements,
+    nextHint: audit.actionableAdvice
+  };
+}
+
+/**
+ * Trình sinh kết quả mô phỏng (Simulated Engine) mượt mà với streaming tự nhiên
+ */
+export async function executeSimulatedPromptStream(
+  promptText: string,
+  lab: LabStep,
+  onChunk: (chunk: string) => void,
+  startTime: number = performance.now()
+): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'simulated'; model: string }> {
+  const text = promptText.toLowerCase();
+  const isImproved = 
+    promptText.length > 200 ||
+    text.includes('bảng') ||
+    text.includes('markdown') ||
+    text.includes('vai trò') ||
+    text.includes('bạn là') ||
+    text.includes('{{') ||
+    text.includes('ràng buộc') ||
+    text.includes('tuyệt đối không') ||
+    text.includes('chỉ');
+
+  const targetOutput = isImproved && lab.simulatedImprovedOutput
+    ? lab.simulatedImprovedOutput
+    : (lab.simulatedBaselineOutput || 'Đang tạo câu trả lời mẫu cho bài thực hành...');
+
+  // Giả lập streaming từng từ với hiệu ứng gõ chữ tự nhiên
+  const words = targetOutput.split(' ');
+  let accumulated = '';
+  const step = Math.max(1, Math.floor(words.length / 35));
+
+  for (let i = 0; i < words.length; i += step) {
+    const chunk = words.slice(i, i + step).join(' ');
+    accumulated += (accumulated ? ' ' : '') + chunk;
+    onChunk(accumulated);
+    await new Promise((resolve) => setTimeout(resolve, 16));
+  }
+  onChunk(targetOutput);
+
+  const latencyMs = Math.round(performance.now() - startTime);
+  const tokenCount = Math.round(targetOutput.length / 3.8);
+
+  return {
+    output: targetOutput,
+    tokenCount,
+    latencyMs,
+    mode: 'simulated',
+    model: 'Mô phỏng Nghiệp vụ'
   };
 }
 
 /**
  * Thực thi gọi Prompt qua Serverless Backend Endpoint POST /api/generate
- * Bảo vệ an toàn tuyệt đối API Key trên server.
+ * Chỉ sử dụng Simulated Engine khi người dùng chủ động chọn chế độ Mô phỏng.
  */
 export async function executePromptStream(
   promptText: string,
@@ -86,8 +313,14 @@ export async function executePromptStream(
   classId?: string,
 ): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'gemini' | 'simulated' | 'openai'; model: string }> {
   const startTime = performance.now();
-  const headers = await getAuthenticatedApiHeaders();
 
+  // 1. Chế độ Mô phỏng (Simulated Engine) - Chỉ chạy khi người dùng chủ động chọn chế độ simulated
+  if (apiConfig.mode === 'simulated') {
+    return executeSimulatedPromptStream(promptText, lab, onChunk, startTime);
+  }
+
+  // 2. Chế độ Live AI - Gọi trực tiếp Server Endpoint POST /api/generate
+  const headers = await getAuthenticatedApiHeaders();
   const response = await fetch('/api/generate', {
     method: 'POST',
     headers,
@@ -95,7 +328,9 @@ export async function executePromptStream(
       lessonId: lab.id,
       classId,
       prompt: promptText,
-      context: lab.sampleInputContext
+      context: lab.sampleInputContext,
+      apiKey: apiConfig.geminiApiKey,
+      model: apiConfig.model
     })
   });
 
@@ -114,6 +349,7 @@ export async function executePromptStream(
   const realOutput = data.output || '';
   const latencyMs = data.latencyMs || Math.round(performance.now() - startTime);
   const tokenCount = Math.round(realOutput.length / 3.8);
+  const model = data.model || 'gemini-2.5-flash';
 
   // Hiệu ứng streaming chữ mượt mà trên dữ liệu thật trả về từ LLM
   const words = realOutput.split(' ');
@@ -132,8 +368,8 @@ export async function executePromptStream(
     output: realOutput,
     tokenCount,
     latencyMs,
-    mode: 'openai',
-    model: data.model || 'openai'
+    mode: model.toLowerCase().includes('gpt') ? 'openai' : 'gemini',
+    model
   };
 }
 
@@ -149,7 +385,38 @@ export async function evaluatePromptLive(params: {
   lessonRubric?: any;
   learnerPrompt: string;
   generatedOutput: string;
+  lab?: LabStep;
+  apiKey?: string;
 }): Promise<AiEvaluationResult> {
+  // 1. Kiểm tra Zero-tolerance về PII ngay lập tức để bảo vệ dữ liệu học viên
+  const piiCheck = detectPiiEntities(params.learnerPrompt);
+  const isPiiLesson = Boolean(
+    (params.lessonId && (params.lessonId.includes('1') || params.lessonId.includes('pii'))) ||
+    (params.scenario && params.scenario.toLowerCase().includes('pii')) ||
+    (params.taskRequirement && params.taskRequirement.toLowerCase().includes('pii')) ||
+    params.learnerPrompt.includes('Nguyễn Văn Tèo') ||
+    params.learnerPrompt.includes('034091002847')
+  );
+
+  if (isPiiLesson && piiCheck.hasPii) {
+    return {
+      scores: {
+        taskCompletion: 1,
+        groundedness: 0,
+        formatAdherence: 1,
+        constraintCompliance: 0,
+        businessUsability: 0
+      },
+      total: 2,
+      strengths: ['Đã tiếp nhận yêu cầu bài toán và thiết lập khung sườn.'],
+      improvements: [
+        `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại ${piiCheck.piiItems.length} thông tin PII thật (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`,
+        'Vi phạm an toàn dữ liệu: Tuyệt đối không gửi CCCD, SĐT, STK của khách hàng lên AI khi chưa qua Bút xóa PII!'
+      ],
+      nextHint: 'Bấm nút "Tự động Bút xóa PII 1-chạm" để hệ thống tự động ẩn danh hóa các thông tin nhạy cảm thành biến giữ chỗ {{BIẾN}}.'
+    };
+  }
+
   const headers = await getAuthenticatedApiHeaders();
   const response = await fetch('/api/evaluate', {
     method: 'POST',
@@ -168,5 +435,7 @@ export async function evaluatePromptLive(params: {
     throw new Error(errorMsg);
   }
 
-  return validateAiEvaluationPayload(await response.json());
+  const result: AiEvaluationResult = await response.json();
+  return validateAiEvaluationPayload(result);
 }
+

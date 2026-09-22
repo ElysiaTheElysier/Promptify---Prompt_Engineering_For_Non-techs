@@ -94,13 +94,13 @@ RÀNG BUỘC THÉP (ZERO CHAT CONSTRAINT):
   - Ký tự bắt đầu của output phải là `|` (không có chữ thừa).
   - Có dòng phân cách Markdown hợp lệ: `| :--- |` hoặc `|---|`.
   - Đếm chính xác số cột trong mỗi dòng: Phải có đúng 6 cột phân cách bởi dấu `|`.
-- **Đánh giá:** Sai lệch số cột hoặc thiếu dòng phân cách $\rightarrow$ **Trừ 30đ**.
+- **Đánh giá:** Sai lệch số cột hoặc thiếu dòng phân cách → **Trừ 30đ**.
 
 ### Test Case 2: Kiểm Tra Lỗi Lời Chào Thừa Thãi (Preamble Zero-Tolerance Test)
 - **Mục tiêu:** Loại bỏ 100% các câu xã giao làm hỏng định dạng copy-paste.
 - **Từ cấm quét tự động ở đầu hoặc cuối output:**
   - `["chào bạn", "dưới đây là", "hy vọng", "chúc bạn", "tổng kết lại"]`
-- **Đánh giá:** Xuất hiện lời chào thừa $\rightarrow$ **Trừ 25đ**.
+- **Đánh giá:** Xuất hiện lời chào thừa → **Trừ 25đ**.
 
 ### Test Case 3: Kiểm Tra Tính Chính Xác Của Việc Phân Loại Nghiệp Vụ (Classification Accuracy)
 - **Mục tiêu:** Phân loại đúng đơn vị xử lý và mức độ khẩn cấp.
@@ -108,7 +108,7 @@ RÀNG BUỘC THÉP (ZERO CHAT CONSTRAINT):
   - Vụ việc 1 (Nuốt tiền ATM, viện phí): Mức độ khẩn cấp phải là `"Khẩn cấp"`, Đơn vị là `"Phòng Dịch Vụ Thẻ"`.
   - Vụ việc 2 (App văng): Đơn vị là `"Trung Tâm CNTT"`.
   - Vụ việc 3 (Vay phụ nữ nông thôn): Đơn vị là `"Phòng Tín Dụng"`.
-- **Đánh giá:** Phân loại sai lệch phòng ban $\rightarrow$ **Trừ 10đ/vụ việc**.
+- **Đánh giá:** Phân loại sai lệch phòng ban → **Trừ 10đ/vụ việc**.
 
 ### Bảng Rubric Đánh Giá (100 Điểm):
 | Tiêu chí | Trọng số | Điều kiện đạt |

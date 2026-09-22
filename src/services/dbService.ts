@@ -1,5 +1,11 @@
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import { 
+  SEED_COURSE_MODULES,
+  SEED_LESSONS,
+  SEED_LESSON_RUBRICS,
+  SEED_LESSON_RESOURCES
+} from '../data/curriculumSeed';
+import { 
   DbUser, 
   DbClient, 
   DbCourse, 
@@ -12,6 +18,7 @@ import {
   DbLearner, 
   DbEnrollment, 
   DbPromptAttempt,
+  AiEvaluationResult,
   ClassWithDetails, 
   LearnerInClassDetail, 
   LearnerActiveEnrollmentView,
@@ -144,16 +151,16 @@ class LocalDbStore {
   getCourses(): DbCourse[] { return this.get('courses', INITIAL_COURSES); }
   setCourses(courses: DbCourse[]) { this.set('courses', courses); }
 
-  getCourseModules(): DbCourseModule[] { return this.get('course_modules', []); }
+  getCourseModules(): DbCourseModule[] { return this.get('course_modules', SEED_COURSE_MODULES); }
   setCourseModules(modules: DbCourseModule[]) { this.set('course_modules', modules); }
 
-  getLessons(): DbLesson[] { return this.get('lessons', []); }
+  getLessons(): DbLesson[] { return this.get('lessons', SEED_LESSONS); }
   setLessons(lessons: DbLesson[]) { this.set('lessons', lessons); }
 
-  getLessonRubrics(): DbLessonRubricCriterion[] { return this.get('lesson_rubrics', []); }
+  getLessonRubrics(): DbLessonRubricCriterion[] { return this.get('lesson_rubrics', SEED_LESSON_RUBRICS); }
   setLessonRubrics(criteria: DbLessonRubricCriterion[]) { this.set('lesson_rubrics', criteria); }
 
-  getLessonResources(): DbLessonResource[] { return this.get('lesson_resources', []); }
+  getLessonResources(): DbLessonResource[] { return this.get('lesson_resources', SEED_LESSON_RESOURCES); }
   setLessonResources(resources: DbLessonResource[]) { this.set('lesson_resources', resources); }
 
   getClasses(): DbClass[] { return this.get('classes', INITIAL_CLASSES); }
@@ -1250,13 +1257,16 @@ export const dbService = {
           .select()
           .single();
 
-        if (!error && data) {
+        if (error) {
+          console.error('[dbService] Lỗi ghi nhận prompt_attempts vào Supabase:', error);
+          throw new Error(`Lỗi lưu lần thử vào CSDL: ${error.message}`);
+        }
+
+        if (data) {
           return data as DbPromptAttempt;
         }
-        if (error) {
-          throw new Error(`Lỗi lưu prompt_attempts: ${error.message}`);
-        }
       } catch (err) {
+        console.error('[dbService] Exception inserting prompt_attempt:', err);
         throw err instanceof Error ? err : new Error('Lỗi lưu prompt_attempts vào database.');
       }
     }
@@ -1320,4 +1330,44 @@ export const dbService = {
       .filter(a => (a.learner_id === learnerId || a.learner_id.includes(learnerId)) && (a.class_id === classId || a.class_id.includes(classId)) && a.lesson_id === lessonId)
       .sort((a, b) => a.attempt_number - b.attempt_number);
   },
+
+  /**
+   * Cập nhật kết quả đánh giá AI (evaluation_json) cho một lần thử đã lưu
+   * Phục vụ chức năng 'Thử đánh giá lại' (Retry Evaluation) khi lần gọi ban đầu gặp sự cố
+   */
+  async updatePromptAttemptEvaluation(
+    attemptId: string, 
+    evaluation: AiEvaluationResult | null
+  ): Promise<boolean> {
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('prompt_attempts')
+          .update({ evaluation_json: evaluation })
+          .eq('id', attemptId);
+
+        if (error) {
+          console.error('[dbService] Supabase update prompt_attempts error:', error);
+          throw new Error(`Lỗi cập nhật đánh giá vào CSDL: ${error.message}`);
+        }
+        return true;
+      } catch (err) {
+        console.error('[dbService] Exception updating prompt_attempt evaluation:', err);
+        throw err;
+      }
+    }
+
+    const localAttempts = localStore.getPromptAttempts();
+    const idx = localAttempts.findIndex(a => a.id === attemptId);
+    if (idx !== -1) {
+      localAttempts[idx] = {
+        ...localAttempts[idx],
+        evaluation_json: evaluation
+      };
+      localStore.setPromptAttempts(localAttempts);
+      return true;
+    }
+    return false;
+  },
 };
+

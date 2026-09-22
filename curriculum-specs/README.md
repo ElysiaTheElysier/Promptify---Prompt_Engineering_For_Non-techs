@@ -80,8 +80,8 @@ Xem tài liệu đặc tả chi tiết: 👉 [`INTERACTION_DESIGN_AND_BEFORE_AFT
 
 ### 3 Nguyên tắc Tương tác Cốt lõi cho Dân Non-tech:
 1. **Quy trình 2 Lần Chạy (2-Run Interactive Flow):** 
-   - *Lần 1 (Trước - Before):* Bấm nút chạy câu lệnh thô $\rightarrow$ Thấy ngay lỗi sai điển hình (Lộ PII, văn sáo rỗng, vỡ nợ, sai số, văn xuôi không dán được vào Excel).
-   - *Lần 2 (Sau - After):* Bấm nút nạp kỹ thuật chuẩn $\rightarrow$ Kết quả lột xác hoàn toàn, chuyên nghiệp, an toàn 100%.
+   - *Lần 1 (Trước - Before):* Bấm nút chạy câu lệnh thô → Thấy ngay lỗi sai điển hình (Lộ PII, văn sáo rỗng, vỡ nợ, sai số, văn xuôi không dán được vào Excel).
+   - *Lần 2 (Sau - After):* Bấm nút nạp kỹ thuật chuẩn → Kết quả lột xác hoàn toàn, chuyên nghiệp, an toàn 100%.
 2. **Đối chiếu A/B Song Song (Side-by-Side Diff View):** 
    - Cột Đỏ (Trước) vs Cột Xanh (Sau) đặt cạnh nhau giúp học viên nhìn thấy ngay sự khác biệt về câu chữ và cấu trúc.
    - Hộp *"Tại sao kết quả sau tốt hơn?" (Why It's Better)* tạo khoảnh khắc **"Aha!"** ngay tại lớp.

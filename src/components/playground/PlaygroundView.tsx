@@ -17,7 +17,6 @@ import {
 import { LabStep, ApiConfig, PromptRun } from '../../types';
 import { executePromptStream, evaluatePromptRubric } from '../../services/llmService';
 import { RubricScorecard } from '../common/RubricScorecard';
-import { InlineCompareCard } from '../common/InlineCompareCard';
 import { LearningBadges } from '../common/LearningBadges';
 import { MiniChallengeCard } from '../common/MiniChallengeCard';
 import { MarkdownView } from '../common/MarkdownView';
@@ -228,13 +227,16 @@ export const PlaygroundView: React.FC<Props> = ({
               <span className="font-bold text-slate-900 flex items-center gap-1.5 text-xs uppercase tracking-wider">
                 <FileText className="w-4 h-4 text-emerald-600" /> Tình huống nghiệp vụ (Đầu bài):
               </span>
-              <p className="text-slate-700 leading-relaxed bg-white p-3 rounded-xl border border-slate-200">
-                {currentLab.scenario}
-              </p>
+              <div className="text-slate-700 leading-relaxed bg-white p-3 rounded-xl border border-slate-200">
+                <MarkdownView content={currentLab.scenario} />
+              </div>
             </div>
 
-            <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-xs font-medium">
-              🎯 <strong>Yêu cầu cần đạt:</strong> {currentLab.taskGoal}
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-950 text-xs font-medium">
+              <div className="font-bold text-emerald-900 mb-1 flex items-center gap-1.5">
+                <span>🎯 Yêu cầu cần đạt:</span>
+              </div>
+              <MarkdownView content={currentLab.taskGoal} />
             </div>
 
             {/* Dữ liệu mẫu nếu có */}
@@ -431,14 +433,6 @@ export const PlaygroundView: React.FC<Props> = ({
                 </div>
               )}
             </div>
-
-            {/* Đối chiếu Trước & Sau: Chỉ hiện khi đã chạy ít nhất 2 lần trong cùng một bài */}
-            <InlineCompareCard
-              lab={currentLab}
-              runCount={currentLabRunCount}
-              currentPrompt={userPrompt}
-              onOpenFullCompare={() => onOpenCompare(currentLab)}
-            />
 
             {/* Mini Challenge tùy chọn ở cuối bài */}
             <MiniChallengeCard

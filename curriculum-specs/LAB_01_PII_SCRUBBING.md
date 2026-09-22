@@ -25,11 +25,11 @@
 Trước khi gửi bất kỳ dữ liệu nghiệp vụ nào cho AI, hãy áp dụng quy trình 3 bước:
 1. **Quét nhận diện (Scan):** Tìm tất cả các thực thể định danh cụ thể (Tên riêng, Số CCCD, SĐT, Số TK, Tên chi nhánh cụ thể).
 2. **Bôi đen & Thay thế (Redact & Replace):** Đổi các thực thể đó thành các **Biến giữ chỗ chuẩn hóa** (Standardized Placeholders) theo cú pháp dấu ngoặc kép hoặc ngoặc vuông:
-   - `Nguyễn Văn Tèo` $\rightarrow$ `[TÊN_KHÁCH_HÀNG]` hoặc `{{TEN_KH}}`
-   - `034091002847` $\rightarrow$ `[SỐ_CCCD_X]`
-   - `0912.345.678` $\rightarrow$ `[SỐ_ĐIỆN_THOẠI_X]`
-   - `7800.205.123456` $\rightarrow$ `[SỐ_TÀI_KHOẢN_X]`
-   - `120.000.000 VNĐ` $\rightarrow$ Có thể giữ lại số tiền nếu không mang tính định danh, hoặc chuyển thành `[KHOẢN_VAY_A]` nếu là số tiền nhạy cảm.
+   - `Nguyễn Văn Tèo` → `[TÊN_KHÁCH_HÀNG]` hoặc `{{TEN_KH}}`
+   - `034091002847` → `[SỐ_CCCD_X]`
+   - `0912.345.678` → `[SỐ_ĐIỆN_THOẠI_X]`
+   - `7800.205.123456` → `[SỐ_TÀI_KHOẢN_X]`
+   - `120.000.000 VNĐ` → Có thể giữ lại số tiền nếu không mang tính định danh, hoặc chuyển thành `[KHOẢN_VAY_A]` nếu là số tiền nhạy cảm.
 3. **Phục hồi sau sinh (Post-Processing):** Sau khi AI viết xong bài văn hoàn chỉnh, bạn copy văn bản về máy tính nội bộ của mình và dùng tính năng **Find & Replace (Ctrl + H)** trong Word/Excel để điền lại thông tin thật nếu cần xuất bản nội bộ.
 
 ---
@@ -89,8 +89,8 @@ Hãy xuất bản 03 góc tiếp cận tiêu đề bài viết theo 3 khía cạ
   - Chuỗi tên riêng: `"Nguyễn Văn Tèo"`, `"Lê Thị Mận"`, `"BS 123456"`.
 - **Kỳ vọng:** KHÔNG TỒN TẠI bất kỳ chuỗi nào nêu trên trong câu lệnh.
 - **Đánh giá:** 
-  - ĐẠT: Toàn bộ thông tin nhạy cảm đã chuyển thành biến `{{TEN_KH}}`, `{{SO_CCCD}}`,... $\rightarrow$ +50 Điểm.
-  - KHÔNG ĐẠT (THẺ ĐỎ): Còn sót dù chỉ 1 số điện thoại hay số CCCD $\rightarrow$ **0 Điểm toàn bài**.
+  - ĐẠT: Toàn bộ thông tin nhạy cảm đã chuyển thành biến `{{TEN_KH}}`, `{{SO_CCCD}}`,... → +50 Điểm.
+  - KHÔNG ĐẠT (THẺ ĐỎ): Còn sót dù chỉ 1 số điện thoại hay số CCCD → **0 Điểm toàn bài**.
 
 ### Test Case 2: Kiểm Tra Tính Bảo Mật Của Đầu Ra AI (Output Sanitization Test)
 - **Mục tiêu:** AI không được "bịa" ra thông tin nhạy cảm giả và giữ nguyên dạng biến đại diện để học viên dán ngược lại sau.

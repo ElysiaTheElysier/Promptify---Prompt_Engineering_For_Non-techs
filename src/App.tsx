@@ -103,17 +103,26 @@ export const App: React.FC = () => {
   // 9. Cấu hình AI API
   const [apiConfig, setApiConfig] = useState<ApiConfig>(() => {
     const saved = localStorage.getItem('promptify_api_config');
+    const defaultKey = import.meta.env.VITE_GEMINI_API_KEY || '';
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.geminiApiKey || parsed.mode === 'gemini') {
+          return {
+            ...parsed,
+            mode: 'gemini',
+            geminiApiKey: parsed.geminiApiKey || defaultKey,
+            model: parsed.model || 'gemini-2.5-flash'
+          };
+        }
       } catch {
         // fallback
       }
     }
     return {
-      mode: 'simulated',
-      geminiApiKey: '',
-      model: 'gemini-1.5-flash',
+      mode: 'gemini',
+      geminiApiKey: defaultKey,
+      model: 'gemini-2.5-flash',
       temperature: 0.3
     };
   });
@@ -893,6 +902,7 @@ export const App: React.FC = () => {
               }}
               currentLearnerId={currentLearner?.id || currentUser?.id}
               currentClassId={selectedCohort?.id}
+              onOpenApiModal={() => setIsApiModalOpen(true)}
             />
           </div>
         )}
@@ -972,6 +982,10 @@ export const App: React.FC = () => {
           activeLab={activeLab}
           currentPrompt={activePrompt}
           runCount={activeRunCount}
+          onApplyPromptSuggestion={(sugg) => {
+            setActivePrompt(sugg);
+            window.dispatchEvent(new CustomEvent('promptify:apply-suggestion', { detail: { prompt: sugg } }));
+          }}
           onOpenTutorial={() => setIsTutorialOpen(true)}
         />
       )}

@@ -20,7 +20,7 @@
 
 ### 1.2 Ẩn dụ Văn phòng (Mental Model)
 > *"Hãy coi AI như một **chuyên viên tập sự trẻ tuổi khi gặp sự cố khủng hoảng**: Nếu bạn giục 'Viết thông cáo thanh minh đi em', bạn ấy sẽ cuống cuồng viết một lá thư giải thích vụng về, càng giải thích càng lộ điểm yếu.*  
-> *Giải pháp là hãy áp dụng **Quy trình Phê duyệt 4 Mắt (Maker - Checker)** của ngân hàng: Bắt chuyên viên phải in tờ trình ra, tích đủ 4 ô kiểm duyệt (Đánh giá tâm lý $\rightarrow$ Xin ý kiến Pháp chế $\rightarrow$ Bản thảo súc tích $\rightarrow$ Cảnh báo công an) rồi mới được đóng dấu phát hành."*
+> *Giải pháp là hãy áp dụng **Quy trình Phê duyệt 4 Mắt (Maker - Checker)** của ngân hàng: Bắt chuyên viên phải in tờ trình ra, tích đủ 4 ô kiểm duyệt (Đánh giá tâm lý → Xin ý kiến Pháp chế → Bản thảo súc tích → Cảnh báo công an) rồi mới được đóng dấu phát hành."*
 
 ### 1.3 Quy trình Kỹ thuật: "4 Chốt Chặn Bất Di Bất Dịch"
 Khi ứng phó khủng hoảng truyền thông ngân hàng, bắt buộc cấu trúc prompt phải chia thành 4 bước tuần tự:
@@ -94,7 +94,7 @@ Hãy thực hiện tư duy công khai theo đúng cấu trúc:
   - `[BƯỚC 2` hoặc `BƯỚC 2:`
   - `[BƯỚC 3` hoặc `BƯỚC 3:`
   - `[BƯỚC 4` hoặc `BƯỚC 4:`
-- **Đánh giá:** Thiếu bất kỳ bước nào trong quy trình $\rightarrow$ **Trừ 30đ**.
+- **Đánh giá:** Thiếu bất kỳ bước nào trong quy trình → **Trừ 30đ**.
 
 ### Test Case 2: Kiểm Tra Chốt Chặn Pháp Lý & Thanh Khoản (Legal Grounding Test)
 - **Mục tiêu:** Văn bản phải có căn cứ pháp lý vững chắc từ Nhà nước để người dân an tâm tuyệt đối.
@@ -102,18 +102,18 @@ Hãy thực hiện tư duy công khai theo đúng cấu trúc:
   - `"100% vốn"` hoặc `"vốn Nhà nước"` hoặc `"sở hữu Nhà nước"`
   - `"thanh khoản"` hoặc `"chi trả đầy đủ"`
   - `"Công an"` hoặc `"cơ quan chức năng"`
-- **Đánh giá:** Thiếu căn cứ bảo trợ thanh khoản Nhà nước $\rightarrow$ **Trừ 25đ**.
+- **Đánh giá:** Thiếu căn cứ bảo trợ thanh khoản Nhà nước → **Trừ 25đ**.
 
 ### Test Case 3: Kiểm Tra Lỗi Nhắc Lại Từ Tiêu Cực (Negative Word Leaking Test)
 - **Mục tiêu:** Không được lặp lại từ ngữ của tin đồn trong thông cáo báo chí chính thức.
 - **Từ cấm quét trong phần Thông cáo báo chí (Bước 3):**
   - `["không vỡ nợ", "chúng tôi không vỡ nợ", "không bỏ trốn", "giám đốc không trốn"]`
-- **Đánh giá:** Bắt gặp bất kỳ cụm từ thanh minh vụng về trên $\rightarrow$ **Trừ 25đ**.
+- **Đánh giá:** Bắt gặp bất kỳ cụm từ thanh minh vụng về trên → **Trừ 25đ**.
 
 ### Test Case 4: Kiểm Tra Giới Hạn Dung Lượng (Length Constraint Test)
 - **Mục tiêu:** Trong khủng hoảng, thông cáo phải dưới 300 từ để dập tắt tin giả trong 30 giây đọc lướt.
-- **Tiêu chí:** Phần văn bản thông cáo báo chí ở Bước 3 có số từ $\le 320$ từ.
-- **Đánh giá:** Vượt quá 350 từ (dài dòng, thiếu tính khẩn cấp) $\rightarrow$ **Trừ 10đ**.
+- **Tiêu chí:** Phần văn bản thông cáo báo chí ở Bước 3 có số từ ≤ 320 từ.
+- **Đánh giá:** Vượt quá 350 từ (dài dòng, thiếu tính khẩn cấp) → **Trừ 10đ**.
 
 ### Bảng Rubric Đánh Giá (100 Điểm):
 | Tiêu chí | Trọng số | Điều kiện đạt |

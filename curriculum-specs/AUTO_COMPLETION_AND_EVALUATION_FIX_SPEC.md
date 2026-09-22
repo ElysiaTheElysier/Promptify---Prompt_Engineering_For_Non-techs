@@ -124,7 +124,7 @@ Tùy thuộc vào từng bài lab và tiêu chí bị khuyết, thuật toán s�
 
 ### 1. Phản hồi Thị giác Tức thì (Instant Visual Feedback)
 - Khi học viên bấm nút Auto-Complete, vùng văn bản được thêm mới sẽ có **hiệu ứng nhấp nháy ánh sáng xanh (Pulse Green Animation)** trong 1.5 giây để học viên nhận biết chính xác: *"Hệ thống vừa thêm khối nào vào câu lệnh của mình"*.
-- Điểm số trên thanh Rubric tự động nhảy số (Animated Counter) từ 45 $\rightarrow$ 95 điểm, mang lại cảm giác thành tựu và phấn khích tức thì.
+- Điểm số trên thanh Rubric tự động nhảy số (Animated Counter) từ 45 → 95 điểm, mang lại cảm giác thành tựu và phấn khích tức thì.
 
 ### 2. Tôn trọng Quyền Kiểm soát của Người dùng
 - Hệ thống không ép buộc: Học viên có thể chọn hoàn thiện từng phần nhỏ (thông qua các nút Chip nhỏ) hoặc hoàn thiện toàn diện (nút Auto-Fix All).

@@ -15,8 +15,8 @@
 - **Mô hình ReAct (Reason + Act) là gì?**
   - ReAct là một kiến trúc thiết kế tác tử nổi tiếng được công bố bởi các nhà nghiên cứu từ Đại học Princeton và Google (Yao et al., 2022).
   - Thay vì bắt AI nhảy ngay vào trả lời, ReAct phân tách tư duy thành một **vòng lặp tương tác có kiểm chứng**:
-    $$\text{Thought (Tư duy)} \longrightarrow \text{Action (Hành động Tra cứu)} \longrightarrow \text{Observation (Quan sát Kết quả)} \longrightarrow \text{Response (Phản hồi Cuối)}$$
-  - Nhờ cơ chế này, AI biết tự bảo mình: *"Mình chưa có công thức tính lãi Thông tư 04, mình phải tra cứu đã"* $\rightarrow$ *Mở tài liệu ra đọc* $\rightarrow$ *Tính toán ra con số chính xác* $\rightarrow$ *Mới viết câu trả lời cho người dùng*.
+    THOUGHT (Tư duy) ⟶ ACTION (Hành động tra cứu) ⟶ OBSERVATION (Quan sát kết quả) ⟶ RESPONSE (Phản hồi cuối)
+  - Nhờ cơ chế này, AI biết tự bảo mình: *"Mình chưa có công thức tính lãi Thông tư 04, mình phải tra cứu đã"* → *Mở tài liệu ra đọc* → *Tính toán ra con số chính xác* → *Mới viết câu trả lời cho người dùng*.
 - **Tác tử AI (Agent) trong Công việc Văn phòng:**
   - Agent không chỉ là một cái ô chat, mà là một **quy trình tự động hóa giải quyết vấn đề**: Có mục tiêu (Goal), biết suy nghĩ (Reasoning), biết dùng công cụ (Tool Use), và biết đánh giá kết quả để điều chỉnh hành động.
 
@@ -29,9 +29,9 @@
 1. **THOUGHT (Tư duy Nghiệp vụ):** Phân tích tâm lý lo âu của khách hàng; xác định bài toán kinh tế cốt lõi cần làm rõ để bảo vệ quyền lợi người gửi tiền.
 2. **ACTION (Hành động Tra cứu):** Viện dẫn chính xác văn bản quy phạm pháp luật (Thông tư 04/2022/TT-NHNN) và biểu lãi suất không kỳ hạn hiện hành của ngân hàng.
 3. **OBSERVATION (Quan sát & Tính toán Chuẩn xác):** Đưa ra phép tính định lượng cụ thể:
-   - Số tiền lãi nếu giữ đúng hạn: $A$ đồng.
-   - Số tiền lãi nếu rút ngay hôm nay: $B$ đồng.
-   - Con số thiệt hại thực tế: $A - B$ đồng.
+   - Số tiền lãi nếu giữ đúng hạn: A đồng.
+   - Số tiền lãi nếu rút ngay hôm nay: B đồng.
+   - Con số thiệt hại thực tế: A - B đồng.
 4. **RESPONSE (Bộ Lời Thoại Ứng Xử Tại Quầy):** Chuyển hóa con số khô khan thành lời nói mộc mạc, tôn trọng khách hàng, giải thích chân tình để bà con tự ra quyết định.
 
 ---
@@ -110,7 +110,7 @@ RESPONSE (BỘ 3 CÂU THOẠI CHO GIAO DỊCH VIÊN TẠI QUẦY):
   - `ACTION` hoặc `HÀNH ĐỘNG`
   - `OBSERVATION` hoặc `QUAN SÁT`
   - `RESPONSE` hoặc `PHẢN HỒI`
-- **Đánh giá:** Thiếu bất kỳ khối nào $\rightarrow$ **Trừ 25đ**.
+- **Đánh giá:** Thiếu bất kỳ khối nào → **Trừ 25đ**.
 
 ### Test Case 2: Kiểm Tra Độ Chính Xác Số Học Tài Chính (Math & Grounding Accuracy Test)
 - **Mục tiêu:** Trợ lý không được bịa số tiền lãi, phải tính đúng chênh lệch lãi suất theo Thông tư 04.
@@ -118,7 +118,7 @@ RESPONSE (BỘ 3 CÂU THOẠI CHO GIAO DỊCH VIÊN TẠI QUẦY):
   - Lãi đúng hạn: `"13.000.000"` hoặc `"13 triệu"`
   - Lãi rút trước hạn (0.2%): xấp xỉ `"333.000"` hoặc `"330.000"` hoặc `"hơn 300 ngàn"`
   - Con số thiệt hại: `"10 triệu"` hoặc `"10.500.000"` hoặc `"10 triệu rưỡi"`
-- **Đánh giá:** Tính sai con số thiệt hại hoặc bịa đặt con số vô căn cứ $\rightarrow$ **Trừ 30đ**.
+- **Đánh giá:** Tính sai con số thiệt hại hoặc bịa đặt con số vô căn cứ → **Trừ 30đ**.
 
 ### Test Case 3: Kiểm Tra Văn Hóa Giao Dịch & Thái Độ Phục Vụ (Empathy & Etiquette Test)
 - **Mục tiêu:** Lời thoại phải đúng mực người cán bộ Agribank, không tranh cãi đôi co với người dân.
@@ -126,12 +126,12 @@ RESPONSE (BỘ 3 CÂU THOẠI CHO GIAO DỊCH VIÊN TẠI QUẦY):
   - Có đại từ nhân xưng chuẩn mực: `"cháu"`, `"con"`, `"bác"`, `"bác Ba"`.
   - Có lời khẳng định sẵn sàng chi tiền: `"tiền trong két sẵn sàng"`, `"làm thủ tục chi tiền mặt ngay"`.
   - Tuyệt đối không dùng từ ngữ gây khó dễ: `"bác không được rút"`, `"chúng cháu cấm rút"`, `"bác tin linh tinh"`.
-- **Đánh giá:** Vi phạm văn hóa giao tiếp tại quầy $\rightarrow$ **Trừ 25đ**.
+- **Đánh giá:** Vi phạm văn hóa giao tiếp tại quầy → **Trừ 25đ**.
 
 ### Bảng Rubric Đánh Giá (100 Điểm):
 | Tiêu chí | Trọng số | Điều kiện đạt |
 | :--- | :---: | :--- |
-| **Quy trình ReAct Chuẩn** | 30đ | Đủ 4 khối THOUGHT $\rightarrow$ ACTION $\rightarrow$ OBSERVATION $\rightarrow$ RESPONSE. |
+| **Quy trình ReAct Chuẩn** | 30đ | Đủ 4 khối THOUGHT → ACTION → OBSERVATION → RESPONSE. |
 | **Tính toán Lãi suất Chuẩn xác** | 30đ | Tính đúng Thông tư 04, nêu bật con số thiệt hại hơn 10.5 triệu đồng. |
 | **Văn phong Dân dã Gần gũi** | 25đ | Ngôn từ mộc mạc, ấm áp, xưng hô như người nhà Tam nông. |
 | **Tôn trọng Quyền Khách hàng** | 15đ | Khẳng định tiền mặt sẵn sàng, không ép buộc hay tranh cãi với dân. |

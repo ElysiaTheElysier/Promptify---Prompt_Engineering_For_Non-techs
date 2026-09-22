@@ -87,7 +87,7 @@ Hãy chuyển hóa ý tưởng sơ sài trên thành một BỘ PROMPT CHUYÊN N
   - Nỗi sợ mất tiền do bấm nhầm nút.
   - Thói quen "thấy người thật mới tin".
   - Nguyên tắc "Cầm tay chỉ việc - Đơn giản hóa tối đa".
-- **Đánh giá:** Thiếu bước trừu tượng hóa tâm lý $\rightarrow$ **Trừ 30đ**.
+- **Đánh giá:** Thiếu bước trừu tượng hóa tâm lý → **Trừ 30đ**.
 
 ### Test Case 2: Kiểm Tra Cấu Trúc Meta-Prompt Sinh Ra (Meta-Prompt Completeness)
 - **Mục tiêu:** Bộ prompt do AI tự động thiết kế phải có đầy đủ 5 thành tố của một System Prompt cấp doanh nghiệp.
@@ -96,7 +96,7 @@ Hãy chuyển hóa ý tưởng sơ sài trên thành một BỘ PROMPT CHUYÊN N
   - Khối bối cảnh: `Context`
   - Khối ràng buộc: `Constraints` (Cấm dùng từ như "sinh trắc học", "xác thực OTP", "giao thức")
   - Đoạn mẫu: `Few-shot`
-- **Đánh giá:** Thiếu một trong các thành tố cốt lõi $\rightarrow$ **Trừ 20đ**.
+- **Đánh giá:** Thiếu một trong các thành tố cốt lõi → **Trừ 20đ**.
 
 ### Test Case 3: Tính Hành Động Ngay Của Bản Kế Hoạch (Actionability Test)
 - **Mục tiêu:** Bản kế hoạch 3 bên phải rõ việc cho từng phòng: CNTT làm gì, Truyền thông làm gì, Quầy làm gì.
@@ -104,7 +104,7 @@ Hãy chuyển hóa ý tưởng sơ sài trên thành một BỘ PROMPT CHUYÊN N
 ### Bảng Rubric Đánh Giá (100 Điểm):
 | Tiêu chí | Trọng số | Điều kiện đạt |
 | :--- | :---: | :--- |
-| **Tư Duy Step-Back Xuất Sắc** | 35đ | Tách bạch 2 bước: Nguyên lý nền tảng $\rightarrow$ Kế hoạch hành động thực tế. |
+| **Tư Duy Step-Back Xuất Sắc** | 35đ | Tách bạch 2 bước: Nguyên lý nền tảng → Kế hoạch hành động thực tế. |
 | **Chất Lượng Bộ Meta-Prompt** | 35đ | Bộ prompt được sinh ra đạt chuẩn công nghiệp, dùng được ngay tại chi nhánh. |
 | **Đồng Bộ Phối Hợp 3 Phòng Ban** | 15đ | Phân công rõ ràng giữa CNTT, Truyền thông và Giao dịch viên. |
 | **Văn Hóa Phục Vụ Nông Dân** | 15đ | Thấm đẫm tinh thần kiên nhẫn, gần gũi, xóa bỏ rào cản số cho bà con. |
