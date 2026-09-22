@@ -10,21 +10,19 @@ import {
   LogOut, 
   RefreshCw,
   Sparkles,
-  ChevronDown,
-  GraduationCap
+  ChevronDown
 } from 'lucide-react';
 import { AppView, ClassCohort, Learner } from '../../types';
 
 interface Props {
   currentView: AppView;
   onNavigate: (view: AppView) => void;
-  selectedCohort: ClassCohort;
+  selectedCohort?: ClassCohort | null;
   onChangeClass: () => void;
-  learner: Learner;
+  learner?: Learner | null;
   onLogout: () => void;
   onOpenTutorial: () => void;
   onResetAll?: () => void;
-  onSwitchToInstructor?: () => void;
 }
 
 export const ProductNavbar: React.FC<Props> = ({
@@ -36,32 +34,24 @@ export const ProductNavbar: React.FC<Props> = ({
   onLogout,
   onOpenTutorial,
   onResetAll,
-  onSwitchToInstructor,
 }) => {
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
-          {/* 1. Logo & Product Title (Click logo để reset toàn bộ về Landing Page) */}
+          {/* 1. Brand Logo */}
           <div 
-            onClick={onResetAll || onLogout}
-            className="flex items-center gap-2.5 cursor-pointer flex-shrink-0 group relative select-none"
-            title="Bấm vào logo để reset toàn bộ hệ thống về Landing Page ban đầu (Xóa session & bật lại Tutorial khi vào học)"
+            className="flex items-center gap-2.5 flex-shrink-0 select-none"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-md group-hover:scale-105 group-hover:shadow-emerald-500/30 transition">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-md">
               <Building2 className="w-5 h-5 text-slate-950 font-bold" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base tracking-tight font-display text-white group-hover:text-emerald-300 transition">
-                  Promptify
-                </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap flex items-center gap-1 group-hover:bg-rose-500/20 group-hover:text-rose-300 group-hover:border-rose-500/30 transition">
-                  <span>↺ Reset về Landing</span>
-                </span>
-              </div>
+              <span className="font-extrabold text-base tracking-tight font-display text-white">
+                Promptify
+              </span>
               <p className="text-[11px] text-slate-400 font-medium whitespace-nowrap hidden sm:block">
-                Bấm logo để bắt đầu lại từ đầu
+                Prompt Engineering Portal
               </p>
             </div>
           </div>
@@ -90,18 +80,6 @@ export const ProductNavbar: React.FC<Props> = ({
             >
               <Map className="w-3.5 h-3.5" />
               <span>Lộ trình học</span>
-            </button>
-
-            <button
-              onClick={() => onNavigate('playground')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                currentView === 'playground'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Playground</span>
             </button>
 
             <button
@@ -136,7 +114,7 @@ export const ProductNavbar: React.FC<Props> = ({
               <div className="text-left">
                 <span className="text-[10px] text-slate-400 block font-medium">Lớp đang học:</span>
                 <span className="text-emerald-400 font-bold truncate max-w-[170px] block">
-                  {selectedCohort.name}
+                  {selectedCohort?.name || 'Đang tải lớp học...'}
                 </span>
               </div>
               <button
@@ -158,29 +136,17 @@ export const ProductNavbar: React.FC<Props> = ({
               <span className="hidden sm:inline">Xem lại hướng dẫn</span>
             </button>
 
-            {/* Chuyển sang Giao diện Giảng viên (Instructor View) */}
-            {onSwitchToInstructor && (
-              <button
-                onClick={onSwitchToInstructor}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold border border-indigo-500/40 transition cursor-pointer whitespace-nowrap shadow-xs"
-                title="Chuyển sang Cổng Quản lý Lớp học & Workshop dành cho Giảng viên"
-              >
-                <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="hidden sm:inline">Giao diện Giảng viên</span>
-              </button>
-            )}
-
             {/* Learner Avatar & Logout */}
             <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
               <div className="w-8 h-8 rounded-full bg-emerald-700 border border-emerald-500/40 flex items-center justify-center text-xs font-bold text-white shadow-xs">
-                {learner.avatarInitials || 'LP'}
+                {learner?.avatarInitials || 'LP'}
               </div>
               <div className="hidden xl:block text-left text-xs leading-tight">
                 <span className="font-semibold text-slate-200 block truncate max-w-[130px]">
-                  {learner.name}
+                  {learner?.name || 'Học viên'}
                 </span>
                 <span className="text-[10px] text-slate-400 block truncate max-w-[130px]">
-                  {learner.department}
+                  {learner?.department || ''}
                 </span>
               </div>
               <button
@@ -207,12 +173,6 @@ export const ProductNavbar: React.FC<Props> = ({
             className={`px-2 py-1 rounded ${currentView === 'learning_path' || currentView === 'lesson' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
           >
             Lộ trình
-          </button>
-          <button
-            onClick={() => onNavigate('playground')}
-            className={`px-2 py-1 rounded ${currentView === 'playground' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
-          >
-            Playground
           </button>
           <button
             onClick={() => onNavigate('library')}

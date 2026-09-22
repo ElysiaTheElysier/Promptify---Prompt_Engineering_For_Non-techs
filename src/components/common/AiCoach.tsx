@@ -319,7 +319,7 @@ export const AiCoach: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 font-sans flex flex-col items-end pointer-events-none" data-tour="tour-coach">
+    <div className="fixed bottom-6 right-6 z-40 font-sans flex flex-col items-end pointer-events-none">
       {/* 1. Ô TEXT BONG BÓNG THOẠI ĐANG NÓI (CHỈ HIỆN LẦN ĐẦU, FONT RÕ RÀNG, NÓI RÕ BÀI TẬP HIỆN TẠI) */}
       {!isOpen && showSpeechBubble && (
         <div 
@@ -369,6 +369,7 @@ export const AiCoach: React.FC<Props> = ({
       {/* 2. ICON MASCOT CUTE PIXEL-ART */}
       {!isOpen ? (
         <button
+          data-tour="tour-coach"
           onClick={handleOpenCoach}
           className="pointer-events-auto group relative flex items-center gap-2.5 p-2 pr-4 bg-white hover:bg-slate-50 text-slate-800 rounded-full shadow-2xl border-2 border-emerald-500 transition-all hover:scale-105 active:scale-95"
           title="Bé Trợ Lý AI Học Tập - Bấm vào tôi để được hỗ trợ"

@@ -27,7 +27,7 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
       {
         id: 'instructor-dashboard-step-1',
         stepNumber: 1,
-        totalSteps: 7,
+        totalSteps: 6,
         targetId: 'instructor-dashboard-header',
         title: 'Tổng quan lớp học',
         description: 'Đây là màn hình trang chủ của Giảng viên / Quản lý lớp. Từ đây bạn có thể bao quát toàn bộ tiến độ các lớp, tình trạng học viên và hoạt động trong buổi đào tạo.',
@@ -36,16 +36,16 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
       {
         id: 'instructor-dashboard-step-2',
         stepNumber: 2,
-        totalSteps: 7,
+        totalSteps: 6,
         targetId: 'instructor-summary-stats',
         title: 'Chỉ số tiến độ tổng hợp',
-        description: 'Đây là snapshot nhanh giúp bạn nắm bắt quy mô lớp học và tình trạng chung: 3 lớp đang hoạt động, 86 học viên tham gia và 34 người đã hoàn thành khóa học.',
+        description: 'Đây là snapshot nhanh giúp bạn nắm bắt quy mô lớp học và tình trạng chung: số lớp đang hoạt động, tổng số học viên tham gia và số học viên đã hoàn thành khóa học.',
         tip: '💡 Giúp bạn nắm bắt nhanh tiến độ chung toàn khóa học trong 3 giây mà không cần tính toán thủ công.'
       },
       {
         id: 'instructor-dashboard-step-3',
         stepNumber: 3,
-        totalSteps: 7,
+        totalSteps: 6,
         targetId: 'instructor-priority-class',
         title: 'Lớp cần chú ý',
         description: 'Đây là khu vực quan trọng nhất. Promptify ưu tiên hiển thị lớp có dấu hiệu cần can thiệp, ví dụ nhiều học viên chưa bắt đầu hoặc tiến độ còn thấp.',
@@ -55,7 +55,7 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
       {
         id: 'instructor-dashboard-step-4',
         stepNumber: 4,
-        totalSteps: 7,
+        totalSteps: 6,
         targetId: 'instructor-other-classes',
         title: 'Danh sách các lớp còn lại',
         description: 'Nơi xem nhanh toàn bộ các lớp đang quản lý. Mỗi dòng cho biết tiến độ % hoàn thành và bạn có thể bấm vào để xem chi tiết từng lớp.',
@@ -65,7 +65,7 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
       {
         id: 'instructor-dashboard-step-5',
         stepNumber: 5,
-        totalSteps: 7,
+        totalSteps: 6,
         targetId: 'instructor-recent-activity',
         title: 'Nhật ký hoạt động gần đây',
         description: 'Cho biết học viên/lớp đang hoạt động ra sao theo thời gian thực (bắt đầu bài, chạy prompt, nộp bài). Đây là thông tin hỗ trợ, không phải trọng tâm đầu tiên.',
@@ -74,21 +74,11 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
       {
         id: 'instructor-dashboard-step-6',
         stepNumber: 6,
-        totalSteps: 7,
+        totalSteps: 6,
         targetId: 'instructor-nav-tabs',
         title: 'Thanh điều hướng quản lý',
-        description: 'Instructor có thể dùng thanh này để chuyển đổi nhanh giữa các khu vực: Tổng quan, Lớp học, Học viên (86), và Nhật ký hoạt động.',
+        description: 'Instructor có thể dùng thanh này để chuyển đổi nhanh giữa các khu vực: Tổng quan, Lớp học, Học viên, và Nhật ký hoạt động.',
         tip: '💡 Bấm vào tab "Học viên" để tra cứu và soi chi tiết câu lệnh của từng người.'
-      },
-      {
-        id: 'instructor-dashboard-step-7',
-        stepNumber: 7,
-        totalSteps: 7,
-        targetId: 'instructor-switch-role',
-        title: 'Chuyển sang Học viên',
-        description: 'Đây là shortcut nhanh để chuyển sang giao diện Học viên (Learner View) trong prototype, giúp bạn trực tiếp thử vai học viên để giải đáp thắc mắc sát thực tế hơn.',
-        actionText: 'Bấm "Chuyển sang Học viên" bất cứ khi nào bạn muốn vào làm bài thực hành.',
-        tip: '💡 Bạn có thể chuyển đổi qua lại giữa Giảng viên và Học viên tức thì.'
       }
     ]
   },

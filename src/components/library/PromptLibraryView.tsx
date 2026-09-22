@@ -11,7 +11,8 @@ import {
   Building2, 
   ArrowLeft,
   Filter,
-  Sparkles
+  Sparkles,
+  BookOpen
 } from 'lucide-react';
 import { SavedPromptTemplate, ClassCohort } from '../../types';
 import { getSavedPromptLibrary, togglePromptRecommended } from '../../services/businessEvaluationService';
@@ -257,10 +258,10 @@ export const PromptLibraryView: React.FC<Props> = ({
                   <button
                     onClick={() => onOpenInPlayground(tpl.promptText)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition cursor-pointer"
-                    title="Đưa câu lệnh này vào Free Playground để chỉnh sửa và chạy ngay"
+                    title="Đưa câu lệnh này vào bài thực hành để chỉnh sửa và chạy ngay"
                   >
-                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Mở trong Playground</span>
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Đưa vào bài thực hành</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>

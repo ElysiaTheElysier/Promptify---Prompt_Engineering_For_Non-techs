@@ -63,6 +63,8 @@ export interface LabStep {
   systemInstruction?: string;
   baselinePrompt: string;
   improvedPrompt: string;
+  starterPrompt?: string;
+  promptPlaceholder?: string;
   sampleInputContext?: string;
   hints: string[];
   expectedOutputFormat: string;
@@ -78,8 +80,33 @@ export interface LabStep {
     whyBetter: string;
   };
   miniChallenge?: MiniChallenge;
+  focusComponents?: PromptComponentType[];
   simulatedBaselineOutput: string;
   simulatedImprovedOutput: string;
+}
+
+export type PromptComponentType =
+  | 'role'
+  | 'context'
+  | 'task'
+  | 'constraint'
+  | 'output_format'
+  | 'example'
+  | 'grounding';
+
+export interface PromptSpan {
+  type: PromptComponentType;
+  start: number;
+  end: number;
+  text: string;
+  confidence: number;
+  reason?: string;
+}
+
+export interface PromptAnalysis {
+  components: PromptSpan[];
+  detectedTypes: PromptComponentType[];
+  missingTypes: PromptComponentType[];
 }
 
 export interface PromptRun {
@@ -157,6 +184,7 @@ export interface PromptVersion {
   };
   timestamp: string;
   businessEvaluation: BusinessEvaluation;
+  aiEvaluation?: import('./database').AiEvaluationResult | null;
   tokenCount?: number;
   latencyMs?: number;
 }

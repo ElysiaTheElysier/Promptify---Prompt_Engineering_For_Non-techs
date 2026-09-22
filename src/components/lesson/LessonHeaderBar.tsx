@@ -69,38 +69,8 @@ export const LessonHeaderBar: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Right: UI Mode Switcher (Notebook vs Hybrid) & Quick Actions */}
+        {/* Right: Quick Actions */}
         <div className="flex items-center gap-2">
-          {/* Layout switcher */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-            <button
-              onClick={() => onSelectMode('hybrid')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
-                currentMode === 'hybrid'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              title="Giao diện song song: Vừa xem đề bài vừa thực hành"
-            >
-              <Columns className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Song song (Khuyên dùng)</span>
-              <span className="md:hidden">Song song</span>
-            </button>
-
-            <button
-              onClick={() => onSelectMode('notebook')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
-                currentMode === 'notebook'
-                  ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              title="Giao diện sổ tay: Làm từng bước tuần tự"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Sổ tay tuần tự</span>
-              <span className="md:hidden">Sổ tay</span>
-            </button>
-          </div>
 
           {/* Quick Library button */}
           <button

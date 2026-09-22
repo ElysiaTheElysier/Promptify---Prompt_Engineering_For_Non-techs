@@ -17,11 +17,12 @@ import { ClassCohort, Learner, Enrollment } from '../../types';
 import { CLASS_COHORTS, DEFAULT_ENROLLMENTS } from '../../data/classesData';
 
 interface Props {
-  learner: Learner;
+  learner?: Learner | null;
   cohorts: ClassCohort[];
   enrollments: Record<string, Enrollment>;
-  onSelectClass: (cohort: ClassCohort) => void;
-  onJoinClassByCode: (code: string) => boolean;
+  totalLabCount: number;
+  onSelectClass: (cohort: ClassCohort) => Promise<boolean>;
+  onJoinClassByCode: (code: string) => Promise<boolean>;
   onLogout: () => void;
   onResetAll?: () => void;
 }
@@ -30,6 +31,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
   learner,
   cohorts,
   enrollments,
+  totalLabCount,
   onSelectClass,
   onJoinClassByCode,
   onLogout,
@@ -50,7 +52,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
     }
   };
 
-  const handleJoinSubmit = (e: React.FormEvent) => {
+  const handleJoinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setJoinError('');
     setJoinSuccess('');
@@ -58,12 +60,12 @@ export const ClassSelectionScreen: React.FC<Props> = ({
       setJoinError('Vui lòng nhập mã lớp do giảng viên hoặc ban tổ chức cung cấp.');
       return;
     }
-    const ok = onJoinClassByCode(classCodeInput.trim());
+    const ok = await onJoinClassByCode(classCodeInput.trim());
     if (ok) {
       setJoinSuccess(`Đã tham gia lớp thành công với mã ${classCodeInput.toUpperCase()}!`);
       setClassCodeInput('');
     } else {
-      setJoinError('Mã lớp không hợp lệ hoặc đã hết hạn. Hãy thử "AGRI-CREDIT" hoặc "CORP-GEN".');
+      setJoinError('Tài khoản chưa được giảng viên ghi danh vào lớp này, hoặc mã lớp không hợp lệ.');
     }
   };
 
@@ -73,22 +75,15 @@ export const ClassSelectionScreen: React.FC<Props> = ({
       <header className="bg-slate-900 text-white border-b border-slate-800 px-6 py-4 shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div 
-            onClick={onResetAll || onLogout}
-            className="flex items-center gap-3 cursor-pointer group"
-            title="Bấm vào đây để reset toàn bộ hệ thống về Landing Page ban đầu"
+            className="flex items-center gap-3 select-none"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base tracking-tight text-white font-display group-hover:text-emerald-300 transition">
-                  Promptify
-                </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  ↺ Reset về Landing
-                </span>
-              </div>
+              <span className="font-extrabold text-base tracking-tight text-white font-display">
+                Promptify
+              </span>
               <span className="text-[11px] text-slate-400 block">
                 Cổng đào tạo Cán bộ Nghiệp vụ
               </span>
@@ -98,11 +93,11 @@ export const ClassSelectionScreen: React.FC<Props> = ({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 pr-3 border-r border-slate-700 text-xs">
               <div className="w-7 h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold">
-                {learner.avatarInitials || 'LP'}
+                {learner?.avatarInitials || 'LP'}
               </div>
               <div className="hidden sm:block text-left">
-                <span className="font-semibold text-slate-200 block">{learner.name}</span>
-                <span className="text-[10px] text-slate-400">{learner.email}</span>
+                <span className="font-semibold text-slate-200 block">{learner?.name || 'Học viên'}</span>
+                <span className="text-[10px] text-slate-400">{learner?.email || ''}</span>
               </div>
             </div>
 
@@ -130,17 +125,27 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             Chọn lớp học của bạn
           </h1>
           <p className="text-sm text-slate-600 max-w-2xl">
-            Chào mừng <strong>{learner.name}</strong> ({learner.department}). Dưới đây là các lớp học / workshop bạn đã được ghi danh. Chọn lớp để vào màn hình chính của khóa học.
+            Chào mừng <strong>{learner?.name || 'Học viên'}</strong> ({learner?.department || ''}). Chỉ những lớp mà giảng viên đã ghi danh tài khoản của bạn mới xuất hiện tại đây.
           </p>
         </div>
 
         {/* Classes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cohorts.length === 0 && (
+            <div className="md:col-span-2 lg:col-span-3 rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
+              <ShieldAlert className="mx-auto h-9 w-9 text-amber-600" />
+              <h2 className="mt-3 text-base font-bold text-amber-950">Bạn chưa được ghi danh vào khóa học</h2>
+              <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-amber-800">
+                Hãy liên hệ giảng viên hoặc quản trị viên để được thêm vào một lớp. Đăng nhập hoặc biết mã lớp không tự động cấp quyền học và làm bài.
+              </p>
+            </div>
+          )}
           {cohorts.map((cohort) => {
-            const enrollmentKey = `${learner.id}_${cohort.id}`;
+            const enrollmentKey = learner ? `${learner.id}_${cohort.id}` : '';
             const enrollment = enrollments[enrollmentKey] || DEFAULT_ENROLLMENTS[enrollmentKey];
             const completedCount = enrollment ? enrollment.completedLabIds.length : 0;
-            const progressPercent = Math.round((completedCount / 5) * 100);
+            const safeTotal = Math.max(1, totalLabCount);
+            const progressPercent = Math.round((completedCount / safeTotal) * 100);
 
             return (
               <div
@@ -184,7 +189,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-500 font-medium">Tiến độ bài học:</span>
-                      <span className="font-bold text-slate-800">{completedCount} / 5 bài ({progressPercent}%)</span>
+                      <span className="font-bold text-slate-800">{completedCount} / {totalLabCount} bài ({progressPercent}%)</span>
                     </div>
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                       <div 
@@ -198,7 +203,10 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                 {/* Footer Action */}
                 <div className="p-4 bg-slate-50 border-t border-slate-100">
                   <button
-                    onClick={() => onSelectClass(cohort)}
+                    onClick={async () => {
+                      const ok = await onSelectClass(cohort);
+                      if (!ok) setJoinError('Quyền truy cập lớp đã hết hạn hoặc bị thu hồi.');
+                    }}
                     className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl transition shadow-sm cursor-pointer"
                   >
                     <span>{completedCount > 0 ? 'Tiếp tục học' : 'Vào lớp học'}</span>
@@ -217,7 +225,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             <h3>Tham gia thêm lớp học bằng mã</h3>
           </div>
           <p className="text-xs text-slate-500 mb-4">
-            Nếu bạn được cấp một mã lớp mới từ giảng viên hoặc ban tổ chức, hãy nhập mã vào đây:
+            Mã lớp chỉ dùng để tìm lớp mà tài khoản của bạn đã được giảng viên ghi danh. Mã lớp không tự cấp quyền truy cập:
           </p>
 
           <form onSubmit={handleJoinSubmit} className="space-y-3">
@@ -260,4 +268,3 @@ export const ClassSelectionScreen: React.FC<Props> = ({
     </div>
   );
 };
-

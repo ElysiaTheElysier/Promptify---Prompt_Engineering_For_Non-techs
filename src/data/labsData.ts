@@ -7,6 +7,7 @@ export const LABS_DATA: LabStep[] = [
     title: 'Bài 1: Viết Prompt Cơ Bản (Chưa Có Mẫu)',
     badge: 'Cơ bản',
     focusSkill: 'Nhận diện điểm yếu của câu lệnh sơ sài',
+    focusComponents: ['task', 'context'],
     scenario: 'Bộ phận Chăm sóc Khách hàng & Truyền thông Agribank nhận được 5 phản hồi thô của người dùng trên App Store về ứng dụng Agribank E-Mobile Banking. Bạn cần tổng hợp ý kiến phản hồi này để báo cáo trong cuộc họp ban sáng mai.',
     taskGoal: 'Thử nghiệm viết prompt đơn giản nhất (chưa kèm kỹ thuật) để quan sát xem AI trả lời ra sao khi thiếu chỉ dẫn cấu trúc.',
     conceptTag: 'Cơ chế sinh từ ngẫu nhiên',
@@ -18,6 +19,7 @@ export const LABS_DATA: LabStep[] = [
 3. "Tính năng thanh toán tiền điện nước rất tiện, nhưng biểu đồ theo dõi chi tiêu tháng này bị lệch số liệu so với sao kê thẻ."
 4. "Mỗi lần lấy mã OTP qua tin nhắn SMS chậm quá, nhiều khi hết 60s vẫn chưa nhận được tin nhắn."
 5. "Mong ngân hàng sớm bổ sung tính năng tạo tài khoản số đẹp online ngay trên app, không muốn phải ra chi nhánh xếp hàng."`,
+    promptPlaceholder: 'Hãy viết câu lệnh của bạn yêu cầu AI phân loại phản hồi khách hàng (Ví dụ: Phân tích 5 phản hồi sau và trích xuất thành bảng...). Bạn có thể bấm "Nạp câu lệnh thô" hoặc "Nạp câu lệnh chuẩn" ở trên để tham khảo.',
     baselinePrompt: 'Phân tích các đánh giá sau của khách hàng và cho tôi biết họ đang nghĩ gì:\n\n[Dán dữ liệu 5 phản hồi thô vào đây]',
     improvedPrompt: `Bạn là Chuyên viên Phân tích Dữ liệu Trải nghiệm Khách hàng (CX Analyst) tại Agribank.
 
@@ -85,6 +87,7 @@ Nhìn chung ngân hàng nên cải thiện hệ thống kỹ thuật và bổ su
     title: 'Bài 2: Cấu Trúc Prompt Chuẩn (Khung Vai Trò - Ngữ Cảnh - Nhiệm Vụ - Ràng Buộc - Định Dạng)',
     badge: 'Cốt lõi',
     focusSkill: 'Áp dụng công thức 5 thành tố chuyên nghiệp',
+    focusComponents: ['role', 'context', 'task', 'constraint', 'output_format'],
     scenario: 'Bộ phận Tín dụng Agribank đang tiếp nhận hồ sơ vay bổ sung vốn lưu động 15 tỷ VNĐ của Công ty Cổ phần Nông nghiệp Xanh Cao Nguyên. Cán bộ thẩm định cần lập tóm tắt sơ bộ các rủi ro tài chính và điều kiện giải ngân để trình Trưởng phòng.',
     taskGoal: 'Xây dựng prompt có cấu trúc chặt chẽ gồm 5 thành tố: Vai trò (Role), Ngữ cảnh (Context), Nhiệm vụ (Task), Ràng buộc (Constraints), Định dạng (Output Format).',
     conceptTag: 'Khung cấu trúc chuẩn',
@@ -97,6 +100,7 @@ Nhìn chung ngân hàng nên cải thiện hệ thống kỹ thuật và bổ su
 - Đề nghị vay: 15 tỷ VNĐ thời hạn 12 tháng tài trợ thu mua nguyên liệu vụ đông xuân.
 - Tài sản bảo đảm: Quyền sử dụng đất nhà xưởng chế biến định giá 22 tỷ VNĐ.
 - Tồn đọng cần lưu ý: Khoản phải thu khách hàng quốc tế chiếm 45% tổng tài sản ngắn hạn, tiềm ẩn rủi ro biến động tỷ giá USD/VND.`,
+    promptPlaceholder: 'Hãy xây dựng câu lệnh có cấu trúc 5 thành phần (Vai trò, Bối cảnh, Nhiệm vụ, Ràng buộc, Định dạng). Bạn có thể bấm "Nạp câu lệnh thô" hoặc "Nạp câu lệnh chuẩn" ở trên để tham khảo.',
     baselinePrompt: 'Viết báo cáo đánh giá rủi ro cho hồ sơ vay của Công ty CP Nông nghiệp Xanh Cao Nguyên.\n\n[Dán thông tin doanh nghiệp]',
     improvedPrompt: `# ROLE & PERSONA
 Bạn là Chuyên viên Thẩm định Tín dụng Doanh nghiệp cao cấp tại Agribank.
@@ -187,6 +191,7 @@ Tuy nhiên rủi ro là công ty bị khách hàng quốc tế nợ nhiều quá
     title: 'Bài 3: Định Hình Phong Cách Bằng Ví Dụ Mẫu (Chuẩn Văn Phong Ngân Hàng)',
     badge: 'Nâng cao',
     focusSkill: 'Đưa ví dụ mẫu (Mẫu đầu vào - Mẫu đầu ra) để AI học theo chuẩn',
+    focusComponents: ['example', 'output_format'],
     scenario: 'Ban Truyền thông Agribank thường xuyên phải soạn thảo thông báo gửi khách hàng khi nâng cấp hệ thống hoặc bảo trì dịch vụ số. Văn bản kỹ thuật từ IT chuyển sang thường khô khan và gây hoang mang nếu không được biên tập chuẩn văn phong ngân hàng.',
     taskGoal: 'Học cách đưa 1-2 cặp ví dụ mẫu (Đầu vào - Đầu ra chuẩn) vào prompt để AI học theo cấu trúc và văn phong "Tận tâm - Chu đáo - An tâm".',
     conceptTag: 'Học qua ví dụ mẫu',
@@ -197,6 +202,7 @@ Tuy nhiên rủi ro là công ty bị khách hàng quốc tế nợ nhiều quá
 - Phạm vi bảo trì: Nâng cấp cổng thanh toán quốc tế và hệ thống thẻ ghi nợ/thẻ tín dụng Agribank JCB & Mastercard.
 - Ảnh hưởng: Trong khoảng thời gian trên, các giao dịch quẹt thẻ POS tại nước ngoài và thanh toán trực tuyến trên các trang thương mại điện tử quốc tế tạm thời gián đoạn.
 - Dịch vụ không bị ảnh hưởng: Rút tiền tại cây ATM trong nước và chuyển tiền trên app Agribank E-Mobile Banking vẫn hoạt động bình thường.`,
+    promptPlaceholder: 'Hãy viết câu lệnh có kèm ví dụ mẫu (Input mẫu -> Output mẫu) để AI học theo chuẩn văn phong thông báo của ngân hàng...',
     baselinePrompt: 'Viết thông báo bảo trì hệ thống thẻ quốc tế gửi khách hàng dựa trên thông tin IT sau:\n\n[Dán thông tin kỹ thuật]',
     improvedPrompt: `Bạn là Trưởng bộ phận Biên tập Truyền thông & Thương hiệu của Agribank.
 Nhiệm vụ của bạn là chuyển thể các thông báo kỹ thuật khô khan thành thông điệp gửi khách hàng chuẩn phong cách Agribank ("Tận tâm - Chu đáo - Minh bạch").
@@ -285,6 +291,7 @@ Trân trọng cảm ơn Quý khách đã luôn tin tưởng và đồng hành c�
     title: 'Bài 4: Đối Chiếu Tài Liệu & Chống Bịa Đặt (Nói Có Sách, Mách Có Chứng)',
     badge: 'Chuyên gia',
     focusSkill: 'Đối chiếu tài liệu chính sách để AI không tự sáng tác thông tin',
+    focusComponents: ['grounding', 'constraint'],
     scenario: 'Một cán bộ tín dụng chi nhánh nhận được câu hỏi từ khách hàng là nông dân trồng hồ tiêu tại Bình Phước hỏi về chính sách cho vay không cần thế chấp tài sản theo Nghị định của Chính phủ. Cán bộ muốn dùng AI để tra cứu nhanh nhưng sợ AI "bịa" thông tin sai chính sách tín dụng.',
     taskGoal: 'Thiết lập prompt có kèm tài liệu tham chiếu (Grounding) và cài đặt hàng rào bảo vệ (Ràng buộc nghiêm ngặt) để AI chỉ trả lời từ văn bản chính sách.',
     conceptTag: 'Đối chiếu tài liệu thực tế',
@@ -297,6 +304,7 @@ a) Tối đa 100 triệu đồng đối với cá nhân, hộ gia đình sản x
 b) Tối đa 200 triệu đồng đối với cá nhân, hộ gia đình sản xuất nông nghiệp có tham gia chuỗi liên kết hoặc ứng dụng công nghệ cao có xác nhận của UBND cấp huyện.
 2. Khách hàng vay vốn không có tài sản bảo đảm phải nộp bản chính Giấy chứng nhận quyền sử dụng đất (sổ đỏ) hoặc Giấy xác nhận của UBND cấp xã về việc chưa được cấp sổ đỏ và đất không có tranh chấp cho Agribank lưu giữ trong thời gian vay vốn.
 3. Thời hạn cho vay tối đa theo chu kỳ sản xuất nhưng không quá 36 tháng đối với cây trồng lâu năm (hồ tiêu, cao su, cà phê)."`,
+    promptPlaceholder: 'Hãy viết câu lệnh có ràng buộc neo chặt vào tài liệu được cung cấp (Grounding) và cấm AI suy diễn ngoài văn bản...',
     baselinePrompt: 'Hộ nông dân trồng hồ tiêu vay tối đa được bao nhiêu tiền không cần tài sản thế chấp tại Agribank và cần nộp những giấy tờ gì?',
     improvedPrompt: `<system_persona>
 Bạn là Trợ lý Pháp chế & Nghiệp vụ Tín dụng Nội bộ của Agribank. Nhiệm vụ của bạn là giải đáp chính xác các thắc mắc chính sách cho cán bộ tín dụng dựa duy nhất trên tài liệu pháp lý được cung cấp.
@@ -391,6 +399,7 @@ Nếu vay không cần thế chấp sổ đỏ thì bà con thường không ph�
     title: 'Bài 5: Thực Hành Tự Do (Bài Toán Thực Tế Của Bạn)',
     badge: 'Sáng tạo',
     focusSkill: 'Tự do thử nghiệm & ứng dụng vào công việc hàng ngày',
+    focusComponents: ['role', 'task', 'constraint', 'output_format', 'grounding'],
     scenario: 'Áp dụng toàn bộ các kỹ thuật đã học (Vai trò, Ngữ cảnh, Cấu trúc bảng, Ví dụ mẫu, Đối chiếu tài liệu) để giải quyết một bài toán thực tế trong công việc hàng ngày của bạn tại ngân hàng hoặc doanh nghiệp.',
     taskGoal: 'Soạn thảo prompt thực tế của chính bạn, chạy thử nghiệm, quan sát số lượng token, độ trễ và kiểm tra bảng chấm điểm tự động.',
     conceptTag: 'Ứng dụng thực tiễn',
@@ -400,6 +409,7 @@ Nếu vay không cần thế chấp sổ đỏ thì bà con thường không ph�
 1. Soạn email từ chối khiếu nại khách hàng khéo léo nhưng tuân thủ đúng điều khoản hợp đồng.
 2. Lập kế hoạch tổ chức sự kiện khai trương phòng giao dịch mới tại địa phương.
 3. Tóm tắt biên bản họp thẩm định tín dụng dài 5 trang thành 1 trang A4 báo cáo Ban Giám đốc.`,
+    promptPlaceholder: 'Hãy viết câu lệnh giải quyết bài toán thực tế của bạn tại cơ quan / doanh nghiệp (soạn thư, lập kế hoạch, tóm tắt báo cáo...)...',
     baselinePrompt: 'Viết cho tôi một bức thư từ chối yêu cầu hoàn tiền phí dịch vụ của khách hàng.',
     improvedPrompt: `Bạn là Trưởng nhóm Xử lý Khiếu nại Dịch vụ Khách hàng Agribank.
 

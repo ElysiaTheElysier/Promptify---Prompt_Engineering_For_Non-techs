@@ -1,32 +1,36 @@
-import React from 'react';
 import { 
   Building2, 
   LayoutDashboard, 
   BookOpen, 
   Users, 
   Activity, 
-  ArrowLeftRight, 
   LogOut,
   GraduationCap,
   HelpCircle
 } from 'lucide-react';
 import { InstructorViewMode } from '../../types/instructor';
-import { CURRENT_INSTRUCTOR } from '../../data/instructorData';
 
 interface Props {
   currentView: InstructorViewMode;
   onNavigate: (view: InstructorViewMode) => void;
-  onSwitchToLearner: () => void;
   onLogout: () => void;
   onOpenTutorial?: () => void;
+  currentUser?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    department?: string;
+    avatarInitials?: string;
+  } | null;
 }
 
 export const InstructorNavbar: React.FC<Props> = ({
   currentView,
   onNavigate,
-  onSwitchToLearner,
   onLogout,
-  onOpenTutorial
+  onOpenTutorial,
+  currentUser
 }) => {
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
@@ -91,7 +95,7 @@ export const InstructorNavbar: React.FC<Props> = ({
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Học viên (86)</span>
+              <span>Học viên</span>
             </button>
 
             <button
@@ -107,7 +111,7 @@ export const InstructorNavbar: React.FC<Props> = ({
             </button>
           </nav>
 
-          {/* 3. Actions & Role Switcher */}
+          {/* 3. Actions & Profile */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             {/* Tutorial button for current tab */}
             {onOpenTutorial && (
@@ -121,28 +125,17 @@ export const InstructorNavbar: React.FC<Props> = ({
               </button>
             )}
 
-            {/* Quick Switch to Learner View */}
-            <button
-              data-tour="instructor-switch-role"
-              onClick={onSwitchToLearner}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md transition cursor-pointer"
-              title="Chuyển sang giao diện Học viên để làm bài thực hành"
-            >
-              <ArrowLeftRight className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Chuyển sang Học viên</span>
-            </button>
-
-            {/* Instructor Profile & Logout */}
+            {/* Instructor Profile & Logout (Real Supabase User) */}
             <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
               <div className="w-8 h-8 rounded-full bg-indigo-700 border border-indigo-500/40 flex items-center justify-center text-xs font-bold text-white shadow-xs">
-                {CURRENT_INSTRUCTOR.avatarInitials}
+                {currentUser?.avatarInitials || currentUser?.name?.slice(0, 2).toUpperCase() || 'IN'}
               </div>
               <div className="hidden xl:block text-left text-xs leading-tight">
-                <span className="font-semibold text-slate-200 block truncate max-w-[140px]">
-                  {CURRENT_INSTRUCTOR.name}
+                <span className="font-semibold text-slate-200 block truncate max-w-[150px]" title={currentUser?.name}>
+                  {currentUser?.name || 'Giảng viên'}
                 </span>
-                <span className="text-[10px] text-slate-400 block truncate max-w-[140px]">
-                  {CURRENT_INSTRUCTOR.department}
+                <span className="text-[10px] text-slate-400 block truncate max-w-[150px]" title={currentUser?.email}>
+                  {currentUser?.email || 'Instructor'}
                 </span>
               </div>
               <button

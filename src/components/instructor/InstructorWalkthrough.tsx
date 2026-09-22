@@ -25,6 +25,7 @@ interface Props {
   isOpen: boolean;
   currentView: InstructorViewMode;
   onClose: () => void;
+  userKey?: string;
 }
 
 interface ElementRect {
@@ -69,6 +70,7 @@ export const InstructorWalkthrough: React.FC<Props> = ({
   isOpen,
   currentView,
   onClose,
+  userKey,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [targetRect, setTargetRect] = useState<ElementRect | null>(null);
@@ -252,11 +254,13 @@ export const InstructorWalkthrough: React.FC<Props> = ({
   };
 
   const handleSkip = () => {
+    if (userKey) localStorage.setItem(`promptify_instructor_tutorial_${userKey}_${currentView}_completed`, 'true');
     localStorage.setItem(`promptify_instructor_tutorial_${currentView}_completed`, 'true');
     onClose();
   };
 
   const handleComplete = () => {
+    if (userKey) localStorage.setItem(`promptify_instructor_tutorial_${userKey}_${currentView}_completed`, 'true');
     localStorage.setItem(`promptify_instructor_tutorial_${currentView}_completed`, 'true');
     onClose();
   };
@@ -271,6 +275,16 @@ export const InstructorWalkthrough: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden font-sans select-none animate-fadeIn">
+      {/* Floating Exit Button always accessible at top right */}
+      <button
+        onClick={handleSkip}
+        className="fixed top-4 right-4 z-[90] flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-lg text-xs font-semibold backdrop-blur-sm cursor-pointer transition"
+        title="Đóng hướng dẫn (Esc)"
+      >
+        <X className="w-3.5 h-3.5" />
+        <span>Đóng hướng dẫn (Esc)</span>
+      </button>
+
       {/* 1. SVG SPOTLIGHT MASK (Làm tối nền, khoét lỗ sáng chính xác ôm component) */}
       <svg 
         className="fixed inset-0 w-full h-full pointer-events-auto cursor-pointer"

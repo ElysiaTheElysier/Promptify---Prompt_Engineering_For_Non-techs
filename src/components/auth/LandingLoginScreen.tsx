@@ -10,45 +10,73 @@ import {
   FileSpreadsheet, 
   Lock, 
   ChevronRight,
-  GraduationCap
+  AlertCircle
 } from 'lucide-react';
 import { Learner } from '../../types';
 import { DEMO_LEARNERS } from '../../data/classesData';
-import { CURRENT_INSTRUCTOR } from '../../data/instructorData';
+import { supabase, isSupabaseConfigured } from '../../services/supabaseClient';
 
 interface Props {
   onLogin: (learner: Learner) => void;
-  onLoginAsInstructor?: () => void;
 }
 
-export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstructor }) => {
+export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
   const [customEmail, setCustomEmail] = useState<string>('');
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
-  const handleGoogleLogin = (learner?: Learner) => {
+  // 1. Luồng Google OAuth THỰC SỰ — Không truy vấn DB trước khi OAuth hoàn tất
+  const handleRealGoogleLogin = async () => {
+    setLoginError(null);
     setIsLoggingIn(true);
-    // Giả lập luồng OAuth Google mượt mà cho prototype
-    setTimeout(() => {
-      setIsLoggingIn(false);
-      if (learner) {
-        onLogin(learner);
-      } else if (customEmail.trim()) {
-        const namePart = customEmail.split('@')[0];
-        const newLearner: Learner = {
-          id: `learner_${Date.now()}`,
-          name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
-          email: customEmail.trim(),
-          role: 'STUDENT',
-          organization: 'Agribank Việt Nam',
-          department: 'Khối Nghiệp vụ',
-          avatarInitials: namePart.slice(0, 2).toUpperCase()
-        };
-        onLogin(newLearner);
-      } else {
-        // Mặc định chọn cán bộ Agribank Linh Phạm
-        onLogin(DEMO_LEARNERS[0]);
+
+    try {
+      console.log('[Auth] Initiating Supabase Google OAuth...');
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+
+      if (error) {
+        console.error('[Auth] Supabase signInWithOAuth error:', error);
+        setLoginError(error.message);
+        setIsLoggingIn(false);
+        return;
       }
-    }, 450);
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      console.error('[Auth] Unexpected error during Google login:', err);
+      setLoginError(err?.message || 'Không thể kết nối đến máy chủ xác thực.');
+      setIsLoggingIn(false);
+    }
+  };
+
+  // 2. Luồng Demo Account tách biệt hoàn toàn
+  const handleDemoAccountLogin = (learner: Learner) => {
+    setLoginError(null);
+    onLogin(learner);
+  };
+
+  const handleCustomEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customEmail.trim()) return;
+    setLoginError(null);
+    const namePart = customEmail.split('@')[0];
+    const newLearner: Learner = {
+      id: `learner_${Date.now()}`,
+      name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
+      email: customEmail.trim().toLowerCase(),
+      role: 'STUDENT',
+      organization: 'Agribank Việt Nam',
+      department: 'Khối Nghiệp vụ',
+      avatarInitials: namePart.slice(0, 2).toUpperCase()
+    };
+    onLogin(newLearner);
   };
 
   return (
@@ -75,9 +103,22 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstruct
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Môi trường đào tạo an toàn nội bộ</span>
+          <div className="flex items-center gap-3">
+            {isSupabaseConfigured ? (
+              <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Supabase & Google OAuth Live</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-full" title="Dual-Mode MVP: Sẵn sàng kết nối Supabase qua .env">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span>Dual-Mode DB (Local Active)</span>
+              </div>
+            )}
+            <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Môi trường đào tạo an toàn</span>
+            </div>
           </div>
         </div>
       </header>
@@ -143,7 +184,8 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstruct
 
               {/* Primary Google Login Button */}
               <button
-                onClick={() => handleGoogleLogin(DEMO_LEARNERS[0])}
+                type="button"
+                onClick={handleRealGoogleLogin}
                 disabled={isLoggingIn}
                 className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-semibold py-3 px-4 rounded-xl transition duration-150 shadow-md hover:shadow-lg disabled:opacity-75 cursor-pointer"
               >
@@ -166,8 +208,20 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstruct
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <span>{isLoggingIn ? 'Đang kết nối Google...' : 'Đăng nhập bằng Google'}</span>
+                <span>{isLoggingIn ? 'Đang chuyển hướng sang Google...' : 'Đăng nhập bằng Google'}</span>
               </button>
+
+              {/* Thông báo lỗi đăng nhập nếu có */}
+              {loginError && (
+                <div className="mt-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2 animate-in fade-in-50">
+                  <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <span className="font-bold block">Lỗi kết nối OAuth:</span>
+                    <span>{loginError}</span>
+                  </div>
+                  <button onClick={() => setLoginError(null)} className="text-rose-400 hover:text-white font-bold ml-1">✕</button>
+                </div>
+              )}
 
               <div className="relative my-6 text-center">
                 <div className="absolute inset-0 flex items-center">
@@ -180,38 +234,10 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstruct
 
               {/* Quick Demo Learner Selector (Great for workshop testing) */}
               <div className="space-y-2">
-                {/* Instructor Demo Account */}
-                {onLoginAsInstructor && (
-                  <button
-                    onClick={onLoginAsInstructor}
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-indigo-950/60 to-slate-800/80 hover:from-indigo-900/80 hover:to-slate-800 border border-indigo-500/40 hover:border-indigo-400 transition text-left group shadow-xs"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs group-hover:scale-105 transition shadow-xs">
-                        <GraduationCap className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-indigo-200 group-hover:text-white transition">
-                            {CURRENT_INSTRUCTOR.name}
-                          </span>
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
-                            Instructor View
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {CURRENT_INSTRUCTOR.department}
-                        </div>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-indigo-400 group-hover:text-indigo-200 group-hover:translate-x-0.5 transition" />
-                  </button>
-                )}
-
                 {DEMO_LEARNERS.map((learner) => (
                   <button
                     key={learner.id}
-                    onClick={() => handleGoogleLogin(learner)}
+                    onClick={() => handleDemoAccountLogin(learner)}
                     className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-emerald-500/50 transition text-left group"
                   >
                     <div className="flex items-center gap-3">
@@ -232,8 +258,31 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin, onLoginAsInstruct
                 ))}
               </div>
 
+              {/* Form nhập email nghiệp vụ */}
+              <form onSubmit={handleCustomEmailSubmit} className="mt-4 pt-4 border-t border-slate-800 space-y-2">
+                <span className="text-[11px] text-slate-400 font-medium block">
+                  Hoặc đăng nhập bằng email cơ quan:
+                </span>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={customEmail}
+                    onChange={(e) => setCustomEmail(e.target.value)}
+                    placeholder="vd: canbo@agribank.com.vn"
+                    className="flex-1 px-3 py-2 bg-slate-950/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!customEmail.trim()}
+                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white rounded-xl text-xs font-semibold transition cursor-pointer"
+                  >
+                    Vào học
+                  </button>
+                </div>
+              </form>
+
               {/* Security guarantee note */}
-              <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+              <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-center gap-2 text-[11px] text-slate-500">
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
                 <span>Bảo mật thông tin nội bộ doanh nghiệp & ngân hàng</span>
               </div>

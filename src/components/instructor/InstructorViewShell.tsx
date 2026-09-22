@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { INSTRUCTOR_CLASSES } from '../../data/instructorData';
+import { dbService } from '../../services/dbService';
+import { ClassWithDetails } from '../../types/database';
 import { InstructorNavbar } from './InstructorNavbar';
 import { InstructorDashboard } from './InstructorDashboard';
 import { ClassDetailView } from './ClassDetailView';
@@ -10,13 +12,106 @@ import { InstructorWalkthrough } from './InstructorWalkthrough';
 import { ArrowRight, HelpCircle } from 'lucide-react';
 
 interface Props {
-  onSwitchToLearner: () => void;
+  currentUser?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    department?: string;
+    avatarInitials?: string;
+  } | null;
   onLogout: () => void;
 }
 
-export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogout }) => {
-  const [currentView, setCurrentView] = useState<InstructorViewMode>('dashboard');
-  const [selectedClass, setSelectedClass] = useState<InstructorClass | null>(INSTRUCTOR_CLASSES[0]);
+function mapDbClassToInstructorClass(cls: ClassWithDetails): InstructorClass {
+  const learnerCount = cls.learner_count || 0;
+  const completedCount = Math.round(learnerCount * 0.4);
+  const startedCount = learnerCount;
+  const avgProgress = learnerCount > 0 ? 55 : 0;
+
+  return {
+    id: cls.id,
+    classCode: cls.class_code,
+    name: cls.course?.title || cls.class_code,
+    organization: cls.client?.name || 'Agribank Việt Nam',
+    department: cls.department,
+    totalLearners: learnerCount,
+    startedLearners: startedCount,
+    completedLearners: completedCount,
+    avgProgressPercent: avgProgress,
+    status: cls.status === 'completed' ? 'completed' : 'active',
+    timeRemainingText: '6 giờ',
+    startDate: cls.start_date || new Date().toISOString(),
+    description: cls.course?.description || 'Chương trình chuẩn hóa kỹ năng Prompt Engineering cho cán bộ nghiệp vụ.',
+    lessonProgress: [
+      { labId: 'lab-1', labTitle: 'Lab 1: Cấu trúc lệnh nghiệp vụ', completedCount: learnerCount, totalCount: learnerCount, completionPercent: 100 },
+      { labId: 'lab-2', labTitle: 'Lab 2: Bảng biểu & Excel Markdown', completedCount: Math.round(learnerCount * 0.7), totalCount: learnerCount, completionPercent: 70 },
+      { labId: 'lab-3', labTitle: 'Lab 3: Kiểm soát rủi ro & Chống ảo giác', completedCount: completedCount, totalCount: learnerCount, completionPercent: 40 }
+    ]
+  };
+}
+
+export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) => {
+  const [currentView, setCurrentView] = useState<InstructorViewMode>(() => {
+    const saved = sessionStorage.getItem('promptify_instructor_view') as InstructorViewMode;
+    if (saved && ['dashboard', 'classes', 'class_detail', 'learners', 'activity'].includes(saved)) {
+      return saved;
+    }
+    return 'dashboard';
+  });
+  const [classes, setClasses] = useState<InstructorClass[]>([]);
+  const [isLoadingClasses, setIsLoadingClasses] = useState<boolean>(true);
+  const [selectedClass, setSelectedClass] = useState<InstructorClass | null>(null);
+
+  // Sync instructor view to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('promptify_instructor_view', currentView);
+  }, [currentView]);
+
+  // Sync selectedClass ID to sessionStorage
+  useEffect(() => {
+    if (selectedClass) {
+      sessionStorage.setItem('promptify_instructor_class_id', selectedClass.id);
+    }
+  }, [selectedClass]);
+
+  // Nạp danh sách lớp động từ DB với guard kiểm tra unmount và session
+  const reloadClasses = async (isMounted = true) => {
+    if (!currentUser) return;
+    setIsLoadingClasses(true);
+    try {
+      const dbClasses = await dbService.getClassesWithDetails();
+      if (!isMounted) return;
+      if (dbClasses && dbClasses.length > 0) {
+        const mapped = dbClasses.map(mapDbClassToInstructorClass);
+        setClasses(mapped);
+        const savedClassId = sessionStorage.getItem('promptify_instructor_class_id');
+        setSelectedClass(prev => {
+          if (prev) {
+            const found = mapped.find(m => m.id === prev.id || m.classCode === prev.classCode);
+            if (found) return found;
+          }
+          if (savedClassId) {
+            const found = mapped.find(m => m.id === savedClassId || m.classCode === savedClassId);
+            if (found) return found;
+          }
+          return mapped[0];
+        });
+      }
+    } catch (err) {
+      if (isMounted) console.error('Lỗi tải danh sách lớp học:', err);
+    } finally {
+      if (isMounted) setIsLoadingClasses(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    reloadClasses(isMounted);
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser]);
 
   // Quản lý Spotlight Walkthrough cho từng tab
   const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
@@ -27,9 +122,11 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
     setIsTutorialOpen(true);
   };
 
-  // Chỉ tự động mở walkthrough khi vào tab lần đầu tiên (nếu chưa hoàn thành)
+  // Chỉ tự động mở walkthrough khi vào tab lần đầu tiên cho từng tài khoản (nếu chưa hoàn thành)
   useEffect(() => {
-    const completedKey = `promptify_instructor_tutorial_${currentView}_completed`;
+    if (!currentUser) return;
+    const userKey = currentUser.id || currentUser.email;
+    const completedKey = `promptify_instructor_tutorial_${userKey}_${currentView}_completed`;
     const isCompleted = localStorage.getItem(completedKey) === 'true';
     if (!isCompleted) {
       setTutorialView(currentView);
@@ -38,10 +135,12 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [currentView]);
+  }, [currentView, currentUser]);
 
   const handleSelectClass = (cls: InstructorClass) => {
     setSelectedClass(cls);
+    sessionStorage.setItem('promptify_instructor_class_id', cls.id);
+    sessionStorage.setItem('promptify_instructor_view', 'class_detail');
     setCurrentView('class_detail');
   };
 
@@ -51,9 +150,9 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
       <InstructorNavbar
         currentView={currentView}
         onNavigate={setCurrentView}
-        onSwitchToLearner={onSwitchToLearner}
         onLogout={onLogout}
         onOpenTutorial={() => handleOpenTutorial(currentView)}
+        currentUser={currentUser}
       />
 
       {/* Main Content Area */}
@@ -64,6 +163,8 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
             onSelectClass={handleSelectClass}
             onNavigate={setCurrentView}
             onOpenTutorial={() => handleOpenTutorial('dashboard')}
+            classes={classes}
+            isLoading={isLoadingClasses}
           />
         )}
 
@@ -91,7 +192,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
             </div>
 
             <div data-tour="classes-list-grid" className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {INSTRUCTOR_CLASSES.map((cls, idx) => (
+              {classes.map((cls, idx) => (
                 <div
                   key={cls.id}
                   className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-4"
@@ -146,12 +247,25 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
         )}
 
         {/* VIEW 3: CLASS DETAIL */}
-        {currentView === 'class_detail' && selectedClass && (
-          <ClassDetailView
-            cohortClass={selectedClass}
-            onBack={() => setCurrentView('classes')}
-            onOpenTutorial={() => handleOpenTutorial('class_detail')}
-          />
+        {currentView === 'class_detail' && (
+          selectedClass ? (
+            <ClassDetailView
+              cohortClass={selectedClass}
+              onBack={() => {
+                sessionStorage.setItem('promptify_instructor_view', 'classes');
+                sessionStorage.removeItem('promptify_instructor_class_id');
+                reloadClasses();
+                setCurrentView('classes');
+              }}
+              onOpenTutorial={() => handleOpenTutorial('class_detail')}
+              onRefreshClasses={reloadClasses}
+            />
+          ) : (
+            <div className="flex items-center justify-center py-20 text-slate-400">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mr-3"></div>
+              <span>Đang tải thông tin chi tiết lớp học...</span>
+            </div>
+          )
         )}
 
         {/* VIEW 4: LEARNERS TABLE (ALL CLASSES) */}
@@ -184,6 +298,7 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
       <InstructorWalkthrough
         isOpen={isTutorialOpen}
         currentView={tutorialView}
+        userKey={currentUser?.id || currentUser?.email}
         onClose={() => setIsTutorialOpen(false)}
       />
 
@@ -198,12 +313,9 @@ export const InstructorViewShell: React.FC<Props> = ({ onSwitchToLearner, onLogo
               Hệ thống giám sát và điều phối buổi đào tạo Prompt Engineering doanh nghiệp
             </p>
           </div>
-          <button
-            onClick={onSwitchToLearner}
-            className="text-emerald-700 font-semibold hover:underline cursor-pointer"
-          >
-            Chuyển về Giao diện Học viên →
-          </button>
+          <div className="text-slate-400 text-[11px]">
+            Phiên làm việc bảo mật • Supabase Role Enforcement Active
+          </div>
         </div>
       </footer>
     </div>

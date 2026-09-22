@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, 
   ChevronDown, 
@@ -15,14 +15,25 @@ import {
   HelpCircle,
   RotateCcw,
   BookmarkPlus,
-  Compass
+  Compass,
+  AlertCircle,
+  ThumbsUp,
+  CheckCircle2,
+  Lightbulb
 } from 'lucide-react';
 import { LabStep, ApiConfig, PromptRun, PromptVersion } from '../../types';
-import { executePromptStream, evaluatePromptRubric } from '../../services/llmService';
+import { AiEvaluationResult } from '../../types/database';
+import { executePromptStream, evaluatePromptLive, mapAiEvaluationToRubricAudit, evaluatePromptRubric } from '../../services/llmService';
 import { detectPromptComponents, evaluateBusinessMetrics } from '../../services/businessEvaluationService';
+import { dbService } from '../../services/dbService';
 import { InlineCompareCard } from '../common/InlineCompareCard';
-import { LearningBadges } from '../common/LearningBadges';
-import { MiniChallengeCard } from '../common/MiniChallengeCard';
+import { PromptStructurePanel } from '../prompt/PromptStructurePanel';
+import { 
+  analyzePromptStructure, 
+  PromptAnalysis, 
+  PromptSpan, 
+  PromptComponentType 
+} from '../../services/promptStructureAnalyzer';
 import { PromptVersionBar } from '../common/PromptVersionBar';
 import { ABCompareModal } from '../common/ABCompareModal';
 import { SavePromptModal } from '../common/SavePromptModal';
@@ -36,6 +47,8 @@ interface Props {
   onActiveContextChange?: (lab: LabStep, prompt: string, runCount: number) => void;
   onOpenTutorial?: () => void;
   initialLabId?: string;
+  currentLearnerId?: string;
+  currentClassId?: string;
 }
 
 export const HybridView: React.FC<Props> = ({
@@ -46,6 +59,8 @@ export const HybridView: React.FC<Props> = ({
   onActiveContextChange,
   onOpenTutorial,
   initialLabId,
+  currentLearnerId,
+  currentClassId,
 }) => {
   // Chỉ số bài lab hiện tại (0 -> labs.length - 1)
   const [currentLabIndex, setCurrentLabIndex] = useState<number>(() => {
@@ -73,11 +88,14 @@ export const HybridView: React.FC<Props> = ({
   const [runCountsByLab, setRunCountsByLab] = useState<Record<string, number>>({});
   const currentLabRunCount = runCountsByLab[currentLab.id] || 0;
 
-  // Trạng thái ô nhập liệu & kết quả
-  const [promptText, setPromptText] = useState<string>(currentLab.baselinePrompt);
+  // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
+  const [promptText, setPromptText] = useState<string>(currentLab.starterPrompt || '');
   const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
   const [output, setOutput] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [runStatus, setRunStatus] = useState<'idle' | 'generating' | 'evaluating' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [aiEvaluation, setAiEvaluation] = useState<AiEvaluationResult | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isDataCopied, setIsDataCopied] = useState<boolean>(false);
 
@@ -100,12 +118,61 @@ export const HybridView: React.FC<Props> = ({
   const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false);
   const [versionToSave, setVersionToSave] = useState<PromptVersion | null>(null);
 
+  // Phân tích cấu trúc Prompt 7 thành phần & inline highlight
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(currentLab.starterPrompt || ''));
+  const [selectedSpan, setSelectedSpan] = useState<PromptSpan | null>(null);
+  const [currentSpanIndexByType, setCurrentSpanIndexByType] = useState<Record<string, number>>({});
+
+  // Debounce phân tích cấu trúc prompt (500ms) để không lag UI khi gõ và 0 LLM call
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const analysis = analyzePromptStructure(promptText);
+      setPromptAnalysis(analysis);
+      if (selectedSpan) {
+        const stillExists = analysis.components.find(c => c.type === selectedSpan.type && c.text === selectedSpan.text);
+        if (!stillExists) {
+          setSelectedSpan(null);
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [promptText]);
+
+  const handleSelectComponent = (type: PromptComponentType) => {
+    const matchingSpans = promptAnalysis.components.filter(c => c.type === type);
+    if (matchingSpans.length === 0) {
+      setSelectedSpan(null);
+      return;
+    }
+
+    // Nếu có nhiều span cùng type, lần lượt chuyển qua từng span khi click nhiều lần
+    const lastIndex = currentSpanIndexByType[type] ?? -1;
+    const nextIndex = (lastIndex + 1) % matchingSpans.length;
+    setCurrentSpanIndexByType(prev => ({ ...prev, [type]: nextIndex }));
+
+    const targetSpan = matchingSpans[nextIndex];
+    setSelectedSpan(targetSpan);
+
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      try {
+        textareaRef.current.setSelectionRange(targetSpan.start, targetSpan.end);
+      } catch (err) {
+        console.error('Error selecting text range:', err);
+      }
+    }
+  };
+
   // Đồng bộ khi chuyển bài lab
   useEffect(() => {
-    setPromptText(currentLab.baselinePrompt);
+    setPromptText(currentLab.starterPrompt || '');
     setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
     setOutput('');
     setScoreResult(null);
+    setAiEvaluation(null);
+    setErrorMessage(null);
     setMetrics(null);
     setCurrentStep(1);
     setSelectedVersionNumber(0);
@@ -114,7 +181,61 @@ export const HybridView: React.FC<Props> = ({
     setShowAdvancedSettings(false);
     setShowTechDetails(false);
     setShowScoreBreakdown(false);
+    setSelectedSpan(null);
+    setCurrentSpanIndexByType({});
+    setPromptAnalysis(analyzePromptStructure(currentLab.starterPrompt || ''));
   }, [currentLabIndex]);
+
+  // Tải lịch sử các lần chạy thật (Prompt Attempts) từ Supabase DB / LocalStore
+  useEffect(() => {
+    let isMounted = true;
+    if (currentLearnerId && currentClassId) {
+      dbService.getPromptAttempts(currentLearnerId, currentClassId, currentLab.id)
+        .then((attempts) => {
+          if (!isMounted || !attempts || attempts.length === 0) return;
+
+          const mappedVersions: PromptVersion[] = attempts.map(a => ({
+            id: a.id,
+            versionNumber: a.attempt_number,
+            labId: a.lesson_id,
+            promptText: a.prompt_text,
+            systemInstruction: systemText,
+            output: a.ai_output,
+            techniqueUsed: currentLab.badge,
+            detectedChanges: detectPromptComponents(a.prompt_text),
+            timestamp: a.created_at ? new Date(a.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
+            businessEvaluation: evaluateBusinessMetrics(a.prompt_text, a.ai_output, currentLab.sampleInputContext),
+            aiEvaluation: a.evaluation_json,
+            tokenCount: Math.round(a.ai_output.length / 3.8),
+            latencyMs: a.latency_ms
+          }));
+
+          setVersionsByLab(prev => ({
+            ...prev,
+            [currentLab.id]: mappedVersions
+          }));
+
+          setRunCountsByLab(prev => ({
+            ...prev,
+            [currentLab.id]: mappedVersions.length
+          }));
+
+          const latest = mappedVersions[mappedVersions.length - 1];
+          if (latest) {
+            setSelectedVersionNumber(latest.versionNumber);
+            setOutput(latest.output);
+            if (latest.aiEvaluation) {
+              setAiEvaluation(latest.aiEvaluation);
+              setScoreResult(mapAiEvaluationToRubricAudit(latest.aiEvaluation));
+            }
+          }
+        })
+        .catch(err => {
+          console.warn('[HybridView] Lỗi tải prompt_attempts:', err);
+        });
+    }
+    return () => { isMounted = false; };
+  }, [currentLab.id, currentLearnerId, currentClassId]);
 
   // Cập nhật ngữ cảnh ra ngoài cho AI Coach
   useEffect(() => {
@@ -124,7 +245,14 @@ export const HybridView: React.FC<Props> = ({
   }, [currentLab.id, promptText, currentLabRunCount]);
 
   const handleRun = async () => {
+    if (!promptText.trim()) {
+      setErrorMessage('Vui lòng nhập câu lệnh prompt trước khi nhấn Chạy.');
+      return;
+    }
+
     setIsRunning(true);
+    setRunStatus('generating');
+    setErrorMessage(null);
     setOutput('');
 
     // Tăng số lượt chạy của bài lab hiện tại
@@ -133,11 +261,8 @@ export const HybridView: React.FC<Props> = ({
       [currentLab.id]: (prev[currentLab.id] || 0) + 1
     }));
 
-    // Đánh giá và chấm điểm prompt
-    const evaluatedScore = evaluatePromptRubric(promptText);
-    setScoreResult(evaluatedScore);
-
     try {
+      // 1. GỬI PROMPT THỰC TẾ ĐẾN MÁY CHỦ LLM (POST /api/generate)
       const result = await executePromptStream(
         promptText,
         systemText,
@@ -145,19 +270,60 @@ export const HybridView: React.FC<Props> = ({
         apiConfig,
         (chunk) => {
           setOutput(chunk);
-        }
+        },
+        currentClassId,
       );
 
+      // Hiển thị ngay kết quả AI để học viên đọc được lập tức
+      setOutput(result.output);
+      setIsRunning(false);
       setMetrics({
         tokens: result.tokenCount,
         latency: result.latencyMs,
         mode: result.mode
       });
 
+      // 2. GỌI AI EVALUATION ĐỘC LẬP THEO RUBRIC MVP (POST /api/evaluate)
+      setRunStatus('evaluating');
+      let evalResult: AiEvaluationResult;
+      try {
+        evalResult = await evaluatePromptLive({
+          lessonId: currentLab.id,
+          classId: currentClassId,
+          scenario: currentLab.scenario,
+          controlData: currentLab.sampleInputContext,
+          taskRequirement: currentLab.taskGoal,
+          lessonRubric: currentLab.rubricCriteria,
+          learnerPrompt: promptText,
+          generatedOutput: result.output
+        });
+      } catch (judgeErr: any) {
+        console.warn('[HybridView] AI Judge fallback to heuristic rubric:', judgeErr);
+        const fallbackAudit = evaluatePromptRubric(promptText);
+        evalResult = {
+          scores: {
+            taskCompletion: Math.min(2, Math.max(0, Math.round(fallbackAudit.taskScore / 10))),
+            groundedness: Math.min(2, Math.max(0, Math.round(fallbackAudit.variableScore / 10))),
+            formatAdherence: Math.min(2, Math.max(0, Math.round(fallbackAudit.formatScore / 10))),
+            constraintCompliance: Math.min(2, Math.max(0, Math.round(fallbackAudit.guardrailsScore / 10))),
+            businessUsability: Math.min(2, Math.max(0, Math.round(fallbackAudit.personaScore / 10)))
+          },
+          total: Math.min(10, Math.max(1, Math.round(fallbackAudit.totalScore / 10))),
+          strengths: ['Đã kết nối thành công và nhận phản hồi từ mô hình AI thật.'],
+          improvements: [fallbackAudit.actionableAdvice || 'Nên bổ sung thêm các ràng buộc tiêu cực.'],
+          nextHint: 'Hãy thử thêm vai trò chuyên gia cụ thể và yêu cầu cấu trúc bảng ở lần thử tiếp theo.'
+        };
+      }
+
+      setAiEvaluation(evalResult);
+      const evaluatedScore = mapAiEvaluationToRubricAudit(evalResult);
+      setScoreResult(evaluatedScore);
+      setRunStatus('idle');
+
       // Cập nhật bước tiến trình nếu đang ở bước 1
       if (currentStep === 1) {
         setCurrentStep(2);
-      } else if (currentStep === 2 && evaluatedScore.totalScore >= 70) {
+      } else if (currentStep === 2 && evalResult.total >= 7) {
         setCurrentStep(3);
       }
 
@@ -174,9 +340,32 @@ export const HybridView: React.FC<Props> = ({
         versionTag: promptText.length > 250 ? 'improved' : 'baseline'
       });
 
-      // Tự động tạo và lưu trữ phiên bản lần thử (Prompt Versioning)
+      // 3. PERSIST ATTEMPT VÀO SUPABASE DATABASE (Bảng prompt_attempts)
       const labVers = versionsByLab[currentLab.id] || [];
       const newVerNum = labVers.length + 1;
+
+      if (currentLearnerId && currentClassId) {
+        try {
+          await dbService.recordPromptAttempt({
+            learner_id: currentLearnerId,
+            class_id: currentClassId,
+            lesson_id: currentLab.id,
+            lesson_ref_id: /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(currentLab.id)
+              ? currentLab.id
+              : null,
+            attempt_number: newVerNum,
+            prompt_text: promptText,
+            ai_output: result.output,
+            evaluation_json: evalResult,
+            model: 'gemini-3.5-flash-lite',
+            latency_ms: result.latencyMs
+          });
+        } catch (dbErr) {
+          console.warn('[HybridView] Lỗi lưu attempt vào DB:', dbErr);
+        }
+      }
+
+      // 4. LƯU PHIÊN BẢN (PROMPT VERSIONING CHO COMPARE MODE)
       const bizEval = evaluateBusinessMetrics(promptText, result.output, currentLab.sampleInputContext);
       const newVer: PromptVersion = {
         id: `ver-${currentLab.id}-${newVerNum}-${Date.now()}`,
@@ -189,6 +378,7 @@ export const HybridView: React.FC<Props> = ({
         detectedChanges: detectPromptComponents(promptText),
         timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
         businessEvaluation: bizEval,
+        aiEvaluation: evalResult,
         tokenCount: result.tokenCount,
         latencyMs: result.latencyMs,
       };
@@ -198,21 +388,24 @@ export const HybridView: React.FC<Props> = ({
         [currentLab.id]: [...(prev[currentLab.id] || []), newVer]
       }));
       setSelectedVersionNumber(newVerNum);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setOutput('Đã xảy ra lỗi khi thực thi. Vui lòng thử lại.');
+      setErrorMessage(err.message || 'Đã xảy ra lỗi khi thực thi câu lệnh. Vui lòng thử lại.');
+      setOutput('');
     } finally {
       setIsRunning(false);
+      setRunStatus('idle');
     }
   };
 
   const handleNextStepOrLab = () => {
     if (currentStep === 1) {
-      // Chuyển sang nạp gợi ý cải tiến cho bước 2
-      setPromptText(currentLab.improvedPrompt);
+      // Giữ nguyên prompt của học viên để họ tiếp tục cải tiến dựa trên AI Feedback
+      // Chỉ nạp gợi ý nếu ô hiện tại chưa có nội dung
+      if (!promptText.trim()) {
+        setPromptText(currentLab.improvedPrompt);
+      }
       setCurrentStep(2);
-      setOutput('');
-      setScoreResult(null);
     } else if (currentLabIndex < labs.length - 1) {
       // Chuyển sang bài tiếp theo
       setCurrentLabIndex(currentLabIndex + 1);
@@ -427,7 +620,10 @@ export const HybridView: React.FC<Props> = ({
               {/* Nút nạp nhanh tinh tế, không lấn át */}
               <div className="flex items-center gap-2 text-xs">
                 <button
-                  onClick={() => setPromptText(currentLab.baselinePrompt)}
+                  onClick={() => {
+                    setPromptText(currentLab.baselinePrompt);
+                    setSelectedSpan(null);
+                  }}
                   className="text-slate-500 hover:text-slate-800 transition"
                   title="Nạp prompt sơ sài ban đầu"
                 >
@@ -435,7 +631,10 @@ export const HybridView: React.FC<Props> = ({
                 </button>
                 <span className="text-slate-300">|</span>
                 <button
-                  onClick={() => setPromptText(currentLab.improvedPrompt)}
+                  onClick={() => {
+                    setPromptText(currentLab.improvedPrompt);
+                    setSelectedSpan(null);
+                  }}
                   className="text-emerald-700 hover:text-emerald-900 font-medium transition"
                   title="Nạp prompt đã thêm cấu trúc chuẩn"
                 >
@@ -450,7 +649,10 @@ export const HybridView: React.FC<Props> = ({
                 versions={currentLabVersions}
                 selectedVersionNumber={selectedVersionNumber}
                 onSelectVersion={(vNum) => setSelectedVersionNumber(vNum)}
-                onRestorePrompt={(restored) => setPromptText(restored)}
+                onRestorePrompt={(restored) => {
+                  setPromptText(restored);
+                  setSelectedSpan(null);
+                }}
                 onOpenCompare={() => setIsABModalOpen(true)}
                 onSaveToLibrary={(ver) => {
                   setVersionToSave(ver);
@@ -461,15 +663,24 @@ export const HybridView: React.FC<Props> = ({
 
             {/* Ô Prompt lớn là thành phần chính */}
             <textarea
+              ref={textareaRef}
               rows={8}
               value={promptText}
-              onChange={(e) => setPromptText(e.target.value)}
-              placeholder="Nhập câu lệnh của bạn tại đây..."
+              onChange={(e) => {
+                setPromptText(e.target.value);
+                if (errorMessage) setErrorMessage(null);
+              }}
+              placeholder={currentLab.promptPlaceholder || "Nhập câu lệnh của bạn tại đây..."}
               className="w-full p-4 text-xs sm:text-sm font-mono text-slate-900 bg-slate-50/50 rounded-xl border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 leading-relaxed transition"
             />
 
-            {/* Huy hiệu học tập nhận diện trực tiếp từ prompt */}
-            <LearningBadges promptText={promptText} runCount={currentLabRunCount} />
+            {/* Phân tích cấu trúc Prompt 7 thành phần & Trọng tâm bài học */}
+            <PromptStructurePanel
+              analysis={promptAnalysis}
+              focusComponents={currentLab.focusComponents}
+              selectedSpan={selectedSpan}
+              onSelectComponent={handleSelectComponent}
+            />
 
             {/* Thiết lập nâng cao (Mặc định đóng) */}
             <div className="border-t border-slate-100 pt-3">
@@ -498,6 +709,16 @@ export const HybridView: React.FC<Props> = ({
               )}
             </div>
 
+            {/* Thông báo lỗi nếu có */}
+            {errorMessage && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2 animate-fadeIn">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-semibold">{errorMessage}</p>
+                </div>
+              </div>
+            )}
+
             {/* Một CTA chính duy nhất: CHẠY PROMPT */}
             <button
               onClick={handleRun}
@@ -506,7 +727,15 @@ export const HybridView: React.FC<Props> = ({
               className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white font-bold text-sm shadow-sm hover:shadow transition flex items-center justify-center gap-2"
             >
               <Play className={`w-4 h-4 ${isRunning ? 'animate-spin' : 'fill-white'}`} />
-              <span>{isRunning ? 'Đang chạy câu lệnh...' : 'Chạy Prompt'}</span>
+              <span>
+                {runStatus === 'generating' 
+                  ? 'Đang tạo câu trả lời...' 
+                  : runStatus === 'evaluating' 
+                  ? 'AI đang đánh giá câu lệnh...' 
+                  : isRunning 
+                  ? 'Đang xử lý...' 
+                  : 'Chạy Prompt'}
+              </span>
             </button>
           </div>
 
@@ -556,7 +785,7 @@ export const HybridView: React.FC<Props> = ({
                 </div>
 
                 <div className="p-4 bg-slate-50 rounded-xl text-xs sm:text-sm text-slate-800 leading-relaxed overflow-x-auto min-h-[140px]">
-                  {isRunning ? (
+                  {runStatus === 'generating' && !output ? (
                     <div className="flex items-center gap-2 text-slate-500 py-6">
                       <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
                       <span>Đang nhận phản hồi từ mô hình...</span>
@@ -604,85 +833,201 @@ export const HybridView: React.FC<Props> = ({
                 onOpenFullCompare={() => setIsABModalOpen(true)}
               />
 
-              {/* Mini Challenge tùy chọn ở cuối bài */}
-              <MiniChallengeCard
-                challenge={currentLab.miniChallenge}
-                onApplyChallengePrompt={(promptStarter) => {
-                  setPromptText(promptStarter);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-              />
-
-              {/* Card chấm điểm nhỏ phía dưới output */}
-              {scoreResult && (
-                <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Award className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs font-bold text-slate-800">
-                        Đánh giá chất lượng Prompt:
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full font-bold text-xs ${
-                        scoreResult.totalScore >= 80 
-                          ? 'bg-emerald-100 text-emerald-800' 
-                          : scoreResult.totalScore >= 50 
-                          ? 'bg-amber-100 text-amber-800' 
-                          : 'bg-rose-100 text-rose-800'
-                      }`}>
-                        {scoreResult.totalScore} / 100 điểm
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
-                      className="text-xs text-slate-500 hover:text-slate-800"
-                    >
-                      {showScoreBreakdown ? 'Thu gọn' : 'Xem tiêu chí'}
-                    </button>
-                  </div>
-
-                  <p className="text-xs text-slate-600">
-                    {scoreResult.actionableAdvice}
-                  </p>
-
-                  {/* Chi tiết 5 tiêu chí nếu mở */}
-                  {showScoreBreakdown && (
-                    <div className="pt-2 mt-2 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs animate-fadeIn">
-                      <div className="p-2 bg-slate-50 rounded">
-                        <span className="text-[11px] text-slate-500 block">Rõ vai trò</span>
-                        <span className="font-bold text-slate-800">{scoreResult.personaScore}/20</span>
-                      </div>
-                      <div className="p-2 bg-slate-50 rounded">
-                        <span className="text-[11px] text-slate-500 block">Nhiệm vụ</span>
-                        <span className="font-bold text-slate-800">{scoreResult.taskScore}/20</span>
-                      </div>
-                      <div className="p-2 bg-slate-50 rounded">
-                        <span className="text-[11px] text-slate-500 block">Ràng buộc</span>
-                        <span className="font-bold text-slate-800">{scoreResult.guardrailsScore}/20</span>
-                      </div>
-                      <div className="p-2 bg-slate-50 rounded">
-                        <span className="text-[11px] text-slate-500 block">Tham số hóa</span>
-                        <span className="font-bold text-slate-800">{scoreResult.variableScore}/20</span>
-                      </div>
-                      <div className="p-2 bg-slate-50 rounded">
-                        <span className="text-[11px] text-slate-500 block">Định dạng</span>
-                        <span className="font-bold text-slate-800">{scoreResult.formatScore}/20</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Nút hành động tiếp tục sau khi chấm điểm */}
-                  <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={handleNextStepOrLab}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
-                    >
-                      <span>{currentStep === 1 ? 'Chuyển sang Bước 2 (Cải tiến prompt)' : currentLabIndex < labs.length - 1 ? 'Sang bài tiếp theo' : 'Hoàn thành khóa học'}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+              {/* Trạng thái AI đang đánh giá Rubric (không che khuất kết quả) */}
+              {runStatus === 'evaluating' && !aiEvaluation && (
+                <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
+                  <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                  <span className="font-semibold">AI đang phân tích và chấm điểm câu lệnh theo 5 tiêu chí Rubric...</span>
                 </div>
               )}
+
+              {/* Card chấm điểm & AI Feedback phía dưới output */}
+              {(() => {
+                const activeAiEval = (selectedVersionNumber > 0 
+                  ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.aiEvaluation 
+                  : null) || aiEvaluation;
+
+                if (activeAiEval) {
+                  return (
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3.5 animate-fadeIn">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Award className="w-4 h-4 text-emerald-600" />
+                          <span className="text-xs font-bold text-slate-800">
+                            AI Feedback & Đánh giá Rubric:
+                          </span>
+                          <span className={`px-2.5 py-0.5 rounded-full font-bold text-xs ${
+                            activeAiEval.total >= 8 
+                              ? 'bg-emerald-100 text-emerald-800' 
+                              : activeAiEval.total >= 5 
+                              ? 'bg-amber-100 text-amber-800' 
+                              : 'bg-rose-100 text-rose-800'
+                          }`}>
+                            {activeAiEval.total} / 10 điểm
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
+                          className="text-xs text-slate-500 hover:text-slate-800 font-medium transition"
+                        >
+                          {showScoreBreakdown ? 'Thu gọn' : 'Xem chi tiết'}
+                        </button>
+                      </div>
+
+                      {/* 5 tiêu chí Rubric chi tiết */}
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-500 block mb-0.5">Hoàn thành nhiệm vụ</span>
+                          <span className="font-bold text-slate-800">{activeAiEval.scores.taskCompletion}/2</span>
+                        </div>
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-500 block mb-0.5">Độ chuẩn xác / Căn cứ</span>
+                          <span className="font-bold text-slate-800">{activeAiEval.scores.groundedness}/2</span>
+                        </div>
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-500 block mb-0.5">Tuân thủ cấu trúc</span>
+                          <span className="font-bold text-slate-800">{activeAiEval.scores.formatAdherence}/2</span>
+                        </div>
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-500 block mb-0.5">Tuân thủ ràng buộc</span>
+                          <span className="font-bold text-slate-800">{activeAiEval.scores.constraintCompliance}/2</span>
+                        </div>
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                          <span className="text-[11px] text-slate-500 block mb-0.5">Tính ứng dụng thực tế</span>
+                          <span className="font-bold text-slate-800">{activeAiEval.scores.businessUsability}/2</span>
+                        </div>
+                      </div>
+
+                      {/* Điểm làm tốt, cần cải thiện */}
+                      {showScoreBreakdown && (
+                        <div className="pt-2 border-t border-slate-100 space-y-2.5 text-xs animate-fadeIn">
+                          {activeAiEval.strengths && activeAiEval.strengths.length > 0 && (
+                            <div>
+                              <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1 mb-1">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Điểm làm tốt:
+                              </span>
+                              <ul className="text-slate-600 pl-4 list-disc space-y-0.5">
+                                {activeAiEval.strengths.map((s: string, idx: number) => (
+                                  <li key={idx}>{s}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {activeAiEval.improvements && activeAiEval.improvements.length > 0 && (
+                            <div>
+                              <span className="text-[11px] font-semibold text-amber-700 flex items-center gap-1 mb-1">
+                                <ThumbsUp className="w-3.5 h-3.5 text-amber-600" /> Cần cải thiện:
+                              </span>
+                              <ul className="text-slate-600 pl-4 list-disc space-y-0.5">
+                                {activeAiEval.improvements.map((s: string, idx: number) => (
+                                  <li key={idx}>{s}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Gợi ý cho lần thử tiếp theo */}
+                      {activeAiEval.nextHint && (
+                        <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-800 flex items-start gap-2">
+                          <Lightbulb className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-semibold block mb-0.5">Gợi ý cho lần thử tiếp theo:</span>
+                            <span>{activeAiEval.nextHint}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Nút hành động tiếp tục sau khi chấm điểm */}
+                      <div className="pt-2 flex justify-end">
+                        <button
+                          onClick={handleNextStepOrLab}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
+                        >
+                          <span>{currentStep === 1 ? 'Chuyển sang Bước 2 (Cải tiến prompt)' : currentLabIndex < labs.length - 1 ? 'Sang bài tiếp theo' : 'Hoàn thành khóa học'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (scoreResult) {
+                  return (
+                    <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2 animate-fadeIn">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Award className="w-4 h-4 text-emerald-600" />
+                          <span className="text-xs font-bold text-slate-800">
+                            AI Feedback:
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full font-bold text-xs ${
+                            scoreResult.totalScore >= 80 
+                              ? 'bg-emerald-100 text-emerald-800' 
+                              : scoreResult.totalScore >= 50 
+                              ? 'bg-amber-100 text-amber-800' 
+                              : 'bg-rose-100 text-rose-800'
+                          }`}>
+                            {Math.round(scoreResult.totalScore / 10)} / 10 điểm
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
+                          className="text-xs text-slate-500 hover:text-slate-800"
+                        >
+                          {showScoreBreakdown ? 'Thu gọn' : 'Xem tiêu chí'}
+                        </button>
+                      </div>
+
+                      <p className="text-xs text-slate-600">
+                        {scoreResult.actionableAdvice}
+                      </p>
+
+                      {showScoreBreakdown && (
+                        <div className="pt-2 mt-2 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs animate-fadeIn">
+                          <div className="p-2 bg-slate-50 rounded">
+                            <span className="text-[11px] text-slate-500 block">Rõ vai trò</span>
+                            <span className="font-bold text-slate-800">{scoreResult.personaScore}/20</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded">
+                            <span className="text-[11px] text-slate-500 block">Nhiệm vụ</span>
+                            <span className="font-bold text-slate-800">{scoreResult.taskScore}/20</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded">
+                            <span className="text-[11px] text-slate-500 block">Ràng buộc</span>
+                            <span className="font-bold text-slate-800">{scoreResult.guardrailsScore}/20</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded">
+                            <span className="text-[11px] text-slate-500 block">Tham số hóa</span>
+                            <span className="font-bold text-slate-800">{scoreResult.variableScore}/20</span>
+                          </div>
+                          <div className="p-2 bg-slate-50 rounded">
+                            <span className="text-[11px] text-slate-500 block">Định dạng</span>
+                            <span className="font-bold text-slate-800">{scoreResult.formatScore}/20</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="pt-2 flex justify-end">
+                        <button
+                          onClick={handleNextStepOrLab}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
+                        >
+                          <span>{currentStep === 1 ? 'Chuyển sang Bước 2 (Cải tiến prompt)' : currentLabIndex < labs.length - 1 ? 'Sang bài tiếp theo' : 'Hoàn thành khóa học'}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return null;
+              })()}
             </div>
           )}
         </div>

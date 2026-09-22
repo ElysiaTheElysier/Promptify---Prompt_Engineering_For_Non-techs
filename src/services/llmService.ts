@@ -1,114 +1,31 @@
 import { ApiConfig, LabStep, PromptRun, RubricAudit } from '../types';
+import { AiEvaluationResult } from '../types/database';
+import { supabase } from './supabaseClient';
+
+async function getAuthenticatedApiHeaders(): Promise<Record<string, string>> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    throw new Error('Bạn cần đăng nhập và được ghi danh để sử dụng chức năng AI.');
+  }
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${session.access_token}`,
+  };
+}
 
 /**
- * Đánh giá chất lượng Prompt theo Rubric Audit từ tài liệu dự án
- * 5 Tiêu chuẩn: Persona, Task, Guardrails, Variables, Output Formatting
+ * Chuyển đổi kết quả AI Evaluation 5 tiêu chuẩn (0–2 điểm mỗi tiêu chí, tổng 0–10)
+ * sang định dạng RubricAudit hiển thị trực quan trên giao diện
  */
-export function evaluatePromptRubric(promptText: string): RubricAudit {
-  const text = promptText.toLowerCase();
-  
-  // 1. Persona Clarity (Rõ ràng về vai trò) - max 20
-  let personaScore = 5;
-  let personaNote = 'Chưa xác định vai trò chuyên môn cụ thể.';
-  if (
-    text.includes('bạn là') ||
-    text.includes('đóng vai trò') ||
-    text.includes('persona') ||
-    text.includes('vai trò là') ||
-    text.includes('role')
-  ) {
-    if (text.includes('chuyên viên') || text.includes('trưởng') || text.includes('trợ lý') || text.includes('expert') || text.includes('analyst')) {
-      personaScore = 20;
-      personaNote = 'Tuyệt vời: Đã định vị vai trò chuyên môn chuyên sâu, cung cấp thẩm quyền chuẩn mực.';
-    } else {
-      personaScore = 14;
-      personaNote = 'Khá tốt: Đã có chỉ định vai trò cơ bản nhưng có thể bổ sung thêm kinh nghiệm hoặc phòng ban cụ thể.';
-    }
-  }
+export function mapAiEvaluationToRubricAudit(evalResult: AiEvaluationResult): RubricAudit {
+  const { scores, total, strengths, improvements, nextHint } = evalResult;
 
-  // 2. Task Specificity (Cụ thể về nhiệm vụ) - max 20
-  let taskScore = 8;
-  let taskNote = 'Nhiệm vụ còn chung chung, mô hình dễ phỏng đoán sai mục đích.';
-  if (
-    text.includes('nhiệm vụ') ||
-    text.includes('mục tiêu') ||
-    text.includes('hãy phân tích') ||
-    text.includes('hãy chuyển thể') ||
-    text.includes('giải đáp') ||
-    text.includes('soạn')
-  ) {
-    if (text.length > 150) {
-      taskScore = 20;
-      taskNote = 'Rất tốt: Nhiệm vụ được mô tả chi tiết, rõ mục tiêu đầu ra.';
-    } else {
-      taskScore = 15;
-      taskNote = 'Tốt: Nhiệm vụ rõ ràng, có thể bổ sung thêm bối cảnh sử dụng.';
-    }
-  }
-
-  // 3. Guardrails & Constraints (Giới hạn & Ràng buộc) - max 20
-  let guardrailsScore = 0;
-  let guardrailsNote = 'Thiếu ràng buộc tiêu cực hoặc giới hạn hành vi (rất dễ bị AI bịa đặt hoặc văn phong đàm thoại).';
-  if (
-    text.includes('ràng buộc') ||
-    text.includes('tuyệt đối không') ||
-    text.includes('không dùng') ||
-    text.includes('constraints') ||
-    text.includes('nguyên tắc') ||
-    text.includes('chỉ dựa trên') ||
-    text.includes('lưu ý')
-  ) {
-    if (text.includes('tuyệt đối') || text.includes('chỉ') || text.includes('không được')) {
-      guardrailsScore = 20;
-      guardrailsNote = 'Tuyệt vời: Thiết lập hàng rào bảo vệ vững chắc, ngăn chặn ảo giác (hallucination) và từ ngữ cảm tính.';
-    } else {
-      guardrailsScore = 14;
-      guardrailsNote = 'Có ràng buộc nhưng nên bổ sung thêm quy tắc tiêu cực (Negative Prompting).';
-    }
-  }
-
-  // 4. Variable Parameterization (Tham số hóa biến số) - max 20
-  let variableScore = 0;
-  let variableNote = 'Các dữ liệu đầu vào đang gắn cứng, chưa đóng gói thành dạng {{biến_số}} để tái sử dụng.';
-  if (text.includes('{{') && text.includes('}}')) {
-    variableScore = 20;
-    variableNote = 'Rất chuyên nghiệp: Đã tham số hóa dữ liệu đầu vào bằng {{variable}} sẵn sàng đóng gói thành Template/Gem.';
-  } else if (text.includes('[dán') || text.includes('[đầu vào') || text.includes('<') && text.includes('>')) {
-    variableScore = 14;
-    variableNote = 'Đã có phân tách dữ liệu đầu vào nhưng nên dùng cú pháp {{tên_biến}} theo chuẩn EdTech.';
-  }
-
-  // 5. Output Formatting (Định dạng đầu ra) - max 20
-  let formatScore = 5;
-  let formatNote = 'Chưa chỉ định khuôn dạng đầu ra cụ thể, kết quả có thể khó tái sử dụng.';
-  if (
-    text.includes('markdown') ||
-    text.includes('bảng') ||
-    text.includes('table') ||
-    text.includes('định dạng') ||
-    text.includes('3 phần') ||
-    text.includes('cột') ||
-    text.includes('cấu trúc')
-  ) {
-    if (text.includes('bảng markdown') || (text.includes('|') && text.includes('cột')) || text.includes('phần:')) {
-      formatScore = 20;
-      formatNote = 'Xuất sắc: Định dạng đầu ra rõ ràng, hỗ trợ copy sang Excel/Email/Báo cáo ngay lập tức.';
-    } else {
-      formatScore = 15;
-      formatNote = 'Đã có yêu cầu định dạng, có thể cụ thể hóa tên từng cột hoặc danh sách mục.';
-    }
-  }
-
-  const totalScore = personaScore + taskScore + guardrailsScore + variableScore + formatScore;
-  
-  let actionableAdvice = '';
-  if (totalScore >= 80) {
-    actionableAdvice = 'Prompt đạt chuẩn cấp độ Chuyên gia! Đầy đủ vai trò, kiểm soát rủi ro và định dạng tối ưu.';
-  } else if (totalScore >= 50) {
-    actionableAdvice = 'Prompt mức Trung bình khá. Hãy bổ sung thêm các ràng buộc tiêu cực (Không dùng từ cảm tính, Không bịa đặt) và yêu cầu khuôn bảng Markdown.';
-  } else {
-    actionableAdvice = 'Prompt còn ở mức cơ bản (Zero-shot thô). Cần bổ sung Vai trò (Role), Ràng buộc (Constraints) và mẫu Định dạng cụ thể để AI không suy đoán ngẫu nhiên.';
-  }
+  // Quy đổi thang 0–2 sang thang 0–20 (Tổng 0–10 -> Tổng 0–100)
+  const taskScore = scores.taskCompletion * 10;
+  const variableScore = scores.groundedness * 10; // Groundedness
+  const formatScore = scores.formatAdherence * 10;
+  const guardrailsScore = scores.constraintCompliance * 10;
+  const personaScore = scores.businessUsability * 10; // Business Usability
 
   return {
     personaScore,
@@ -116,135 +33,139 @@ export function evaluatePromptRubric(promptText: string): RubricAudit {
     guardrailsScore,
     variableScore,
     formatScore,
-    totalScore,
-    personaNote,
-    taskNote,
-    guardrailsNote,
-    variableNote,
-    formatNote,
-    actionableAdvice
+    totalScore: total * 10,
+    personaNote: `Khả năng ứng dụng nghiệp vụ: ${scores.businessUsability}/2 điểm.`,
+    taskNote: `Mức độ hoàn thành nhiệm vụ: ${scores.taskCompletion}/2 điểm.`,
+    guardrailsNote: `Tuân thủ ràng buộc và điều cấm: ${scores.constraintCompliance}/2 điểm.`,
+    variableNote: `Mức độ bám sát dữ liệu (Groundedness): ${scores.groundedness}/2 điểm.`,
+    formatNote: `Tuân thủ định dạng yêu cầu: ${scores.formatAdherence}/2 điểm.`,
+    actionableAdvice: nextHint || (improvements.length > 0 ? improvements.join('. ') : 'Tiếp tục phát huy phong cách prompt chuẩn.')
   };
 }
 
 /**
- * Thực thi gọi Prompt (Hỗ trợ cả Mô phỏng Chân thực và Live Gemini API)
+ * Đánh giá fallback cục bộ nếu máy chủ gặp sự cố
+ */
+export function evaluatePromptRubric(promptText: string): RubricAudit {
+  const text = promptText.toLowerCase();
+  
+  let personaScore = text.includes('bạn là') || text.includes('vai trò') ? 15 : 5;
+  let taskScore = text.includes('hãy') || text.includes('phân tích') || text.includes('nhiệm vụ') ? 15 : 8;
+  let guardrailsScore = text.includes('tuyệt đối không') || text.includes('không được') || text.includes('chỉ') ? 15 : 5;
+  let variableScore = text.includes('{{') || text.includes('dữ liệu') ? 15 : 5;
+  let formatScore = text.includes('bảng') || text.includes('markdown') ? 15 : 5;
+
+  const totalScore = personaScore + taskScore + guardrailsScore + variableScore + formatScore;
+  return {
+    personaScore,
+    taskScore,
+    guardrailsScore,
+    variableScore,
+    formatScore,
+    totalScore,
+    personaNote: 'Vai trò chuyên môn.',
+    taskNote: 'Mô tả nhiệm vụ.',
+    guardrailsNote: 'Ràng buộc tiêu cực.',
+    variableNote: 'Dữ liệu đầu vào.',
+    formatNote: 'Định dạng đầu ra.',
+    actionableAdvice: totalScore >= 70 ? 'Prompt đã khá tốt!' : 'Nên bổ sung thêm vai trò và định dạng bảng.'
+  };
+}
+
+/**
+ * Thực thi gọi Prompt qua Serverless Backend Endpoint POST /api/generate
+ * Bảo vệ an toàn tuyệt đối API Key trên server.
  */
 export async function executePromptStream(
   promptText: string,
   systemInstruction: string,
   lab: LabStep,
   apiConfig: ApiConfig,
-  onChunk: (chunk: string) => void
-): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'simulated' | 'gemini' }> {
+  onChunk: (chunk: string) => void,
+  classId?: string,
+): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'gemini' | 'simulated' }> {
   const startTime = performance.now();
+  const headers = await getAuthenticatedApiHeaders();
 
-  // Chế độ 1: LIVE GEMINI API (Nếu người dùng nhập Key và chọn Gemini)
-  if (apiConfig.mode === 'gemini' && apiConfig.geminiApiKey) {
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      lessonId: lab.id,
+      classId,
+      prompt: promptText,
+      context: lab.sampleInputContext
+    })
+  });
+
+  if (!response.ok) {
+    let errorMsg = `Lỗi máy chủ (${response.status})`;
     try {
-      const model = apiConfig.model || 'gemini-1.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiConfig.geminiApiKey}`;
-
-      const contents = [
-        {
-          role: 'user',
-          parts: [{ text: promptText }]
-        }
-      ];
-
-      const requestBody: Record<string, unknown> = {
-        contents,
-        generationConfig: {
-          temperature: apiConfig.temperature ?? 0.3,
-          maxOutputTokens: 2048,
-        }
-      };
-
-      if (systemInstruction && systemInstruction.trim()) {
-        requestBody.systemInstruction = {
-          parts: [{ text: systemInstruction }]
-        };
-      }
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini API Lỗi (${response.status}): ${errorText}`);
-      }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullOutput = '';
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunkStr = decoder.decode(value, { stream: true });
-          const lines = chunkStr.split('\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const jsonStr = line.replace('data: ', '').trim();
-              if (jsonStr === '[DONE]') continue;
-              try {
-                const parsed = JSON.parse(jsonStr);
-                const textPart = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                if (textPart) {
-                  fullOutput += textPart;
-                  onChunk(fullOutput);
-                }
-              } catch {
-                // Ignore parse errors on partial sse chunks
-              }
-            }
-          }
-        }
-      }
-
-      const latencyMs = Math.round(performance.now() - startTime);
-      const tokenCount = Math.round(fullOutput.length / 4);
-      return { output: fullOutput, tokenCount, latencyMs, mode: 'gemini' };
-    } catch (err: unknown) {
-      console.warn('Lỗi gọi Gemini API, tự động chuyển về Simulated Engine:', err);
-      // Fallback to simulated if live API failed
+      const errJson = await response.json();
+      if (errJson.error) errorMsg = errJson.error;
+    } catch {
+      // fallback
     }
+    throw new Error(errorMsg);
   }
 
-  // Chế độ 2: SIMULATED ENGINE (Mặc định cho trải nghiệm mượt mà, không tốn phí)
-  // Xác định xem prompt gần với improvedPrompt hay baselinePrompt
-  const isImproved = promptText.length > 250 || 
-    promptText.includes('bảng') || 
-    promptText.includes('markdown') || 
-    promptText.includes('ROLE') || 
-    promptText.includes('TASK') ||
-    promptText.includes('system_persona');
+  const data = await response.json();
+  const realOutput = data.output || '';
+  const latencyMs = data.latencyMs || Math.round(performance.now() - startTime);
+  const tokenCount = Math.round(realOutput.length / 3.8);
 
-  const targetOutput = isImproved ? lab.simulatedImprovedOutput : lab.simulatedBaselineOutput;
-
-  // Giả lập streaming từng từ để tạo cảm giác AI đang sinh văn bản thời gian thực
-  const words = targetOutput.split(' ');
+  // Hiệu ứng streaming chữ mượt mà trên dữ liệu thật trả về từ LLM
+  const words = realOutput.split(' ');
   let accumulated = '';
+  const step = Math.max(1, Math.floor(words.length / 40));
 
-  for (let i = 0; i < words.length; i++) {
-    accumulated += (i === 0 ? '' : ' ') + words[i];
+  for (let i = 0; i < words.length; i += step) {
+    const chunk = words.slice(i, i + step).join(' ');
+    accumulated += (accumulated ? ' ' : '') + chunk;
     onChunk(accumulated);
-    // Tốc độ streaming tự nhiên
-    const delay = Math.floor(Math.random() * 15) + 12;
-    await new Promise((resolve) => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, 15));
   }
-
-  const latencyMs = Math.round(performance.now() - startTime);
-  const tokenCount = Math.round(targetOutput.length / 3.8);
+  onChunk(realOutput);
 
   return {
-    output: targetOutput,
+    output: realOutput,
     tokenCount,
     latencyMs,
-    mode: 'simulated'
+    mode: 'gemini'
   };
 }
 
+/**
+ * Chấm điểm câu lệnh và kết quả thông qua endpoint POST /api/evaluate
+ */
+export async function evaluatePromptLive(params: {
+  lessonId: string;
+  classId?: string;
+  scenario: string;
+  controlData?: string;
+  taskRequirement: string;
+  lessonRubric?: any;
+  learnerPrompt: string;
+  generatedOutput: string;
+}): Promise<AiEvaluationResult> {
+  const headers = await getAuthenticatedApiHeaders();
+  const response = await fetch('/api/evaluate', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(params)
+  });
+
+  if (!response.ok) {
+    let errorMsg = `Lỗi máy chủ đánh giá (${response.status})`;
+    try {
+      const errJson = await response.json();
+      if (errJson.error) errorMsg = errJson.error;
+    } catch {
+      // fallback
+    }
+    throw new Error(errorMsg);
+  }
+
+  const result: AiEvaluationResult = await response.json();
+  return result;
+}

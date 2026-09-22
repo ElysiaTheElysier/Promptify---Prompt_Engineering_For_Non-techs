@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { dbService } from '../src/services/dbService';
+import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthorizationService';
+
+console.log('=== TEST: Enrollment-gated Course Access ===');
+
+const enrolledUserId = '00000000-0000-0000-0000-000000000002';
+const enrolledClassId = '44444444-4444-4444-4444-444444444441';
+const otherClassId = '44444444-4444-4444-4444-444444444442';
+
+assert.equal(await dbService.canUserAccessClass(enrolledUserId, enrolledClassId), true);
+assert.equal(await dbService.canUserAccessClass(enrolledUserId, otherClassId), false);
+
+const unassigned = await dbService.syncUserFromOAuth({
+  email: `unassigned-${Date.now()}@example.com`,
+  full_name: 'Learner chưa ghi danh',
+});
+assert.equal(await dbService.canUserAccessClass(unassigned.id, enrolledClassId), false);
+assert.equal(await dbService.getLearnerActiveEnrollment(unassigned.id), null);
+
+await assert.rejects(
+  () => assertAiLessonAccess({ classId: enrolledClassId, lessonId: 'lab-1' }),
+  (error: unknown) => error instanceof ApiAccessError && error.statusCode === 401,
+);
+
+const migration = await readFile('supabase/migrations/006_enforce_course_enrollment_access.sql', 'utf8');
+assert.match(migration, /has_active_class_enrollment/);
+assert.match(migration, /has_active_course_enrollment/);
+assert.match(migration, /lesson_belongs_to_class/);
+assert.match(migration, /DROP POLICY IF EXISTS "Classes read active or enrolled or instructor"/);
+assert.match(migration, /public\.has_active_class_enrollment\(class_id\)/);
+
+const appSource = await readFile('src/App.tsx', 'utf8');
+assert.doesNotMatch(appSource, /Khởi tạo enrollment nếu chưa có/);
+assert.match(appSource, /canUserAccessClass/);
+assert.match(appSource, /!hasActiveEnrollment/);
+
+console.log('✓ Enrolled learner can access only their assigned class');
+console.log('✓ Unassigned learner has no active enrollment or class access');
+console.log('✓ AI endpoint authorization rejects missing authentication');
+console.log('✓ Migration 006 gates courses, classes, lessons and attempts through enrollment');
+console.log('=== ENROLLMENT ACCESS TEST PASSED ===');

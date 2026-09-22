@@ -20,7 +20,7 @@ import {
 import { ClassCohort, Learner, Enrollment, LabStep, AppView } from '../../types';
 
 interface Props {
-  learner: Learner;
+  learner?: Learner | null;
   cohort: ClassCohort;
   enrollment: Enrollment;
   labs: LabStep[];
@@ -86,13 +86,18 @@ export const LearnerDashboard: React.FC<Props> = ({
               <span className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-mono text-xs font-bold">
                 {cohort.classCode}
               </span>
+              {learner?.id && (
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono text-[11px] font-bold">
+                  {learner.id}
+                </span>
+              )}
               <span className="text-xs font-semibold text-slate-500">
                 {cohort.organization} • {cohort.department}
               </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Xin chào, {learner.name} 👋
+              Xin chào, {learner?.name || 'Học viên'} 👋
             </h1>
 
             <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">
@@ -280,28 +285,7 @@ export const LearnerDashboard: React.FC<Props> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Tool 1: Free Playground */}
-          <div
-            onClick={() => onNavigate('playground')}
-            className="bg-white border border-slate-200/90 hover:border-emerald-500/60 rounded-2xl p-4 shadow-xs hover:shadow-md transition duration-200 cursor-pointer flex flex-col justify-between group"
-          >
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-slate-900 text-emerald-400 flex items-center justify-center">
-                <Sliders className="w-5 h-5" />
-              </div>
-              <h4 className="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                Free Playground
-              </h4>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Tự do thử prompt ngoài bài học, tuỳ chỉnh system instruction theo tình huống riêng của bạn.
-              </p>
-            </div>
-            <div className="pt-4 flex items-center text-xs font-semibold text-emerald-600 group-hover:text-emerald-700">
-              <span>Mở Playground</span>
-              <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition" />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
           {/* Tool 2: Prompt Library */}
           <div

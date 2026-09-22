@@ -27,6 +27,7 @@ interface Props {
   onClose: () => void;
   currentMode: UIMode;
   activeLab: LabStep;
+  userKey?: string;
 }
 
 interface ElementRect {
@@ -96,6 +97,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   onClose,
   currentMode,
   activeLab,
+  userKey,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [targetRect, setTargetRect] = useState<ElementRect | null>(null);
@@ -111,6 +113,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   );
   const currentStep = steps[currentStepIndex] || steps[0];
   const isLastStep = currentStepIndex === steps.length - 1;
+  const isCoachStep = currentStep.targetId === 'tour-coach' || currentStep.id === 'step-coach';
 
   // Lắng nghe thay đổi kích thước màn hình
   useEffect(() => {
@@ -134,6 +137,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
     placement,
     update,
   } = useFloating({
+    strategy: 'fixed',
     placement: initialPlacement,
     whileElementsMounted: autoUpdate,
     middleware: [
@@ -275,11 +279,13 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   };
 
   const handleSkip = () => {
+    if (userKey) localStorage.setItem(`promptify_tutorial_${userKey}_lesson_completed`, 'true');
     localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 
   const handleComplete = () => {
+    if (userKey) localStorage.setItem(`promptify_tutorial_${userKey}_lesson_completed`, 'true');
     localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
@@ -415,7 +421,14 @@ export const GuidedWalkthrough: React.FC<Props> = ({
         /* Layout Desktop: Định vị chính xác qua Floating UI với Arrow */
         <div
           ref={refs.setFloating}
-          style={{
+          style={isCoachStep ? {
+            position: 'fixed',
+            bottom: '92px',
+            right: '24px',
+            zIndex: 70,
+            opacity: isPositionReady ? 1 : 0,
+            transition: 'opacity 150ms ease, transform 150ms ease',
+          } : {
             ...floatingStyles,
             zIndex: 70,
             opacity: isPositionReady ? 1 : 0,
@@ -424,16 +437,18 @@ export const GuidedWalkthrough: React.FC<Props> = ({
           onClick={(e) => e.stopPropagation()}
           className="max-w-[390px] w-[390px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden font-sans animate-scaleIn"
         >
-          {/* Mũi tên Arrow của Floating UI chỉ về target */}
-          <FloatingArrow
-            ref={arrowRef}
-            context={context}
-            fill={arrowFill}
-            stroke="#E2E8F0"
-            strokeWidth={1}
-            width={14}
-            height={8}
-          />
+          {/* Mũi tên Arrow của Floating UI chỉ về target (nếu không phải coach step cố định) */}
+          {!isCoachStep && (
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              fill={arrowFill}
+              stroke="#E2E8F0"
+              strokeWidth={1}
+              width={14}
+              height={8}
+            />
+          )}
 
           {/* Header Popover */}
           <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -533,9 +548,16 @@ export const GuidedWalkthrough: React.FC<Props> = ({
           </div>
         </div>
       ) : (
-        /* Fallback khi không tìm thấy target trong DOM: Căn giữa màn hình an toàn */
+        /* Fallback khi không tìm thấy target trong DOM: Nếu là AI Coach thì ở góc phải dưới, còn lại căn giữa */
         <div
-          style={{
+          style={isCoachStep ? {
+            position: 'fixed',
+            bottom: isMobile ? '76px' : '92px',
+            right: isMobile ? '12px' : '24px',
+            maxWidth: isMobile ? 'calc(100vw - 24px)' : '390px',
+            width: isMobile ? 'calc(100vw - 24px)' : '390px',
+            zIndex: 70,
+          } : {
             position: 'fixed',
             top: '50%',
             left: '50%',
