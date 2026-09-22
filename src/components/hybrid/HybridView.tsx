@@ -47,6 +47,7 @@ interface Props {
   onActiveContextChange?: (lab: LabStep, prompt: string, runCount: number) => void;
   onOpenTutorial?: () => void;
   initialLabId?: string;
+  onSelectLab?: (labId: string) => void;
   currentLearnerId?: string;
   currentClassId?: string;
 }
@@ -59,6 +60,7 @@ export const HybridView: React.FC<Props> = ({
   onActiveContextChange,
   onOpenTutorial,
   initialLabId,
+  onSelectLab,
   currentLearnerId,
   currentClassId,
 }) => {
@@ -421,7 +423,9 @@ export const HybridView: React.FC<Props> = ({
       setCurrentStep(2);
     } else if (currentLabIndex < labs.length - 1) {
       // Chuyển sang bài tiếp theo
-      setCurrentLabIndex(currentLabIndex + 1);
+      const nextIndex = currentLabIndex + 1;
+      setCurrentLabIndex(nextIndex);
+      onSelectLab?.(labs[nextIndex].id);
     } else {
       // Đã hoàn thành toàn bộ bài lab
       setCurrentStep(3);
@@ -467,7 +471,11 @@ export const HybridView: React.FC<Props> = ({
             <div className="relative">
               <select
                 value={currentLabIndex}
-                onChange={(e) => setCurrentLabIndex(Number(e.target.value))}
+                onChange={(e) => {
+                  const nextIndex = Number(e.target.value);
+                  setCurrentLabIndex(nextIndex);
+                  onSelectLab?.(labs[nextIndex].id);
+                }}
                 className="appearance-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm py-1.5 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none transition"
               >
                 {labs.map((lab, index) => (

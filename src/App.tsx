@@ -28,6 +28,7 @@ import { InstructorViewShell } from './components/instructor/InstructorViewShell
 import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 import { dbService } from './services/dbService';
 import { mapCurriculumToLabs } from './services/curriculumAdapter';
+import { buildLessonUrl, readLessonId, resolveAuthorizedLessonId } from './services/lessonUrlState';
 
 export const App: React.FC = () => {
   // Trạng thái kiểm tra phiên đăng nhập (Ngăn loading vô hạn)
@@ -67,6 +68,7 @@ export const App: React.FC = () => {
   // Curriculum thật từ database; giữ LABS_DATA làm fallback khi chưa triển khai
   // migration hoặc khóa học chưa có nội dung đã xuất bản.
   const [labs, setLabs] = useState<LabStep[]>(LABS_DATA);
+  const [curriculumReadyKey, setCurriculumReadyKey] = useState<string | null>(null);
 
   // 5. Quản lý Tiến độ ghi danh (Enrollments)
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>(() => {
@@ -90,7 +92,9 @@ export const App: React.FC = () => {
 
   // 7. Bài lab hiện tại đang học
   const [activeLabId, setActiveLabId] = useState<string>(() => {
-    return sessionStorage.getItem('promptify_active_lab_id') || 'lab-1';
+    return readLessonId(window.location.search)
+      || sessionStorage.getItem('promptify_active_lab_id')
+      || 'lab-1';
   });
 
   // 8. Prompt đang được nạp vào Playground (khi chuyển từ Prompt Library sang)
@@ -157,31 +161,80 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false;
+    const readyKey = currentUser?.id && hasActiveEnrollment
+      ? `${currentUser.id}:${selectedCohort.id}`
+      : null;
+
+    setCurriculumReadyKey(null);
+    if (!readyKey) return () => { cancelled = true; };
 
     const loadCourseCurriculum = async () => {
       try {
         const classDetails = await dbService.getClassDetail(selectedCohort.id);
-        if (!classDetails) return;
+        if (!classDetails) {
+          if (!cancelled) setLabs(LABS_DATA);
+          return;
+        }
         const curriculum = await dbService.getCourseCurriculum(classDetails.course_id);
         const databaseLabs = mapCurriculumToLabs(curriculum);
         if (cancelled) return;
         if (databaseLabs.length === 0) {
           setLabs(LABS_DATA);
-          setActiveLabId((current) => LABS_DATA.some((lab) => lab.id === current) ? current : LABS_DATA[0].id);
           return;
         }
 
         setLabs(databaseLabs);
-        setActiveLabId((current) => databaseLabs.some((lab) => lab.id === current) ? current : databaseLabs[0].id);
       } catch (error) {
         // Migration chưa được deploy hoặc phiên chưa có quyền: tiếp tục dùng static fallback.
         console.warn('[App] Không thể tải curriculum từ database, dùng LABS_DATA fallback:', error);
+        if (!cancelled) setLabs(LABS_DATA);
+      } finally {
+        if (!cancelled) setCurriculumReadyKey(readyKey);
       }
     };
 
     loadCourseCurriculum();
     return () => { cancelled = true; };
-  }, [selectedCohort.id, currentUser?.id]);
+  }, [selectedCohort.id, currentUser?.id, hasActiveEnrollment]);
+
+  // URL là source of truth cho bài đang mở, nhưng chỉ được đọc sau khi curriculum
+  // của đúng user/lớp đã tải xong và đã qua enrollment authorization.
+  useEffect(() => {
+    const expectedReadyKey = currentUser?.id && hasActiveEnrollment
+      ? `${currentUser.id}:${selectedCohort.id}`
+      : null;
+    if (!expectedReadyKey || curriculumReadyKey !== expectedReadyKey || labs.length === 0) return;
+
+    const applyLocation = (historyMode: 'replace' | 'pop') => {
+      const requestedId = readLessonId(window.location.search);
+      if (!requestedId && historyMode === 'pop') {
+        setCurrentView('dashboard');
+        return;
+      }
+      if (!requestedId && currentView !== 'lesson') return;
+
+      const authorizedIds = labs.map((lab) => lab.id);
+      const resolvedId = resolveAuthorizedLessonId(requestedId, authorizedIds, activeLabId);
+      if (!resolvedId) return;
+
+      setActiveLabId(resolvedId);
+      const resolvedLab = labs.find((lab) => lab.id === resolvedId);
+      if (resolvedLab) {
+        setActiveLab(resolvedLab);
+        setActivePrompt(resolvedLab.baselinePrompt);
+      }
+      setCurrentView('lesson');
+
+      if (requestedId !== resolvedId) {
+        window.history.replaceState({}, '', buildLessonUrl(window.location.href, resolvedId));
+      }
+    };
+
+    applyLocation('replace');
+    const handlePopState = () => applyLocation('pop');
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [curriculumReadyKey, currentUser?.id, hasActiveEnrollment, selectedCohort.id, labs]);
 
   useEffect(() => {
     sessionStorage.setItem('promptify_lesson_mode', preferredLessonMode);
@@ -659,6 +712,7 @@ export const App: React.FC = () => {
       return;
     }
     setActiveLabId(labId);
+    window.history.pushState({}, '', buildLessonUrl(window.location.href, labId));
     const lab = labs.find((l) => l.id === labId);
     if (lab) {
       setActiveLab(lab);
@@ -830,6 +884,10 @@ export const App: React.FC = () => {
               onActiveContextChange={handleActiveContextChange}
               onOpenTutorial={() => setIsTutorialOpen(true)}
               initialLabId={activeLabId}
+              onSelectLab={(labId) => {
+                setActiveLabId(labId);
+                window.history.pushState({}, '', buildLessonUrl(window.location.href, labId));
+              }}
               currentLearnerId={currentLearner?.id || currentUser?.id}
               currentClassId={selectedCohort?.id}
             />
