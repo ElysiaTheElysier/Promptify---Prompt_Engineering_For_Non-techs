@@ -961,29 +961,6 @@ export const HybridView: React.FC<Props> = ({
                 )}
               </div>
 
-              {/* Thông báo lỗi khi AI Judge không thể đánh giá */}
-              {evaluationError && runStatus !== 'evaluating' && !aiEvaluation && output && (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900 animate-fadeIn">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-start gap-2.5">
-                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                      <div>
-                        <p className="font-semibold">AI chưa thể đánh giá lần này.</p>
-                        <p className="mt-1 text-amber-800">{evaluationError}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleRetryEvaluation}
-                      className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-2 font-semibold text-amber-900 hover:bg-amber-100"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                      Thử chấm lại
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* Trạng thái AI đang đánh giá Rubric (không che khuất kết quả) */}
               {(runStatus === 'evaluating' || isRetryingEvaluation) && !aiEvaluation && (
                 <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
@@ -1184,7 +1161,7 @@ export const HybridView: React.FC<Props> = ({
                           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                           <div>
                             <h4 className="text-xs font-bold text-amber-900">
-                              Không thể đánh giá lúc này
+                              AI chưa thể đánh giá lần này.
                             </h4>
                             <p className="text-xs text-amber-800 mt-1 leading-relaxed">
                               {evaluationError || 'Hệ thống AI Judge chưa thể hoàn tất chấm điểm cho câu lệnh này do kết nối bị gián đoạn.'}
@@ -1201,7 +1178,7 @@ export const HybridView: React.FC<Props> = ({
                           className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:bg-slate-200 text-white font-bold text-xs shadow-xs transition"
                         >
                           <RotateCcw className={`w-3.5 h-3.5 ${isRetryingEvaluation ? 'animate-spin' : ''}`} />
-                          <span>Thử đánh giá lại</span>
+                          <span>Thử chấm lại</span>
                         </button>
                       </div>
                     </div>

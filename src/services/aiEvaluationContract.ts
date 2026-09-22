@@ -63,6 +63,9 @@ export function parseAiEvaluationText(rawText: string): AiEvaluationResult {
   const endIdx = cleaned.lastIndexOf('}');
   if (startIdx !== -1 && endIdx > startIdx) cleaned = cleaned.slice(startIdx, endIdx + 1);
 
+  // Xóa trailing comma trước dấu đóng object/array (lỗi phổ biến khi LLM sinh JSON)
+  cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
+
   try {
     return validateAiEvaluationPayload(JSON.parse(cleaned));
   } catch (error) {

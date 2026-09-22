@@ -38,6 +38,8 @@ export const ApiKeyModal: React.FC<Props> = ({ isOpen, onClose, config, onSaveCo
 
   if (!isOpen) return null;
 
+  const defaultClassroomKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+
   const handleTestConnection = async () => {
     const keyToTest = apiKey.trim();
     if (!keyToTest) {

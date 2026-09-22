@@ -191,7 +191,7 @@ async function callGeminiWithFallback(
               ...payload,
               generationConfig: payload.generationConfig
                 ? Object.fromEntries(Object.entries(payload.generationConfig).filter(([key]) => (
-                    key !== 'thinkingConfig' && (!model.startsWith('gemma-') || key !== 'responseMimeType')
+                    key !== 'thinkingConfig' && (!model.startsWith('gemma-') || (key !== 'responseMimeType' && key !== 'responseSchema'))
                   )))
                 : undefined,
             };
@@ -409,15 +409,34 @@ Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trư
       contents: [{ role: 'user', parts: [{ text: evaluationPrompt }] }],
       generationConfig: {
         temperature: 0.1,
-        maxOutputTokens: 600,
+        maxOutputTokens: 2048,
         responseMimeType: 'application/json',
-        thinkingConfig: {
-          thinkingBudget: 0,
-        },
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            scores: {
+              type: 'OBJECT',
+              properties: {
+                taskCompletion: { type: 'INTEGER' },
+                groundedness: { type: 'INTEGER' },
+                formatAdherence: { type: 'INTEGER' },
+                constraintCompliance: { type: 'INTEGER' },
+                businessUsability: { type: 'INTEGER' }
+              },
+              required: ['taskCompletion', 'groundedness', 'formatAdherence', 'constraintCompliance', 'businessUsability']
+            },
+            strengths: { type: 'ARRAY', items: { type: 'STRING' } },
+            improvements: { type: 'ARRAY', items: { type: 'STRING' } },
+            nextHint: { type: 'STRING' }
+          },
+          required: ['scores', 'strengths', 'improvements', 'nextHint']
+        }
       }
     };
     const { data } = await callGeminiWithFallback(geminiApiKey, payload, { allowJudgeGemmaFallback: true });
-    rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const textPart = parts.find((p: any) => !p.thought && typeof p.text === 'string' && p.text.trim()) || parts[parts.length - 1];
+    rawText = textPart?.text || '{}';
   }
 
   try {
