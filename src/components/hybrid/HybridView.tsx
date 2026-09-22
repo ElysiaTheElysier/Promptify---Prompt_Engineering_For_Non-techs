@@ -317,7 +317,9 @@ export const HybridView: React.FC<Props> = ({
         });
       } catch (judgeErr: any) {
         console.warn('[HybridView] AI Judge failed:', judgeErr);
-        throw new Error(`AI đã tạo kết quả nhưng chấm điểm thất bại: ${judgeErr.message || 'Vui lòng thử lại.'}`);
+        setErrorMessage(`AI đã tạo kết quả nhưng chấm điểm thất bại: ${judgeErr.message || 'Vui lòng thử lại.'}`);
+        setRunStatus('idle');
+        return;
       }
 
       setAiEvaluation(evalResult);

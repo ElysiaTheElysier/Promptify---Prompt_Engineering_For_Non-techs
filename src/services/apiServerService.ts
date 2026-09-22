@@ -45,7 +45,46 @@ function getGeminiApiKey(): string {
 }
 
 function getGeminiModel(): string {
-  return process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  return process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+}
+
+function getOpenAiApiKey(): string {
+  return (process.env.OPENAI_API_KEY || '').trim();
+}
+
+async function callOpenAiJudge(apiKey: string, prompt: string): Promise<string> {
+  const response = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      input: prompt,
+      max_output_tokens: 600,
+      store: false,
+    }),
+    signal: AbortSignal.timeout(20_000),
+  });
+
+  if (!response.ok) {
+    console.error(`[OpenAI Judge] HTTP ${response.status}.`);
+    throw new AiServerError(
+      response.status === 401 || response.status === 403
+        ? 'OPENAI_API_KEY trên máy chủ không hợp lệ hoặc không có quyền dùng model Judge.'
+        : response.status === 429
+          ? 'OpenAI Judge đang vượt giới hạn sử dụng. Vui lòng thử lại.'
+          : 'OpenAI Judge tạm thời không khả dụng. Vui lòng thử lại.',
+      response.status === 429 ? 503 : 502,
+    );
+  }
+
+  const data = await response.json() as any;
+  const outputText = data.output_text
+    || data.output?.flatMap((item: any) => item.content || []).find((item: any) => item.type === 'output_text')?.text;
+  if (!outputText) throw new AiServerError('OpenAI Judge không trả về nội dung hợp lệ.', 502);
+  return outputText;
 }
 
 /**
@@ -70,12 +109,14 @@ function parseJsonSafely(rawText: string): any {
  * Gọi Google Gemini API với cơ chế tự động thử lại (retry) và chuyển đổi dự phòng (fallback)
  * Ưu tiên các model Lite siêu tốc (800ms) để không bị nghẽn demand
  */
-async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ data: any; model: string }> {
-  const candidateModels = [
-    getGeminiModel(),
-    'gemini-2.5-flash-lite',
-    'gemini-2.5-flash'
-  ];
+async function callGeminiWithFallback(
+  apiKey: string,
+  payload: any,
+  options: { allowJudgeGemmaFallback?: boolean } = {},
+): Promise<{ data: any; model: string }> {
+  const candidateModels = options.allowJudgeGemmaFallback
+    ? ['gemini-3-flash-preview', 'gemma-4-26b-a4b-it']
+    : ['gemini-3-flash-preview', getGeminiModel(), 'gemini-flash-lite-latest'];
   // Loại bỏ model trùng lặp
   const models = Array.from(new Set(candidateModels));
   let lastError: Error | null = null;
@@ -84,12 +125,22 @@ async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ d
     const model = models[i];
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-    for (let attempt = 1; attempt <= 1; attempt++) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
       try {
+        const modelPayload = model.startsWith('gemini-3')
+          ? payload
+          : {
+              ...payload,
+              generationConfig: payload.generationConfig
+                ? Object.fromEntries(Object.entries(payload.generationConfig).filter(([key]) => (
+                    key !== 'thinkingConfig' && (!model.startsWith('gemma-') || key !== 'responseMimeType')
+                  )))
+                : undefined,
+            };
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(modelPayload),
           signal: AbortSignal.timeout(12_000),
         });
 
@@ -110,6 +161,10 @@ async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ d
             503,
           );
           console.warn(`[Gemini API] Model ${model} trả về HTTP ${response.status} (attempt ${attempt}). Chuyển fallback...`);
+          if (attempt < 2) {
+            await new Promise((resolve) => setTimeout(resolve, 750 * attempt));
+            continue;
+          }
         } else {
           console.error(`[Gemini API] Model ${model} trả về HTTP ${response.status}.`);
           // Giữ lỗi 503 có thể retry nếu các model fallback không tồn tại cho project này.
@@ -132,6 +187,9 @@ async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ d
             : 'Không thể kết nối với dịch vụ AI. Vui lòng thử lại.',
           503,
         );
+        if (attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 750 * attempt));
+        }
       }
     }
   }
@@ -231,72 +289,19 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
     ? typeof lessonRubric === 'string' ? lessonRubric : JSON.stringify(lessonRubric, null, 2)
     : 'Yêu cầu chuẩn: Đúng vai trò, bám sát dữ liệu đầu vào, xuất bảng hoặc định dạng chuẩn, không đàm thoại lan man.';
 
-  const evaluationPrompt = `Bạn là Giám khảo AI (Prompt Evaluator) trong chương trình đào tạo "Prompt Engineering for Non-techs".
-Nhiệm vụ: Đánh giá câu lệnh của học viên (Learner Prompt) và kết quả mô hình sinh ra (Generated Output) dựa trên bài tập và dữ liệu thực tế.
+  const evaluationPrompt = `Bạn là AI Judge. Chấm learner prompt và AI output theo đúng bài tập.
+Mỗi tiêu chí là số nguyên 0–2: taskCompletion, groundedness, formatAdherence, constraintCompliance, businessUsability.
+0 = không đạt; 1 = đạt một phần; 2 = đạt đầy đủ. Không trả chain-of-thought.
 
-[TÌNH HUỐNG BÀI HỌC]:
-${scenario || 'Tình huống nghiệp vụ ngân hàng.'}
+SCENARIO: ${scenario || 'Không có'}
+CONTROL DATA: ${controlData || 'Không có'}
+TASK: ${taskRequirement || 'Không có'}
+LESSON RUBRIC: ${rubricDescription}
+LEARNER PROMPT: ${learnerPrompt}
+AI OUTPUT: ${generatedOutput || '(Không có output)'}
 
-[DỮ LIỆU ĐẦU VÀO CỐ ĐỊNH (Control Data)]:
-${controlData || 'Dữ liệu được cung cấp trong bài học.'}
-
-[MỤC TIÊU BÀI HỌC CẦN ĐẠT]:
-${taskRequirement || 'Phân tích và chuyển hóa dữ liệu.'}
-
-[RUBRIC BÀI HỌC]:
-${rubricDescription}
-
-[CÂU LỆNH CỦA HỌC VIÊN]:
-${learnerPrompt}
-
-[KẾT QUẢ AI SINH RA]:
-${generatedOutput || '(Chưa có output)'}
-
----
-HÃY ĐÁNH GIÁ CHÍNH XÁC THEO 5 TIÊU CHÍ RUBRIC (0–2 điểm mỗi tiêu chí, Tổng 0–10 điểm):
-1. taskCompletion (0-2):
-   - 0: Không đạt yêu cầu hoặc sai lệch mục tiêu.
-   - 1: Đạt một phần mục tiêu nhưng còn thiếu thông tin nghiệp vụ quan trọng.
-   - 2: Hoàn thành trọn vẹn, chính xác mục tiêu bài toán.
-2. groundedness (0-2):
-   - 0: Bịa đặt thông tin, ảo giác hoặc đưa số liệu ngoài dữ liệu đầu vào.
-   - 1: Cơ bản đúng nhưng còn suy diễn một vài ý kiến chủ quan.
-   - 2: Bám chặt 100% vào dữ liệu/bằng chứng được cung cấp, không suy diễn.
-3. formatAdherence (0-2):
-   - 0: Sai định dạng yêu cầu (ví dụ yêu cầu bảng markdown nhưng trả về đoạn văn).
-   - 1: Có cấu trúc nhưng chưa đầy đủ cột hoặc định dạng chưa chuẩn.
-   - 2: Định dạng chuẩn chỉnh, sẵn sàng xuất ra Excel/Email/Báo cáo.
-4. constraintCompliance (0-2):
-   - 0: Vi phạm các ràng buộc, không tuân thủ quy tắc tiêu cực.
-   - 1: Tuân thủ phần lớn nhưng còn vi phạm nhỏ (ví dụ còn lời chào hỏi thừa).
-   - 2: Tuân thủ tuyệt đối mọi ràng buộc nghiệp vụ.
-5. businessUsability (0-2):
-   - 0: Văn phong đàm thoại lan man, không dùng được trong công việc.
-   - 1: Cần cán bộ dành nhiều thời gian biên tập lại mới dùng được.
-   - 2: Văn phong chuyên nghiệp chuẩn mực ngân hàng, dùng được ngay lập tức.
-
-YÊU CẦU ĐẦU RA:
-- Trả về DUY NHẤT một chuỗi JSON hợp lệ.
-- KHÔNG thêm markdown codeblock (\`\`\`json).
-- KHÔNG trả chain-of-thought hay phân tích dài dòng.
-- "strengths": mảng 1-3 nhận xét ngắn gọn về điểm làm tốt.
-- "improvements": mảng 1-3 nhận xét ngắn gọn về điểm cần cải thiện.
-- "nextHint": 1 câu hướng dẫn hành động cụ thể cho lần sửa tiếp theo.
-
-JSON CẤU TRÚC BẮT BUỘC:
-{
-  "scores": {
-    "taskCompletion": 0,
-    "groundedness": 0,
-    "formatAdherence": 0,
-    "constraintCompliance": 0,
-    "businessUsability": 0
-  },
-  "total": 0,
-  "strengths": ["..."],
-  "improvements": ["..."],
-  "nextHint": "..."
-}`;
+Chỉ trả JSON hợp lệ, không markdown:
+{"scores":{"taskCompletion":0,"groundedness":0,"formatAdherence":0,"constraintCompliance":0,"businessUsability":0},"strengths":["1–3 ý ngắn"],"improvements":["1–3 ý ngắn"],"nextHint":"một hành động cụ thể"}`;
 
   const payload = {
     contents: [
@@ -308,12 +313,21 @@ JSON CẤU TRÚC BẮT BUỘC:
     generationConfig: {
       temperature: 0.1, // Thấp để đảm bảo tính khách quan và nhất quán
       maxOutputTokens: 600, // Tối ưu token để phản hồi dưới 1 giây
-      responseMimeType: 'application/json'
+      responseMimeType: 'application/json',
+      thinkingConfig: {
+        thinkingBudget: 0,
+      },
     }
   };
 
-  const { data } = await callGeminiWithFallback(apiKey, payload);
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  const openAiApiKey = getOpenAiApiKey();
+  let rawText: string;
+  if (openAiApiKey) {
+    rawText = await callOpenAiJudge(openAiApiKey, evaluationPrompt);
+  } else {
+    const { data } = await callGeminiWithFallback(apiKey, payload, { allowJudgeGemmaFallback: true });
+    rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  }
 
   try {
     const parsed = parseJsonSafely(rawText);
