@@ -1,6 +1,7 @@
 import { ApiConfig, LabStep, PromptRun, RubricAudit } from '../types';
 import { AiEvaluationResult } from '../types/database';
 import { supabase } from './supabaseClient';
+import { validateAiEvaluationPayload } from './aiEvaluationContract';
 
 async function getAuthenticatedApiHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
@@ -167,6 +168,5 @@ export async function evaluatePromptLive(params: {
     throw new Error(errorMsg);
   }
 
-  const result: AiEvaluationResult = await response.json();
-  return result;
+  return validateAiEvaluationPayload(await response.json());
 }

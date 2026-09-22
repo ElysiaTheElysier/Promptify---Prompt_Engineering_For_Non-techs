@@ -1,4 +1,5 @@
 import type { AiEvaluationResult } from '../types/database.js';
+import { AiEvaluationValidationError, parseAiEvaluationText } from './aiEvaluationContract.js';
 
 export interface GenerateRequestBody {
   lessonId?: string;
@@ -64,6 +65,35 @@ async function callOpenAiJudge(apiKey: string, prompt: string): Promise<string> 
       input: prompt,
       max_output_tokens: 600,
       store: false,
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'prompt_evaluation',
+          strict: true,
+          schema: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['scores', 'strengths', 'improvements', 'nextHint'],
+            properties: {
+              scores: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['taskCompletion', 'groundedness', 'formatAdherence', 'constraintCompliance', 'businessUsability'],
+                properties: {
+                  taskCompletion: { type: 'integer', minimum: 0, maximum: 2 },
+                  groundedness: { type: 'integer', minimum: 0, maximum: 2 },
+                  formatAdherence: { type: 'integer', minimum: 0, maximum: 2 },
+                  constraintCompliance: { type: 'integer', minimum: 0, maximum: 2 },
+                  businessUsability: { type: 'integer', minimum: 0, maximum: 2 },
+                },
+              },
+              strengths: { type: 'array', items: { type: 'string' }, maxItems: 3 },
+              improvements: { type: 'array', items: { type: 'string' }, maxItems: 3 },
+              nextHint: { type: 'string' },
+            },
+          },
+        },
+      },
     }),
     signal: AbortSignal.timeout(20_000),
   });
@@ -129,24 +159,6 @@ async function callOpenAiGenerate(
     || data.output?.flatMap((item: any) => item.content || []).find((item: any) => item.type === 'output_text')?.text;
   if (!output) throw new AiServerError('OpenAI không trả về nội dung hợp lệ.', 502);
   return { output, model, tokens: data.usage?.total_tokens };
-}
-
-/**
- * Trích xuất JSON an toàn ngay cả khi mô hình trả về chuỗi có ký tự nháy hoặc cấu trúc lỗi
- */
-function parseJsonSafely(rawText: string): any {
-  let cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-  const startIdx = cleaned.indexOf('{');
-  const endIdx = cleaned.lastIndexOf('}');
-  if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-    cleaned = cleaned.slice(startIdx, endIdx + 1);
-  }
-
-  try {
-    return JSON.parse(cleaned);
-  } catch {
-    throw new AiServerError('AI Judge trả về dữ liệu không đúng định dạng. Vui lòng thử chấm lại.', 502);
-  }
 }
 
 /**
@@ -302,55 +314,23 @@ LESSON RUBRIC: ${rubricDescription}
 LEARNER PROMPT: ${learnerPrompt}
 AI OUTPUT: ${generatedOutput || '(Không có output)'}
 
-Chỉ trả JSON hợp lệ, không markdown:
-{"scores":{"taskCompletion":0,"groundedness":0,"formatAdherence":0,"constraintCompliance":0,"businessUsability":0},"strengths":["1–3 ý ngắn"],"improvements":["1–3 ý ngắn"],"nextHint":"một hành động cụ thể"}`;
+Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trường và không dùng điểm mặc định.`;
 
   const openAiApiKey = getOpenAiApiKey();
   if (!openAiApiKey) throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY cho AI Evaluation.', 503);
   const rawText = await callOpenAiJudge(openAiApiKey, evaluationPrompt);
 
   try {
-    const parsed = parseJsonSafely(rawText);
-
-    const clamp = (val: any) => {
-      const num = Number(val);
-      if (isNaN(num)) return 1;
-      return Math.max(0, Math.min(2, Math.round(num)));
-    };
-
-    const taskCompletion = clamp(parsed.scores?.taskCompletion);
-    const groundedness = clamp(parsed.scores?.groundedness);
-    const formatAdherence = clamp(parsed.scores?.formatAdherence);
-    const constraintCompliance = clamp(parsed.scores?.constraintCompliance);
-    const businessUsability = clamp(parsed.scores?.businessUsability);
-
-    const total = taskCompletion + groundedness + formatAdherence + constraintCompliance + businessUsability;
-
-    const evaluationResult: AiEvaluationResult = {
-      scores: {
-        taskCompletion,
-        groundedness,
-        formatAdherence,
-        constraintCompliance,
-        businessUsability
-      },
-      total,
-      strengths: Array.isArray(parsed.strengths) && parsed.strengths.length > 0 
-        ? parsed.strengths.slice(0, 3) 
-        : ['Đã thể hiện được nỗ lực chỉ dẫn mô hình thực hiện công việc.'],
-      improvements: Array.isArray(parsed.improvements) && parsed.improvements.length > 0 
-        ? parsed.improvements.slice(0, 3) 
-        : ['Nên bổ sung thêm các ràng buộc tiêu cực và yêu cầu định dạng bảng cụ thể.'],
-      nextHint: typeof parsed.nextHint === 'string' && parsed.nextHint.trim() 
-        ? parsed.nextHint.trim() 
-        : 'Hãy thử thêm vai trò chuyên gia cụ thể và yêu cầu cấu trúc bảng rõ ràng ở lần thử tiếp theo.'
-    };
-
-    return evaluationResult;
+    return parseAiEvaluationText(rawText);
   } catch (parseErr) {
-    console.error('Lỗi phân tích JSON từ AI Judge.');
-    throw parseErr instanceof AiServerError
-      ? parseErr
-      : new AiServerError('Không thể phân tích kết quả AI Judge. Vui lòng thử lại.', 502);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[OpenAI Judge] Evaluation validation failed:', parseErr instanceof Error ? parseErr.message : 'Unknown validation error');
+    }
+    throw new AiServerError(
+      parseErr instanceof AiEvaluationValidationError
+        ? `AI Judge trả về evaluation không hợp lệ: ${parseErr.message}`
+        : 'Không thể phân tích kết quả AI Judge. Vui lòng thử chấm lại.',
+      502,
+    );
   }
 }

@@ -19,9 +19,9 @@ import {
   CheckCircle2,
   Lightbulb
 } from 'lucide-react';
-import { LabStep, ApiConfig, PromptRun, PromptVersion } from '../../types';
+import { LabStep, ApiConfig, PromptRun, PromptVersion, RubricAudit } from '../../types';
 import { AiEvaluationResult } from '../../types/database';
-import { executePromptStream, evaluatePromptLive, mapAiEvaluationToRubricAudit, evaluatePromptRubric } from '../../services/llmService';
+import { executePromptStream, evaluatePromptLive, mapAiEvaluationToRubricAudit } from '../../services/llmService';
 import { detectPromptComponents, evaluateBusinessMetrics } from '../../services/businessEvaluationService';
 import { dbService } from '../../services/dbService';
 import { InlineCompareCard } from '../common/InlineCompareCard';
@@ -38,6 +38,7 @@ import { PromptVersionBar } from '../common/PromptVersionBar';
 import { ABCompareModal } from '../common/ABCompareModal';
 import { SavePromptModal } from '../common/SavePromptModal';
 import { MarkdownView } from '../common/MarkdownView';
+import { validateAiEvaluationPayload } from '../../services/aiEvaluationContract';
 
 interface Props {
   labs: LabStep[];
@@ -98,6 +99,7 @@ export const HybridView: React.FC<Props> = ({
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [runStatus, setRunStatus] = useState<'idle' | 'generating' | 'evaluating' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [evaluationError, setEvaluationError] = useState<string | null>(null);
   const [aiEvaluation, setAiEvaluation] = useState<AiEvaluationResult | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [isDataCopied, setIsDataCopied] = useState<boolean>(false);
@@ -108,8 +110,8 @@ export const HybridView: React.FC<Props> = ({
   const [showScoreBreakdown, setShowScoreBreakdown] = useState<boolean>(false);
 
   // Kết quả sau khi chạy
-  const [scoreResult, setScoreResult] = useState<ReturnType<typeof evaluatePromptRubric> | null>(null);
-  const [metrics, setMetrics] = useState<{ tokens: number; latency: number; mode: string } | null>(null);
+  const [scoreResult, setScoreResult] = useState<RubricAudit | null>(null);
+  const [metrics, setMetrics] = useState<{ tokens: number; latency: number; mode: string; model: string } | null>(null);
 
   // Quản lý các phiên bản câu lệnh (Prompt Versioning) theo từng lab
   const [versionsByLab, setVersionsByLab] = useState<Record<string, PromptVersion[]>>({});
@@ -193,6 +195,7 @@ export const HybridView: React.FC<Props> = ({
     setScoreResult(null);
     setAiEvaluation(null);
     setErrorMessage(null);
+    setEvaluationError(null);
     setMetrics(null);
     setCurrentStep(1);
     setSelectedVersionNumber(0);
@@ -212,21 +215,31 @@ export const HybridView: React.FC<Props> = ({
         .then((attempts) => {
           if (!isMounted || !attempts || attempts.length === 0) return;
 
-          const mappedVersions: PromptVersion[] = attempts.map(a => ({
-            id: a.id,
-            versionNumber: a.attempt_number,
-            labId: a.lesson_id,
-            promptText: a.prompt_text,
-            systemInstruction: systemText,
-            output: a.ai_output,
-            techniqueUsed: currentLab.badge,
-            detectedChanges: detectPromptComponents(a.prompt_text),
-            timestamp: a.created_at ? new Date(a.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
-            businessEvaluation: evaluateBusinessMetrics(a.prompt_text, a.ai_output, currentLab.sampleInputContext),
-            aiEvaluation: a.evaluation_json,
-            tokenCount: Math.round(a.ai_output.length / 3.8),
-            latencyMs: a.latency_ms
-          }));
+          const mappedVersions: PromptVersion[] = attempts.map((attempt) => {
+            let storedEvaluation: AiEvaluationResult | null = null;
+            if (attempt.evaluation_json) {
+              try {
+                storedEvaluation = validateAiEvaluationPayload(attempt.evaluation_json);
+              } catch (error) {
+                console.warn('[HybridView] Bỏ qua evaluation_json cũ không đúng contract:', error);
+              }
+            }
+            return {
+              id: attempt.id,
+              versionNumber: attempt.attempt_number,
+              labId: attempt.lesson_id,
+              promptText: attempt.prompt_text,
+              systemInstruction: systemText,
+              output: attempt.ai_output,
+              techniqueUsed: currentLab.badge,
+              detectedChanges: detectPromptComponents(attempt.prompt_text),
+              timestamp: attempt.created_at ? new Date(attempt.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
+              businessEvaluation: evaluateBusinessMetrics(attempt.prompt_text, attempt.ai_output, currentLab.sampleInputContext),
+              aiEvaluation: storedEvaluation,
+              tokenCount: Math.round(attempt.ai_output.length / 3.8),
+              latencyMs: attempt.latency_ms,
+            };
+          });
 
           setVersionsByLab(prev => ({
             ...prev,
@@ -271,6 +284,7 @@ export const HybridView: React.FC<Props> = ({
     setIsRunning(true);
     setRunStatus('generating');
     setErrorMessage(null);
+    setEvaluationError(null);
     setOutput('');
 
     // Tăng số lượt chạy của bài lab hiện tại
@@ -298,7 +312,8 @@ export const HybridView: React.FC<Props> = ({
       setMetrics({
         tokens: result.tokenCount,
         latency: result.latencyMs,
-        mode: result.mode
+        mode: result.mode,
+        model: result.model,
       });
 
       // 2. GỌI AI EVALUATION ĐỘC LẬP THEO RUBRIC MVP (POST /api/evaluate)
@@ -317,7 +332,9 @@ export const HybridView: React.FC<Props> = ({
         });
       } catch (judgeErr: any) {
         console.warn('[HybridView] AI Judge failed:', judgeErr);
-        setErrorMessage(`AI đã tạo kết quả nhưng chấm điểm thất bại: ${judgeErr.message || 'Vui lòng thử lại.'}`);
+        setAiEvaluation(null);
+        setScoreResult(null);
+        setEvaluationError(judgeErr.message || 'Vui lòng thử lại.');
         setRunStatus('idle');
         return;
       }
@@ -397,6 +414,48 @@ export const HybridView: React.FC<Props> = ({
       setOutput('');
     } finally {
       setIsRunning(false);
+      setRunStatus('idle');
+    }
+  };
+
+  const handleRetryEvaluation = async () => {
+    if (!promptText.trim() || !output.trim()) return;
+    setRunStatus('evaluating');
+    setEvaluationError(null);
+    try {
+      const evalResult = await evaluatePromptLive({
+        lessonId: currentLab.id,
+        classId: currentClassId,
+        scenario: currentLab.scenario,
+        controlData: currentLab.sampleInputContext,
+        taskRequirement: currentLab.taskGoal,
+        lessonRubric: currentLab.rubricCriteria,
+        learnerPrompt: promptText,
+        generatedOutput: output,
+      });
+      setAiEvaluation(evalResult);
+      setScoreResult(mapAiEvaluationToRubricAudit(evalResult));
+
+      if (currentLearnerId && currentClassId) {
+        await dbService.recordPromptAttempt({
+          learner_id: currentLearnerId,
+          class_id: currentClassId,
+          lesson_id: currentLab.id,
+          lesson_ref_id: /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(currentLab.id) ? currentLab.id : null,
+          attempt_number: (versionsByLab[currentLab.id]?.length || 0) + 1,
+          prompt_text: promptText,
+          ai_output: output,
+          evaluation_json: evalResult,
+          model: metrics?.model || 'openai',
+          latency_ms: metrics?.latency || 0,
+        });
+      }
+    } catch (judgeErr: any) {
+      console.warn('[HybridView] AI Judge retry failed:', judgeErr);
+      setAiEvaluation(null);
+      setScoreResult(null);
+      setEvaluationError(judgeErr.message || 'Vui lòng thử lại.');
+    } finally {
       setRunStatus('idle');
     }
   };
@@ -535,7 +594,11 @@ export const HybridView: React.FC<Props> = ({
                 : 'Tự viết prompt của bạn tại đây...'}
               samplePrompt={currentLab.improvedPrompt}
               textareaRef={textareaRef}
-              onChange={(value) => { setPromptText(value); if (errorMessage) setErrorMessage(null); }}
+              onChange={(value) => {
+                setPromptText(value);
+                if (errorMessage) setErrorMessage(null);
+                if (evaluationError) setEvaluationError(null);
+              }}
               onSupportModeChange={setSupportMode}
               onInsertBlock={insertPromptBlock}
               history={currentLabVersions.length > 0 ? (
@@ -706,6 +769,28 @@ export const HybridView: React.FC<Props> = ({
                 <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
                   <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0" />
                   <span className="font-semibold">AI đang phân tích và chấm điểm câu lệnh theo 5 tiêu chí Rubric...</span>
+                </div>
+              )}
+
+              {evaluationError && runStatus !== 'evaluating' && !aiEvaluation && output && (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900 animate-fadeIn">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-start gap-2.5">
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                      <div>
+                        <p className="font-semibold">AI chưa thể đánh giá lần này.</p>
+                        <p className="mt-1 text-amber-800">{evaluationError}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRetryEvaluation}
+                      className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-2 font-semibold text-amber-900 hover:bg-amber-100"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Thử chấm lại
+                    </button>
+                  </div>
                 </div>
               )}
 
