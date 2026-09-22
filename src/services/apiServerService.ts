@@ -1,4 +1,4 @@
-import { AiEvaluationResult } from '../types/database';
+import type { AiEvaluationResult } from '../types/database.js';
 
 export interface GenerateRequestBody {
   lessonId?: string;

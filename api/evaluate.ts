@@ -1,5 +1,5 @@
-import { AiServerError, handleEvaluateRequest } from '../src/services/apiServerService';
-import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthorizationService';
+import { AiServerError, handleEvaluateRequest } from '../src/services/apiServerService.js';
+import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthorizationService.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
