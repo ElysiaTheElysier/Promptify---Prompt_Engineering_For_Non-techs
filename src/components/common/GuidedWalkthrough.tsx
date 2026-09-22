@@ -27,7 +27,6 @@ interface Props {
   onClose: () => void;
   currentMode: UIMode;
   activeLab: LabStep;
-  userKey?: string;
 }
 
 interface ElementRect {
@@ -97,7 +96,6 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   onClose,
   currentMode,
   activeLab,
-  userKey,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [targetRect, setTargetRect] = useState<ElementRect | null>(null);
@@ -279,14 +277,10 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   };
 
   const handleSkip = () => {
-    if (userKey) localStorage.setItem(`promptify_tutorial_${userKey}_lesson_completed`, 'true');
-    localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 
   const handleComplete = () => {
-    if (userKey) localStorage.setItem(`promptify_tutorial_${userKey}_lesson_completed`, 'true');
-    localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 

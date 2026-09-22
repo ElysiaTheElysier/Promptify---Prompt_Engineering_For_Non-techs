@@ -94,12 +94,10 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 
   const handleSkip = () => {
-    localStorage.setItem('promptify_tutorial_completed', 'true');
     onClose();
   };
 
@@ -188,4 +186,3 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
     </div>
   );
 };
-

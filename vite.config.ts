@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { handleGenerateRequest, handleEvaluateRequest } from './src/services/apiServerService';
+import { AiServerError, handleGenerateRequest, handleEvaluateRequest } from './src/services/apiServerService';
 import { ApiAccessError, assertAiLessonAccess } from './src/services/apiAuthorizationService';
 
 function apiDevServerPlugin(): Plugin {
@@ -25,7 +25,7 @@ function apiDevServerPlugin(): Plugin {
               res.end(JSON.stringify(result));
             } catch (err: any) {
               res.setHeader('Content-Type', 'application/json');
-              res.statusCode = err instanceof ApiAccessError ? err.statusCode : 500;
+              res.statusCode = err instanceof ApiAccessError || err instanceof AiServerError ? err.statusCode : 500;
               res.end(JSON.stringify({ error: err.message || 'Lỗi server sinh AI' }));
             }
           });
@@ -49,7 +49,7 @@ function apiDevServerPlugin(): Plugin {
               res.end(JSON.stringify(result));
             } catch (err: any) {
               res.setHeader('Content-Type', 'application/json');
-              res.statusCode = err instanceof ApiAccessError ? err.statusCode : 500;
+              res.statusCode = err instanceof ApiAccessError || err instanceof AiServerError ? err.statusCode : 500;
               res.end(JSON.stringify({ error: err.message || 'Lỗi server chấm điểm AI' }));
             }
           });

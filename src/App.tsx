@@ -638,7 +638,6 @@ export const App: React.FC = () => {
 
   // Xử lý Reset toàn bộ luồng về Landing Page ban đầu
   const handleResetAll = async () => {
-    localStorage.removeItem('promptify_tutorial_completed');
     localStorage.removeItem('promptify_history');
     setActiveLabId('lab-1');
     setActiveLab(labs[0]);
@@ -661,20 +660,31 @@ export const App: React.FC = () => {
     }
   };
 
-  // Tự động kích hoạt tutorial khi vào bài học lần đầu tiên cho từng tài khoản
+  // Resolve từ DB trước khi mở để tutorial không flash sai sau reload/login.
   useEffect(() => {
-    if (currentView === 'lesson' && currentUser) {
-      const userKey = currentUser.id || currentUser.email;
-      const completedKey = `promptify_tutorial_${userKey}_lesson_completed`;
-      const isCompleted = localStorage.getItem(completedKey) === 'true';
-      if (!isCompleted) {
-        const timer = setTimeout(() => {
-          setIsTutorialOpen(true);
-        }, 500);
-        return () => clearTimeout(timer);
-      }
+    if (currentView !== 'lesson' || !currentUser?.id) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    dbService.hasCompletedTutorial(currentUser.id, 'lesson_workspace')
+      .then((completed) => {
+        if (!cancelled && !completed) {
+          timer = setTimeout(() => setIsTutorialOpen(true), 500);
+        }
+      })
+      .catch((error) => console.warn('[Tutorial] Không thể resolve trạng thái:', error));
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [currentView, currentUser?.id]);
+
+  const handleTutorialClose = () => {
+    setIsTutorialOpen(false);
+    if (currentUser?.id) {
+      void dbService.completeTutorial(currentUser.id, 'lesson_workspace')
+        .catch((error) => console.warn('[Tutorial] Không thể lưu trạng thái:', error));
     }
-  }, [currentView, currentUser]);
+  };
 
   // Xử lý Chọn lớp
   const handleSelectClass = async (cohort: ClassCohort): Promise<boolean> => {
@@ -719,13 +729,6 @@ export const App: React.FC = () => {
       setActivePrompt(lab.baselinePrompt);
     }
     setCurrentView('lesson');
-    // Nếu chưa hoàn thành tutorial, bật sau 500ms
-    const isCompleted = localStorage.getItem('promptify_tutorial_completed') === 'true';
-    if (!isCompleted) {
-      setTimeout(() => {
-        setIsTutorialOpen(true);
-      }, 500);
-    }
   };
 
   // Sử dụng Prompt từ Thư viện vào Bài thực hành
@@ -981,10 +984,9 @@ export const App: React.FC = () => {
       {/* Guided Visual Walkthrough */}
       <GuidedWalkthrough
         isOpen={isTutorialOpen}
-        onClose={() => setIsTutorialOpen(false)}
+        onClose={handleTutorialClose}
         currentMode="hybrid"
         activeLab={activeLab}
-        userKey={currentUser?.id || currentUser?.email}
       />
     </div>
   );

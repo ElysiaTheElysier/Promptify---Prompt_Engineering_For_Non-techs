@@ -1,4 +1,4 @@
-import { handleGenerateRequest } from '../src/services/apiServerService';
+import { AiServerError, handleGenerateRequest } from '../src/services/apiServerService';
 import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthorizationService';
 
 export default async function handler(req: any, res: any) {
@@ -26,7 +26,7 @@ export default async function handler(req: any, res: any) {
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error in /api/generate:', error);
-    const status = error instanceof ApiAccessError ? error.statusCode : 500;
+    const status = error instanceof ApiAccessError || error instanceof AiServerError ? error.statusCode : 500;
     return res.status(status).json({ error: error.message || 'Lỗi xử lý sinh văn bản AI' });
   }
 }

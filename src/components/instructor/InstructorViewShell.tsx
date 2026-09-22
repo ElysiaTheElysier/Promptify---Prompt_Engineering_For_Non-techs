@@ -117,25 +117,39 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
   const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
   const [tutorialView, setTutorialView] = useState<InstructorViewMode>('dashboard');
 
+  const tutorialKeyForView = (view: InstructorViewMode) => `instructor_${view}`;
+
   const handleOpenTutorial = (view?: InstructorViewMode) => {
     setTutorialView(view || currentView);
     setIsTutorialOpen(true);
   };
 
-  // Chỉ tự động mở walkthrough khi vào tab lần đầu tiên cho từng tài khoản (nếu chưa hoàn thành)
+  // Chỉ mở sau khi trạng thái DB của đúng user + screen đã resolve.
   useEffect(() => {
-    if (!currentUser) return;
-    const userKey = currentUser.id || currentUser.email;
-    const completedKey = `promptify_instructor_tutorial_${userKey}_${currentView}_completed`;
-    const isCompleted = localStorage.getItem(completedKey) === 'true';
-    if (!isCompleted) {
-      setTutorialView(currentView);
-      const timer = setTimeout(() => {
-        setIsTutorialOpen(true);
-      }, 350);
-      return () => clearTimeout(timer);
+    if (!currentUser?.id) return;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    dbService.hasCompletedTutorial(currentUser.id, tutorialKeyForView(currentView))
+      .then((completed) => {
+        if (!cancelled && !completed) {
+          setTutorialView(currentView);
+          timer = setTimeout(() => setIsTutorialOpen(true), 350);
+        }
+      })
+      .catch((error) => console.warn('[Instructor tutorial] Không thể resolve trạng thái:', error));
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [currentView, currentUser?.id]);
+
+  const handleTutorialClose = () => {
+    setIsTutorialOpen(false);
+    if (currentUser?.id) {
+      void dbService.completeTutorial(currentUser.id, tutorialKeyForView(tutorialView))
+        .catch((error) => console.warn('[Instructor tutorial] Không thể lưu trạng thái:', error));
     }
-  }, [currentView, currentUser]);
+  };
 
   const handleSelectClass = (cls: InstructorClass) => {
     setSelectedClass(cls);
@@ -298,8 +312,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
       <InstructorWalkthrough
         isOpen={isTutorialOpen}
         currentView={tutorialView}
-        userKey={currentUser?.id || currentUser?.email}
-        onClose={() => setIsTutorialOpen(false)}
+        onClose={handleTutorialClose}
       />
 
       {/* Footer */}

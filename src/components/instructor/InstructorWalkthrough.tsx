@@ -25,7 +25,6 @@ interface Props {
   isOpen: boolean;
   currentView: InstructorViewMode;
   onClose: () => void;
-  userKey?: string;
 }
 
 interface ElementRect {
@@ -70,7 +69,6 @@ export const InstructorWalkthrough: React.FC<Props> = ({
   isOpen,
   currentView,
   onClose,
-  userKey,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [targetRect, setTargetRect] = useState<ElementRect | null>(null);
@@ -254,14 +252,10 @@ export const InstructorWalkthrough: React.FC<Props> = ({
   };
 
   const handleSkip = () => {
-    if (userKey) localStorage.setItem(`promptify_instructor_tutorial_${userKey}_${currentView}_completed`, 'true');
-    localStorage.setItem(`promptify_instructor_tutorial_${currentView}_completed`, 'true');
     onClose();
   };
 
   const handleComplete = () => {
-    if (userKey) localStorage.setItem(`promptify_instructor_tutorial_${userKey}_${currentView}_completed`, 'true');
-    localStorage.setItem(`promptify_instructor_tutorial_${currentView}_completed`, 'true');
     onClose();
   };
 

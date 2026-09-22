@@ -83,7 +83,7 @@ export async function executePromptStream(
   apiConfig: ApiConfig,
   onChunk: (chunk: string) => void,
   classId?: string,
-): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'gemini' | 'simulated' }> {
+): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'gemini' | 'simulated'; model: string }> {
   const startTime = performance.now();
   const headers = await getAuthenticatedApiHeaders();
 
@@ -131,7 +131,8 @@ export async function executePromptStream(
     output: realOutput,
     tokenCount,
     latencyMs,
-    mode: 'gemini'
+    mode: 'gemini',
+    model: data.model || 'gemini'
   };
 }
 

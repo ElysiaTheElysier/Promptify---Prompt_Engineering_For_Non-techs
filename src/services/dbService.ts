@@ -187,6 +187,29 @@ const localStore = new LocalDbStore();
 // ==============================================================================
 
 export const dbService = {
+  async hasCompletedTutorial(userId: string, tutorialKey: string): Promise<boolean> {
+    if (!isSupabaseConfigured) return false;
+    const { data, error } = await supabase
+      .from('user_tutorial_progress')
+      .select('tutorial_key')
+      .eq('user_id', userId)
+      .eq('tutorial_key', tutorialKey)
+      .maybeSingle();
+    if (error) throw new Error(`Lỗi tải trạng thái hướng dẫn: ${error.message}`);
+    return Boolean(data);
+  },
+
+  async completeTutorial(userId: string, tutorialKey: string): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    const { error } = await supabase
+      .from('user_tutorial_progress')
+      .upsert(
+        { user_id: userId, tutorial_key: tutorialKey, completed_at: new Date().toISOString() },
+        { onConflict: 'user_id,tutorial_key' },
+      );
+    if (error) throw new Error(`Lỗi lưu trạng thái hướng dẫn: ${error.message}`);
+  },
+
   // ----------------------------------------------------------------------------
   // P0.2 — USERS & AUTH & ROLE ROUTING
   // ----------------------------------------------------------------------------
@@ -1231,10 +1254,10 @@ export const dbService = {
           return data as DbPromptAttempt;
         }
         if (error) {
-          console.warn('[dbService] Supabase insert prompt_attempts error, falling back to local:', error);
+          throw new Error(`Lỗi lưu prompt_attempts: ${error.message}`);
         }
       } catch (err) {
-        console.warn('[dbService] Exception inserting prompt_attempt:', err);
+        throw err instanceof Error ? err : new Error('Lỗi lưu prompt_attempts vào database.');
       }
     }
 

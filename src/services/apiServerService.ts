@@ -25,12 +25,22 @@ export interface EvaluateRequestBody {
   generatedOutput: string;
 }
 
+export class AiServerError extends Error {
+  statusCode: number;
+
+  constructor(message: string, statusCode: number) {
+    super(message);
+    this.name = 'AiServerError';
+    this.statusCode = statusCode;
+  }
+}
+
 /**
  * Lấy API key từ biến môi trường máy chủ (Server-only environment variable)
  * Tuyệt đối không đọc từ biến client VITE_*
  */
 function getGeminiApiKey(): string {
-  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
+  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
   return key.trim();
 }
 
@@ -52,33 +62,7 @@ function parseJsonSafely(rawText: string): any {
   try {
     return JSON.parse(cleaned);
   } catch {
-    // Regex extraction fallback nếu JSON.parse lỗi do ký tự unescaped
-    const getNum = (field: string) => {
-      const match = cleaned.match(new RegExp(`"${field}"\\s*:\\s*([0-2])`));
-      return match ? Number(match[1]) : 1;
-    };
-
-    const extractArray = (key: string): string[] => {
-      const match = cleaned.match(new RegExp(`"${key}"\\s*:\\s*\\[([^\\]]*)\\]`));
-      if (!match) return [];
-      const items = match[1].match(/"([^"\\]*(?:\\.[^"\\]*)*)"/g);
-      return items ? items.map(s => s.replace(/^"|"$/g, '').replace(/\\"/g, '"')) : [];
-    };
-
-    const nextHintMatch = cleaned.match(/"nextHint"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/);
-
-    return {
-      scores: {
-        taskCompletion: getNum('taskCompletion'),
-        groundedness: getNum('groundedness'),
-        formatAdherence: getNum('formatAdherence'),
-        constraintCompliance: getNum('constraintCompliance'),
-        businessUsability: getNum('businessUsability')
-      },
-      strengths: extractArray('strengths'),
-      improvements: extractArray('improvements'),
-      nextHint: nextHintMatch ? nextHintMatch[1].replace(/\\"/g, '"') : ''
-    };
+    throw new AiServerError('AI Judge trả về dữ liệu không đúng định dạng. Vui lòng thử chấm lại.', 502);
   }
 }
 
@@ -89,10 +73,8 @@ function parseJsonSafely(rawText: string): any {
 async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ data: any; model: string }> {
   const candidateModels = [
     getGeminiModel(),
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite',
-    'gemini-flash-lite-latest',
-    'gemini-3.6-flash'
+    'gemini-2.5-flash-lite',
+    'gemini-2.5-flash'
   ];
   // Loại bỏ model trùng lặp
   const models = Array.from(new Set(candidateModels));
@@ -102,12 +84,13 @@ async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ d
     const model = models[i];
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-    for (let attempt = 1; attempt <= 2; attempt++) {
+    for (let attempt = 1; attempt <= 1; attempt++) {
       try {
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(12_000),
         });
 
         if (response.ok) {
@@ -115,24 +98,40 @@ async function callGeminiWithFallback(apiKey: string, payload: any): Promise<{ d
           return { data, model };
         }
 
-        const errText = await response.text();
+        const errorBody = await response.json().catch(() => null) as any;
+        const upstreamMessage = errorBody?.error?.message;
 
         // 503 (High demand) hoặc 429 (Rate limit) -> Thử model khác nhanh chóng
         if (response.status === 503 || response.status === 429) {
+          lastError = new AiServerError(
+            response.status === 429
+              ? 'Dịch vụ AI đang vượt giới hạn sử dụng. Vui lòng thử lại sau ít phút.'
+              : 'Dịch vụ AI tạm thời quá tải. Vui lòng thử lại.',
+            503,
+          );
           console.warn(`[Gemini API] Model ${model} trả về HTTP ${response.status} (attempt ${attempt}). Chuyển fallback...`);
-          if (attempt < 2) {
-            await new Promise(r => setTimeout(r, 400));
-            continue;
-          }
         } else {
-          lastError = new Error(`Lỗi từ Gemini API (${response.status}): ${errText}`);
+          console.error(`[Gemini API] Model ${model} trả về HTTP ${response.status}.`);
+          // Giữ lỗi 503 có thể retry nếu các model fallback không tồn tại cho project này.
+          if (!(lastError instanceof AiServerError && lastError.statusCode === 503 && response.status === 404)) {
+            lastError = new AiServerError(
+              response.status === 400
+                ? `Gemini từ chối request${upstreamMessage ? `: ${upstreamMessage}` : '.'}`
+                : response.status === 401 || response.status === 403
+                  ? 'GEMINI_API_KEY trên máy chủ không hợp lệ hoặc không có quyền dùng model đã cấu hình.'
+                  : 'Không thể nhận phản hồi hợp lệ từ dịch vụ AI.',
+              response.status === 400 ? 400 : 502,
+            );
+          }
           break; // Không retry nếu là lỗi client
         }
       } catch (err: any) {
-        lastError = err;
-        if (attempt < 2) {
-          await new Promise(r => setTimeout(r, 300));
-        }
+        lastError = new AiServerError(
+          err?.name === 'TimeoutError' || err?.name === 'AbortError'
+            ? 'Dịch vụ AI phản hồi quá chậm. Vui lòng thử lại.'
+            : 'Không thể kết nối với dịch vụ AI. Vui lòng thử lại.',
+          503,
+        );
       }
     }
   }
@@ -147,14 +146,12 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
   const { prompt, context } = body;
 
   if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-    throw new Error('Câu lệnh prompt không được để trống.');
+    throw new AiServerError('Câu lệnh prompt không được để trống.', 400);
   }
 
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
-    throw new Error(
-      'Chưa cấu hình GEMINI_API_KEY trên máy chủ. Vui lòng thiết lập biến môi trường GEMINI_API_KEY trong file .env để kết nối AI thật.'
-    );
+    throw new AiServerError('Máy chủ chưa cấu hình GEMINI_API_KEY cho môi trường deployment.', 503);
   }
 
   const startTime = performance.now();
@@ -220,14 +217,12 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
   } = body;
 
   if (!learnerPrompt || !learnerPrompt.trim()) {
-    throw new Error('Learner prompt không được để trống khi đánh giá.');
+    throw new AiServerError('Learner prompt không được để trống khi đánh giá.', 400);
   }
 
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
-    throw new Error(
-      'Chưa cấu hình GEMINI_API_KEY trên máy chủ. Vui lòng thiết lập biến môi trường GEMINI_API_KEY trong file .env để thực hiện AI Evaluation.'
-    );
+    throw new AiServerError('Máy chủ chưa cấu hình GEMINI_API_KEY cho AI Evaluation.', 503);
   }
 
   const model = getGeminiModel();
@@ -359,20 +354,9 @@ JSON CẤU TRÚC BẮT BUỘC:
 
     return evaluationResult;
   } catch (parseErr) {
-    console.error('Lỗi phân tích JSON từ AI Judge:', rawText, parseErr);
-    // Fallback an toàn nếu AI trả JSON không đúng cấu trúc
-    return {
-      scores: {
-        taskCompletion: 1,
-        groundedness: 1,
-        formatAdherence: 1,
-        constraintCompliance: 1,
-        businessUsability: 1
-      },
-      total: 5,
-      strengths: ['Đã gửi yêu cầu đến mô hình thành công.'],
-      improvements: ['Cần cấu trúc rõ ràng hơn để AI judge đánh giá chuẩn xác.'],
-      nextHint: 'Hãy kiểm tra lại định dạng bảng hoặc các ràng buộc nghiệp vụ.'
-    };
+    console.error('Lỗi phân tích JSON từ AI Judge.');
+    throw parseErr instanceof AiServerError
+      ? parseErr
+      : new AiServerError('Không thể phân tích kết quả AI Judge. Vui lòng thử lại.', 502);
   }
 }

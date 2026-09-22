@@ -316,21 +316,8 @@ export const HybridView: React.FC<Props> = ({
           generatedOutput: result.output
         });
       } catch (judgeErr: any) {
-        console.warn('[HybridView] AI Judge fallback to heuristic rubric:', judgeErr);
-        const fallbackAudit = evaluatePromptRubric(promptText);
-        evalResult = {
-          scores: {
-            taskCompletion: Math.min(2, Math.max(0, Math.round(fallbackAudit.taskScore / 10))),
-            groundedness: Math.min(2, Math.max(0, Math.round(fallbackAudit.variableScore / 10))),
-            formatAdherence: Math.min(2, Math.max(0, Math.round(fallbackAudit.formatScore / 10))),
-            constraintCompliance: Math.min(2, Math.max(0, Math.round(fallbackAudit.guardrailsScore / 10))),
-            businessUsability: Math.min(2, Math.max(0, Math.round(fallbackAudit.personaScore / 10)))
-          },
-          total: Math.min(10, Math.max(1, Math.round(fallbackAudit.totalScore / 10))),
-          strengths: ['Đã kết nối thành công và nhận phản hồi từ mô hình AI thật.'],
-          improvements: [fallbackAudit.actionableAdvice || 'Nên bổ sung thêm các ràng buộc tiêu cực.'],
-          nextHint: 'Hãy thử thêm vai trò chuyên gia cụ thể và yêu cầu cấu trúc bảng ở lần thử tiếp theo.'
-        };
+        console.warn('[HybridView] AI Judge failed:', judgeErr);
+        throw new Error(`AI đã tạo kết quả nhưng chấm điểm thất bại: ${judgeErr.message || 'Vui lòng thử lại.'}`);
       }
 
       setAiEvaluation(evalResult);
@@ -363,8 +350,7 @@ export const HybridView: React.FC<Props> = ({
       const newVerNum = labVers.length + 1;
 
       if (currentLearnerId && currentClassId) {
-        try {
-          await dbService.recordPromptAttempt({
+        await dbService.recordPromptAttempt({
             learner_id: currentLearnerId,
             class_id: currentClassId,
             lesson_id: currentLab.id,
@@ -375,12 +361,9 @@ export const HybridView: React.FC<Props> = ({
             prompt_text: promptText,
             ai_output: result.output,
             evaluation_json: evalResult,
-            model: 'gemini-3.5-flash-lite',
+            model: result.model,
             latency_ms: result.latencyMs
-          });
-        } catch (dbErr) {
-          console.warn('[HybridView] Lỗi lưu attempt vào DB:', dbErr);
-        }
+        });
       }
 
       // 4. LƯU PHIÊN BẢN (PROMPT VERSIONING CHO COMPARE MODE)
