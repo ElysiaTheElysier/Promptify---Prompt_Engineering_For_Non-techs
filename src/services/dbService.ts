@@ -1088,7 +1088,7 @@ export const dbService = {
    * Khi Learner đăng nhập:
    * Resolve User -> LearnerID -> Enrollment active -> Class -> Course + Client + Industry
    */
-  async getLearnerActiveEnrollment(userId: string): Promise<LearnerActiveEnrollmentView | null> {
+  async getLearnerActiveEnrollments(userId: string): Promise<LearnerActiveEnrollmentView[]> {
     if (isSupabaseConfigured) {
       try {
         // Bước 1: Tìm bản ghi learner ứng với user_id
@@ -1099,11 +1099,11 @@ export const dbService = {
           .maybeSingle();
 
         if (lErr || !learner) {
-          return null;
+          return [];
         }
 
-        // Bước 2: Tìm enrollment đang active của learner
-        const { data: enrollment, error: eErr } = await supabase
+        // Bước 2: Lấy toàn bộ enrollment active để learner có thể đổi lớp.
+        const { data: enrollmentRows, error: eErr } = await supabase
           .from('enrollments')
           .select(`
             id,
@@ -1127,58 +1127,62 @@ export const dbService = {
           `)
           .eq('learner_id', learner.id)
           .eq('status', 'active')
-          .order('joined_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .order('joined_at', { ascending: false });
 
-        if (!eErr && enrollment && enrollment.class) {
-          const cls = enrollment.class as any;
-          return {
-            user: (learner as any).user,
-            learner: { id: learner.id, learner_code: learner.learner_code, user_id: userId },
-            enrollment: { 
-              id: enrollment.id, 
-              learner_id: enrollment.learner_id, 
-              class_id: enrollment.class_id, 
-              status: enrollment.status,
-              joined_at: enrollment.joined_at 
-            },
-            classDetails: {
-              ...cls,
-              course: cls.course,
-              client: cls.client,
-              learner_count: 1,
-            },
-          };
-        }
+        if (eErr || !enrollmentRows) return [];
+        return enrollmentRows
+          .filter((enrollment: any) => Boolean(enrollment.class))
+          .map((enrollment: any) => {
+            const cls = enrollment.class as any;
+            return {
+              user: (learner as any).user,
+              learner: { id: learner.id, learner_code: learner.learner_code, user_id: userId },
+              enrollment: {
+                id: enrollment.id,
+                learner_id: enrollment.learner_id,
+                class_id: enrollment.class_id,
+                status: enrollment.status,
+                joined_at: enrollment.joined_at,
+              },
+              classDetails: {
+                ...cls,
+                course: cls.course,
+                client: cls.client,
+                learner_count: 1,
+              },
+            } as LearnerActiveEnrollmentView;
+          });
       } catch (err) {
-        console.error('[dbService] Lỗi khi lấy active enrollment:', err);
+        console.error('[dbService] Lỗi khi lấy danh sách enrollment active:', err);
       }
-      return null;
+      return [];
     }
 
     // Local fallback store
     const users = localStore.getUsers();
     const user = users.find(u => u.id === userId);
-    if (!user) return null;
+    if (!user) return [];
 
     const learners = localStore.getLearners();
     const learner = learners.find(l => l.user_id === user.id);
-    if (!learner) return null;
+    if (!learner) return [];
 
     const enrollments = localStore.getEnrollments();
-    const activeEnrollment = enrollments.find(e => e.learner_id === learner.id && e.status === 'active');
-    if (!activeEnrollment) return null;
+    const activeEnrollments = enrollments
+      .filter(e => e.learner_id === learner.id && e.status === 'active')
+      .sort((a, b) => (b.joined_at || '').localeCompare(a.joined_at || ''));
 
-    const classDetails = await this.getClassDetail(activeEnrollment.class_id);
-    if (!classDetails) return null;
+    const views = await Promise.all(activeEnrollments.map(async (enrollment) => {
+      const classDetails = await this.getClassDetail(enrollment.class_id);
+      if (!classDetails) return null;
+      return { user, learner, enrollment, classDetails } as LearnerActiveEnrollmentView;
+    }));
+    return views.filter((view): view is LearnerActiveEnrollmentView => Boolean(view));
+  },
 
-    return {
-      user,
-      learner,
-      enrollment: activeEnrollment,
-      classDetails,
-    };
+  async getLearnerActiveEnrollment(userId: string): Promise<LearnerActiveEnrollmentView | null> {
+    const enrollments = await this.getLearnerActiveEnrollments(userId);
+    return enrollments[0] || null;
   },
 
   /**

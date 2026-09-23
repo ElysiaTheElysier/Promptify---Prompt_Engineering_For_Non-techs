@@ -51,6 +51,7 @@ export const App: React.FC = () => {
   // 1.1 Quản lý Vai trò (Learner vs Instructor - DUY NHẤT từ public.users.role)
   const [userRole, setUserRole] = useState<'LEARNER' | 'INSTRUCTOR' | null>(null);
   const [hasActiveEnrollment, setHasActiveEnrollment] = useState<boolean>(false);
+  const [enrolledClassIds, setEnrolledClassIds] = useState<string[]>([]);
 
   // 2. Quản lý Màn hình ứng dụng (App View - Khôi phục từ sessionStorage nếu tab đang mở)
   const [currentView, setCurrentView] = useState<AppView>(() => {
@@ -267,6 +268,9 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('promptify_cohort', JSON.stringify(selectedCohort));
+    if (selectedCohort?.id) {
+      sessionStorage.setItem('promptify_selected_class_id', selectedCohort.id);
+    }
   }, [selectedCohort]);
 
   useEffect(() => {
@@ -396,7 +400,9 @@ export const App: React.FC = () => {
       }
 
       // 3. Quyền Learner: DO DB QUYẾT ĐỊNH (public.users.role)
-      const activeView = await dbService.getLearnerActiveEnrollment(dbUser.id);
+      const activeViews = await dbService.getLearnerActiveEnrollments(dbUser.id);
+      const savedClassId = sessionStorage.getItem('promptify_selected_class_id');
+      const activeView = activeViews.find((view) => view.classDetails.id === savedClassId) || activeViews[0];
       if (activeView) {
         const learnerData: Learner = {
           id: activeView.learner.learner_code,
@@ -419,6 +425,7 @@ export const App: React.FC = () => {
         });
         setUserRole('LEARNER');
         setHasActiveEnrollment(true);
+        setEnrolledClassIds(activeViews.map((view) => view.classDetails.id));
 
         // Chọn đúng Class Cohort từ DB Class Details
         const cohortData: ClassCohort = {
@@ -481,6 +488,7 @@ export const App: React.FC = () => {
         });
         setUserRole('LEARNER');
         setHasActiveEnrollment(false);
+        setEnrolledClassIds([]);
         setCohorts([]);
         setCurrentView('class_select');
       }
@@ -501,6 +509,7 @@ export const App: React.FC = () => {
     setCurrentLearner(null);
     setUserRole(null);
     setHasActiveEnrollment(false);
+    setEnrolledClassIds([]);
     setCohorts([]);
     setCurrentView('landing');
     setSelectedCohort(CLASS_COHORTS[0]);
@@ -520,6 +529,7 @@ export const App: React.FC = () => {
     sessionStorage.removeItem('promptify_instructor_view');
     sessionStorage.removeItem('promptify_instructor_class_id');
     sessionStorage.removeItem('promptify_learner_table_class_id');
+    sessionStorage.removeItem('promptify_selected_class_id');
   };
 
   // Xử lý Đăng xuất an toàn tuyệt đối
@@ -701,6 +711,7 @@ export const App: React.FC = () => {
       const selfEnrollment = await dbService.selfEnrollInPublicClass(cohort.id);
       if (selfEnrollment) {
         canAccess = true;
+        setEnrolledClassIds((ids) => ids.includes(cohort.id) ? ids : [...ids, cohort.id]);
         setCurrentLearner((learner) => learner ? {
           ...learner,
           id: selfEnrollment.learnerCode,
@@ -715,7 +726,21 @@ export const App: React.FC = () => {
       return false;
     }
     setHasActiveEnrollment(true);
+    setEnrolledClassIds((ids) => ids.includes(cohort.id) ? ids : [...ids, cohort.id]);
     setSelectedCohort(cohort);
+    setCurrentLearner((learner) => learner ? {
+      ...learner,
+      organization: cohort.organization,
+      department: cohort.department,
+    } : learner);
+    setCurrentUser((user) => user ? {
+      ...user,
+      organization: cohort.organization,
+      department: cohort.department,
+    } : user);
+    const classUrl = new URL(window.location.href);
+    classUrl.searchParams.delete('lesson');
+    window.history.replaceState({}, '', classUrl.toString());
     setCurrentView('dashboard');
     return true;
   };
@@ -770,6 +795,9 @@ export const App: React.FC = () => {
     enrolledAt: new Date().toISOString(),
     expiresAt: new Date(Date.now() + 4 * 3600 * 1000).toISOString()
   };
+  const selectableCohorts = cohorts.filter((cohort) => (
+    cohort.isPublic || enrolledClassIds.includes(cohort.id) || (hasActiveEnrollment && cohort.id === selectedCohort.id)
+  ));
 
   // Loading Screen khi đang kiểm tra auth session hoặc đang đăng xuất
   if (isAuthLoading) {
@@ -808,7 +836,7 @@ export const App: React.FC = () => {
     return (
       <ClassSelectionScreen
         learner={currentLearner}
-        cohorts={cohorts}
+        cohorts={selectableCohorts}
         enrollments={{}}
         totalLabCount={labs.length}
         onSelectClass={handleSelectClass}
@@ -831,7 +859,7 @@ export const App: React.FC = () => {
     return (
       <ClassSelectionScreen
         learner={currentLearner}
-        cohorts={cohorts}
+        cohorts={selectableCohorts}
         enrollments={enrollments}
         totalLabCount={labs.length}
         onSelectClass={handleSelectClass}
@@ -858,6 +886,8 @@ export const App: React.FC = () => {
         currentView={currentView}
         onNavigate={setCurrentView}
         selectedCohort={selectedCohort}
+        availableCohorts={selectableCohorts}
+        onSelectClass={handleSelectClass}
         onChangeClass={() => setCurrentView('class_select')}
         learner={currentLearner}
         onLogout={handleLogout}

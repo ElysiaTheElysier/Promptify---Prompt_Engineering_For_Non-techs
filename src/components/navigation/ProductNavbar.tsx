@@ -2,13 +2,11 @@ import React from 'react';
 import { 
   Home, 
   Map, 
-  Sliders, 
   Bookmark, 
   History, 
   HelpCircle, 
   LogOut, 
   RefreshCw,
-  Sparkles,
   ChevronDown
 } from 'lucide-react';
 import { AppView, ClassCohort, Learner } from '../../types';
@@ -18,6 +16,8 @@ interface Props {
   currentView: AppView;
   onNavigate: (view: AppView) => void;
   selectedCohort?: ClassCohort | null;
+  availableCohorts: ClassCohort[];
+  onSelectClass: (cohort: ClassCohort) => Promise<boolean>;
   onChangeClass: () => void;
   learner?: Learner | null;
   onLogout: () => void;
@@ -29,12 +29,21 @@ export const ProductNavbar: React.FC<Props> = ({
   currentView,
   onNavigate,
   selectedCohort,
+  availableCohorts,
+  onSelectClass,
   onChangeClass,
   learner,
   onLogout,
   onOpenTutorial,
   onResetAll,
 }) => {
+  const handleClassChange = (classId: string) => {
+    const cohort = availableCohorts.find((item) => item.id === classId);
+    if (cohort && cohort.id !== selectedCohort?.id) {
+      void onSelectClass(cohort);
+    }
+  };
+
   return (
     <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -111,9 +120,22 @@ export const ProductNavbar: React.FC<Props> = ({
             <div className="hidden lg:flex items-center gap-2 bg-slate-800/90 hover:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700/80 text-xs">
               <div className="text-left">
                 <span className="text-[10px] text-slate-400 block font-medium">Lớp đang học:</span>
-                <span className="text-emerald-400 font-bold truncate max-w-[170px] block">
-                  {selectedCohort?.name || 'Đang tải lớp học...'}
-                </span>
+                <div className="relative flex items-center">
+                  <select
+                    value={selectedCohort?.id || ''}
+                    onChange={(event) => handleClassChange(event.target.value)}
+                    className="appearance-none bg-transparent pr-5 text-emerald-400 font-bold truncate max-w-[190px] cursor-pointer outline-none"
+                    aria-label="Chọn lớp đang học"
+                    title="Chọn một lớp đã được ghi danh"
+                  >
+                    {availableCohorts.map((cohort) => (
+                      <option key={cohort.id} value={cohort.id} className="bg-slate-900 text-white">
+                        {cohort.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-slate-400" />
+                </div>
               </div>
               <button
                 onClick={onChangeClass}
@@ -183,6 +205,33 @@ export const ProductNavbar: React.FC<Props> = ({
             className={`px-2 py-1 rounded ${currentView === 'history' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
           >
             Lịch sử
+          </button>
+        </div>
+
+        {/* Class switcher remains available on tablet and mobile. */}
+        <div className="flex lg:hidden items-center gap-2 border-t border-slate-800 py-2">
+          <span className="shrink-0 text-[10px] font-medium text-slate-400">Lớp:</span>
+          <div className="relative min-w-0 flex-1">
+            <select
+              value={selectedCohort?.id || ''}
+              onChange={(event) => handleClassChange(event.target.value)}
+              className="w-full appearance-none truncate rounded-lg border border-slate-700 bg-slate-800 py-1.5 pl-2.5 pr-7 text-xs font-semibold text-emerald-300 outline-none focus:border-emerald-500"
+              aria-label="Chọn lớp đang học"
+            >
+              {availableCohorts.map((cohort) => (
+                <option key={cohort.id} value={cohort.id} className="bg-slate-900 text-white">
+                  {cohort.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          </div>
+          <button
+            onClick={onChangeClass}
+            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+            title="Xem tất cả lớp có thể tham gia"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>

@@ -19,6 +19,18 @@ const unassigned = await dbService.syncUserFromOAuth({
 assert.equal(await dbService.canUserAccessClass(unassigned.id, enrolledClassId), false);
 assert.equal(await dbService.getLearnerActiveEnrollment(unassigned.id), null);
 
+const secondEnrollment = await dbService.addLearnerToClass(otherClassId, {
+  email: 'linh.pham@agribank.com.vn',
+  fullName: 'Linh Phạm',
+});
+assert.equal(secondEnrollment.success, true);
+const activeEnrollments = await dbService.getLearnerActiveEnrollments(enrolledUserId);
+assert.equal(activeEnrollments.length, 2);
+assert.deepEqual(
+  new Set(activeEnrollments.map((view) => view.classDetails.id)),
+  new Set([enrolledClassId, otherClassId]),
+);
+
 await assert.rejects(
   () => assertAiLessonAccess({ classId: enrolledClassId, lessonId: 'lab-1' }),
   (error: unknown) => error instanceof ApiAccessError && error.statusCode === 401,
@@ -35,9 +47,16 @@ const appSource = await readFile('src/App.tsx', 'utf8');
 assert.doesNotMatch(appSource, /Khởi tạo enrollment nếu chưa có/);
 assert.match(appSource, /canUserAccessClass/);
 assert.match(appSource, /!hasActiveEnrollment/);
+assert.match(appSource, /getLearnerActiveEnrollments/);
+assert.match(appSource, /promptify_selected_class_id/);
+
+const navbarSource = await readFile('src/components/navigation/ProductNavbar.tsx', 'utf8');
+assert.match(navbarSource, /availableCohorts\.map/);
+assert.match(navbarSource, /aria-label="Chọn lớp đang học"/);
 
 console.log('✓ Enrolled learner can access only their assigned class');
 console.log('✓ Unassigned learner has no active enrollment or class access');
 console.log('✓ AI endpoint authorization rejects missing authentication');
 console.log('✓ Migration 006 gates courses, classes, lessons and attempts through enrollment');
+console.log('✓ Learner with two active enrollments receives both classes in the class switcher');
 console.log('=== ENROLLMENT ACCESS TEST PASSED ===');
