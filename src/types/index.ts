@@ -31,6 +31,7 @@ export interface ClassCohort {
   expiryDateText?: string;
   description: string;
   iconName: string;
+  isPublic?: boolean;
 }
 
 export interface Enrollment {

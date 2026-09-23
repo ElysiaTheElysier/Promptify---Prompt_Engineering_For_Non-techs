@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS classes (
   start_date TIMESTAMPTZ NOT NULL,
   end_date TIMESTAMPTZ NOT NULL,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'upcoming', 'completed', 'archived')),
+  enrollment_mode TEXT NOT NULL DEFAULT 'instructor' CHECK (enrollment_mode IN ('instructor', 'self_enroll')),
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -433,4 +434,3 @@ WITH CHECK (public.is_instructor());
 
 -- Tải lại PostgREST schema cache để áp dụng ngay lập tức
 NOTIFY pgrst, 'reload schema';
-

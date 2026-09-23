@@ -625,7 +625,8 @@ export const App: React.FC = () => {
             expiryDurationHours: 8,
             expiryDateText: 'Hết hạn lúc 18:00 hôm nay',
             description: c.course?.description || 'Chương trình đào tạo Prompt Engineering.',
-            iconName: 'Building2'
+            iconName: c.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
+            isPublic: c.enrollment_mode === 'self_enroll'
           }));
           setCohorts(mappedCohorts);
         }
@@ -695,7 +696,19 @@ export const App: React.FC = () => {
   // Xử lý Chọn lớp
   const handleSelectClass = async (cohort: ClassCohort): Promise<boolean> => {
     if (!currentUser || userRole !== 'LEARNER') return false;
-    const canAccess = await dbService.canUserAccessClass(currentUser.id, cohort.id);
+    let canAccess = await dbService.canUserAccessClass(currentUser.id, cohort.id);
+    if (!canAccess && cohort.isPublic) {
+      const selfEnrollment = await dbService.selfEnrollInPublicClass(cohort.id);
+      if (selfEnrollment) {
+        canAccess = true;
+        setCurrentLearner((learner) => learner ? {
+          ...learner,
+          id: selfEnrollment.learnerCode,
+          organization: cohort.organization,
+          department: cohort.department,
+        } : learner);
+      }
+    }
     if (!canAccess) {
       setHasActiveEnrollment(false);
       setCurrentView('class_select');
@@ -707,8 +720,8 @@ export const App: React.FC = () => {
     return true;
   };
 
-  // Mã lớp chỉ giúp chọn một lớp mà instructor đã ghi danh sẵn; biết mã lớp
-  // không tự cấp quyền và không tạo enrollment ở client.
+  // Mã lớp doanh nghiệp chỉ chọn enrollment đã được cấp. Riêng lớp public có
+  // thể tự ghi danh qua RPC; client không bao giờ insert enrollment trực tiếp.
   const handleJoinClassByCode = async (code: string): Promise<boolean> => {
     const upperCode = code.toUpperCase().trim();
     const found = cohorts.find(
@@ -795,7 +808,7 @@ export const App: React.FC = () => {
     return (
       <ClassSelectionScreen
         learner={currentLearner}
-        cohorts={[]}
+        cohorts={cohorts}
         enrollments={{}}
         totalLabCount={labs.length}
         onSelectClass={handleSelectClass}

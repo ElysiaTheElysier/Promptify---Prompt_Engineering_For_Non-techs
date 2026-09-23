@@ -129,6 +129,7 @@ export interface DbClass {
   start_date: string;
   end_date: string;
   status: ClassStatus;
+  enrollment_mode?: 'instructor' | 'self_enroll';
   created_at?: string;
 }
 

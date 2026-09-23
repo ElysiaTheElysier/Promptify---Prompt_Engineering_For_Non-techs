@@ -48,6 +48,8 @@ export const ClassSelectionScreen: React.FC<Props> = ({
         return <Megaphone className="w-5 h-5 text-emerald-400" />;
       case 'Building2':
         return <Building2 className="w-5 h-5 text-teal-400" />;
+      case 'Sparkles':
+        return <Sparkles className="w-5 h-5 text-emerald-400" />;
       default:
         return <Briefcase className="w-5 h-5 text-indigo-400" />;
     }
@@ -58,7 +60,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
     setJoinError('');
     setJoinSuccess('');
     if (!classCodeInput.trim()) {
-      setJoinError('Vui lòng nhập mã lớp do giảng viên hoặc ban tổ chức cung cấp.');
+      setJoinError('Vui lòng nhập mã lớp.');
       return;
     }
     const ok = await onJoinClassByCode(classCodeInput.trim());
@@ -66,7 +68,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
       setJoinSuccess(`Đã tham gia lớp thành công với mã ${classCodeInput.toUpperCase()}!`);
       setClassCodeInput('');
     } else {
-      setJoinError('Tài khoản chưa được giảng viên ghi danh vào lớp này, hoặc mã lớp không hợp lệ.');
+      setJoinError('Mã lớp không hợp lệ, hoặc lớp doanh nghiệp này chưa được giảng viên ghi danh cho bạn.');
     }
   };
 
@@ -124,7 +126,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             Chọn lớp học của bạn
           </h1>
           <p className="text-sm text-slate-600 max-w-2xl">
-            Chào mừng <strong>{learner?.name || 'Học viên'}</strong> ({learner?.department || ''}). Chỉ những lớp mà giảng viên đã ghi danh tài khoản của bạn mới xuất hiện tại đây.
+            Chào mừng <strong>{learner?.name || 'Học viên'}</strong> ({learner?.department || ''}). Lớp testing có thể tự tham gia; lớp doanh nghiệp chỉ xuất hiện khi giảng viên đã ghi danh bạn.
           </p>
         </div>
 
@@ -157,9 +159,16 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                     <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center flex-shrink-0 shadow-sm">
                       {getCohortIcon(cohort.iconName)}
                     </div>
-                    <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                      {cohort.classCode}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {cohort.isPublic && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          Công khai
+                        </span>
+                      )}
+                      <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                        {cohort.classCode}
+                      </span>
+                    </div>
                   </div>
 
                   <div>
@@ -208,7 +217,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                     }}
                     className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl transition shadow-sm cursor-pointer"
                   >
-                    <span>{completedCount > 0 ? 'Tiếp tục học' : 'Vào lớp học'}</span>
+                    <span>{completedCount > 0 ? 'Tiếp tục học' : cohort.isPublic ? 'Tham gia miễn phí' : 'Vào lớp học'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -224,7 +233,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             <h3>Tham gia thêm lớp học bằng mã</h3>
           </div>
           <p className="text-xs text-slate-500 mb-4">
-            Mã lớp chỉ dùng để tìm lớp mà tài khoản của bạn đã được giảng viên ghi danh. Mã lớp không tự cấp quyền truy cập:
+            Lớp testing công khai cho phép tự tham gia. Với lớp doanh nghiệp, mã lớp chỉ có tác dụng sau khi giảng viên đã ghi danh bạn:
           </p>
 
           <form onSubmit={handleJoinSubmit} className="space-y-3">
@@ -237,7 +246,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                   setJoinError('');
                   setJoinSuccess('');
                 }}
-                placeholder="Ví dụ: AGRI-COMM hoặc AGRI-CREDIT"
+                placeholder="Ví dụ: TESTER-PE-001 hoặc AGRI-COMM"
                 className="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase font-mono"
               />
               <button

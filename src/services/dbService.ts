@@ -409,6 +409,7 @@ export const dbService = {
         start_date: item.start_date,
         end_date: item.end_date,
         status: item.status,
+        enrollment_mode: item.enrollment_mode || 'instructor',
         created_at: item.created_at,
         course: item.course,
         client: item.client,
@@ -1210,6 +1211,28 @@ export const dbService = {
       && enrollment.class_id === classId
       && enrollment.status === 'active'
     ));
+  },
+
+  /**
+   * Tự ghi danh vào lớp được instructor đánh dấu self_enroll. Việc kiểm tra loại
+   * lớp và tạo enrollment diễn ra hoàn toàn trong SECURITY DEFINER RPC; client
+   * không có quyền INSERT enrollment trực tiếp.
+   */
+  async selfEnrollInPublicClass(classId: string): Promise<{ learnerCode: string } | null> {
+    if (!isSupabaseConfigured) return null;
+
+    const { data, error } = await supabase.rpc('self_enroll_public_class', {
+      target_class_id: classId,
+    });
+
+    if (error) {
+      console.error('[dbService] Không thể tự ghi danh lớp public:', error);
+      return null;
+    }
+
+    const result = Array.isArray(data) ? data[0] : data;
+    if (!result?.learner_code || result.enrollment_status !== 'active') return null;
+    return { learnerCode: result.learner_code as string };
   },
 
   // ----------------------------------------------------------------------------
