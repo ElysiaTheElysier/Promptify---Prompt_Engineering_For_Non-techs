@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { mapCurriculumToLabs } from '../src/services/curriculumAdapter';
 
-const migration = await readFile('supabase/migrations/009_fill_tester_sample_prompts.sql', 'utf8');
+const migration = await readFile('supabase/migrations/013_align_tester_solution_prompts.sql', 'utf8');
 const lessonKeys = [
   'TESTER-ZERO-SHOT',
   'TESTER-ONE-SHOT',
@@ -13,16 +13,38 @@ const lessonKeys = [
 ];
 
 for (const lessonKey of lessonKeys) {
-  assert.ok(migration.includes(`WHEN '${lessonKey}'`), `Missing sample prompt for ${lessonKey}`);
+  assert.ok(migration.includes(`'${lessonKey}'`), `Missing corrected sample prompt for ${lessonKey}`);
 }
 assert.ok(migration.includes("module.course_id = '92000000-0000-4000-8000-000000000001'"));
 assert.ok(!migration.includes('AGRI-'), 'Tester migration must not modify Agribank lessons');
-assert.match(migration, /Bạn là trợ lý truyền thông nội bộ/);
-assert.match(migration, /"sentiment": "mixed"/);
-assert.match(migration, /Output: account_access/);
-assert.match(migration, /1\. Dữ kiện/);
-assert.match(migration, /Bullet 3: Deadline/);
-assert.match(migration, /Không đủ thông tin trong tài liệu được cung cấp/);
+
+const promptBlocks = [...migration.matchAll(/\(\s*'(TESTER-[A-Z-]+)',\s*\$prompt\$([\s\S]*?)\$prompt\$\s*\)/g)];
+assert.equal(promptBlocks.length, lessonKeys.length, 'Every Tester lesson must have exactly one corrected prompt');
+const promptByKey = new Map(promptBlocks.map((match) => [match[1], match[2].trim()]));
+assert.equal(new Set(promptByKey.values()).size, lessonKeys.length, 'Tester solution prompts must be unique');
+
+assert.match(promptByKey.get('TESTER-ZERO-SHOT') || '', /dự án Orion/);
+assert.match(promptByKey.get('TESTER-ZERO-SHOT') || '', /09:00 thứ Sáu/);
+assert.doesNotMatch(promptByKey.get('TESTER-ZERO-SHOT') || '', /đào tạo AI ngày mai/);
+
+assert.match(promptByKey.get('TESTER-ONE-SHOT') || '', /API xong, chờ QA thứ Ba/);
+assert.match(promptByKey.get('TESTER-ONE-SHOT') || '', /UI dashboard 80%, review sáng mai/);
+assert.doesNotMatch(promptByKey.get('TESTER-ONE-SHOT') || '', /sentiment/);
+
+assert.match(promptByKey.get('TESTER-FEW-SHOT') || '', /Rất dễ dùng/);
+assert.match(promptByKey.get('TESTER-FEW-SHOT') || '', /Chức năng tốt nhưng tải hơi chậm/);
+assert.match(promptByKey.get('TESTER-FEW-SHOT') || '', /Không tạo nhãn mới/);
+
+assert.match(promptByKey.get('TESTER-STRUCTURED-REASONING') || '', /Phương án A: 2 tuần, 4 người, chi phí 80 triệu/);
+assert.match(promptByKey.get('TESTER-STRUCTURED-REASONING') || '', /Phương án B: 3 tuần, 2 người, chi phí 55 triệu/);
+
+assert.match(promptByKey.get('TESTER-CONSTRAINTS-OUTPUT') || '', /Release 2\.4/);
+assert.match(promptByKey.get('TESTER-CONSTRAINTS-OUTPUT') || '', /đúng 3 bullet Markdown/);
+assert.match(promptByKey.get('TESTER-CONSTRAINTS-OUTPUT') || '', /Không suy diễn.*mobile/);
+
+assert.match(promptByKey.get('TESTER-GROUNDED-PROMPTING') || '', /làm việc từ xa tối đa 2 ngày/);
+assert.match(promptByKey.get('TESTER-GROUNDED-PROMPTING') || '', /làm từ nước ngoài 10 ngày/);
+assert.match(promptByKey.get('TESTER-GROUNDED-PROMPTING') || '', /Không đủ thông tin trong nguồn/);
 
 const mapped = mapCurriculumToLabs([{
   id: 'module',
