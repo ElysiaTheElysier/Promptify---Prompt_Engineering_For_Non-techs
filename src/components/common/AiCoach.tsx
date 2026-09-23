@@ -57,8 +57,8 @@ const CHAT_AUTOCOMPLETE_DICTIONARY = [
   'giải thích ý nghĩa bài tập này',
   'xóa thông tin nhạy cảm PII trong prompt',
   'làm sao để AI trả về bảng Markdown?',
-  'cách thêm vai trò cán bộ ngân hàng Agribank',
-  'làm sao để chống AI bịa số liệu tài chính?'
+  'cách thêm vai trò phù hợp với bài',
+  'làm sao để chống AI bịa dữ kiện?'
 ];
 
 export const AiCoach: React.FC<Props> = ({
@@ -84,42 +84,11 @@ export const AiCoach: React.FC<Props> = ({
   const [activeInputSuggestion, setActiveInputSuggestion] = useState<SuggestionPayload | null>(null);
   const [suggestionAppliedToast, setSuggestionAppliedToast] = useState<boolean>(false);
 
-  // Mô tả bài tập theo ngôn ngữ nghiệp vụ ngân hàng
-  const getFriendlyExerciseDescription = (order: number) => {
-    switch (order) {
-      case 1:
-        return 'Bạn đang viết câu lệnh phân tích phản hồi khách hàng và chuẩn hóa bảo mật dữ liệu định danh (PII)...';
-      case 2:
-        return 'Bạn đang học cách cấu trúc câu lệnh chuyên nghiệp với 5 thành phần chuẩn hóa Agribank...';
-      case 3:
-        return 'Bạn đang hướng dẫn AI thông qua ví dụ mẫu để cố định phong cách văn bản ngân hàng...';
-      case 4:
-        return 'Bạn đang phân loại các tình huống phức tạp bằng nhiều ví dụ đa dạng...';
-      case 5:
-        return 'Bạn đang neo câu trả lời vào tài liệu thực tế để chống AI bịa đặt số liệu tài chính...';
-      default:
-        return 'Bạn đang thực hành bài tập nâng cao kỹ năng prompt công nghệ ngân hàng...';
-    }
-  };
-
-  const friendlyDesc = getFriendlyExerciseDescription(activeLab.order);
+  const friendlyDesc = activeLab.taskGoal || activeLab.scenario || `Bạn đang thực hành ${activeLab.title}.`;
 
   // Câu hỏi gợi mở khởi tạo thân thiện
   const getInitialCoachQuestion = (): string => {
-    switch (activeLab.order) {
-      case 1:
-        return `Chào bạn! Tôi là Trợ Lý AI Đồng Hành của bạn.\n\nỞ bài tập này: ${friendlyDesc}\n\nBạn hãy quan sát xem: Câu lệnh của bạn đã xóa các thông tin định danh cá nhân (PII như CCCD, SĐT) và quy định rõ xuất báo cáo dạng bảng chưa?`;
-      case 2:
-        return `Chào bạn! Ở bài cấu trúc câu lệnh này, hãy kiểm tra xem bạn đã nêu đủ 5 ý: Vai trò (Ai làm?) - Ngữ cảnh - Nhiệm vụ - Ràng buộc - Định dạng bảng chưa?`;
-      case 3:
-        return `Chào bạn! Khi dạy AI qua ví dụ mẫu, ví dụ bạn đưa ra có đúng phong cách chu đáo và bảng biểu bạn mong muốn không?`;
-      case 4:
-        return `Chào bạn! Khi có nhiều tình huống khác nhau, các ví dụ bạn đưa ra đã bao quát được cả khen, chê và khiếu nại chưa?`;
-      case 5:
-        return `Chào bạn! Ở bài này cần cẩn trọng chống AI bịa số liệu. Kết luận này dựa trên tài liệu nào? Có trích dẫn cụ thể chưa?`;
-      default:
-        return `Chào bạn! Tôi đang đồng hành cùng bạn ở Bài ${activeLab.order}. Bạn cần tôi hỗ trợ góc nhìn hay đưa ra đề xuất tối ưu prompt không?`;
-    }
+    return `Chào bạn! Tôi đang đồng hành ở ${activeLab.title}.\n\nMục tiêu: ${friendlyDesc}\n\nHãy kiểm tra prompt đã nêu rõ nhiệm vụ, dữ liệu cần dùng, ràng buộc và định dạng đầu ra của bài này chưa.`;
   };
 
   // Tạo đề xuất diff cho prompt hiện tại
@@ -154,7 +123,7 @@ export const AiCoach: React.FC<Props> = ({
       return {
         id: `sugg-pii-${Date.now()}`,
         type: 'pii',
-        title: 'Đề xuất chuẩn hóa PII (Bảo mật Agribank)',
+        title: 'Đề xuất chuẩn hóa dữ liệu PII',
         description: 'Phát hiện dữ liệu định danh khách hàng nhạy cảm. Khuyến nghị thay thế bằng biến giả lập.',
         items: piiItems,
         suggestedPrompt: sanitized
@@ -162,7 +131,7 @@ export const AiCoach: React.FC<Props> = ({
     }
 
     // 2. Kiểm tra cấu trúc Rubric
-    const audit = evaluatePromptRubric(prompt);
+    const audit = evaluatePromptRubric(prompt, activeLab);
     const missingItems: DiffSuggestionItem[] = [];
     let improved = prompt.trim();
 
@@ -170,37 +139,37 @@ export const AiCoach: React.FC<Props> = ({
       missingItems.push({
         id: `sugg-role-${Date.now()}`,
         originalText: '(Chưa định nghĩa vai trò)',
-        replacementText: 'BẠN LÀ AI: Chuyên viên Phân tích Dữ liệu / Cán bộ Ngân hàng Agribank.',
+        replacementText: `VAI TRÒ: Bạn là trợ lý chuyên môn phù hợp với bài "${activeLab.title}".`,
         label: 'Vai trò chuyên môn'
       });
-      improved = `BẠN LÀ AI: Chuyên viên Phân tích Nghiệp vụ Agribank.\n\n` + improved;
+      improved = `VAI TRÒ: Bạn là trợ lý chuyên môn phù hợp với bài "${activeLab.title}".\n\n` + improved;
     }
 
     if (audit.formatScore < 15) {
       missingItems.push({
         id: `sugg-format-${Date.now()}`,
-        originalText: '(Chưa có định dạng xuất bảng)',
-        replacementText: 'ĐỊNH DẠNG ĐẦU RA: Xuất báo cáo bằng Bảng Markdown gồm [STT | Tiêu chí | Nội dung | Hướng xử lý].',
-        label: 'Định dạng báo cáo'
+        originalText: '(Chưa có định dạng đầu ra)',
+        replacementText: `ĐỊNH DẠNG ĐẦU RA: ${activeLab.expectedOutputFormat || 'Trình bày kết quả ngắn gọn, rõ ràng.'}`,
+        label: 'Định dạng của bài'
       });
-      improved = improved + `\n\nĐỊNH DẠNG ĐẦU RA: Xuất kết quả dưới dạng Bảng Markdown chuyên nghiệp, dễ sao chép vào Excel.`;
+      improved = improved + `\n\nĐỊNH DẠNG ĐẦU RA: ${activeLab.expectedOutputFormat || 'Trình bày kết quả ngắn gọn, rõ ràng.'}`;
     }
 
     if (audit.guardrailsScore < 10) {
       missingItems.push({
         id: `sugg-guard-${Date.now()}`,
         originalText: '(Chưa có quy tắc an toàn)',
-        replacementText: 'RÀNG BUỘC: Đi thẳng vào nội dung chính, không chào hỏi xã giao, bám sát sự thật 100%.',
+        replacementText: `RÀNG BUỘC: ${activeLab.systemInstruction || 'Chỉ dùng dữ liệu được cung cấp và không tự suy diễn.'}`,
         label: 'Ràng buộc an toàn'
       });
-      improved = improved + `\nRÀNG BUỘC: Không tự bịa thông tin, đi thẳng vào báo cáo.`;
+      improved = improved + `\nRÀNG BUỘC: ${activeLab.systemInstruction || 'Chỉ dùng dữ liệu được cung cấp và không tự suy diễn.'}`;
     }
 
     if (missingItems.length > 0) {
       return {
         id: `sugg-struct-${Date.now()}`,
         type: 'structure',
-        title: 'Đề xuất nâng cấp cấu trúc Prompt (Chuẩn Agribank)',
+        title: `Đề xuất nâng cấp prompt cho ${activeLab.title}`,
         description: 'Bổ sung các thành phần nghiệp vụ còn thiếu để đạt điểm tối đa trên thang Rubric.',
         items: missingItems,
         suggestedPrompt: improved
@@ -522,14 +491,14 @@ export const AiCoach: React.FC<Props> = ({
 
     if (lower.includes('đáp án') || lower.includes('cho tôi prompt') || lower.includes('viết hộ') || lower.includes('làm mẫu')) {
       if (runCount >= 2) {
-        coachReply = `Tôi thấy bạn đã thử nghiệm ${runCount} lần trong bài này! Bạn có thể bấm "Xem mẫu chuẩn" ngay phía trên ô soạn thảo Prompt để đối chiếu câu lệnh mẫu tối ưu của Agribank nhé.`;
+        coachReply = `Tôi thấy bạn đã thử nghiệm ${runCount} lần trong bài này! Bạn có thể mở tab "Lời giải" để đối chiếu với prompt tham khảo của đúng bài hiện tại nhé.`;
       } else {
         coachReply = `Để bạn làm chủ kỹ năng, bạn cứ tự gõ thử ít nhất 1 lần trước nhé. Bạn chỉ cần tập trung vào 3 ý: "AI đóng vai ai", "Làm gì với dữ liệu này", và "Trả về dạng bảng hay văn bản". Thử bấm Chạy prompt một lần xem sao!`;
       }
     } else if (lower.includes('tại sao') || lower.includes('vì sao')) {
       coachReply = `Khi không quy định rõ ràng, AI sẽ chọn phương án xác suất phổ biến nhất — thường là trả lời dạng đàm thoại lịch sự và nhận xét chung chung. Đưa khuôn khổ cụ thể sẽ giúp AI tập trung 100% vào việc xử lý dữ liệu bạn cần.`;
     } else {
-      coachReply = `Trong nghiệp vụ ngân hàng thực tế, bạn hãy nhớ nguyên tắc: "Giao việc cho AI như giao việc cho một thực tập sinh: Nói rõ vai trò, mục tiêu và hình thức nộp báo cáo." Bạn có thể bấm nút "Đề xuất tối ưu (Diff)" bên dưới để xem gợi ý trực tiếp nhé!`;
+      coachReply = `Hãy nhớ nguyên tắc: "Giao việc cho AI như giao việc cho một người mới: nói rõ vai trò, dữ liệu, mục tiêu và hình thức đầu ra." Bạn có thể bấm nút "Đề xuất tối ưu (Diff)" để xem gợi ý của đúng bài hiện tại.`;
     }
 
     const coachMsg: Message = {

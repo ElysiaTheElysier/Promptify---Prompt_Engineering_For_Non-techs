@@ -232,7 +232,7 @@ export async function executePromptStream(
       lessonId: lab.id,
       classId,
       prompt: promptText,
-      context: lab.sampleInputContext
+      systemInstruction,
     })
   });
 

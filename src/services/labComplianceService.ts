@@ -274,10 +274,11 @@ export function getTabnineContextualSuggestion(
 
   // A. Gợi ý Vai trò (Role)
   if (trimmedLine === 'vai trò:' || trimmedLine === 'vai trò' || trimmedLine === 'bạn là:' || trimmedLine === 'bạn là') {
+    const roleText = ` Trợ lý chuyên môn phù hợp với bài "${lab.title || 'thực hành prompt'}".`;
     return {
       triggerPrefix: currentLine,
-      suggestionText: ' Chuyên viên Truyền thông & Báo chí Agribank với 10 năm kinh nghiệm gắn bó cùng Tam Nông.',
-      displayLabel: 'Chuyên viên Truyền thông Agribank (10 năm kinh nghiệm)',
+      suggestionText: roleText,
+      displayLabel: `Vai trò phù hợp với ${lab.title || 'bài hiện tại'}`,
       category: 'role'
     };
   }
@@ -291,15 +292,17 @@ export function getTabnineContextualSuggestion(
     trimmedLine === 'chốt chặn:' ||
     trimmedLine.endsWith('tuyệt đối không')
   ) {
-    const isPiiLab = lab.id?.includes('1') || lab.title?.includes('PII');
+    const isPiiLab = lab.id === 'lab-1'
+      || lab.conceptTag?.toLowerCase().includes('pii')
+      || lab.title?.toLowerCase().includes('pii');
     return {
       triggerPrefix: currentLine,
-      suggestionText: isPiiLab 
+      suggestionText: isPiiLab
         ? ' Tuyệt đối không sử dụng thông tin PII thật. Chỉ làm việc trên dữ liệu đã được ẩn danh hóa.'
-        : ' Tuyệt đối không suy diễn ngoài tài liệu đã cấp, không dùng từ ngữ giật gân, đao to búa lớn.',
-      displayLabel: isPiiLab 
-        ? 'Tuyệt đối không dùng PII thật. Chỉ làm việc trên dữ liệu ẩn danh.' 
-        : 'Không suy diễn ngoài tài liệu, không dùng từ giật gân.',
+        : ` ${lab.systemInstruction || 'Chỉ sử dụng dữ liệu được cung cấp và không tự suy diễn thông tin ngoài nguồn.'}`,
+      displayLabel: isPiiLab
+        ? 'Tuyệt đối không dùng PII thật. Chỉ làm việc trên dữ liệu ẩn danh.'
+        : 'Ràng buộc của bài hiện tại',
       category: 'guardrails'
     };
   }
@@ -308,8 +311,8 @@ export function getTabnineContextualSuggestion(
   if (trimmedLine === 'nhiệm vụ:' || trimmedLine === 'nhiệm vụ' || trimmedLine === 'hãy:' || trimmedLine === 'yêu cầu:') {
     return {
       triggerPrefix: currentLine,
-      suggestionText: ' Xuất bản 03 góc tiếp cận tiêu đề bài viết: (1) Nghị lực nhà nông, (2) Nghĩa tình Agribank, (3) Niềm tin hồi sinh.',
-      displayLabel: 'Xuất bản 03 góc tiếp cận tiêu đề theo chuẩn nghiệp vụ Agribank',
+      suggestionText: ` ${lab.taskGoal || 'Thực hiện đúng nhiệm vụ được mô tả trong bài.'}`,
+      displayLabel: `Nhiệm vụ của ${lab.title || 'bài hiện tại'}`,
       category: 'task'
     };
   }
@@ -318,8 +321,8 @@ export function getTabnineContextualSuggestion(
   if (trimmedLine === 'định dạng đầu ra:' || trimmedLine === 'định dạng:' || trimmedLine === 'khuôn mẫu:' || trimmedLine === 'đầu ra:') {
     return {
       triggerPrefix: currentLine,
-      suggestionText: '\n| STT | Khía Cạnh Tiếp Cận | Tiêu Đề Đề Xuất | Thông Điệp Cốt Lõi |\n| :--- | :--- | :--- | :--- |\n| 1 | Nghị lực nhà nông | ... | ... |',
-      displayLabel: 'Bảng Markdown hoàn chỉnh với 4 cột nghiệp vụ',
+      suggestionText: ` ${lab.expectedOutputFormat || 'Trình bày kết quả ngắn gọn, rõ ràng.'}`,
+      displayLabel: 'Định dạng đầu ra của bài hiện tại',
       category: 'format'
     };
   }
@@ -328,8 +331,8 @@ export function getTabnineContextualSuggestion(
   if (trimmedLine.includes('[dán dữ liệu') || trimmedLine === 'bối cảnh:' || trimmedLine === 'dữ liệu:') {
     return {
       triggerPrefix: currentLine,
-      suggestionText: '\nHọ tên: {{TEN_KH}} | CCCD: {{SO_CCCD}} | SĐT: {{SO_DT}} | Địa chỉ: Trấn Yên, Yên Bái | HĐTD: {{MA_HDTD}}',
-      displayLabel: 'Dữ liệu đã khử PII bằng biến {{TEN_KH}}, {{SO_CCCD}} an toàn',
+      suggestionText: `\n${lab.sampleInputContext || lab.scenario || '[Dán dữ liệu đầu vào của bài tại đây]'}`,
+      displayLabel: 'Dữ liệu đầu vào của bài hiện tại',
       category: 'grounding'
     };
   }

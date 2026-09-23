@@ -104,7 +104,7 @@ export const HybridView: React.FC<Props> = ({
 
   // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
   const [promptText, setPromptText] = useState<string>('');
-  const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
+  const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp và không tự suy diễn dữ kiện.');
   const [output, setOutput] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [runStatus, setRunStatus] = useState<'idle' | 'generating' | 'evaluating' | 'error'>('idle');
@@ -284,7 +284,7 @@ export const HybridView: React.FC<Props> = ({
   // Đồng bộ khi chuyển bài lab
   useEffect(() => {
     setPromptText('');
-    setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
+    setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp và không tự suy diễn dữ kiện.');
     setOutput('');
     setScoreResult(null);
     setAiEvaluation(null);

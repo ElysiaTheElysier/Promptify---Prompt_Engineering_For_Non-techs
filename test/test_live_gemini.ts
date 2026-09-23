@@ -7,7 +7,7 @@ async function main() {
   console.log('\n--- 1. Testing handleGenerateRequest ---');
   const genResult = await handleGenerateRequest({
     prompt: 'Viết thông báo ngắn 2 câu gửi khách hàng về bảo trì hệ thống 2h sáng Chủ Nhật.',
-    context: 'Ngân hàng Agribank'
+    systemInstruction: 'Bạn là trợ lý truyền thông. Không bổ sung dữ kiện ngoài câu lệnh người dùng.'
   });
 
   console.log('Success! Latency:', genResult.latency, 'ms');
@@ -34,4 +34,3 @@ main().catch(err => {
   console.error('Live test failed:', err);
   process.exit(1);
 });
-

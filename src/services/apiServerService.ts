@@ -5,7 +5,7 @@ export interface GenerateRequestBody {
   lessonId?: string;
   classId?: string;
   prompt: string;
-  context?: string;
+  systemInstruction?: string;
 }
 
 export interface GenerateResponseBody {
@@ -120,12 +120,11 @@ async function callOpenAiJudge(apiKey: string, prompt: string): Promise<string> 
 async function callOpenAiGenerate(
   apiKey: string,
   prompt: string,
-  context?: string,
+  systemInstruction?: string,
 ): Promise<{ output: string; model: string; tokens?: number }> {
   const model = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
-  const input = context?.trim()
-    ? `[DỮ LIỆU ĐẦU VÀO / NGỮ CẢNH CỐ ĐỊNH]:\n${context.trim()}\n\n---\n[CÂU LỆNH YÊU CẦU CỦA NGƯỜI DÙNG]:\n${prompt.trim()}`
-    : prompt.trim();
+  const instructions = systemInstruction?.trim()
+    || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp; không tự suy diễn dữ kiện hoặc âm thầm hoàn thành một bài tập không có trong prompt.';
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
@@ -134,8 +133,8 @@ async function callOpenAiGenerate(
     },
     body: JSON.stringify({
       model,
-      instructions: 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ và doanh nghiệp. Thực hiện chính xác, súc tích và đúng trọng tâm yêu cầu; không bịa dữ kiện ngoài nguồn.',
-      input,
+      instructions,
+      input: prompt.trim(),
       max_output_tokens: 2048,
       store: false,
     }),
@@ -262,7 +261,7 @@ async function callGeminiWithFallback(
  * Xử lý yêu cầu POST /api/generate
  */
 export async function handleGenerateRequest(body: GenerateRequestBody): Promise<GenerateResponseBody> {
-  const { prompt, context } = body;
+  const { prompt, systemInstruction } = body;
 
   if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
     throw new AiServerError('Câu lệnh prompt không được để trống.', 400);
@@ -275,7 +274,7 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
 
   // 1. Sử dụng OpenAI nếu có OpenAI key
   if (openAiApiKey) {
-    const result = await callOpenAiGenerate(openAiApiKey, prompt, context);
+    const result = await callOpenAiGenerate(openAiApiKey, prompt, systemInstruction);
     const latencyMs = Math.round(performance.now() - startTime);
     return {
       output: result.output,
@@ -287,17 +286,12 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
 
   // 2. Sử dụng Google Gemini nếu có Gemini key
   if (geminiApiKey) {
-    const userParts: { text: string }[] = [];
-    if (context && context.trim()) {
-      userParts.push({ text: `[DỮ LIỆU ĐẦU VÀO / NGỮ CẢNH CỐ ĐỊNH]:\n${context.trim()}\n\n---\n[CÂU LỆNH YÊU CẦU CỦA NGƯỜI DÙNG]:\n${prompt.trim()}` });
-    } else {
-      userParts.push({ text: prompt.trim() });
-    }
+    const userParts: { text: string }[] = [{ text: prompt.trim() }];
 
     const payload = {
       contents: [{ role: 'user', parts: userParts }],
       systemInstruction: {
-        parts: [{ text: 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng và doanh nghiệp. Hãy thực hiện chính xác, súc tích và đúng trọng tâm yêu cầu được đưa ra trong câu lệnh của người dùng.' }]
+        parts: [{ text: systemInstruction?.trim() || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp; không tự suy diễn dữ kiện hoặc âm thầm hoàn thành một bài tập không có trong prompt.' }]
       },
       generationConfig: {
         temperature: 0.3,

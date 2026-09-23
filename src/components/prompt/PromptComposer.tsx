@@ -114,6 +114,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
   const isCurrentPromptEvaluated = Boolean(
     aiEvaluation &&
     lastEvaluatedPromptText &&
+    promptText === lastEvaluatedPromptText &&
     runStatus === 'idle'
   );
 
@@ -159,9 +160,22 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     if (scores) {
       const promptLower = promptText.toLowerCase();
 
+      // Hoàn thành nhiệm vụ của đúng lesson hiện tại
+      if (scores.taskCompletion < 2 && !promptLower.includes('nhiệm vụ')) {
+        const repl = `NHIỆM VỤ: ${lab.taskGoal || `Thực hiện đúng yêu cầu của bài ${lab.title}.`}`;
+        items.push({
+          id: 'diff-task',
+          originalText: '(Chưa nêu nhiệm vụ cần thực hiện)',
+          replacementText: repl,
+          label: 'Cấu trúc: Bổ sung nhiệm vụ của bài',
+          fullOriginalLine: '(Chưa có nhiệm vụ rõ ràng)',
+          fullReplacementLine: repl,
+        });
+      }
+
       // Kiểm tra định dạng đầu ra (formatAdherence < 2)
       if (scores.formatAdherence < 2 && !promptLower.includes('định dạng') && !promptLower.includes('bảng') && !promptText.includes('|')) {
-        const repl = 'ĐỊNH DẠNG ĐẦU RA: Trình bày báo cáo dưới dạng Bảng Markdown gồm các cột [STT | Tiêu chí thẩm định | Nội dung phân tích | Đề xuất xử lý].';
+        const repl = `ĐỊNH DẠNG ĐẦU RA: ${lab.expectedOutputFormat || 'Trình bày kết quả ngắn gọn, rõ ràng và đúng cấu trúc yêu cầu.'}`;
         items.push({
           id: 'diff-format',
           originalText: '(Chưa quy định định dạng đầu ra)',
@@ -174,7 +188,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
 
       // Kiểm tra ràng buộc an toàn & kiểm soát (constraintCompliance < 2)
       if (scores.constraintCompliance < 2 && !promptLower.includes('ràng buộc') && !promptLower.includes('tuyệt đối')) {
-        const repl = 'RÀNG BUỘC: Bám sát 100% hồ sơ cung cấp, không suy diễn thông tin ngoài tài liệu, bảo mật dữ liệu khách hàng.';
+        const repl = `RÀNG BUỘC: ${lab.systemInstruction || 'Chỉ sử dụng dữ liệu được cung cấp, không tự suy diễn hoặc bổ sung thông tin ngoài nguồn.'}`;
         items.push({
           id: 'diff-constraint',
           originalText: '(Chưa có ràng buộc kiểm soát & an toàn)',
@@ -187,20 +201,20 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
 
       // Kiểm tra bối cảnh nghiệp vụ (groundedness < 2)
       if (scores.groundedness < 2 && !promptLower.includes('bối cảnh') && !promptLower.includes('căn cứ')) {
-        const repl = 'BỐI CẢNH: Căn cứ quy trình thẩm định tín dụng khách hàng và kiểm soát rủi ro của Agribank.';
+        const repl = `BỐI CẢNH / DỮ LIỆU ĐẦU VÀO: ${lab.sampleInputContext || lab.scenario || 'Nêu rõ dữ liệu nguồn cần dùng cho nhiệm vụ này.'}`;
         items.push({
           id: 'diff-context',
-          originalText: '(Chưa xác định bối cảnh nghiệp vụ Agribank)',
+          originalText: '(Chưa xác định bối cảnh hoặc dữ liệu đầu vào)',
           replacementText: repl,
-          label: 'Cấu trúc: Bổ sung bối cảnh Agribank',
-          fullOriginalLine: '(Chưa có bối cảnh nghiệp vụ)',
+          label: 'Cấu trúc: Bổ sung dữ liệu của bài',
+          fullOriginalLine: '(Chưa có bối cảnh hoặc dữ liệu đầu vào)',
           fullReplacementLine: repl
         });
       }
 
       // Kiểm tra vai trò chuyên gia (businessUsability < 2)
       if (scores.businessUsability < 2 && !promptLower.includes('vai trò') && !promptLower.includes('bạn là')) {
-        const repl = 'VAI TRÒ: Bạn là Chuyên viên Phân tích Nghiệp vụ & Thẩm định Khách hàng Agribank.';
+        const repl = `VAI TRÒ: Bạn là trợ lý chuyên môn phù hợp với bài "${lab.title}".`;
         items.push({
           id: 'diff-role',
           originalText: '(Chưa định nghĩa vai trò chuyên môn)',
@@ -213,7 +227,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }
 
     return items;
-  }, [isCurrentPromptEvaluated, aiEvaluation, promptText]);
+  }, [isCurrentPromptEvaluated, aiEvaluation, promptText, lab]);
 
   // Lọc bỏ những mục đã được chấp nhận hoặc bỏ qua
   const activeDiffItems = evaluatedDiffItems.filter(item => !dismissedDiffIds.includes(item.id));
@@ -614,7 +628,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
               type="text"
               value={systemText}
               onChange={(e) => setSystemText(e.target.value)}
-              placeholder="Ví dụ: Bạn là chuyên viên phân tích ngân hàng..."
+              placeholder="Ví dụ: Bạn là trợ lý chuyên môn cho nhiệm vụ này..."
               className="w-full px-3 py-2 text-xs bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 font-mono"
             />
           </div>
