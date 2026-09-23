@@ -8,20 +8,12 @@ import {
   BookOpen, 
   FileSpreadsheet, 
   Lock, 
-  ChevronRight,
   AlertCircle
 } from 'lucide-react';
-import { Learner } from '../../types';
-import { DEMO_LEARNERS } from '../../data/classesData';
 import { supabase, isSupabaseConfigured } from '../../services/supabaseClient';
 import { PromptifyMark } from '../common/PromptifyMark';
 
-interface Props {
-  onLogin: (learner: Learner) => void;
-}
-
-export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
-  const [customEmail, setCustomEmail] = useState<string>('');
+export const LandingLoginScreen: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -56,29 +48,6 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
     }
   };
 
-  // 2. Luồng Demo Account tách biệt hoàn toàn
-  const handleDemoAccountLogin = (learner: Learner) => {
-    setLoginError(null);
-    onLogin(learner);
-  };
-
-  const handleCustomEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customEmail.trim()) return;
-    setLoginError(null);
-    const namePart = customEmail.split('@')[0];
-    const newLearner: Learner = {
-      id: `learner_${Date.now()}`,
-      name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
-      email: customEmail.trim().toLowerCase(),
-      role: 'STUDENT',
-      organization: 'Agribank Việt Nam',
-      department: 'Khối Nghiệp vụ',
-      avatarInitials: namePart.slice(0, 2).toUpperCase()
-    };
-    onLogin(newLearner);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
       {/* Top Simple Brand Bar */}
@@ -92,11 +61,11 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
                   Promptify
                 </span>
                 <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
-                  Doanh nghiệp
+                  Học tập
                 </span>
               </div>
               <p className="text-xs text-slate-400 hidden sm:block">
-                Nền tảng thực hành Prompt AI cho Cán bộ & Chuyên viên Nghiệp vụ
+                Nền tảng thực hành Prompt Engineering
               </p>
             </div>
           </div>
@@ -137,7 +106,7 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
             </h1>
 
             <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-              Không cần học lập trình. Dành riêng cho cán bộ ngân hàng và người làm văn phòng muốn điều khiển AI viết báo cáo, trích xuất bảng biểu và xử lý nghiệp vụ chuẩn xác.
+              Không cần học lập trình. Thực hành cách giao việc cho AI, kiểm soát đầu ra và áp dụng vào công việc hằng ngày.
             </p>
 
             {/* 3 Core Highlights */}
@@ -162,8 +131,8 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
                 <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm font-semibold text-white">Chuẩn văn phong</h4>
-                <p className="text-xs text-slate-400">Định hình giọng văn chuẩn mực ngân hàng và quy chuẩn doanh nghiệp.</p>
+                <h4 className="text-sm font-semibold text-white">Đúng mục tiêu</h4>
+                <p className="text-xs text-slate-400">Định hình giọng văn và cấu trúc phù hợp với tình huống sử dụng.</p>
               </div>
             </div>
           </div>
@@ -176,7 +145,7 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
                   Đăng nhập vào lớp học
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Sử dụng tài khoản email cơ quan hoặc tài khoản Google được cấp quyền
+                  Sử dụng tài khoản Google đã được cấp quyền
                 </p>
               </div>
 
@@ -221,68 +190,10 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
                 </div>
               )}
 
-              <div className="relative my-6 text-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-800"></div>
-                </div>
-                <span className="relative px-3 bg-slate-900 text-xs text-slate-500 font-medium uppercase tracking-wider">
-                  Hoặc chọn nhanh tài khoản mẫu
-                </span>
-              </div>
-
-              {/* Quick Demo Learner Selector (Great for workshop testing) */}
-              <div className="space-y-2">
-                {DEMO_LEARNERS.map((learner) => (
-                  <button
-                    key={learner.id}
-                    onClick={() => handleDemoAccountLogin(learner)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-emerald-500/50 transition text-left group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-700 text-slate-200 flex items-center justify-center font-bold text-xs group-hover:bg-emerald-600 group-hover:text-white transition">
-                        {learner.avatarInitials}
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-white group-hover:text-emerald-300 transition">
-                          {learner.name}
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {learner.department} • {learner.organization}
-                        </div>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition" />
-                  </button>
-                ))}
-              </div>
-
-              {/* Form nhập email nghiệp vụ */}
-              <form onSubmit={handleCustomEmailSubmit} className="mt-4 pt-4 border-t border-slate-800 space-y-2">
-                <span className="text-[11px] text-slate-400 font-medium block">
-                  Hoặc đăng nhập bằng email cơ quan:
-                </span>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    value={customEmail}
-                    onChange={(e) => setCustomEmail(e.target.value)}
-                    placeholder="vd: canbo@agribank.com.vn"
-                    className="flex-1 px-3 py-2 bg-slate-950/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!customEmail.trim()}
-                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white rounded-xl text-xs font-semibold transition cursor-pointer"
-                  >
-                    Vào học
-                  </button>
-                </div>
-              </form>
-
               {/* Security guarantee note */}
               <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-center gap-2 text-[11px] text-slate-500">
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
-                <span>Bảo mật thông tin nội bộ doanh nghiệp & ngân hàng</span>
+                <span>Không có tài khoản mẫu hoặc đăng nhập bỏ qua xác thực</span>
               </div>
             </div>
           </div>
@@ -292,7 +203,7 @@ export const LandingLoginScreen: React.FC<Props> = ({ onLogin }) => {
       {/* Simple Footer */}
       <footer className="border-t border-slate-800/80 py-4 px-6 text-center text-xs text-slate-500 bg-slate-950/40">
         <p>
-          Promptify © 2026 • Chương trình Đào tạo Kỹ năng Prompt Engineering cho Cán bộ Nghiệp vụ (Agribank & Corporate)
+          Promptify © 2026 • Nền tảng đào tạo kỹ năng Prompt Engineering
         </p>
       </footer>
     </div>

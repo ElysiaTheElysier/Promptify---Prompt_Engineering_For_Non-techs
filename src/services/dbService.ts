@@ -31,85 +31,63 @@ import {
 // (Khớp chính xác với supabase/schema.sql)
 // ==============================================================================
 
-const INITIAL_USERS: DbUser[] = [
-  { id: '00000000-0000-0000-0000-000000000001', email: 'nam.nh@agribank.com.vn', full_name: 'Nguyễn Hoàng Nam', role: 'instructor' },
-  { id: '00000000-0000-0000-0000-000000000002', email: 'linh.pham@agribank.com.vn', full_name: 'Linh Phạm', role: 'learner' },
-  { id: '00000000-0000-0000-0000-000000000003', email: 'minh.tran@agribank.com.vn', full_name: 'Minh Trần', role: 'learner' },
-  { id: '00000000-0000-0000-0000-000000000004', email: 'phuong.nguyen@enterprise.com', full_name: 'Phương Nguyễn', role: 'learner' },
-];
+const INITIAL_USERS: DbUser[] = [];
 
+// Anonymous local fixtures support repository tests only. They contain no
+// people, enterprise identity, department assignment or production branding.
 const INITIAL_CLIENTS: DbClient[] = [
-  { id: '11111111-1111-1111-1111-111111111111', name: 'Agribank Việt Nam', industry: 'Ngân hàng & Tài chính' },
-  { id: '22222222-2222-2222-2222-222222222222', name: 'Enterprise Business Users', industry: 'Doanh nghiệp & Dịch vụ' },
+  { id: '11111111-1111-1111-1111-111111111111', name: 'Local test organization', industry: 'Testing' },
 ];
 
 const INITIAL_COURSES: DbCourse[] = [
   {
     id: '33333333-3333-3333-3333-333333333331',
-    title: 'Prompt Engineering for Business Users & Non-techs',
-    description: 'Chương trình chuẩn hóa kỹ năng điều khiển AI cho cán bộ văn phòng: Viết prompt có cấu trúc, trích xuất bảng Markdown và chống ảo giác.',
+    title: 'Local test course A',
+    description: 'Local repository verification fixture.',
     status: 'active',
-    slug: 'prompt-engineering-business-nontechs',
+    slug: 'local-test-course-a',
     publication_status: 'published',
-    version: 2,
-    created_by: '00000000-0000-0000-0000-000000000001',
+    version: 1,
+    created_by: null,
   },
   {
     id: '33333333-3333-3333-3333-333333333332',
-    title: 'AI Thẩm định & Phân tích Tín dụng Doanh nghiệp',
-    description: 'Ứng dụng Prompting trong tóm tắt hồ sơ vay vốn, phân tích báo cáo tài chính và trích xuất chỉ số rủi ro.',
+    title: 'Local test course B',
+    description: 'Local repository verification fixture.',
     status: 'active',
-    slug: 'ai-tham-dinh-tin-dung-doanh-nghiep',
+    slug: 'local-test-course-b',
     publication_status: 'published',
     version: 1,
-    created_by: '00000000-0000-0000-0000-000000000001',
+    created_by: null,
   },
 ];
 
 const INITIAL_CLASSES: DbClass[] = [
   {
     id: '44444444-4444-4444-4444-444444444441',
-    class_code: 'AGRI-COMM-2026-01',
+    class_code: 'TEST-CLASS-01',
     course_id: '33333333-3333-3333-3333-333333333331',
     client_id: '11111111-1111-1111-1111-111111111111',
-    department: 'Ban Truyền thông & Thương hiệu',
+    department: '',
     start_date: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
     end_date: new Date(Date.now() + 6 * 3600 * 1000).toISOString(),
     status: 'active',
   },
   {
     id: '44444444-4444-4444-4444-444444444442',
-    class_code: 'AGRI-CREDIT-2026-02',
+    class_code: 'TEST-CLASS-02',
     course_id: '33333333-3333-3333-3333-333333333332',
     client_id: '11111111-1111-1111-1111-111111111111',
-    department: 'Khối Quản lý & Thẩm định Tín dụng',
-    start_date: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    end_date: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+    department: '',
+    start_date: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    end_date: new Date(Date.now() + 6 * 3600 * 1000).toISOString(),
     status: 'active',
   },
-  {
-    id: '44444444-4444-4444-4444-444444444443',
-    class_code: 'CORP-GEN-2026-03',
-    course_id: '33333333-3333-3333-3333-333333333331',
-    client_id: '22222222-2222-2222-2222-222222222222',
-    department: 'Văn phòng Tổng hợp & CSKH',
-    start_date: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-    end_date: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
-    status: 'upcoming',
-  },
 ];
 
-const INITIAL_LEARNERS: DbLearner[] = [
-  { id: '55555555-5555-5555-5555-555555555551', learner_code: 'LRN-000001', user_id: '00000000-0000-0000-0000-000000000002' },
-  { id: '55555555-5555-5555-5555-555555555552', learner_code: 'LRN-000002', user_id: '00000000-0000-0000-0000-000000000003' },
-  { id: '55555555-5555-5555-5555-555555555553', learner_code: 'LRN-000003', user_id: '00000000-0000-0000-0000-000000000004' },
-];
+const INITIAL_LEARNERS: DbLearner[] = [];
 
-const INITIAL_ENROLLMENTS: DbEnrollment[] = [
-  { id: '66666666-6666-6666-6666-666666666661', learner_id: '55555555-5555-5555-5555-555555555551', class_id: '44444444-4444-4444-4444-444444444441', status: 'active' },
-  { id: '66666666-6666-6666-6666-666666666662', learner_id: '55555555-5555-5555-5555-555555555552', class_id: '44444444-4444-4444-4444-444444444442', status: 'active' },
-  { id: '66666666-6666-6666-6666-666666666663', learner_id: '55555555-5555-5555-5555-555555555553', class_id: '44444444-4444-4444-4444-444444444443', status: 'active' },
-];
+const INITIAL_ENROLLMENTS: DbEnrollment[] = [];
 
 // ==============================================================================
 // LOCAL STORAGE HELPER CHO PROMPTIFY DB REPOSITORY
@@ -796,7 +774,7 @@ export const dbService = {
             learner_code: e.learner?.learner_code || 'LRN-000000',
             full_name: e.learner?.user?.full_name || 'Học viên',
             email: e.learner?.user?.email || '',
-            department: e.class?.department || 'Ban Nghiệp vụ',
+            department: e.class?.department || '',
             enrollment_status: e.status,
             joined_at: e.joined_at,
           }));
@@ -826,7 +804,7 @@ export const dbService = {
         learner_code: learner?.learner_code || 'LRN-000000',
         full_name: user?.full_name || 'Học viên',
         email: user?.email || '',
-        department: cls?.department || 'Ban Nghiệp vụ',
+        department: cls?.department || '',
         enrollment_status: e.status,
         joined_at: e.joined_at || new Date().toISOString(),
       };
@@ -929,7 +907,7 @@ export const dbService = {
           learner_code: learner.learner_code,
           full_name: user.full_name,
           email: user.email,
-          department: cls?.department || 'Ban Nghiệp vụ',
+          department: cls?.department || '',
           enrollment_status: 'active',
           joined_at: new Date().toISOString(),
         }
@@ -992,7 +970,7 @@ export const dbService = {
         learner_code: learner.learner_code,
         full_name: user.full_name,
         email: user.email,
-        department: cls?.department || 'Ban Nghiệp vụ',
+        department: cls?.department || '',
         enrollment_status: 'active',
         joined_at: enrollment.joined_at || new Date().toISOString(),
       }

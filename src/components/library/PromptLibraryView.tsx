@@ -8,7 +8,6 @@ import {
   ArrowRight, 
   Sliders, 
   Tag, 
-  Building2, 
   ArrowLeft,
   Filter,
   Sparkles,
@@ -81,7 +80,7 @@ export const PromptLibraryView: React.FC<Props> = ({
             <span>Thư viện Prompt Chuẩn Nghiệp vụ</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Kho câu lệnh mẫu chuẩn mực dành cho cán bộ {cohort.organization} ({cohort.department})
+            Kho câu lệnh mẫu để tham khảo, lưu lại và tái sử dụng khi thực hành
           </p>
         </div>
 
@@ -212,11 +211,6 @@ export const PromptLibraryView: React.FC<Props> = ({
                     {tpl.businessUseCase}
                   </p>
 
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                    <Building2 className="w-3 h-3" />
-                    <span>{tpl.department}</span>
-                  </div>
-
                   {/* Prompt Text Preview Box */}
                   <div className="relative mt-2">
                     <pre className={`text-xs font-mono bg-slate-50 p-3 rounded-xl border border-slate-200 text-slate-800 whitespace-pre-wrap ${
@@ -273,4 +267,3 @@ export const PromptLibraryView: React.FC<Props> = ({
     </div>
   );
 };
-

@@ -3,18 +3,13 @@ import {
   Building2, 
   Megaphone, 
   Briefcase, 
-  Clock, 
   ArrowRight, 
-  Plus, 
-  CheckCircle2, 
   BookOpen, 
   LogOut, 
-  AlertCircle,
   Sparkles,
   ShieldAlert
 } from 'lucide-react';
 import { ClassCohort, Learner, Enrollment } from '../../types';
-import { CLASS_COHORTS, DEFAULT_ENROLLMENTS } from '../../data/classesData';
 import { PromptifyMark } from '../common/PromptifyMark';
 
 interface Props {
@@ -23,9 +18,7 @@ interface Props {
   enrollments: Record<string, Enrollment>;
   totalLabCount: number;
   onSelectClass: (cohort: ClassCohort) => Promise<boolean>;
-  onJoinClassByCode: (code: string) => Promise<boolean>;
   onLogout: () => void;
-  onResetAll?: () => void;
 }
 
 export const ClassSelectionScreen: React.FC<Props> = ({
@@ -34,13 +27,9 @@ export const ClassSelectionScreen: React.FC<Props> = ({
   enrollments,
   totalLabCount,
   onSelectClass,
-  onJoinClassByCode,
   onLogout,
-  onResetAll,
 }) => {
-  const [classCodeInput, setClassCodeInput] = useState<string>('');
   const [joinError, setJoinError] = useState<string>('');
-  const [joinSuccess, setJoinSuccess] = useState<string>('');
 
   const getCohortIcon = (iconName: string) => {
     switch (iconName) {
@@ -52,23 +41,6 @@ export const ClassSelectionScreen: React.FC<Props> = ({
         return <Sparkles className="w-5 h-5 text-emerald-400" />;
       default:
         return <Briefcase className="w-5 h-5 text-indigo-400" />;
-    }
-  };
-
-  const handleJoinSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setJoinError('');
-    setJoinSuccess('');
-    if (!classCodeInput.trim()) {
-      setJoinError('Vui lòng nhập mã lớp.');
-      return;
-    }
-    const ok = await onJoinClassByCode(classCodeInput.trim());
-    if (ok) {
-      setJoinSuccess(`Đã tham gia lớp thành công với mã ${classCodeInput.toUpperCase()}!`);
-      setClassCodeInput('');
-    } else {
-      setJoinError('Mã lớp không hợp lệ, hoặc lớp doanh nghiệp này chưa được giảng viên ghi danh cho bạn.');
     }
   };
 
@@ -126,7 +98,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             Chọn lớp học của bạn
           </h1>
           <p className="text-sm text-slate-600 max-w-2xl">
-            Chào mừng <strong>{learner?.name || 'Học viên'}</strong> ({learner?.department || ''}). Lớp testing có thể tự tham gia; lớp doanh nghiệp chỉ xuất hiện khi giảng viên đã ghi danh bạn.
+            Chào mừng <strong>{learner?.name || 'Học viên'}</strong>. Lớp công khai luôn có thể tham gia; các lớp riêng chỉ xuất hiện khi giảng viên đã ghi danh bạn.
           </p>
         </div>
 
@@ -143,7 +115,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
           )}
           {cohorts.map((cohort) => {
             const enrollmentKey = learner ? `${learner.id}_${cohort.id}` : '';
-            const enrollment = enrollments[enrollmentKey] || DEFAULT_ENROLLMENTS[enrollmentKey];
+            const enrollment = enrollments[enrollmentKey];
             const completedCount = enrollment ? enrollment.completedLabIds.length : 0;
             const safeTotal = Math.max(1, totalLabCount);
             const progressPercent = Math.round((completedCount / safeTotal) * 100);
@@ -165,9 +137,6 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                           Công khai
                         </span>
                       )}
-                      <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                        {cohort.classCode}
-                      </span>
                     </div>
                   </div>
 
@@ -175,23 +144,11 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                     <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition leading-snug">
                       {cohort.name}
                     </h3>
-                    <div className="text-xs font-semibold text-slate-700 mt-1">
-                      {cohort.organization} • {cohort.department}
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Ngành: <span className="font-medium text-slate-700">{cohort.industry}</span>
-                    </div>
                   </div>
 
                   <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
                     {cohort.description}
                   </p>
-
-                  {/* Expiry Badge */}
-                  <div className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200">
-                    <Clock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                    <span>Thời hạn truy cập: <strong>{cohort.expiryDateText || `Còn ${cohort.expiryDurationHours} giờ`}</strong></span>
-                  </div>
 
                   {/* Progress bar */}
                   <div className="space-y-1.5 pt-1">
@@ -226,52 +183,6 @@ export const ClassSelectionScreen: React.FC<Props> = ({
           })}
         </div>
 
-        {/* Join new class section */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs max-w-xl">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-base mb-1">
-            <Plus className="w-5 h-5 text-emerald-600" />
-            <h3>Tham gia thêm lớp học bằng mã</h3>
-          </div>
-          <p className="text-xs text-slate-500 mb-4">
-            Lớp testing công khai cho phép tự tham gia. Với lớp doanh nghiệp, mã lớp chỉ có tác dụng sau khi giảng viên đã ghi danh bạn:
-          </p>
-
-          <form onSubmit={handleJoinSubmit} className="space-y-3">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={classCodeInput}
-                onChange={(e) => {
-                  setClassCodeInput(e.target.value);
-                  setJoinError('');
-                  setJoinSuccess('');
-                }}
-                placeholder="Ví dụ: TESTER-PE-001 hoặc AGRI-COMM"
-                className="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase font-mono"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
-              >
-                Tham gia lớp
-              </button>
-            </div>
-
-            {joinError && (
-              <div className="flex items-center gap-1.5 text-xs text-rose-600">
-                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>{joinError}</span>
-              </div>
-            )}
-
-            {joinSuccess && (
-              <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
-                <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>{joinSuccess}</span>
-              </div>
-            )}
-          </form>
-        </div>
       </main>
     </div>
   );

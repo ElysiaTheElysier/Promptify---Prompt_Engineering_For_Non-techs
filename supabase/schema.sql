@@ -115,39 +115,31 @@ FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 -- SEED DATA (Mẫu thực tế Agribank & Khối Doanh nghiệp)
 -- ==============================================================================
 
--- 1. Thêm Users mẫu (1 Instructor, 3 Learners)
-INSERT INTO users (id, email, full_name, role) VALUES
-  ('00000000-0000-0000-0000-000000000001', 'nam.nh@agribank.com.vn', 'Nguyễn Hoàng Nam', 'instructor'),
-  ('00000000-0000-0000-0000-000000000002', 'linh.pham@agribank.com.vn', 'Linh Phạm', 'learner'),
-  ('00000000-0000-0000-0000-000000000003', 'minh.tran@agribank.com.vn', 'Minh Trần', 'learner'),
-  ('00000000-0000-0000-0000-000000000004', 'phuong.nguyen@enterprise.com', 'Phương Nguyễn', 'learner')
-ON CONFLICT (email) DO NOTHING;
-
--- 2. Thêm Clients (Doanh nghiệp đối tác)
+-- 1. Thêm Clients (Doanh nghiệp đối tác)
 INSERT INTO clients (id, name, industry) VALUES
   ('11111111-1111-1111-1111-111111111111', 'Agribank Việt Nam', 'Ngân hàng & Tài chính'),
   ('22222222-2222-2222-2222-222222222222', 'Enterprise Business Users', 'Doanh nghiệp & Dịch vụ')
 ON CONFLICT DO NOTHING;
 
--- 3. Thêm Courses (Khóa đào tạo có thể tái sử dụng)
+-- 2. Thêm Courses (Khóa đào tạo có thể tái sử dụng)
 INSERT INTO courses (id, title, description, status, created_by) VALUES
   (
     '33333333-3333-3333-3333-333333333331',
     'Prompt Engineering for Business Users & Non-techs',
     'Chương trình chuẩn hóa kỹ năng điều khiển AI cho cán bộ văn phòng: Viết prompt có cấu trúc, trích xuất bảng Markdown và chống ảo giác.',
     'active',
-    '00000000-0000-0000-0000-000000000001'
+    NULL
   ),
   (
     '33333333-3333-3333-3333-333333333332',
     'AI Thẩm định & Phân tích Tín dụng Doanh nghiệp',
     'Ứng dụng Prompting trong tóm tắt hồ sơ vay vốn, phân tích báo cáo tài chính và trích xuất chỉ số rủi ro.',
     'active',
-    '00000000-0000-0000-0000-000000000001'
+    NULL
   )
 ON CONFLICT DO NOTHING;
 
--- 4. Thêm Classes (Triển khai cho từng Client & Phòng ban)
+-- 3. Thêm Classes (Triển khai cho từng Client & Phòng ban)
 INSERT INTO classes (id, class_code, course_id, client_id, department, start_date, end_date, status) VALUES
   (
     '44444444-4444-4444-4444-444444444441',
@@ -180,35 +172,6 @@ INSERT INTO classes (id, class_code, course_id, client_id, department, start_dat
     'upcoming'
   )
 ON CONFLICT (class_code) DO NOTHING;
-
--- 5. Thêm Learners (Mã LRN-000001, LRN-000002, ...)
-INSERT INTO learners (id, learner_code, user_id) VALUES
-  ('55555555-5555-5555-5555-555555555551', 'LRN-000001', '00000000-0000-0000-0000-000000000002'),
-  ('55555555-5555-5555-5555-555555555552', 'LRN-000002', '00000000-0000-0000-0000-000000000003'),
-  ('55555555-5555-5555-5555-555555555553', 'LRN-000003', '00000000-0000-0000-0000-000000000004')
-ON CONFLICT (user_id) DO NOTHING;
-
--- 6. Thêm Enrollments (Ghi danh vào lớp)
-INSERT INTO enrollments (id, learner_id, class_id, status) VALUES
-  (
-    '66666666-6666-6666-6666-666666666661',
-    '55555555-5555-5555-5555-555555555551',
-    '44444444-4444-4444-4444-444444444441',
-    'active'
-  ),
-  (
-    '66666666-6666-6666-6666-666666666662',
-    '55555555-5555-5555-5555-555555555552',
-    '44444444-4444-4444-4444-444444444442',
-    'active'
-  ),
-  (
-    '66666666-6666-6666-6666-666666666663',
-    '55555555-5555-5555-5555-555555555553',
-    '44444444-4444-4444-4444-444444444443',
-    'active'
-  )
-ON CONFLICT (learner_id, class_id) DO NOTHING;
 
 -- ==============================================================================
 -- 7. THU HỒI TOÀN BỘ QUYỀN CỦA ROLE ANON (Không expose business data cho anon)

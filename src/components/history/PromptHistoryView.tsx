@@ -44,8 +44,7 @@ export const PromptHistoryView: React.FC<Props> = ({
 
   const handleExportMarkdown = () => {
     let content = `# NHẬT KÝ THỰC HÀNH PROMPT ENGINEERING\n`;
-    content += `Lớp học: ${cohort.name} (${cohort.classCode})\n`;
-    content += `Đơn vị: ${cohort.organization} - ${cohort.department}\n`;
+    content += `Khóa học: ${cohort.name}\n`;
     content += `Thời gian xuất: ${new Date().toLocaleString('vi-VN')}\n`;
     content += `Tổng số lần thử: ${history.length}\n\n`;
     content += `---\n\n`;

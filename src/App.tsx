@@ -9,7 +9,6 @@ import {
   ApiConfig, 
   PromptRun 
 } from './types';
-import { CLASS_COHORTS, DEMO_LEARNERS, DEFAULT_ENROLLMENTS } from './data/classesData';
 import { LABS_DATA } from './data/labsData';
 import { LandingLoginScreen } from './components/auth/LandingLoginScreen';
 import { ClassSelectionScreen } from './components/classes/ClassSelectionScreen';
@@ -30,6 +29,18 @@ import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 import { dbService } from './services/dbService';
 import { mapCurriculumToLabs } from './services/curriculumAdapter';
 import { buildLessonUrl, readLessonId, resolveAuthorizedLessonId } from './services/lessonUrlState';
+
+const EMPTY_COHORT: ClassCohort = {
+  id: '',
+  classCode: '',
+  name: '',
+  organization: '',
+  industry: '',
+  department: '',
+  expiryDurationHours: 0,
+  description: '',
+  iconName: 'BookOpen',
+};
 
 export const App: React.FC = () => {
   // Trạng thái kiểm tra phiên đăng nhập (Ngăn loading vô hạn)
@@ -62,10 +73,10 @@ export const App: React.FC = () => {
   });
 
   // 3. Quản lý Lớp học được chọn
-  const [selectedCohort, setSelectedCohort] = useState<ClassCohort>(CLASS_COHORTS[0]);
+  const [selectedCohort, setSelectedCohort] = useState<ClassCohort>(EMPTY_COHORT);
 
   // 4. Danh sách các lớp học hiện có
-  const [cohorts, setCohorts] = useState<ClassCohort[]>(CLASS_COHORTS);
+  const [cohorts, setCohorts] = useState<ClassCohort[]>([]);
 
   // Curriculum thật từ database; giữ LABS_DATA làm fallback khi chưa triển khai
   // migration hoặc khóa học chưa có nội dung đã xuất bản.
@@ -82,7 +93,7 @@ export const App: React.FC = () => {
         // fallback
       }
     }
-    return DEFAULT_ENROLLMENTS;
+    return {};
   });
 
   // 6. Chế độ giao diện trong bài học (Hybrid song song hoặc Notebook tuần tự)
@@ -376,8 +387,6 @@ export const App: React.FC = () => {
           name: resolvedName,
           email: dbUser.email,
           role: 'Instructor',
-          organization: 'Agribank Việt Nam',
-          department: 'Ban Đào tạo & Khối Công nghệ',
           avatarInitials: initials
         };
         setCurrentUser(instructorProfile);
@@ -410,8 +419,8 @@ export const App: React.FC = () => {
           name: activeView.user.full_name || resolvedName,
           email: activeView.user.email,
           role: 'STUDENT',
-          organization: activeView.classDetails.client?.name || 'Agribank Việt Nam',
-          department: activeView.classDetails.department,
+          organization: '',
+          department: '',
           avatarInitials: initials
         };
         setCurrentLearner(learnerData);
@@ -420,8 +429,6 @@ export const App: React.FC = () => {
           name: activeView.user.full_name || resolvedName,
           email: dbUser.email,
           role: 'Learner',
-          department: activeView.classDetails.department,
-          organization: activeView.classDetails.client?.name || 'Agribank Việt Nam',
           avatarInitials: initials
         });
         setUserRole('LEARNER');
@@ -433,8 +440,8 @@ export const App: React.FC = () => {
           id: activeView.classDetails.id,
           classCode: activeView.classDetails.class_code,
           name: activeView.classDetails.course?.title || activeView.classDetails.class_code,
-          organization: activeView.classDetails.client?.name || 'Agribank Việt Nam',
-          industry: activeView.classDetails.client?.industry || 'Ngân hàng & Tài chính',
+          organization: activeView.classDetails.client?.name || '',
+          industry: activeView.classDetails.client?.industry || '',
           department: activeView.classDetails.department,
           expiryDurationHours: 8,
           expiryDateText: 'Hết hạn lúc 18:00 hôm nay',
@@ -468,23 +475,21 @@ export const App: React.FC = () => {
           return 'dashboard';
         });
       } else {
-        const fallbackLearner: Learner = {
+        const learnerWithoutEnrollment: Learner = {
           id: dbUser.id,
           name: resolvedName,
           email: dbUser.email,
           role: 'STUDENT',
-          organization: 'Agribank Việt Nam',
-          department: 'Khối Nghiệp vụ',
+          organization: '',
+          department: '',
           avatarInitials: initials
         };
-        setCurrentLearner(fallbackLearner);
+        setCurrentLearner(learnerWithoutEnrollment);
         setCurrentUser({
           id: dbUser.id,
           name: resolvedName,
           email: dbUser.email,
           role: 'Learner',
-          department: 'Khối Nghiệp vụ',
-          organization: 'Agribank Việt Nam',
           avatarInitials: initials
         });
         setUserRole('LEARNER');
@@ -513,7 +518,7 @@ export const App: React.FC = () => {
     setEnrolledClassIds([]);
     setCohorts([]);
     setCurrentView('landing');
-    setSelectedCohort(CLASS_COHORTS[0]);
+    setSelectedCohort(EMPTY_COHORT);
     setActiveLabId('lab-1');
 
     // LocalStorage
@@ -630,8 +635,8 @@ export const App: React.FC = () => {
             id: c.id,
             classCode: c.class_code,
             name: c.course?.title || c.class_code,
-            organization: c.client?.name || 'Agribank Việt Nam',
-            industry: c.client?.industry || 'Ngân hàng & Tài chính',
+            organization: c.client?.name || '',
+            industry: c.client?.industry || '',
             department: c.department,
             expiryDurationHours: 8,
             expiryDateText: 'Hết hạn lúc 18:00 hôm nay',
@@ -648,23 +653,6 @@ export const App: React.FC = () => {
     fetchClasses();
     return () => { isMounted = false; };
   }, [currentUser, currentLearner, userRole]);
-
-  // Xử lý Đăng nhập Học viên
-  const handleLogin = (learner: Learner) => {
-    resolveUserSession(learner.email, learner.name);
-  };
-
-  // Xử lý Reset toàn bộ luồng về Landing Page ban đầu
-  const handleResetAll = async () => {
-    localStorage.removeItem('promptify_history');
-    setActiveLabId('lab-1');
-    setActiveLab(labs[0]);
-    setActivePrompt(labs[0].baselinePrompt);
-    setActiveRunCount(0);
-    setHistory([]);
-    setIsTutorialOpen(false);
-    await handleLogout();
-  };
 
   // Mở hướng dẫn (nếu đang ở màn hình khác thì chuyển vào bài học trước để target highlight chuẩn xác)
   const handleOpenTutorial = () => {
@@ -716,8 +704,6 @@ export const App: React.FC = () => {
         setCurrentLearner((learner) => learner ? {
           ...learner,
           id: selfEnrollment.learnerCode,
-          organization: cohort.organization,
-          department: cohort.department,
         } : learner);
       }
     }
@@ -729,35 +715,11 @@ export const App: React.FC = () => {
     setHasActiveEnrollment(true);
     setEnrolledClassIds((ids) => ids.includes(cohort.id) ? ids : [...ids, cohort.id]);
     setSelectedCohort(cohort);
-    setCurrentLearner((learner) => learner ? {
-      ...learner,
-      organization: cohort.organization,
-      department: cohort.department,
-    } : learner);
-    setCurrentUser((user) => user ? {
-      ...user,
-      organization: cohort.organization,
-      department: cohort.department,
-    } : user);
     const classUrl = new URL(window.location.href);
     classUrl.searchParams.delete('lesson');
     window.history.replaceState({}, '', classUrl.toString());
     setCurrentView('dashboard');
     return true;
-  };
-
-  // Mã lớp doanh nghiệp chỉ chọn enrollment đã được cấp. Riêng lớp public có
-  // thể tự ghi danh qua RPC; client không bao giờ insert enrollment trực tiếp.
-  const handleJoinClassByCode = async (code: string): Promise<boolean> => {
-    const upperCode = code.toUpperCase().trim();
-    const found = cohorts.find(
-      (c) => c.id.toUpperCase() === upperCode || c.classCode.toUpperCase() === upperCode
-    );
-
-    if (found) {
-      return handleSelectClass(found);
-    }
-    return false;
   };
 
   // Bắt đầu một bài học từ Dashboard hoặc Lộ trình
@@ -789,8 +751,8 @@ export const App: React.FC = () => {
   // Lấy enrollment hiện tại của learner (với null-check an toàn)
   const currentEnrollmentKey = currentLearner && selectedCohort ? `${currentLearner.id}_${selectedCohort.id}` : '';
   const currentEnrollment: Enrollment = (currentEnrollmentKey && enrollments[currentEnrollmentKey]) || {
-    learnerId: currentLearner?.id || 'demo',
-    classId: selectedCohort?.id || (CLASS_COHORTS[0] && CLASS_COHORTS[0].id) || 'AGRI-COMM-2026-01',
+    learnerId: currentLearner?.id || '',
+    classId: selectedCohort?.id || '',
     completedLabIds: [],
     currentLabId: labs[0]?.id || '',
     enrolledAt: new Date().toISOString(),
@@ -799,6 +761,15 @@ export const App: React.FC = () => {
   const selectableCohorts = cohorts.filter((cohort) => (
     cohort.isPublic || enrolledClassIds.includes(cohort.id) || (hasActiveEnrollment && cohort.id === selectedCohort.id)
   ));
+
+  const handleProductNavigate = (view: AppView) => {
+    if (view === 'dashboard') {
+      const homeUrl = new URL(window.location.href);
+      homeUrl.searchParams.delete('lesson');
+      window.history.replaceState({}, '', homeUrl.toString());
+    }
+    setCurrentView(view);
+  };
 
   // Loading Screen khi đang kiểm tra auth session hoặc đang đăng xuất
   if (isAuthLoading) {
@@ -815,9 +786,7 @@ export const App: React.FC = () => {
   // 1. Màn hình Landing & Login (khi chưa có currentUser HOẶC view === 'landing')
   if (!currentUser || currentView === 'landing') {
     return (
-      <LandingLoginScreen 
-        onLogin={handleLogin} 
-      />
+      <LandingLoginScreen />
     );
   }
 
@@ -841,9 +810,7 @@ export const App: React.FC = () => {
         enrollments={{}}
         totalLabCount={labs.length}
         onSelectClass={handleSelectClass}
-        onJoinClassByCode={handleJoinClassByCode}
         onLogout={handleLogout}
-        onResetAll={handleResetAll}
       />
     );
   }
@@ -852,9 +819,7 @@ export const App: React.FC = () => {
   if (currentView === 'class_select') {
     if (!currentLearner) {
       return (
-        <LandingLoginScreen 
-          onLogin={handleLogin} 
-        />
+          <LandingLoginScreen />
       );
     }
     return (
@@ -864,9 +829,7 @@ export const App: React.FC = () => {
         enrollments={enrollments}
         totalLabCount={labs.length}
         onSelectClass={handleSelectClass}
-        onJoinClassByCode={handleJoinClassByCode}
         onLogout={handleLogout}
-        onResetAll={handleResetAll}
       />
     );
   }
@@ -874,9 +837,7 @@ export const App: React.FC = () => {
   // 4. Không gian chính của học viên (Product Shell)
   if (!currentLearner) {
     return (
-      <LandingLoginScreen 
-        onLogin={handleLogin} 
-      />
+      <LandingLoginScreen />
     );
   }
 
@@ -885,7 +846,7 @@ export const App: React.FC = () => {
       {/* Product Top Navbar */}
       <ProductNavbar
         currentView={currentView}
-        onNavigate={setCurrentView}
+        onNavigate={handleProductNavigate}
         selectedCohort={selectedCohort}
         availableCohorts={selectableCohorts}
         onSelectClass={async (cohort) => {
@@ -896,8 +857,6 @@ export const App: React.FC = () => {
         onChangeClass={() => setCurrentView('class_select')}
         learner={currentLearner}
         onLogout={handleLogout}
-        onOpenTutorial={handleOpenTutorial}
-        onResetAll={handleResetAll}
       />
 
       {/* Main Content Area based on currentView */}
@@ -990,10 +949,10 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="font-bold text-slate-700">
-              Promptify • Hệ thống Đào tạo & Thực hành Prompt Engineering Chuẩn Doanh nghiệp
+              Promptify • Hệ thống Đào tạo & Thực hành Prompt Engineering
             </p>
             <p className="text-slate-600">
-              {selectedCohort.organization} • {selectedCohort.department} • Khóa học: {selectedCohort.name} ({selectedCohort.classCode})
+              Khóa học: {selectedCohort.name}
             </p>
           </div>
 

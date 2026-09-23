@@ -69,14 +69,6 @@ export const LearnerDashboard: React.FC<Props> = ({
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md bg-slate-900 px-2.5 py-1 font-mono text-xs font-bold text-white">
-                {cohort.classCode}
-              </span>
-              <span className="text-xs font-semibold text-slate-500">
-                {cohort.organization} • {cohort.department}
-              </span>
-            </div>
             <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">
               <Layers3 className="h-6 w-6 text-emerald-600" />
               Lộ trình học

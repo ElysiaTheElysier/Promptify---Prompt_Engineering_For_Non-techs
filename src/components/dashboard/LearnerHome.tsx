@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, BookOpen, Building2, CheckCircle2, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Sparkles } from 'lucide-react';
 import { ClassCohort, Enrollment, Learner } from '../../types';
 
 interface Props {
@@ -76,7 +76,7 @@ export const LearnerHome: React.FC<Props> = ({
                 <div className="space-y-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-emerald-300">
-                      {cohort.isPublic ? <Sparkles className="h-5 w-5" /> : <Building2 className="h-5 w-5" />}
+                      {cohort.isPublic ? <Sparkles className="h-5 w-5" /> : <BookOpen className="h-5 w-5" />}
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
                       {isSelected && (
@@ -93,11 +93,7 @@ export const LearnerHome: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <p className="font-mono text-xs font-bold text-emerald-700">{cohort.classCode}</p>
-                    <h3 className="mt-1 text-lg font-bold leading-snug text-slate-950">{cohort.name}</h3>
-                    <p className="mt-2 text-xs font-medium text-slate-600">
-                      {cohort.organization} · {cohort.department}
-                    </p>
+                    <h3 className="text-lg font-bold leading-snug text-slate-950">{cohort.name}</h3>
                     <p className="mt-3 line-clamp-2 text-xs leading-5 text-slate-500">{cohort.description}</p>
                   </div>
 

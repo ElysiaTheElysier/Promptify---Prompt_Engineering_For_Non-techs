@@ -5,9 +5,19 @@ import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthori
 
 console.log('=== TEST: Enrollment-gated Course Access ===');
 
-const enrolledUserId = '00000000-0000-0000-0000-000000000002';
 const enrolledClassId = '44444444-4444-4444-4444-444444444441';
 const otherClassId = '44444444-4444-4444-4444-444444444442';
+
+const enrolledUser = await dbService.syncUserFromOAuth({
+  email: `enrolled-${Date.now()}@example.com`,
+  full_name: 'Test learner',
+});
+const enrolledUserId = enrolledUser.id;
+const firstEnrollment = await dbService.addLearnerToClass(enrolledClassId, {
+  email: enrolledUser.email,
+  fullName: enrolledUser.full_name,
+});
+assert.equal(firstEnrollment.success, true);
 
 assert.equal(await dbService.canUserAccessClass(enrolledUserId, enrolledClassId), true);
 assert.equal(await dbService.canUserAccessClass(enrolledUserId, otherClassId), false);
@@ -20,8 +30,8 @@ assert.equal(await dbService.canUserAccessClass(unassigned.id, enrolledClassId),
 assert.equal(await dbService.getLearnerActiveEnrollment(unassigned.id), null);
 
 const secondEnrollment = await dbService.addLearnerToClass(otherClassId, {
-  email: 'linh.pham@agribank.com.vn',
-  fullName: 'Linh Phạm',
+  email: enrolledUser.email,
+  fullName: enrolledUser.full_name,
 });
 assert.equal(secondEnrollment.success, true);
 const activeEnrollments = await dbService.getLearnerActiveEnrollments(enrolledUserId);
