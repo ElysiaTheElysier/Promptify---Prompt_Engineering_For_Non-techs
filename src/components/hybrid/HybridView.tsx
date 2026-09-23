@@ -888,10 +888,10 @@ export const HybridView: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 2. BỐ CỤC CHÍNH (HYBRID 35% - 65%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* CỘT TRÁI (35%): TÌNH HUỐNG & MỤC TIÊU - STICKY DESKTOP */}
-        <div className="lg:col-span-4 lg:sticky lg:top-20 space-y-4">
+      {/* 2. BỐ CỤC CHÍNH (HYBRID 42% - 58%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* CỘT TRÁI (42%): TÌNH HUỐNG & MỤC TIÊU - STICKY DESKTOP */}
+        <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
           <LessonBriefPanel
             lab={currentLab}
             showDataAccordion={showDataAccordion}
@@ -905,8 +905,8 @@ export const HybridView: React.FC<Props> = ({
             />
         </div>
 
-        {/* CỘT PHẢI (65%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
-        <div className="lg:col-span-8 space-y-5">
+        {/* CỘT PHẢI (58%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
+        <div className="lg:col-span-7 space-y-5">
           <PromptComposer
             lab={currentLab}
             promptText={promptText}

@@ -84,7 +84,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
 
   return (
     <div 
-      className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-6rem)] sm:max-h-[740px] transition-all"
+      className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col max-h-[calc(100vh-6rem)] sm:max-h-[780px] transition-all"
       data-tour="tour-scenario"
     >
       {/* 1. HEADER CHÍNH CỦA BÀI HỌC */}
@@ -97,7 +97,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
             {lab.badge}
           </span>
         </div>
-        <h2 className="text-base font-bold text-slate-900 leading-snug line-clamp-2">
+        <h2 className="text-lg font-bold text-slate-900 leading-snug line-clamp-2">
           {lab.title}
         </h2>
         {lab.focusSkill && (
@@ -186,7 +186,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
         {activeTab === 'theory' && (
           <div className="space-y-4 animate-fadeIn">
             <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4 text-emerald-600" />
                 <span>Lý thuyết Cốt lõi & Bản chất Kỹ thuật</span>
               </span>
@@ -196,8 +196,8 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
             </div>
 
             {/* Khối hiển thị lý thuyết chuẩn sư phạm */}
-            <div className="text-xs text-slate-700 leading-relaxed bg-slate-50/70 p-4 rounded-xl border border-slate-200/80 space-y-3">
-              <MarkdownView content={lab.theoryContent || lab.conceptExplanation} />
+            <div className="text-slate-700 bg-slate-50/70 p-4 sm:p-5 rounded-xl border border-slate-200/80 space-y-3">
+              <MarkdownView content={lab.theoryContent || lab.conceptExplanation} size="sm" />
             </div>
 
             {/* Nút chuyển nhanh sang Bài tập */}
@@ -220,23 +220,23 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
         {activeTab === 'exercise' && (
           <div className="space-y-4 animate-fadeIn">
             {/* Tình huống nghiệp vụ */}
-            <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
+            <div className="space-y-1.5 text-sm text-slate-600 leading-6">
               <span className="font-bold text-slate-800 flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Tình huống thực tế:</span>
               </span>
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-slate-700">
-                <MarkdownView content={lab.scenario} />
+                <MarkdownView content={lab.scenario} size="sm" />
               </div>
             </div>
 
             {/* Mục tiêu cần đạt */}
-            <div className="p-3.5 bg-emerald-50/80 rounded-xl text-xs text-emerald-950 leading-relaxed border border-emerald-200/70 shadow-2xs">
+            <div className="p-4 bg-emerald-50/80 rounded-xl text-sm text-emerald-950 leading-6 border border-emerald-200/70 shadow-2xs">
               <div className="flex items-center gap-1.5 font-bold text-emerald-900 mb-1.5">
                 <Target className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                 <span>Mục tiêu cần đạt:</span>
               </div>
-              <MarkdownView content={lab.taskGoal} />
+              <MarkdownView content={lab.taskGoal} size="sm" />
             </div>
 
             {/* Dữ liệu đầu vào cố định (Control Data) */}

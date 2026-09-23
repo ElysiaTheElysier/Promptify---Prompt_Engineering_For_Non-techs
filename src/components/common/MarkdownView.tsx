@@ -3,6 +3,7 @@ import React from 'react';
 interface Props {
   content: string;
   className?: string;
+  size?: 'xs' | 'sm';
 }
 
 /**
@@ -51,7 +52,7 @@ function sanitizeLatexAndSymbols(text: string): string {
     .replace(/\$([A-Za-z0-9\s\-+*/=<>]+)\$/g, '$1');
 }
 
-export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
+export const MarkdownView: React.FC<Props> = ({ content, className = '', size = 'xs' }) => {
   if (!content) {
     return <div className="text-slate-400 italic text-xs">Chưa có nội dung.</div>;
   }
@@ -59,6 +60,7 @@ export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
   const sanitizedContent = sanitizeLatexAndSymbols(content);
   const lines = sanitizedContent.split(/\r?\n/);
   const blocks: React.ReactNode[] = [];
+  const bodyTextClass = size === 'sm' ? 'text-sm leading-6' : 'text-xs leading-relaxed';
 
   let i = 0;
   while (i < lines.length) {
@@ -190,7 +192,7 @@ export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
       blocks.push(
         <blockquote
           key={`quote-${i}`}
-          className="my-2 p-2.5 bg-amber-50/80 border-l-3 border-amber-500 text-xs text-amber-950 rounded-r-xl italic leading-relaxed"
+          className={`my-2 p-3 bg-amber-50/80 border-l-3 border-amber-500 text-amber-950 rounded-r-xl italic ${bodyTextClass}`}
         >
           {quoteLines.map((ql, qIdx) => (
             <p key={qIdx}>{renderInline(ql)}</p>
@@ -232,7 +234,7 @@ export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
           listElements.push(
             <div
               key={`li-num-${i}`}
-              className="flex items-start gap-2 text-xs leading-relaxed text-slate-800 my-1"
+              className={`flex items-start gap-2 text-slate-800 my-1 ${bodyTextClass}`}
               style={{ paddingLeft: `${indentLevel * 14}px` }}
             >
               <span className="font-bold text-emerald-700 shrink-0 w-4 text-right">{num}.</span>
@@ -245,7 +247,7 @@ export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
           listElements.push(
             <div
               key={`li-bullet-${i}`}
-              className="flex items-start gap-2 text-xs leading-relaxed text-slate-700 my-0.5"
+              className={`flex items-start gap-2 text-slate-700 my-0.5 ${bodyTextClass}`}
               style={{ paddingLeft: `${Math.max(indentLevel * 14, 8)}px` }}
             >
               <span className="text-emerald-600 font-bold shrink-0 mt-0.5">•</span>
@@ -257,7 +259,7 @@ export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
           listElements.push(
             <div
               key={`li-sub-${i}`}
-              className="text-xs leading-relaxed text-slate-600 my-0.5"
+              className={`text-slate-600 my-0.5 ${bodyTextClass}`}
               style={{ paddingLeft: `${Math.max(indentLevel * 14 + 16, 24)}px` }}
             >
               {renderInline(itemTrimmed)}
@@ -284,7 +286,7 @@ export const MarkdownView: React.FC<Props> = ({ content, className = '' }) => {
 
     // 8. Đoạn văn thông thường
     blocks.push(
-      <p key={`p-${i}`} className="text-xs leading-relaxed text-slate-800 my-1">
+      <p key={`p-${i}`} className={`text-slate-800 my-1 ${bodyTextClass}`}>
         {renderInline(trimmed)}
       </p>
     );
