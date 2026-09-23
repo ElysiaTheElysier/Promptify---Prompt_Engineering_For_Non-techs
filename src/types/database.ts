@@ -204,7 +204,6 @@ export interface AiEvaluationResult {
   strengths: string[];
   improvements: string[];
   nextHint: string;
-  assistanceState?: import('./index').LabAssistanceState;
 }
 
 export interface DbPromptAttempt {

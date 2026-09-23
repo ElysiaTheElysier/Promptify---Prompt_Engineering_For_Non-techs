@@ -94,7 +94,6 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
 }) => {
   const [showSampleModal, setShowSampleModal] = useState<boolean>(false);
   const [isSampleCopied, setIsSampleCopied] = useState<boolean>(false);
-  const [showConfirmOverwrite, setShowConfirmOverwrite] = useState<boolean>(false);
 
   // Tabnine-style contextual suggestion
   const [tabnineSuggestion, setTabnineSuggestion] = useState<TabnineSuggestion | null>(null);
@@ -421,16 +420,6 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }
   };
 
-  const handleApplySampleToEditor = () => {
-    if (promptText.trim() && !showConfirmOverwrite) {
-      setShowConfirmOverwrite(true);
-      return;
-    }
-    setPromptText(lab.improvedPrompt);
-    setShowConfirmOverwrite(false);
-    setShowSampleModal(false);
-  };
-
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-prompt">
       {/* 1. Header của vùng soạn thảo: Tiêu đề & 3 tầng trợ giúp */}
@@ -470,19 +459,8 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
           )}
         </div>
 
-        {/* Các nút hỗ trợ theo tầng: Nạp thô & Xem mẫu tham khảo */}
+        {/* Prompt mẫu chỉ để tham khảo, không tự chèn hoặc ghi đè bài làm. */}
         <div className="flex items-center gap-2 text-xs">
-          <button
-            type="button"
-            onClick={() => setPromptText(lab.baselinePrompt)}
-            className="text-slate-500 hover:text-slate-800 transition"
-            title="Nạp prompt sơ sài ban đầu để thử nghiệm"
-          >
-            Nạp câu lệnh thô
-          </button>
-
-          <span className="text-slate-300">|</span>
-
           <button
             type="button"
             onClick={() => setShowSampleModal(true)}
@@ -681,15 +659,12 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-emerald-600" />
                 <h4 className="text-sm font-bold text-slate-900">
-                  Câu lệnh chuẩn tham khảo — {lab.title}
+                  Prompt mẫu tham khảo — {lab.title}
                 </h4>
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setShowSampleModal(false);
-                  setShowConfirmOverwrite(false);
-                }}
+                onClick={() => setShowSampleModal(false)}
                 className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
               >
                 <X className="w-5 h-5" />
@@ -699,7 +674,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
             <div className="p-3 bg-amber-50 rounded-xl text-xs text-amber-800 flex items-start gap-2 border border-amber-200/70">
               <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <strong>Lời khuyên học tập:</strong> Hãy đối chiếu câu lệnh mẫu dưới đây với cấu trúc prompt bạn đã tự viết. Bạn có thể sao chép từng đoạn hoặc nạp vào editor để thực hành.
+                <strong>Đây là một cách làm tốt, không phải đáp án duy nhất.</strong> Hãy đối chiếu với cấu trúc prompt bạn đã tự viết. Mẫu không tự chèn hoặc ghi đè bài làm.
               </div>
             </div>
 
@@ -709,6 +684,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                 <button
                   type="button"
                   onClick={handleCopySample}
+                  disabled={!lab.improvedPrompt.trim()}
                   className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold flex items-center gap-1 transition"
                 >
                   {isSampleCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -716,9 +692,11 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                 </button>
               </div>
 
-              <pre className="p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border border-slate-800">
-                {lab.improvedPrompt}
-              </pre>
+              {lab.improvedPrompt.trim() ? (
+                <pre className="p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border border-slate-800">{lab.improvedPrompt}</pre>
+              ) : (
+                <p className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">Lesson này chưa có prompt mẫu.</p>
+              )}
             </div>
 
             {lab.expectedOutputFormat && (
@@ -727,48 +705,13 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
               </div>
             )}
 
-            {showConfirmOverwrite && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-2">
-                <p className="font-semibold">
-                  ⚠️ Ô soạn thảo của bạn đang có nội dung. Bạn có chắc chắn muốn nạp mẫu này để ghi đè không?
-                </p>
-                <div className="flex items-center gap-2 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmOverwrite(false)}
-                    className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 font-medium hover:bg-slate-50"
-                  >
-                    Hủy bỏ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleApplySampleToEditor}
-                    className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold"
-                  >
-                    Xác nhận ghi đè
-                  </button>
-                </div>
-              </div>
-            )}
-
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
               <button
                 type="button"
-                onClick={() => {
-                  setShowSampleModal(false);
-                  setShowConfirmOverwrite(false);
-                }}
+                onClick={() => setShowSampleModal(false)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
               >
                 Đóng
-              </button>
-
-              <button
-                type="button"
-                onClick={handleApplySampleToEditor}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition"
-              >
-                Nạp vào ô soạn thảo
               </button>
             </div>
           </div>

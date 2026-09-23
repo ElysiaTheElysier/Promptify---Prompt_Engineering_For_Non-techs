@@ -1,5 +1,4 @@
-import { detectPiiEntities, sanitizePii, getTabnineContextualSuggestion, auditLabCompliance } from '../src/services/labComplianceService';
-import { evaluatePromptHeuristic } from '../src/services/llmService';
+import { detectPiiEntities, sanitizePii, getTabnineContextualSuggestion } from '../src/services/labComplianceService';
 
 console.log('================================================================');
 console.log('🧪 VERIFYING PII DETECTION, SANITIZATION & TABNINE AUTOCOMPLETION');
@@ -34,22 +33,8 @@ if (!piiResult.hasPii || piiResult.piiItems.length < 4) {
 }
 console.log('✅ PASS: Detected all PII items (CCCD, SĐT, STK, Tên riêng, Mã HĐTD, Sổ đỏ).\n');
 
-// TEST 2: ZERO-TOLERANCE EVALUATION (Must NOT give full score, must give RED CARD)
-console.log('TEST 2: Evaluate unscrubbed prompt in Lab 1 (Must give RED CARD & <= 2 points)');
-const badEval = evaluatePromptHeuristic(unscrubbedPrompt, '', { id: 'lab-1', title: 'Bảo mật dữ liệu & Bút xóa PII' });
-console.log('Score with unscrubbed PII:', badEval.total, '/ 10');
-console.log('Groundedness score:', badEval.scores.groundedness);
-console.log('Constraint score:', badEval.scores.constraintCompliance);
-console.log('Improvements:', badEval.improvements);
-
-if (badEval.total > 3 || badEval.scores.groundedness !== 0 || !badEval.improvements[0]?.includes('THẺ ĐỎ')) {
-  console.error('❌ Failed: Unscrubbed prompt did not receive a RED CARD!');
-  process.exit(1);
-}
-console.log('✅ PASS: Successfully gave RED CARD and locked score to 2/10 for unscrubbed PII.\n');
-
-// TEST 3: SANITIZATION (Bút xóa PII)
-console.log('TEST 3: Sanitize PII with 1-click Bút Xóa PII');
+// TEST 2: SANITIZATION (Bút xóa PII)
+console.log('TEST 2: Sanitize PII with 1-click Bút Xóa PII');
 const sanitizedPrompt = sanitizePii(unscrubbedPrompt);
 const sanitizedCheck = detectPiiEntities(sanitizedPrompt);
 console.log('Sanitized Has PII:', sanitizedCheck.hasPii);
@@ -59,18 +44,8 @@ if (sanitizedCheck.hasPii) {
 }
 console.log('✅ PASS: Sanitized prompt is 100% clean of raw PII!\n');
 
-// TEST 4: EVALUATE SANITIZED PROMPT (Should now get high score)
-console.log('TEST 4: Evaluate sanitized prompt in Lab 1');
-const goodEval = evaluatePromptHeuristic(sanitizedPrompt, '', { id: 'lab-1', title: 'Bảo mật dữ liệu & Bút xóa PII' });
-console.log('Score with sanitized PII:', goodEval.total, '/ 10');
-if (goodEval.total < 8) {
-  console.error('❌ Failed: Sanitized prompt should pass with high score!');
-  process.exit(1);
-}
-console.log('✅ PASS: Sanitized prompt received high score (>= 8/10).\n');
-
-// TEST 5: TABNINE-STYLE CONTEXTUAL AUTOCOMPLETION
-console.log('TEST 5: Tabnine Contextual Suggestion');
+// TEST 3: TABNINE-STYLE CONTEXTUAL AUTOCOMPLETION
+console.log('TEST 3: Tabnine Contextual Suggestion');
 const labDummy = { id: 'lab-1', title: 'Bút xóa PII' } as any;
 const suggestionRole = getTabnineContextualSuggestion('Vai trò:', 8, labDummy);
 console.log('Suggestion after "Vai trò:":', suggestionRole?.suggestionText);
@@ -84,4 +59,4 @@ if (!suggestionRole || !suggestionGuardrail?.suggestionText.includes('PII')) {
 }
 console.log('✅ PASS: Tabnine autocompletion generated accurate contextual snippets!\n');
 
-console.log('🎉 ALL TESTS PASSED! ZERO-TOLERANCE PII AUDIT & TABNINE AUTOCOMPLETION ARE FULLY FUNCTIONAL!');
+console.log('🎉 ALL TESTS PASSED! PII DETECTION, SANITIZATION & AUTOCOMPLETION ARE FULLY FUNCTIONAL WITHOUT FAKE SCORES!');

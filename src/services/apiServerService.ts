@@ -6,7 +6,6 @@ export interface GenerateRequestBody {
   classId?: string;
   prompt: string;
   context?: string;
-  apiKey?: string;
 }
 
 export interface GenerateResponseBody {
@@ -25,7 +24,6 @@ export interface EvaluateRequestBody {
   lessonRubric?: any;
   learnerPrompt: string;
   generatedOutput: string;
-  apiKey?: string;
 }
 
 export class AiServerError extends Error {
@@ -270,9 +268,8 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
     throw new AiServerError('Câu lệnh prompt không được để trống.', 400);
   }
 
-  const requestedApiKey = body.apiKey && body.apiKey.trim();
-  const openAiApiKey = (requestedApiKey?.startsWith('sk-') ? requestedApiKey : '') || getOpenAiApiKey();
-  const geminiApiKey = (requestedApiKey && !requestedApiKey.startsWith('sk-') ? requestedApiKey : '') || getGeminiApiKey();
+  const openAiApiKey = getOpenAiApiKey();
+  const geminiApiKey = getGeminiApiKey();
 
   const startTime = performance.now();
 
@@ -332,8 +329,6 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
  * Xử lý yêu cầu POST /api/evaluate
  * Đánh giá khách quan câu lệnh và kết quả AI sinh ra dựa trên 5 tiêu chí Rubric MVP (0-2 điểm mỗi tiêu chí)
  */
-import { detectPiiEntities } from './labComplianceService';
-
 export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<AiEvaluationResult> {
   const {
     scenario,
@@ -348,35 +343,8 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
     throw new AiServerError('Learner prompt không được để trống khi đánh giá.', 400);
   }
 
-  // 1. KIỂM TRA ZERO-TOLERANCE VỀ RÒ RỈ THÔNG TIN PII (LAB 01 & NGHỊ ĐỊNH 13)
-  const isPiiLesson = 
-    (scenario && scenario.toLowerCase().includes('pii')) ||
-    (taskRequirement && taskRequirement.toLowerCase().includes('pii')) ||
-    (lessonRubric && JSON.stringify(lessonRubric).toLowerCase().includes('pii'));
-
-  const piiCheck = detectPiiEntities(learnerPrompt);
-  if (isPiiLesson && piiCheck.hasPii) {
-    return {
-      scores: {
-        taskCompletion: 1,
-        groundedness: 0,
-        formatAdherence: 1,
-        constraintCompliance: 0,
-        businessUsability: 0
-      },
-      total: 2,
-      strengths: ['Đã nắm được cấu trúc nhiệm vụ ban đầu.'],
-      improvements: [
-        `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại thông tin PII thật trong câu lệnh (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`,
-        'Vi phạm quy chuẩn an toàn dữ liệu khách hàng Agribank: Tuyệt đối không gửi CCCD, SĐT, STK thật lên AI mà chưa khử định danh!'
-      ],
-      nextHint: 'Bấm nút "Tự động Bút xóa PII 1-chạm" để hệ thống tự động ẩn danh hóa toàn bộ thông tin nhạy cảm thành biến giữ chỗ an toàn.'
-    };
-  }
-
-  const requestedApiKey = body.apiKey && body.apiKey.trim();
-  const openAiApiKey = (requestedApiKey?.startsWith('sk-') ? requestedApiKey : '') || getOpenAiApiKey();
-  const geminiApiKey = (requestedApiKey && !requestedApiKey.startsWith('sk-') ? requestedApiKey : '') || getGeminiApiKey();
+  const openAiApiKey = getOpenAiApiKey();
+  const geminiApiKey = getGeminiApiKey();
 
   if (!openAiApiKey && !geminiApiKey) {
     throw new AiServerError(
@@ -400,8 +368,7 @@ LESSON RUBRIC: ${rubricDescription}
 LEARNER PROMPT: ${learnerPrompt}
 AI OUTPUT: ${generatedOutput || '(Không có output)'}
 
-Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trường và không dùng điểm mặc định:
-{"scores":{"taskCompletion":0,"groundedness":0,"formatAdherence":0,"constraintCompliance":0,"businessUsability":0},"strengths":["1–3 ý ngắn"],"improvements":["1–3 ý ngắn"],"nextHint":"một hành động cụ thể"}`;
+Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trường và không dùng điểm mặc định.`;
 
   let rawText: string;
   if (openAiApiKey) {
@@ -447,8 +414,9 @@ Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trư
   try {
     return parseAiEvaluationText(rawText);
   } catch (parseErr) {
-    console.error('[AI Judge] Evaluation parsing failed. Raw response was:\n', rawText);
-    console.error('[AI Judge] Parse error details:', parseErr instanceof Error ? parseErr.message : parseErr);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[AI Judge] Evaluation validation failed:', parseErr instanceof Error ? parseErr.message : 'Unknown validation error');
+    }
     throw new AiServerError(
       parseErr instanceof AiEvaluationValidationError
         ? `AI Judge trả về evaluation không hợp lệ: ${parseErr.message}`

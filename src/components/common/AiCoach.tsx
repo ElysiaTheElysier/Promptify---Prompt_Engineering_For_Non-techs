@@ -29,7 +29,6 @@ interface Props {
   activeLab: LabStep;
   currentPrompt: string;
   runCount: number;
-  onApplyPromptSuggestion?: (suggestion: string) => void;
   onOpenTutorial?: () => void;
 }
 
@@ -66,7 +65,6 @@ export const AiCoach: React.FC<Props> = ({
   activeLab,
   currentPrompt,
   runCount,
-  onApplyPromptSuggestion,
   onOpenTutorial,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -254,15 +252,10 @@ export const AiCoach: React.FC<Props> = ({
     }
   };
 
-  // Áp dụng đề xuất từ input field vào câu lệnh
+  // Chỉ sao chép đề xuất để learner chủ động chỉnh sửa; Coach không ghi đè bài làm.
   const handleApplyActiveInputSuggestion = () => {
     if (!activeInputSuggestion) return;
-
-    if (onApplyPromptSuggestion) {
-      onApplyPromptSuggestion(activeInputSuggestion.suggestedPrompt);
-    } else {
-      window.dispatchEvent(new CustomEvent('promptify:apply-suggestion', { detail: { prompt: activeInputSuggestion.suggestedPrompt } }));
-    }
+    navigator.clipboard.writeText(activeInputSuggestion.suggestedPrompt);
 
     setActiveInputSuggestion(null);
     setSuggestionAppliedToast(true);

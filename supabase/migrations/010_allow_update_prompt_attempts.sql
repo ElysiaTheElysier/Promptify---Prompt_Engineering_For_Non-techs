@@ -1,7 +1,4 @@
--- MIGRATION: 007_allow_update_prompt_attempts.sql
--- Mục đích: Cho phép người học cập nhật kết quả đánh giá (evaluation_json)
--- khi thực hiện 'Thử đánh giá lại' (Retry Evaluation) cho chính bài làm của mình.
-
+-- Allow enrolled learners and instructors to persist a retried AI evaluation.
 DROP POLICY IF EXISTS "Learners and instructors can update prompt attempts" ON public.prompt_attempts;
 CREATE POLICY "Learners and instructors can update prompt attempts"
 ON public.prompt_attempts FOR UPDATE TO authenticated

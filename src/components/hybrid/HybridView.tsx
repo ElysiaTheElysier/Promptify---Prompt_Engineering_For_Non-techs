@@ -41,6 +41,7 @@ import {
 import { ABCompareModal } from '../common/ABCompareModal';
 import { SavePromptModal } from '../common/SavePromptModal';
 import { MarkdownView } from '../common/MarkdownView';
+import { validateAiEvaluationPayload } from '../../services/aiEvaluationContract';
 
 interface Props {
   labs: LabStep[];
@@ -102,7 +103,7 @@ export const HybridView: React.FC<Props> = ({
   const currentLabRunCount = runCountsByLab[currentLab.id] || 0;
 
   // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
-  const [promptText, setPromptText] = useState<string>(currentLab.starterPrompt || '');
+  const [promptText, setPromptText] = useState<string>('');
   const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
   const [output, setOutput] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
@@ -206,36 +207,11 @@ export const HybridView: React.FC<Props> = ({
     setAssistanceModalState(prev => ({ ...prev, isOpen: false }));
   };
 
-  const handleLoadSolutionPrompt = (solPrompt: string) => {
-    setPromptText(solPrompt);
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  };
-
   // Phân tích cấu trúc Prompt 7 thành phần & inline highlight
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(currentLab.starterPrompt || ''));
+  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysis>(() => analyzePromptStructure(''));
   const [selectedSpan, setSelectedSpan] = useState<PromptSpan | null>(null);
   const [currentSpanIndexByType, setCurrentSpanIndexByType] = useState<Record<string, number>>({});
-
-  // Lắng nghe sự kiện áp dụng đề xuất từ Chat Assistant hoặc modal ngoài
-  useEffect(() => {
-    const handleApplySuggestion = (e: any) => {
-      if (e.detail?.prompt !== undefined) {
-        setPromptText(e.detail.prompt);
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-          textareaRef.current.classList.add('ring-4', 'ring-emerald-500');
-          setTimeout(() => {
-            textareaRef.current?.classList.remove('ring-4', 'ring-emerald-500');
-          }, 1500);
-        }
-      }
-    };
-    window.addEventListener('promptify:apply-suggestion', handleApplySuggestion);
-    return () => window.removeEventListener('promptify:apply-suggestion', handleApplySuggestion);
-  }, []);
 
   // Debounce phân tích cấu trúc prompt (500ms) để không lag UI khi gõ và 0 LLM call
   useEffect(() => {
@@ -307,7 +283,7 @@ export const HybridView: React.FC<Props> = ({
 
   // Đồng bộ khi chuyển bài lab
   useEffect(() => {
-    setPromptText(currentLab.starterPrompt || '');
+    setPromptText('');
     setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp hỗ trợ cán bộ ngân hàng Agribank.');
     setOutput('');
     setScoreResult(null);
@@ -326,7 +302,7 @@ export const HybridView: React.FC<Props> = ({
     setShowScoreBreakdown(false);
     setSelectedSpan(null);
     setCurrentSpanIndexByType({});
-    setPromptAnalysis(analyzePromptStructure(currentLab.starterPrompt || ''));
+    setPromptAnalysis(analyzePromptStructure(''));
   }, [currentLabIndex]);
 
   // Tải lịch sử các lần chạy thật (Prompt Attempts) từ Supabase DB / LocalStore
@@ -337,21 +313,31 @@ export const HybridView: React.FC<Props> = ({
         .then((attempts) => {
           if (!isMounted || !attempts || attempts.length === 0) return;
 
-          const mappedVersions: PromptVersion[] = attempts.map(a => ({
-            id: a.id,
-            versionNumber: a.attempt_number,
-            labId: a.lesson_id,
-            promptText: a.prompt_text,
-            systemInstruction: systemText,
-            output: a.ai_output,
-            techniqueUsed: currentLab.badge,
-            detectedChanges: detectPromptComponents(a.prompt_text),
-            timestamp: a.created_at ? new Date(a.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
-            businessEvaluation: evaluateBusinessMetrics(a.prompt_text, a.ai_output, currentLab.sampleInputContext),
-            aiEvaluation: a.evaluation_json,
-            tokenCount: Math.round(a.ai_output.length / 3.8),
-            latencyMs: a.latency_ms
-          }));
+          const mappedVersions: PromptVersion[] = attempts.map((attempt) => {
+            let storedEvaluation: AiEvaluationResult | null = null;
+            if (attempt.evaluation_json) {
+              try {
+                storedEvaluation = validateAiEvaluationPayload(attempt.evaluation_json);
+              } catch (error) {
+                console.warn('[HybridView] Bỏ qua evaluation_json không đúng contract:', error);
+              }
+            }
+            return {
+              id: attempt.id,
+              versionNumber: attempt.attempt_number,
+              labId: attempt.lesson_id,
+              promptText: attempt.prompt_text,
+              systemInstruction: systemText,
+              output: attempt.ai_output,
+              techniqueUsed: currentLab.badge,
+              detectedChanges: detectPromptComponents(attempt.prompt_text),
+              timestamp: attempt.created_at ? new Date(attempt.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
+              businessEvaluation: evaluateBusinessMetrics(attempt.prompt_text, attempt.ai_output, currentLab.sampleInputContext),
+              aiEvaluation: storedEvaluation,
+              tokenCount: Math.round(attempt.ai_output.length / 3.8),
+              latencyMs: attempt.latency_ms,
+            };
+          });
 
           setVersionsByLab(prev => ({
             ...prev,
@@ -435,9 +421,7 @@ export const HybridView: React.FC<Props> = ({
           taskRequirement: currentLab.taskGoal,
           lessonRubric: currentLab.rubricCriteria,
           learnerPrompt: promptText,
-          generatedOutput: result.output,
-          lab: currentLab,
-          apiKey: apiConfig.geminiApiKey
+          generatedOutput: result.output
         });
       } catch (judgeErr: any) {
         console.warn('[HybridView] AI Judge evaluation failed:', judgeErr);
@@ -448,8 +432,6 @@ export const HybridView: React.FC<Props> = ({
       }
 
       if (evalResult) {
-        // Gắn cờ trạng thái trợ giúp (xem gợi ý / lời giải) vào kết quả đánh giá để giảng viên nắm được
-        evalResult.assistanceState = currentLabAssistance;
         setAiEvaluation(evalResult);
         setLastEvaluatedPrompt(promptText);
         const evaluatedScore = mapAiEvaluationToRubricAudit(evalResult);
@@ -573,12 +555,9 @@ export const HybridView: React.FC<Props> = ({
         taskRequirement: currentLab.taskGoal,
         lessonRubric: currentLab.rubricCriteria,
         learnerPrompt: targetPrompt,
-        generatedOutput: targetOutput,
-        lab: currentLab,
-        apiKey: apiConfig.geminiApiKey
+        generatedOutput: targetOutput
       });
 
-      evalResult.assistanceState = currentLabAssistance;
       setAiEvaluation(evalResult);
       const evaluatedScore = mapAiEvaluationToRubricAudit(evalResult);
       setScoreResult(evaluatedScore);
@@ -628,11 +607,7 @@ export const HybridView: React.FC<Props> = ({
 
   const handleNextStepOrLab = () => {
     if (currentStep === 1) {
-      // Giữ nguyên prompt của học viên để họ tiếp tục cải tiến dựa trên AI Feedback
-      // Chỉ nạp gợi ý nếu ô hiện tại chưa có nội dung
-      if (!promptText.trim()) {
-        setPromptText(currentLab.improvedPrompt);
-      }
+      // Giữ nguyên prompt của học viên để họ tiếp tục tự cải tiến dựa trên AI Feedback.
       setCurrentStep(2);
     } else if (currentLabIndex < labs.length - 1) {
       // Chuyển sang bài tiếp theo
@@ -670,22 +645,6 @@ export const HybridView: React.FC<Props> = ({
     }
     setAiEvaluation(null);
     setScoreResult(null);
-  };
-
-  // Tự động nâng cấp câu lệnh chuẩn mực (Auto-Fix All)
-  const handleApplyAutoFixAll = () => {
-    if (currentLab.improvedPrompt) {
-      setPromptText(currentLab.improvedPrompt);
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.classList.add('ring-4', 'ring-emerald-500');
-        setTimeout(() => {
-          textareaRef.current?.classList.remove('ring-4', 'ring-emerald-500');
-        }, 1500);
-      }
-      setAiEvaluation(null);
-      setScoreResult(null);
-    }
   };
 
   // Tên bước tiến trình
@@ -783,8 +742,7 @@ export const HybridView: React.FC<Props> = ({
             hasViewedSolution={currentLabAssistance.hasViewedSolution}
             onRequestViewHints={handleRequestViewHints}
             onRequestViewSolution={handleRequestViewSolution}
-            onLoadSolutionPrompt={handleLoadSolutionPrompt}
-          />
+            />
         </div>
 
         {/* CỘT PHẢI (65%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
@@ -1002,7 +960,7 @@ export const HybridView: React.FC<Props> = ({
                                 Phát hiện {piiCheck.piiItems.length} thông tin định danh cá nhân thật chưa qua Bút xóa PII: {' '}
                                 <span className="font-semibold text-rose-950 font-mono">
                                   {piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}
-                                </span>. Điểm căn cứ & bảo mật bị khóa về 0 điểm.
+                                </span>. Hãy khử định danh trước khi tiếp tục sử dụng dữ liệu này với AI.
                               </p>
                             </div>
                           </div>

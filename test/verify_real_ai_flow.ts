@@ -27,8 +27,9 @@ async function runTests() {
   if (/setPromptText\(currentLab\.(?:starterPrompt|baselinePrompt|improvedPrompt)/.test(hybridViewSource)) {
     throw new Error('HybridView vẫn tự động nạp prompt hoàn chỉnh vào editor!');
   }
-  if (!hybridViewSource.includes("useState<PromptSupportMode>('structure')")) {
-    throw new Error('Mức hỗ trợ mặc định chưa phải Gợi ý cấu trúc!');
+  const composerSource = readFileSync(resolve(process.cwd(), 'src/components/prompt/PromptComposer.tsx'), 'utf8');
+  if (!composerSource.includes('<PromptStructurePanel')) {
+    throw new Error('Prompt Composer chưa hiển thị Gợi ý cấu trúc!');
   }
   console.log('✓ Editor không prefill prompt hoàn chỉnh và mặc định dùng Gợi ý cấu trúc.');
 

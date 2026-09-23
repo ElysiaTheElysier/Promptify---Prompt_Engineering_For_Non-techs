@@ -12,8 +12,7 @@ import {
   Sparkles, 
   HelpCircle,
   ShieldAlert,
-  ArrowRight,
-  SendHorizontal
+  ArrowRight
 } from 'lucide-react';
 import { LabStep } from '../../types';
 import { MarkdownView } from '../common/MarkdownView';
@@ -28,7 +27,6 @@ export interface LessonBriefPanelProps {
   hasViewedSolution: boolean;
   onRequestViewHints: () => void;
   onRequestViewSolution: () => void;
-  onLoadSolutionPrompt?: (prompt: string) => void;
 }
 
 export type LessonPanelTab = 'theory' | 'exercise' | 'hints' | 'solution';
@@ -41,7 +39,6 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
   hasViewedSolution,
   onRequestViewHints,
   onRequestViewSolution,
-  onLoadSolutionPrompt,
 }) => {
   const [activeTab, setActiveTab] = useState<LessonPanelTab>('theory');
   const [isSolutionCopied, setIsSolutionCopied] = useState<boolean>(false);
@@ -51,12 +48,6 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
       navigator.clipboard.writeText(lab.improvedPrompt);
       setIsSolutionCopied(true);
       setTimeout(() => setIsSolutionCopied(false), 2000);
-    }
-  };
-
-  const handleApplySolution = () => {
-    if (onLoadSolutionPrompt && lab.improvedPrompt) {
-      onLoadSolutionPrompt(lab.improvedPrompt);
     }
   };
 
@@ -378,17 +369,6 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
                         <span>{isSolutionCopied ? 'Đã chép' : 'Sao chép'}</span>
                       </button>
 
-                      {onLoadSolutionPrompt && (
-                        <button
-                          type="button"
-                          onClick={handleApplySolution}
-                          className="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 transition cursor-pointer flex items-center gap-1"
-                          title="Nạp trực tiếp câu lệnh này vào ô soạn thảo"
-                        >
-                          <SendHorizontal className="w-3 h-3 text-emerald-600" />
-                          <span>Nạp vào ô lệnh</span>
-                        </button>
-                      )}
                     </div>
                   </div>
 

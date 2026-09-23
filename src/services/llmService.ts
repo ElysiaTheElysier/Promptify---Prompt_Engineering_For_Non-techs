@@ -5,32 +5,13 @@ import { validateAiEvaluationPayload } from './aiEvaluationContract';
 
 async function getAuthenticatedApiHeaders(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession();
-  if (session?.access_token) {
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.access_token}`,
-    };
+  if (!session?.access_token) {
+    throw new Error('Bạn cần đăng nhập và được ghi danh để sử dụng chức năng AI.');
   }
-
-  // Hỗ trợ phiên tài khoản mẫu (Demo Learner) khi chưa có Supabase OAuth session
-  if (typeof localStorage !== 'undefined') {
-    const savedLearnerStr = localStorage.getItem('promptify_learner');
-    if (savedLearnerStr) {
-      try {
-        const savedLearner = JSON.parse(savedLearnerStr);
-        if (savedLearner?.email) {
-          return {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer demo-token:${encodeURIComponent(savedLearner.email)}`,
-          };
-        }
-      } catch {
-        // fallback
-      }
-    }
-  }
-
-  throw new Error('Bạn cần đăng nhập hoặc chọn tài khoản mẫu để sử dụng chức năng AI.');
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${session.access_token}`,
+  };
 }
 
 /**
@@ -63,7 +44,7 @@ export function mapAiEvaluationToRubricAudit(evalResult: AiEvaluationResult): Ru
   };
 }
 
-import { detectPiiEntities, auditLabCompliance } from './labComplianceService';
+import { detectPiiEntities } from './labComplianceService';
 
 /**
  * Đánh giá fallback cục bộ nếu máy chủ gặp sự cố
@@ -174,83 +155,6 @@ export function evaluatePromptRubric(
 }
 
 /**
- * Đánh giá heuristic chuyển đổi sang AiEvaluationResult (0-10 điểm)
- */
-export function evaluatePromptHeuristic(
-  promptText: string, 
-  outputText: string = '', 
-  lab?: LabStep | { id?: string; title?: string; taskGoal?: string }
-): AiEvaluationResult {
-  const piiCheck = detectPiiEntities(promptText);
-  const isPiiLesson = Boolean(
-    (lab?.id && (lab.id.includes('1') || lab.id.includes('pii'))) ||
-    (lab?.title && lab.title.toLowerCase().includes('pii')) ||
-    promptText.includes('Nguyễn Văn Tèo') ||
-    promptText.includes('034091002847')
-  );
-
-  if (isPiiLesson && piiCheck.hasPii) {
-    return {
-      scores: {
-        taskCompletion: 1,
-        groundedness: 0,
-        formatAdherence: 1,
-        constraintCompliance: 0,
-        businessUsability: 0
-      },
-      total: 2,
-      strengths: ['Đã tiếp nhận yêu cầu bài toán và thiết lập khung sườn.'],
-      improvements: [
-        `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại ${piiCheck.piiItems.length} thông tin PII thật (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`,
-        'Vi phạm quy chuẩn an toàn dữ liệu khách hàng Agribank: Tuyệt đối không gửi CCCD, SĐT, STK thật lên AI mà chưa khử định danh!'
-      ],
-      nextHint: 'Bấm nút "Tự động Bút xóa PII 1-chạm" để hệ thống tự động ẩn danh hóa toàn bộ thông tin nhạy cảm thành biến giữ chỗ an toàn.'
-    };
-  }
-
-  const audit = evaluatePromptRubric(promptText, lab);
-  const taskCompletion = Math.min(2, Math.max(0, Math.round(audit.taskScore / 10)));
-  const groundedness = Math.min(2, Math.max(0, Math.round(audit.variableScore / 10)));
-  const formatAdherence = Math.min(2, Math.max(0, Math.round(audit.formatScore / 10)));
-  const constraintCompliance = Math.min(2, Math.max(0, Math.round(audit.guardrailsScore / 10)));
-  const businessUsability = Math.min(2, Math.max(0, Math.round(audit.personaScore / 10)));
-
-  const total = taskCompletion + groundedness + formatAdherence + constraintCompliance + businessUsability;
-
-  const strengths: string[] = [];
-  const improvements: string[] = [];
-
-  if (businessUsability >= 2) strengths.push('Thiết lập vai trò chuyên môn và góc nhìn nghiệp vụ rõ ràng.');
-  else improvements.push('Nên bổ sung thêm vai trò chuyên môn cụ thể (VD: Chuyên viên Truyền thông, Thẩm định viên).');
-
-  if (taskCompletion >= 2) strengths.push('Nhiệm vụ cốt lõi được mô tả rõ ràng, đầy đủ động từ hành động.');
-  else improvements.push('Cần làm rõ hành động cụ thể AI cần làm (Hãy trích xuất, Soạn thảo, Phân tích).');
-
-  if (groundedness >= 2) strengths.push('Bám sát dữ liệu thực tế và áp dụng biến giữ chỗ chuẩn hóa.');
-  else improvements.push('Hãy neo chặt vào dữ liệu đầu vào hoặc dùng biến giữ chỗ {{BIẾN}} thay cho dữ liệu thật.');
-
-  if (constraintCompliance >= 2) strengths.push('Có hàng rào ràng buộc chặt chẽ, ngăn ngừa ảo giác hiệu quả.');
-  else improvements.push('Nên bổ sung ràng buộc tiêu cực (Tuyệt đối không suy diễn, Không dùng từ cảm tính).');
-
-  if (formatAdherence >= 2) strengths.push('Yêu cầu định dạng đầu ra chuẩn (bảng Markdown/danh sách cấu trúc).');
-  else improvements.push('Nên chỉ định khuôn dạng đầu ra cụ thể (bảng biểu Markdown hoặc số mục ngắn gọn).');
-
-  return {
-    scores: {
-      taskCompletion,
-      groundedness,
-      formatAdherence,
-      constraintCompliance,
-      businessUsability,
-    },
-    total,
-    strengths,
-    improvements,
-    nextHint: audit.actionableAdvice
-  };
-}
-
-/**
  * Trình sinh kết quả mô phỏng (Simulated Engine) mượt mà với streaming tự nhiên
  */
 export async function executeSimulatedPromptStream(
@@ -328,9 +232,7 @@ export async function executePromptStream(
       lessonId: lab.id,
       classId,
       prompt: promptText,
-      context: lab.sampleInputContext,
-      apiKey: apiConfig.geminiApiKey,
-      model: apiConfig.model
+      context: lab.sampleInputContext
     })
   });
 
@@ -385,38 +287,7 @@ export async function evaluatePromptLive(params: {
   lessonRubric?: any;
   learnerPrompt: string;
   generatedOutput: string;
-  lab?: LabStep;
-  apiKey?: string;
 }): Promise<AiEvaluationResult> {
-  // 1. Kiểm tra Zero-tolerance về PII ngay lập tức để bảo vệ dữ liệu học viên
-  const piiCheck = detectPiiEntities(params.learnerPrompt);
-  const isPiiLesson = Boolean(
-    (params.lessonId && (params.lessonId.includes('1') || params.lessonId.includes('pii'))) ||
-    (params.scenario && params.scenario.toLowerCase().includes('pii')) ||
-    (params.taskRequirement && params.taskRequirement.toLowerCase().includes('pii')) ||
-    params.learnerPrompt.includes('Nguyễn Văn Tèo') ||
-    params.learnerPrompt.includes('034091002847')
-  );
-
-  if (isPiiLesson && piiCheck.hasPii) {
-    return {
-      scores: {
-        taskCompletion: 1,
-        groundedness: 0,
-        formatAdherence: 1,
-        constraintCompliance: 0,
-        businessUsability: 0
-      },
-      total: 2,
-      strengths: ['Đã tiếp nhận yêu cầu bài toán và thiết lập khung sườn.'],
-      improvements: [
-        `THẺ ĐỎ VI PHẠM NGHỊ ĐỊNH 13: Còn tồn tại ${piiCheck.piiItems.length} thông tin PII thật (${piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}).`,
-        'Vi phạm an toàn dữ liệu: Tuyệt đối không gửi CCCD, SĐT, STK của khách hàng lên AI khi chưa qua Bút xóa PII!'
-      ],
-      nextHint: 'Bấm nút "Tự động Bút xóa PII 1-chạm" để hệ thống tự động ẩn danh hóa các thông tin nhạy cảm thành biến giữ chỗ {{BIẾN}}.'
-    };
-  }
-
   const headers = await getAuthenticatedApiHeaders();
   const response = await fetch('/api/evaluate', {
     method: 'POST',

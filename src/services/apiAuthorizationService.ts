@@ -37,15 +37,6 @@ export async function assertAiLessonAccess(params: {
   const token = readBearerToken(params.authorization);
   if (!params.classId) throw new ApiAccessError('Thiếu lớp học để xác thực quyền truy cập.', 403);
 
-  // 1. Cho phép tài khoản mẫu (Demo Learner) trong workshop và thực hành
-  if (token.startsWith('demo-token:')) {
-    const email = decodeURIComponent(token.slice('demo-token:'.length)).toLowerCase().trim();
-    if (!email || !email.includes('@')) {
-      throw new ApiAccessError('Tài khoản mẫu không hợp lệ.', 401);
-    }
-    return;
-  }
-
   const { url, anonKey } = getServerSupabaseConfig();
   const client = createClient(url, anonKey, {
     global: { headers: { Authorization: `Bearer ${token}` } },
