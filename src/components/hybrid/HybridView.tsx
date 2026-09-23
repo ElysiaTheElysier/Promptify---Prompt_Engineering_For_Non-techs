@@ -134,6 +134,166 @@ export const HybridView: React.FC<Props> = ({
   const [isABModalOpen, setIsABModalOpen] = useState<boolean>(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false);
   const [versionToSave, setVersionToSave] = useState<PromptVersion | null>(null);
+  const tutorialSnapshotRef = useRef<{
+    promptText: string;
+    output: string;
+    aiEvaluation: AiEvaluationResult | null;
+    lastEvaluatedPrompt: string | null;
+    scoreResult: RubricAudit | null;
+    versions: PromptVersion[];
+    selectedVersionNumber: number;
+    runCount: number;
+    errorMessage: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    const makeTutorialEvaluation = (improved: boolean): AiEvaluationResult => ({
+      scores: improved
+        ? { taskCompletion: 2, groundedness: 2, formatAdherence: 2, constraintCompliance: 2, businessUsability: 2 }
+        : { taskCompletion: 1, groundedness: 1, formatAdherence: 1, constraintCompliance: 0, businessUsability: 1 },
+      total: improved ? 10 : 4,
+      strengths: improved
+        ? ['Prompt nêu rõ nhiệm vụ và định dạng đầu ra của bài.']
+        : ['Đã có yêu cầu ban đầu để AI phản hồi.'],
+      improvements: improved
+        ? ['Có thể tiếp tục thử với dữ liệu mới cùng cấu trúc.']
+        : ['Bổ sung vai trò, dữ liệu, ràng buộc và định dạng đầu ra.'],
+      nextHint: improved
+        ? 'So sánh với lần đầu để nhận ra phần cấu trúc đã cải thiện.'
+        : 'Dùng các chip cấu trúc để làm prompt cụ thể hơn.',
+    });
+
+    const makeTutorialVersions = (): PromptVersion[] => {
+      const baselinePrompt = currentLab.baselinePrompt || `Hãy thực hiện nhiệm vụ: ${currentLab.taskGoal}`;
+      const improvedPrompt = currentLab.improvedPrompt || `NHIỆM VỤ: ${currentLab.taskGoal}\nĐỊNH DẠNG ĐẦU RA: ${currentLab.expectedOutputFormat}`;
+      const baselineOutput = currentLab.simulatedBaselineOutput || 'Đây là output minh họa ban đầu, còn thiếu cấu trúc và chi tiết.';
+      const improvedOutput = currentLab.simulatedImprovedOutput || `Output minh họa đã tuân thủ: ${currentLab.expectedOutputFormat}`;
+      return [
+        {
+          id: `tutorial-${currentLab.id}-1`,
+          versionNumber: 1,
+          labId: currentLab.id,
+          promptText: baselinePrompt,
+          systemInstruction: systemText,
+          output: baselineOutput,
+          techniqueUsed: 'Lần thử minh họa',
+          detectedChanges: detectPromptComponents(baselinePrompt),
+          timestamp: 'Demo',
+          businessEvaluation: evaluateBusinessMetrics(baselinePrompt, baselineOutput, currentLab.sampleInputContext),
+          aiEvaluation: makeTutorialEvaluation(false),
+        },
+        {
+          id: `tutorial-${currentLab.id}-2`,
+          versionNumber: 2,
+          labId: currentLab.id,
+          promptText: improvedPrompt,
+          systemInstruction: systemText,
+          output: improvedOutput,
+          techniqueUsed: currentLab.badge,
+          detectedChanges: detectPromptComponents(improvedPrompt),
+          timestamp: 'Demo',
+          businessEvaluation: evaluateBusinessMetrics(improvedPrompt, improvedOutput, currentLab.sampleInputContext),
+          aiEvaluation: makeTutorialEvaluation(true),
+        },
+      ];
+    };
+
+    const handleTutorialStep = (event: Event) => {
+      const detail = (event as CustomEvent).detail as { isOpen?: boolean; demoAction?: string };
+      if (!detail?.isOpen) {
+        const snapshot = tutorialSnapshotRef.current;
+        if (snapshot) {
+          setPromptText(snapshot.promptText);
+          setOutput(snapshot.output);
+          setAiEvaluation(snapshot.aiEvaluation);
+          setLastEvaluatedPrompt(snapshot.lastEvaluatedPrompt);
+          setScoreResult(snapshot.scoreResult);
+          setSelectedVersionNumber(snapshot.selectedVersionNumber);
+          setErrorMessage(snapshot.errorMessage);
+          setVersionsByLab((prev) => ({ ...prev, [currentLab.id]: snapshot.versions }));
+          setRunCountsByLab((prev) => ({ ...prev, [currentLab.id]: snapshot.runCount }));
+        }
+        tutorialSnapshotRef.current = null;
+        setIsABModalOpen(false);
+        setIsSaveModalOpen(false);
+        setVersionToSave(null);
+        return;
+      }
+
+      if (!tutorialSnapshotRef.current) {
+        tutorialSnapshotRef.current = {
+          promptText,
+          output,
+          aiEvaluation,
+          lastEvaluatedPrompt,
+          scoreResult,
+          versions: currentLabVersions,
+          selectedVersionNumber,
+          runCount: currentLabRunCount,
+          errorMessage,
+        };
+      }
+
+      const demoPrompt = currentLab.starterPrompt
+        || `NHIỆM VỤ: ${currentLab.taskGoal}\nĐỊNH DẠNG ĐẦU RA: ${currentLab.expectedOutputFormat}`;
+
+      if (detail.demoAction === 'show-prompt' || detail.demoAction === 'show-run') {
+        if (!promptText.trim()) setPromptText(demoPrompt);
+        setIsABModalOpen(false);
+        setIsSaveModalOpen(false);
+      }
+
+      if (detail.demoAction === 'show-output') {
+        const evaluation = makeTutorialEvaluation(false);
+        const mockPrompt = promptText.trim() ? promptText : demoPrompt;
+        setPromptText(mockPrompt);
+        setOutput(currentLab.simulatedBaselineOutput || 'Output minh họa của AI sẽ xuất hiện tại đây sau khi chạy prompt.');
+        setAiEvaluation(evaluation);
+        setLastEvaluatedPrompt(mockPrompt);
+        setScoreResult(mapAiEvaluationToRubricAudit(evaluation));
+        setRunStatus('idle');
+        setErrorMessage(null);
+        setIsABModalOpen(false);
+        setIsSaveModalOpen(false);
+      }
+
+      if (detail.demoAction === 'show-compare') {
+        const versions = makeTutorialVersions();
+        setVersionsByLab((prev) => ({ ...prev, [currentLab.id]: versions }));
+        setRunCountsByLab((prev) => ({ ...prev, [currentLab.id]: 2 }));
+        setSelectedVersionNumber(2);
+        setPromptText(versions[1].promptText);
+        setOutput(versions[1].output);
+        setIsSaveModalOpen(false);
+        setIsABModalOpen(true);
+      }
+
+      if (detail.demoAction === 'show-library') {
+        const versions = makeTutorialVersions();
+        setVersionsByLab((prev) => ({ ...prev, [currentLab.id]: versions }));
+        setRunCountsByLab((prev) => ({ ...prev, [currentLab.id]: 2 }));
+        setSelectedVersionNumber(2);
+        setIsABModalOpen(false);
+        setVersionToSave(versions[1]);
+        setIsSaveModalOpen(true);
+      }
+    };
+
+    window.addEventListener('promptify:tutorial-step', handleTutorialStep);
+    return () => window.removeEventListener('promptify:tutorial-step', handleTutorialStep);
+  }, [
+    currentLab,
+    currentLabRunCount,
+    currentLabVersions,
+    promptText,
+    output,
+    aiEvaluation,
+    lastEvaluatedPrompt,
+    scoreResult,
+    selectedVersionNumber,
+    errorMessage,
+    systemText,
+  ]);
 
   // Quản lý trạng thái mở khóa Gợi ý / Lời giải theo từng bài lab
   const [assistanceByLab, setAssistanceByLab] = useState<Record<string, LabAssistanceState>>(() => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
   BookOpen, 
   FileText, 
@@ -42,6 +42,37 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<LessonPanelTab>('theory');
   const [isSolutionCopied, setIsSolutionCopied] = useState<boolean>(false);
+  const [tutorialShowsData, setTutorialShowsData] = useState<boolean>(false);
+  const tabBeforeTutorialRef = useRef<LessonPanelTab>('theory');
+  const tutorialChangedTabRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    const handleTutorialStep = (event: Event) => {
+      const detail = (event as CustomEvent).detail as { isOpen?: boolean; demoAction?: string };
+      if (!detail?.isOpen) {
+        setTutorialShowsData(false);
+        if (tutorialChangedTabRef.current) {
+          setActiveTab(tabBeforeTutorialRef.current);
+          tutorialChangedTabRef.current = false;
+        }
+        return;
+      }
+      if (detail.demoAction === 'show-data') {
+        if (!tutorialChangedTabRef.current) {
+          tabBeforeTutorialRef.current = activeTab;
+          tutorialChangedTabRef.current = true;
+        }
+        setTutorialShowsData(true);
+        setActiveTab('exercise');
+      }
+    };
+    window.addEventListener('promptify:tutorial-step', handleTutorialStep);
+    return () => window.removeEventListener('promptify:tutorial-step', handleTutorialStep);
+  }, [activeTab]);
+
+  const tutorialData = lab.sampleInputContext || (tutorialShowsData
+    ? `DỮ LIỆU MINH HỌA — chỉ dùng trong hướng dẫn\nNhiệm vụ: ${lab.taskGoal}\nĐịnh dạng mong muốn: ${lab.expectedOutputFormat}`
+    : '');
 
   const handleCopySolution = () => {
     if (lab.improvedPrompt) {
@@ -97,6 +128,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
         {/* Tab 2: Bài tập */}
         <button
           type="button"
+          data-tour="tour-data-trigger"
           onClick={() => setActiveTab('exercise')}
           className={`py-2 px-1 rounded-xl transition flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer ${
             activeTab === 'exercise'
@@ -208,7 +240,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
             </div>
 
             {/* Dữ liệu đầu vào cố định (Control Data) */}
-            {lab.sampleInputContext && (
+            {tutorialData && (
               <div data-tour="tour-data" className="space-y-1.5 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-indigo-950 flex items-center gap-1">
@@ -217,7 +249,10 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
                   </span>
                   <button
                     type="button"
-                    onClick={onCopySampleData}
+                    onClick={() => {
+                      if (lab.sampleInputContext) onCopySampleData();
+                      else void navigator.clipboard.writeText(tutorialData);
+                    }}
                     className="text-[11px] text-indigo-700 hover:text-indigo-900 font-semibold flex items-center gap-1 transition cursor-pointer"
                   >
                     {isDataCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -225,7 +260,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
                   </button>
                 </div>
                 <pre className="p-2.5 bg-slate-900 text-slate-100 rounded-xl text-[11px] font-mono whitespace-pre-wrap max-h-48 overflow-y-auto border border-slate-800 custom-scrollbar-dark leading-relaxed">
-                  {lab.sampleInputContext}
+                  {tutorialData}
                 </pre>
               </div>
             )}

@@ -66,7 +66,7 @@ export const SavePromptModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn font-sans">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-scaleUp">
+      <div data-tour="tour-library-demo" className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-scaleUp">
         
         {/* Header */}
         <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
@@ -177,4 +177,3 @@ export const SavePromptModal: React.FC<Props> = ({
     </div>
   );
 };
-

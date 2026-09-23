@@ -111,7 +111,26 @@ export const GuidedWalkthrough: React.FC<Props> = ({
   );
   const currentStep = steps[currentStepIndex] || steps[0];
   const isLastStep = currentStepIndex === steps.length - 1;
-  const isCoachStep = currentStep.targetId === 'tour-coach' || currentStep.id === 'step-coach';
+  // Yêu cầu workspace dựng đúng trạng thái demo trước khi tìm target. Các state
+  // này chỉ tồn tại trong tutorial và được workspace hoàn nguyên khi đóng.
+  useEffect(() => {
+    if (!isOpen) {
+      window.dispatchEvent(new CustomEvent('promptify:tutorial-step', {
+        detail: { isOpen: false, stepId: null, demoAction: null },
+      }));
+      setCurrentStepIndex(0);
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('promptify:tutorial-step', {
+      detail: {
+        isOpen: true,
+        stepId: currentStep.id,
+        targetId: currentStep.targetId,
+        demoAction: currentStep.demoAction,
+      },
+    }));
+  }, [isOpen, currentStep.id, currentStep.targetId, currentStep.demoAction]);
 
   // Lắng nghe thay đổi kích thước màn hình
   useEffect(() => {
@@ -174,21 +193,32 @@ export const GuidedWalkthrough: React.FC<Props> = ({
 
     setIsPositionReady(false);
 
+    const timers: ReturnType<typeof setTimeout>[] = [];
     const selector = `[data-tour="${currentStep.targetId}"]`;
-    const el = document.querySelector(selector) as HTMLElement | null;
 
-    if (el) {
+    const locateTarget = (attempt = 0) => {
+      const el = document.querySelector(selector) as HTMLElement | null;
+      if (!el && attempt < 12) {
+        timers.push(setTimeout(() => locateTarget(attempt + 1), 80));
+        return;
+      }
+
+      if (!el) {
+        setTargetEl(null);
+        setTargetRect(null);
+        refs.setReference(null);
+        setIsPositionReady(true);
+        return;
+      }
+
       setTargetEl(el);
-
-      // Cuộn target vào tầm nhìn trước
-      el.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: isMobile ? 'start' : 'center', 
-        inline: 'nearest' 
+      el.scrollIntoView({
+        behavior: 'smooth',
+        block: isMobile ? 'start' : 'center',
+        inline: 'nearest',
       });
 
-      // Chờ hiệu ứng scroll hoàn tất (180ms) để lấy tọa độ viewport chuẩn xác nhất
-      const timer = setTimeout(() => {
+      timers.push(setTimeout(() => {
         const rect = el.getBoundingClientRect();
         if (rect.width > 0 && rect.height > 0) {
           setTargetRect({
@@ -205,15 +235,11 @@ export const GuidedWalkthrough: React.FC<Props> = ({
           refs.setReference(null);
         }
         setIsPositionReady(true);
-      }, 180);
+      }, 180));
+    };
 
-      return () => clearTimeout(timer);
-    } else {
-      setTargetEl(null);
-      setTargetRect(null);
-      refs.setReference(null);
-      setIsPositionReady(true);
-    }
+    timers.push(setTimeout(() => locateTarget(), 40));
+    return () => timers.forEach(clearTimeout);
   }, [isOpen, currentStepIndex, currentStep.targetId, isMobile, refs]);
 
   // Cập nhật tọa độ spotlight theo reference khi scroll hoặc resize
@@ -415,14 +441,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
         /* Layout Desktop: Định vị chính xác qua Floating UI với Arrow */
         <div
           ref={refs.setFloating}
-          style={isCoachStep ? {
-            position: 'fixed',
-            bottom: '92px',
-            right: '24px',
-            zIndex: 70,
-            opacity: isPositionReady ? 1 : 0,
-            transition: 'opacity 150ms ease, transform 150ms ease',
-          } : {
+          style={{
             ...floatingStyles,
             zIndex: 70,
             opacity: isPositionReady ? 1 : 0,
@@ -432,17 +451,15 @@ export const GuidedWalkthrough: React.FC<Props> = ({
           className="max-w-[390px] w-[390px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden font-sans animate-scaleIn"
         >
           {/* Mũi tên Arrow của Floating UI chỉ về target (nếu không phải coach step cố định) */}
-          {!isCoachStep && (
-            <FloatingArrow
-              ref={arrowRef}
-              context={context}
-              fill={arrowFill}
-              stroke="#E2E8F0"
-              strokeWidth={1}
-              width={14}
-              height={8}
-            />
-          )}
+          <FloatingArrow
+            ref={arrowRef}
+            context={context}
+            fill={arrowFill}
+            stroke="#E2E8F0"
+            strokeWidth={1}
+            width={14}
+            height={8}
+          />
 
           {/* Header Popover */}
           <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -544,14 +561,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
       ) : (
         /* Fallback khi không tìm thấy target trong DOM: Nếu là AI Coach thì ở góc phải dưới, còn lại căn giữa */
         <div
-          style={isCoachStep ? {
-            position: 'fixed',
-            bottom: isMobile ? '76px' : '92px',
-            right: isMobile ? '12px' : '24px',
-            maxWidth: isMobile ? 'calc(100vw - 24px)' : '390px',
-            width: isMobile ? 'calc(100vw - 24px)' : '390px',
-            zIndex: 70,
-          } : {
+          style={{
             position: 'fixed',
             top: '50%',
             left: '50%',

@@ -69,6 +69,29 @@ export const AiCoach: React.FC<Props> = ({
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
+  const wasOpenBeforeTutorialRef = useRef<boolean | null>(null);
+
+  useEffect(() => {
+    const handleTutorialStep = (event: Event) => {
+      const detail = (event as CustomEvent).detail as { isOpen?: boolean; demoAction?: string };
+      if (!detail?.isOpen) {
+        if (wasOpenBeforeTutorialRef.current !== null) {
+          setIsOpen(wasOpenBeforeTutorialRef.current);
+          wasOpenBeforeTutorialRef.current = null;
+        }
+        return;
+      }
+      if (detail.demoAction === 'show-coach') {
+        if (wasOpenBeforeTutorialRef.current === null) {
+          wasOpenBeforeTutorialRef.current = isOpen;
+        }
+        setShowSpeechBubble(false);
+        setIsOpen(true);
+      }
+    };
+    window.addEventListener('promptify:tutorial-step', handleTutorialStep);
+    return () => window.removeEventListener('promptify:tutorial-step', handleTutorialStep);
+  }, [isOpen]);
 
   const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(() => {
     return localStorage.getItem('promptify_coach_intro_dismissed') !== 'true';
@@ -587,7 +610,7 @@ export const AiCoach: React.FC<Props> = ({
         </button>
       ) : (
         /* 3. Khung Chat Mở Rộng Chiều Cao với Gợi Ý Trực Tiếp Trong Input Field */
-        <div className={`pointer-events-auto bg-white rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fadeIn transition-all duration-200 ${
+        <div data-tour="tour-coach-panel" className={`pointer-events-auto bg-white rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fadeIn transition-all duration-200 ${
           isMaximized 
             ? 'w-[95vw] sm:w-[620px] md:w-[680px] h-[840px] max-h-[92vh]' 
             : 'w-[94vw] sm:w-[460px] md:w-[500px] h-[660px] sm:h-[720px] max-h-[88vh]'

@@ -215,7 +215,7 @@ export const ABCompareModal: React.FC<Props> = ({
         {/* =================================================================== */}
         {/* HEADER MODAL: Phong cách Google AI Studio Compare Mode              */}
         {/* =================================================================== */}
-        <div className="bg-slate-900 text-white px-5 sm:px-7 py-3.5 flex items-center justify-between flex-shrink-0 border-b border-slate-800">
+        <div data-tour="tour-compare-demo" className="bg-slate-900 text-white px-5 sm:px-7 py-3.5 flex items-center justify-between flex-shrink-0 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-md">
               <GitCompare className="w-5 h-5 text-white" />
