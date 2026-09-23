@@ -15,6 +15,7 @@ import { LandingLoginScreen } from './components/auth/LandingLoginScreen';
 import { ClassSelectionScreen } from './components/classes/ClassSelectionScreen';
 import { ProductNavbar } from './components/navigation/ProductNavbar';
 import { LearnerDashboard } from './components/dashboard/LearnerDashboard';
+import { LearnerHome } from './components/dashboard/LearnerHome';
 import { LessonHeaderBar } from './components/lesson/LessonHeaderBar';
 import { PromptLibraryView } from './components/library/PromptLibraryView';
 import { PromptHistoryView } from './components/history/PromptHistoryView';
@@ -887,7 +888,11 @@ export const App: React.FC = () => {
         onNavigate={setCurrentView}
         selectedCohort={selectedCohort}
         availableCohorts={selectableCohorts}
-        onSelectClass={handleSelectClass}
+        onSelectClass={async (cohort) => {
+          const selected = await handleSelectClass(cohort);
+          if (selected) setCurrentView('learning_path');
+          return selected;
+        }}
         onChangeClass={() => setCurrentView('class_select')}
         learner={currentLearner}
         onLogout={handleLogout}
@@ -898,9 +903,22 @@ export const App: React.FC = () => {
       {/* Main Content Area based on currentView */}
       <main className="flex-1">
         {/* VIEW 1: LEARNER DASHBOARD (Trang chủ chính) */}
-        {(currentView === 'dashboard' || currentView === 'learning_path') && (
-          <LearnerDashboard
+        {currentView === 'dashboard' && (
+          <LearnerHome
             learner={currentLearner}
+            cohorts={selectableCohorts}
+            selectedCohort={selectedCohort}
+            enrollments={enrollments}
+            totalLabCount={labs.length}
+            onChooseClass={async (cohort) => {
+              const selected = await handleSelectClass(cohort);
+              if (selected) setCurrentView('learning_path');
+            }}
+          />
+        )}
+
+        {currentView === 'learning_path' && (
+          <LearnerDashboard
             cohort={selectedCohort}
             enrollment={currentEnrollment}
             labs={labs}

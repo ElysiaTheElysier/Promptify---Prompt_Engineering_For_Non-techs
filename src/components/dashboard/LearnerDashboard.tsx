@@ -1,26 +1,16 @@
 import React from 'react';
 import { 
-  Building2, 
-  Sparkles, 
-  Clock, 
-  ArrowRight, 
   CheckCircle2, 
   Play, 
-  Sliders, 
   Bookmark, 
   History, 
   HelpCircle, 
-  BookOpen, 
-  Award,
   ChevronRight,
-  ShieldCheck,
-  Zap,
-  RotateCcw
+  Layers3
 } from 'lucide-react';
-import { ClassCohort, Learner, Enrollment, LabStep, AppView } from '../../types';
+import { ClassCohort, Enrollment, LabStep, AppView } from '../../types';
 
 interface Props {
-  learner?: Learner | null;
   cohort: ClassCohort;
   enrollment: Enrollment;
   labs: LabStep[];
@@ -30,7 +20,6 @@ interface Props {
 }
 
 export const LearnerDashboard: React.FC<Props> = ({
-  learner,
   cohort,
   enrollment,
   labs,
@@ -76,90 +65,38 @@ export const LearnerDashboard: React.FC<Props> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* 1. Header Cá nhân hóa & 5-Second Clarity */}
-      <section className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-emerald-50 via-teal-50/20 to-transparent -z-0 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      {/* Thông tin lớp đang được chọn; lời chào và menu lớp nằm ở Trang chủ. */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-md bg-slate-900 text-white font-mono text-xs font-bold">
+              <span className="rounded-md bg-slate-900 px-2.5 py-1 font-mono text-xs font-bold text-white">
                 {cohort.classCode}
               </span>
-              {learner?.id && (
-                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono text-[11px] font-bold">
-                  {learner.id}
-                </span>
-              )}
               <span className="text-xs font-semibold text-slate-500">
                 {cohort.organization} • {cohort.department}
               </span>
             </div>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Xin chào, {learner?.name || 'Học viên'} 👋
+            <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">
+              <Layers3 className="h-6 w-6 text-emerald-600" />
+              Lộ trình học
             </h1>
-
-            <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">
-              Chào mừng bạn đến với khóa <strong>{cohort.name}</strong>. Hãy cùng nâng cao năng suất nghiệp vụ ngân hàng bằng kỹ thuật ra lệnh chuẩn mực cho AI.
-            </p>
-
-            <div className="inline-flex items-center gap-2 pt-1 text-xs text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200/80">
-              <Clock className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <span>Thời gian sử dụng còn lại: <strong>{cohort.expiryDateText || 'Còn 3 giờ 45 phút'}</strong></span>
-            </div>
+            <p className="text-base font-bold text-slate-800">{cohort.name}</p>
+            <p className="max-w-2xl text-sm leading-6 text-slate-500">{cohort.description}</p>
           </div>
 
-          {/* Progress Card Box */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 min-w-[280px] sm:min-w-[320px] space-y-3 flex-shrink-0">
+          <div className="min-w-[260px] space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-600">Tiến độ khóa học</span>
-              <span className="font-extrabold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full text-xs">
-                {completedCount} / {totalCount} bài ({progressPercent}%)
-              </span>
+              <span className="font-semibold text-slate-600">Tiến độ lớp này</span>
+              <span className="font-extrabold text-emerald-700">{completedCount}/{totalCount} bài · {progressPercent}%</span>
             </div>
-
-            {/* Progress Bar */}
-            <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div 
-                className="bg-gradient-to-r from-emerald-600 to-teal-500 h-full rounded-full transition-all duration-500 shadow-xs"
-                style={{ width: `${progressPercent}%` }}
-              />
+            <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
+              <div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-500" style={{ width: `${progressPercent}%` }} />
             </div>
-
-            <div className="text-[11px] text-slate-500 flex items-center justify-between">
-              <span>Trạng thái:</span>
-              <span className="font-medium text-slate-700">
-                {isCourseCompleted ? 'Đã hoàn thành toàn bộ' : `Đang học: Bài ${nextLab.order}`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Primary CTA (Nổi bật nhất màn hình - Không thể bỏ lỡ) */}
-        <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
-                {completedCount === 0 ? 'Bước tiếp theo' : 'Tiếp tục lộ trình'}
-              </span>
-            </div>
-            <div className="text-base font-bold text-slate-900">
-              {isCourseCompleted ? 'Bạn đã hoàn thành xuất sắc 5 bài học!' : `${nextLab.title}`}
-            </div>
-            <p className="text-xs text-slate-500">
-              {getLessonSubtitle(nextLab.order)}
+            <p className="text-[11px] text-slate-500">
+              {isCourseCompleted ? 'Đã hoàn thành toàn bộ lộ trình.' : `Bài tiếp theo: ${nextLab.title}`}
             </p>
           </div>
-
-          <button
-            onClick={() => onStartLesson(nextLab.id)}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] transition-all cursor-pointer whitespace-nowrap"
-          >
-            <Play className="w-4 h-4 fill-white" />
-            <span>{completedCount === 0 ? 'Bắt đầu học ngay (Có hướng dẫn)' : 'Tiếp tục bài đang học'}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
         </div>
       </section>
 
@@ -168,7 +105,7 @@ export const LearnerDashboard: React.FC<Props> = ({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              <span>Lộ trình 5 bước tinh thông Prompt AI</span>
+              <span>Lộ trình {totalCount} bài học</span>
               <span className="text-xs font-normal text-slate-500 hidden sm:inline">
                 (Từ Zero-shot đến Grounding tài liệu chuẩn mực)
               </span>
