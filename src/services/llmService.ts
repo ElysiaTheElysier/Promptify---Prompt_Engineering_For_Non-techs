@@ -233,6 +233,7 @@ export async function executePromptStream(
       classId,
       prompt: promptText,
       systemInstruction,
+      inputContext: lab.sampleInputContext,
     })
   });
 

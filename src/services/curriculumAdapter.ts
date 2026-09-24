@@ -77,10 +77,9 @@ export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[
       focusComponents: lesson.focus_components.filter(
         (component): component is PromptComponentType => ALLOWED_COMPONENTS.has(component as PromptComponentType),
       ),
-      comparisonHighlights: seedLab?.comparisonHighlights,
       miniChallenge: seedLab?.miniChallenge,
-      simulatedBaselineOutput: seedLab?.simulatedBaselineOutput || (isEnglishLesson ? 'Run the baseline prompt to generate live AI output.' : 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt baseline để tạo kết quả thực tế.'),
-      simulatedImprovedOutput: seedLab?.simulatedImprovedOutput || (isEnglishLesson ? 'Run the improved prompt to generate live AI output.' : 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt cải thiện để tạo kết quả thực tế.'),
+      simulatedBaselineOutput: seedLab?.simulatedBaselineOutput || (isEnglishLesson ? 'Run the baseline prompt to generate live AI output.' : '[Chế độ Mô phỏng / Simulated] Output mẫu cục bộ dành riêng cho môi trường thử nghiệm giao diện. Vui lòng chuyển sang Live AI để sinh kết quả từ mô hình ngôn ngữ lớn.'),
+      simulatedImprovedOutput: seedLab?.simulatedImprovedOutput || (isEnglishLesson ? 'Run the improved prompt to generate live AI output.' : '[Chế độ Mô phỏng / Simulated] Output mẫu cục bộ dành riêng cho môi trường thử nghiệm giao diện. Vui lòng chuyển sang Live AI để sinh kết quả từ mô hình ngôn ngữ lớn.'),
     };
   });
 }

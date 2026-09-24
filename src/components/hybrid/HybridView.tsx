@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Play, 
-  ChevronDown, 
-  ChevronUp, 
-  ChevronRight, 
-  Copy, 
-  Check, 
-  GitCompare, 
-  FileText, 
-  Sparkles, 
-  Award, 
+import {
+  Play,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  Copy,
+  Check,
+  GitCompare,
+  FileText,
+  Sparkles,
+  Award,
   ArrowRight,
   Settings2,
   HelpCircle,
@@ -32,11 +32,11 @@ import { detectPromptComponents, evaluateBusinessMetrics } from '../../services/
 import { dbService } from '../../services/dbService';
 import { LessonBriefPanel } from '../lesson/LessonBriefPanel';
 import { PromptComposer } from '../prompt/PromptComposer';
-import { 
-  analyzePromptStructure, 
-  PromptAnalysis, 
-  PromptSpan, 
-  PromptComponentType 
+import {
+  analyzePromptStructure,
+  PromptAnalysis,
+  PromptSpan,
+  PromptComponentType
 } from '../../services/promptStructureAnalyzer';
 import { ABCompareModal } from '../common/ABCompareModal';
 import { SavePromptModal } from '../common/SavePromptModal';
@@ -568,7 +568,16 @@ export const HybridView: React.FC<Props> = ({
         mode: result.mode
       });
 
-      // 2. GỌI AI EVALUATION ĐỘC LẬP THEO RUBRIC MVP (POST /api/evaluate)
+      // 2. NẾU LÀ CHẾ ĐỘ MÔ PHỎNG: Dừng lại, KHÔNG gửi fake output tới AI Judge và KHÔNG lưu attempt vào database
+      if (result.mode === 'simulated') {
+        setAiEvaluation(null);
+        setLastEvaluatedPrompt(null);
+        setScoreResult(null);
+        setRunStatus('idle');
+        return;
+      }
+
+      // 3. GỌI AI EVALUATION ĐỘC LẬP THEO RUBRIC MVP (POST /api/evaluate)
       setRunStatus('evaluating');
       setEvaluationError(null);
       let evalResult: AiEvaluationResult | null = null;
@@ -700,8 +709,8 @@ export const HybridView: React.FC<Props> = ({
    * Cập nhật kết quả vào đúng attempt đã lưu mà không cần chạy lại mô hình sinh văn bản
    */
   const handleRetryEvaluation = async () => {
-    const activeVer = selectedVersionNumber > 0 
-      ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber) 
+    const activeVer = selectedVersionNumber > 0
+      ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)
       : null;
     const targetPrompt = activeVer ? activeVer.promptText : promptText;
     const targetOutput = activeVer ? activeVer.output : output;
@@ -816,6 +825,25 @@ export const HybridView: React.FC<Props> = ({
     setScoreResult(null);
   };
 
+  // Chuyển sang thực hành: focus và cuộn vào ô soạn thảo prompt
+  const handleStartPractice = () => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      textareaRef.current.classList.remove('ring-4', 'ring-emerald-400', 'border-emerald-400');
+      void textareaRef.current.offsetWidth;
+      textareaRef.current.classList.add('ring-4', 'ring-emerald-400', 'border-emerald-400');
+      setTimeout(() => {
+        textareaRef.current?.classList.remove('ring-4', 'ring-emerald-400', 'border-emerald-400');
+      }, 1500);
+    }
+  };
+
+  // Trạng thái đã có output hoặc đang chạy AI (dùng để điều phối bố cục kết quả)
+  const hasOutputOrRunning = Boolean(
+    output || isRunning || (selectedVersionNumber > 0 && currentLabVersions.length > 0)
+  );
+
   // Tên bước tiến trình
   const stepLabel = currentStep === 1 
     ? 'Step 1 / 3: Initial Draft' 
@@ -824,12 +852,12 @@ export const HybridView: React.FC<Props> = ({
     : 'Step 3 / 3: Mastered & Validated';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-[1560px] mx-auto px-4 sm:px-6 xl:px-8 py-5 space-y-5">
       {/* 1. THANH TIẾN ĐỘ MẢNH & ĐIỀU HƯỚNG TỐI GIẢN */}
       <div className="space-y-3">
         {/* Progress bar mảnh ở đầu lesson */}
         <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-          <div 
+          <div
             className="bg-emerald-500 h-full rounded-full transition-all duration-500"
             style={{ width: `${Math.min(100, Math.round(((currentLabIndex + (currentStep === 3 ? 1 : currentStep === 2 ? 0.66 : 0.33)) / labs.length) * 100))}%` }}
           />
@@ -842,7 +870,7 @@ export const HybridView: React.FC<Props> = ({
               <select
                 value={currentLabIndex}
                 onChange={(e) => setCurrentLabIndex(Number(e.target.value))}
-                className="appearance-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm py-1.5 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none transition"
+                className="appearance-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm py-1.5 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none transition shadow-2xs"
               >
                 {labs.map((lab, index) => (
                   <option key={lab.id} value={index}>
@@ -875,7 +903,7 @@ export const HybridView: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={onOpenTutorial}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200 transition"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200 transition shadow-2xs"
                 title="Review lab walkthrough (Guided Walkthrough)"
               >
                 <Compass className="w-3.5 h-3.5 text-emerald-600" />
@@ -897,10 +925,14 @@ export const HybridView: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 2. BỐ CỤC CHÍNH (HYBRID 42% - 58%) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* CỘT TRÁI (42%): TÌNH HUỐNG & MỤC TIÊU - STICKY DESKTOP */}
-        <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-4">
+      {/* 2. BỐ CỤC CHÍNH (PROFESSIONAL AI WORKBENCH) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 2xl:grid-cols-12 gap-5 items-start">
+        {/* CỘT 1: TÌNH HUỐNG, LÝ THUYẾT & NHIỆM VỤ - STICKY DESKTOP */}
+        <div className={`space-y-4 lg:sticky lg:top-20 transition-all duration-300 ${
+          hasOutputOrRunning
+            ? 'lg:col-span-5 xl:col-span-3 2xl:col-span-3'
+            : 'lg:col-span-5 xl:col-span-4 2xl:col-span-3'
+        }`}>
           <LessonBriefPanel
             lab={currentLab}
             showDataAccordion={showDataAccordion}
@@ -911,11 +943,16 @@ export const HybridView: React.FC<Props> = ({
             hasViewedSolution={currentLabAssistance.hasViewedSolution}
             onRequestViewHints={handleRequestViewHints}
             onRequestViewSolution={handleRequestViewSolution}
-            />
+            onStartPractice={handleStartPractice}
+          />
         </div>
 
-        {/* CỘT PHẢI (58%): TẬP TRUNG HOÀN TOÀN VÀO THỰC HÀNH */}
-        <div className="lg:col-span-7 space-y-5">
+        {/* CỘT 2: Ô SOẠN THẢO PROMPT (KHÔNG GIAN LÀM BÀI CHÍNH - RỘNG NHẤT) */}
+        <div className={`space-y-5 transition-all duration-300 ${
+          hasOutputOrRunning
+            ? 'lg:col-span-7 xl:col-span-5 2xl:col-span-5'
+            : 'lg:col-span-7 xl:col-span-8 2xl:col-span-5'
+        }`}>
           <PromptComposer
             lab={currentLab}
             promptText={promptText}
@@ -981,9 +1018,34 @@ export const HybridView: React.FC<Props> = ({
               }
             }}
           />
+        </div>
 
-          {/* VÙNG KẾT QUẢ SAU KHI RUN HOẶC KHI CHỌN VERSION */}
-          {(output || isRunning || (selectedVersionNumber > 0 && currentLabVersions.length > 0)) && (
+        {/* CỘT 3: KẾT QUẢ AI & ĐÁNH GIÁ RUBRIC */}
+        <div className={`space-y-4 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto custom-scrollbar-light transition-all duration-300 ${
+          hasOutputOrRunning
+            ? 'lg:col-span-7 lg:col-start-6 xl:col-span-4 xl:col-start-auto 2xl:col-span-4 2xl:col-start-auto'
+            : 'hidden 2xl:flex 2xl:col-span-4 2xl:col-start-auto'
+        }`}>
+          {/* Trạng thái CHƯA CÓ KẾT QUẢ (Trước khi Run): chỉ hiện standby card tinh tế ở màn hình 2xl, không chiếm chỗ ở màn nhỏ */}
+          {!hasOutputOrRunning ? (
+            <div className="hidden 2xl:flex flex-col items-center justify-center p-8 bg-white/70 backdrop-blur-xs rounded-2xl border border-dashed border-slate-200 text-center space-y-3 min-h-[380px] shadow-2xs">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-2xs">
+                <Sparkles className="w-6 h-6 stroke-[1.8]" />
+              </div>
+              <div className="space-y-1.5 max-w-[280px]">
+                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  Khu vực Kết quả & Đánh giá
+                </h4>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Soạn câu lệnh và bấm <strong className="text-emerald-700 font-semibold">Chạy Prompt</strong> (Ctrl + Enter) để AI sinh kết quả và chấm điểm theo 5 tiêu chí Rubric.
+                </p>
+              </div>
+              <div className="pt-2 flex items-center gap-1.5 text-[11px] text-slate-400 font-medium bg-slate-50 px-3 py-1 rounded-full border border-slate-200/60">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>AI Engine sẵn sàng</span>
+              </div>
+            </div>
+          ) : (
             <div className="space-y-4 animate-fadeIn">
               {/* Output xuất hiện ngay dưới prompt */}
               <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-3" data-tour="tour-output">
@@ -992,9 +1054,15 @@ export const HybridView: React.FC<Props> = ({
                     <h3 className="text-sm font-bold text-slate-900">
                       AI Generated Output
                     </h3>
-                    <span className="text-xs text-slate-500 font-medium">
-                      (Attempt {selectedVersionNumber > 0 ? selectedVersionNumber : currentLabRunCount})
-                    </span>
+                    {metrics?.mode === 'simulated' ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                        Simulated Mode (Progress not saved)
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-500 font-medium">
+                        (Attempt {selectedVersionNumber > 0 ? selectedVersionNumber : currentLabRunCount})
+                      </span>
+                    )}
 
                     {/* Nút lưu nhanh version này vào thư viện Prompt */}
                     {selectedVersionNumber > 0 && (
@@ -1055,10 +1123,10 @@ export const HybridView: React.FC<Props> = ({
                     </div>
                   ) : (selectedVersionNumber > 0 ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.output : output) ? (
                     <div className="text-xs sm:text-sm leading-relaxed">
-                      <MarkdownView 
-                        content={selectedVersionNumber > 0 
-                          ? (currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.output || output) 
-                          : output} 
+                      <MarkdownView
+                        content={selectedVersionNumber > 0
+                          ? (currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.output || output)
+                          : output}
                       />
                     </div>
                   ) : (
@@ -1102,13 +1170,13 @@ export const HybridView: React.FC<Props> = ({
 
               {/* Card chấm điểm & AI Feedback phía dưới output */}
               {(() => {
-                const activeAiEval = (selectedVersionNumber > 0 
-                  ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.aiEvaluation 
+                const activeAiEval = (selectedVersionNumber > 0
+                  ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.aiEvaluation
                   : null) || aiEvaluation;
 
                 if (activeAiEval) {
-                  const targetPromptForAudit = selectedVersionNumber > 0 
-                    ? (currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.promptText || promptText) 
+                  const targetPromptForAudit = selectedVersionNumber > 0
+                    ? (currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.promptText || promptText)
                     : promptText;
                   const piiCheck = detectPiiEntities(targetPromptForAudit);
                   const isPiiLesson = Boolean(currentLab.id?.includes('1') || currentLab.title?.toLowerCase().includes('pii'));
@@ -1157,10 +1225,10 @@ export const HybridView: React.FC<Props> = ({
                             AI Feedback & Rubric Evaluation:
                           </span>
                           <span className={`px-2.5 py-0.5 rounded-full font-bold text-xs ${
-                            activeAiEval.total >= 8 
-                              ? 'bg-emerald-100 text-emerald-800' 
-                              : activeAiEval.total >= 5 
-                              ? 'bg-amber-100 text-amber-800' 
+                            activeAiEval.total >= 8
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : activeAiEval.total >= 5
+                              ? 'bg-amber-100 text-amber-800'
                               : 'bg-rose-100 text-rose-800'
                           }`}>
                             {activeAiEval.total} / 10 pts
@@ -1199,10 +1267,10 @@ export const HybridView: React.FC<Props> = ({
                                 <div className="flex items-center justify-between gap-1">
                                   <span className="font-bold text-slate-900 text-sm">{score10}/10</span>
                                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                                    isPassed 
-                                      ? 'bg-emerald-100 text-emerald-800' 
-                                      : isPartial 
-                                      ? 'bg-amber-100 text-amber-800' 
+                                    isPassed
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : isPartial
+                                      ? 'bg-amber-100 text-amber-800'
                                       : 'bg-rose-100 text-rose-800'
                                   }`}>
                                     {isPassed ? 'Exemplary' : isPartial ? 'Needs Work' : 'Incomplete'}
@@ -1211,7 +1279,7 @@ export const HybridView: React.FC<Props> = ({
                               </div>
                               {/* Thanh tiến trình vi mô */}
                               <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden mt-2">
-                                <div 
+                                <div
                                   className={`h-full rounded-full transition-all duration-500 ${
                                     isPassed ? 'bg-emerald-500' : isPartial ? 'bg-amber-500' : 'bg-rose-500'
                                   }`}

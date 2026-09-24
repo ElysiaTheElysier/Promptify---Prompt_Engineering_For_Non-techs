@@ -6,6 +6,7 @@ export interface GenerateRequestBody {
   classId?: string;
   prompt: string;
   systemInstruction?: string;
+  inputContext?: string;
 }
 
 export interface GenerateResponseBody {
@@ -261,7 +262,7 @@ async function callGeminiWithFallback(
  * Xử lý yêu cầu POST /api/generate
  */
 export async function handleGenerateRequest(body: GenerateRequestBody): Promise<GenerateResponseBody> {
-  const { prompt, systemInstruction } = body;
+  const { prompt, systemInstruction, inputContext } = body;
 
   if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
     throw new AiServerError('Prompt cannot be empty.', 400);
@@ -272,9 +273,14 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
 
   const startTime = performance.now();
 
+  // Tách biệt rõ ràng bối cảnh dữ liệu bài tập và câu lệnh do người học viết
+  const composedUserContent = inputContext?.trim()
+    ? `CONTEXT / INPUT DATA:\n${inputContext.trim()}\n\nUSER PROMPT:\n${prompt.trim()}`
+    : prompt.trim();
+
   // 1. Sử dụng OpenAI nếu có OpenAI key
   if (openAiApiKey) {
-    const result = await callOpenAiGenerate(openAiApiKey, prompt, systemInstruction);
+    const result = await callOpenAiGenerate(openAiApiKey, composedUserContent, systemInstruction);
     const latencyMs = Math.round(performance.now() - startTime);
     return {
       output: result.output,
@@ -286,7 +292,7 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
 
   // 2. Sử dụng Google Gemini nếu có Gemini key
   if (geminiApiKey) {
-    const userParts: { text: string }[] = [{ text: prompt.trim() }];
+    const userParts: { text: string }[] = [{ text: composedUserContent }];
 
     const payload = {
       contents: [{ role: 'user', parts: userParts }],

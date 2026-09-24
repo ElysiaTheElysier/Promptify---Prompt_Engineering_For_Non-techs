@@ -39,31 +39,31 @@ export const LessonHeaderBar: React.FC<Props> = ({
   onOpenApiModal,
 }) => {
   return (
-    <div className="bg-slate-900 text-white border-b border-slate-800 px-4 sm:px-6 py-2.5 sticky top-16 z-30 shadow-xs">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <div className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-2.5 sticky top-16 z-30 shadow-2xs">
+      <div className="max-w-[1560px] mx-auto flex flex-wrap items-center justify-between gap-3">
         
         {/* Left: Breadcrumb & Back button */}
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToDashboard}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold border border-slate-700 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900 text-xs font-semibold border border-slate-200 transition cursor-pointer active:scale-95"
             title="Return to Class Dashboard"
           >
-            <ArrowLeft className="w-4 h-4 text-emerald-400" />
+            <ArrowLeft className="w-3.5 h-3.5 text-emerald-600" />
             <span>Back to Dashboard</span>
           </button>
 
           {/* Breadcrumb text */}
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400">
-            <span className="text-slate-300 font-medium truncate max-w-[140px] md:max-w-[180px]">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500">
+            <span className="text-slate-700 font-medium truncate max-w-[140px] md:max-w-[200px]">
               {cohort.name}
             </span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-slate-400 font-mono text-[11px]">
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-slate-500 font-mono text-[11px] bg-slate-100 px-1.5 py-0.5 rounded">
               Lesson {activeLab.order}
             </span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-emerald-400 font-semibold truncate max-w-[200px] md:max-w-[280px]">
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-emerald-700 font-bold truncate max-w-[220px] md:max-w-[320px]">
               {activeLab.title}
             </span>
           </div>
@@ -74,22 +74,22 @@ export const LessonHeaderBar: React.FC<Props> = ({
           {/* AI Engine Status */}
           <button
             onClick={onOpenApiModal}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer shadow-2xs ${
               apiConfig?.mode === 'simulated'
-                ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/50'
-                : 'bg-indigo-950/40 text-indigo-300 border-indigo-800/60 hover:bg-indigo-900/50'
+                ? 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
             }`}
             title="Configure AI Engine"
           >
             {apiConfig?.mode === 'simulated' ? (
               <>
-                <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                <Zap className="w-3.5 h-3.5 text-amber-600" />
                 <span>AI: Simulated</span>
               </>
             ) : (
               <>
-                <Key className="w-3.5 h-3.5 text-indigo-400" />
-                <span>AI: Server Managed</span>
+                <Key className="w-3.5 h-3.5 text-emerald-600" />
+                <span>AI: Live Server</span>
               </>
             )}
           </button>
@@ -97,21 +97,21 @@ export const LessonHeaderBar: React.FC<Props> = ({
           {/* Quick Library button */}
           <button
             onClick={onOpenPromptLibrary}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-semibold border border-amber-200 transition cursor-pointer shadow-2xs"
             title="Open Prompt Library"
           >
-            <Bookmark className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden lg:inline">Library</span>
+            <Bookmark className="w-3.5 h-3.5 text-amber-600" />
+            <span className="hidden md:inline">Library</span>
           </button>
 
           {/* Tutorial button */}
           <button
             onClick={onOpenTutorial}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition cursor-pointer shadow-2xs"
             title="View Guided Walkthrough"
           >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden lg:inline">Guide</span>
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="hidden md:inline">Guide</span>
           </button>
         </div>
       </div>

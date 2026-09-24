@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const ApiKeyModal: React.FC<Props> = ({ isOpen, onClose, config, onSaveConfig }) => {
-  const [mode, setMode] = useState<'simulated' | 'gemini'>(config.mode || 'gemini');
+  const [mode, setMode] = useState<'live' | 'simulated'>(config.mode === 'simulated' ? 'simulated' : 'live');
   if (!isOpen) return null;
 
   const save = () => {
@@ -39,10 +39,10 @@ export const ApiKeyModal: React.FC<Props> = ({ isOpen, onClose, config, onSaveCo
             <p>Never store API keys in the browser. Live AI uses secure credentials configured in the server deployment environment.</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => setMode('gemini')} className={`rounded-xl border p-4 text-left ${mode === 'gemini' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200'}`}>
+            <button type="button" onClick={() => setMode('live')} className={`rounded-xl border p-4 text-left ${mode === 'live' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200'}`}>
               <div className="flex items-center justify-between font-semibold text-slate-900">
-                <span>Live AI</span>
-                {mode === 'gemini' && <Check className="h-4 w-4 text-emerald-600" />}
+                <span>Live AI (Server-Managed)</span>
+                {mode === 'live' && <Check className="h-4 w-4 text-emerald-600" />}
               </div>
               <p className="mt-1 text-xs text-slate-500">Server-managed LLM execution.</p>
             </button>

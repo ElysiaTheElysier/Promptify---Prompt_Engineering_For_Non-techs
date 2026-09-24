@@ -155,9 +155,11 @@ export interface RubricAudit {
   actionableAdvice: string;
 }
 
+export type ApiEngineMode = 'live' | 'simulated' | 'gemini';
+
 export interface ApiConfig {
-  mode: 'simulated' | 'gemini';
-  geminiApiKey: string;
+  mode: ApiEngineMode;
+  geminiApiKey?: string;
   model: string;
   temperature: number;
 }

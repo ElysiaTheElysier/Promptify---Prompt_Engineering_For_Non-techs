@@ -522,7 +522,7 @@ export const AiCoach: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 font-sans flex flex-col items-end pointer-events-none">
+    <div className="fixed bottom-5 right-5 z-40 font-sans flex flex-col items-end pointer-events-none">
       {/* 1. Speech bubble teaser before chat is opened */}
       {!isOpen && showSpeechBubble && (
         <div 
@@ -576,13 +576,13 @@ export const AiCoach: React.FC<Props> = ({
         <button
           data-tour="tour-coach"
           onClick={handleOpenCoach}
-          className="pointer-events-auto group relative flex items-center gap-3 p-2.5 pr-5 bg-white hover:bg-slate-50 text-slate-800 rounded-full shadow-2xl border-2 border-emerald-500 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          className="pointer-events-auto group relative flex items-center gap-2.5 p-2 pr-4 bg-white hover:bg-slate-50 text-slate-800 rounded-full shadow-lg hover:shadow-xl border-2 border-emerald-500 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
           title="AI Learning Coach - Click for guidance and suggestions"
         >
-          <div className="relative w-10 h-10 flex-shrink-0 flex items-center justify-center bg-slate-900 rounded-full text-emerald-400 border border-emerald-400/60 shadow-inner group-hover:rotate-6 transition-transform">
-            <Bot className="w-6 h-6" />
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-ping" />
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
+          <div className="relative w-9 h-9 flex-shrink-0 flex items-center justify-center bg-slate-900 rounded-full text-emerald-400 border border-emerald-400/60 shadow-inner group-hover:rotate-6 transition-transform">
+            <Bot className="w-5 h-5" />
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white animate-ping" />
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white" />
           </div>
 
           <div className="text-left">
@@ -590,7 +590,7 @@ export const AiCoach: React.FC<Props> = ({
               <span>AI Coach</span>
               <Sparkles className="w-3 h-3 text-amber-500" />
             </span>
-            <span className="text-[11px] font-medium text-emerald-700 block leading-tight">
+            <span className="text-[10px] font-medium text-emerald-700 block leading-tight">
               Lesson {activeLab.order}: {activeLab.badge}
             </span>
           </div>

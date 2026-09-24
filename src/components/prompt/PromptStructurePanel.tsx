@@ -108,7 +108,7 @@ export const PromptStructurePanel: React.FC<Props> = ({
   const missingFocusComponent = focusComponents.find(c => !analysis.detectedTypes.includes(c));
 
   return (
-    <div className={`relative bg-slate-50 rounded-xl p-3 border border-slate-200 text-slate-700 font-sans space-y-2.5 ${className}`}>
+    <div className={`relative bg-slate-50/70 rounded-xl p-3 border border-slate-200/80 text-slate-700 font-sans space-y-2.5 ${className}`}>
       {/* 1. Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 flex-wrap">

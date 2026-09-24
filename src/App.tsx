@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  UIMode, 
+import {
+  UIMode,
   AppView,
-  ClassCohort, 
+  ClassCohort,
   Learner,
   Enrollment,
-  LabStep, 
-  ApiConfig, 
-  PromptRun 
+  LabStep,
+  ApiConfig,
+  PromptRun
 } from './types';
 import { LABS_DATA } from './data/labsData';
 import { LandingLoginScreen } from './components/auth/LandingLoginScreen';
@@ -72,6 +72,7 @@ const EMPTY_LAB: LabStep = {
 };
 
 export const App: React.FC = () => {
+  const reviewClassCode = ((import.meta as any).env?.VITE_REVIEW_CLASS_CODE || '').trim();
   // Trạng thái kiểm tra phiên đăng nhập (Ngăn loading vô hạn)
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
 
@@ -140,7 +141,7 @@ export const App: React.FC = () => {
       try {
         const parsed = JSON.parse(saved);
         return {
-          mode: parsed.mode === 'simulated' ? 'simulated' : 'gemini',
+          mode: parsed.mode === 'simulated' ? 'simulated' : 'live',
           geminiApiKey: '',
           model: 'server-managed',
           temperature: parsed.temperature ?? 0.3,
@@ -150,7 +151,7 @@ export const App: React.FC = () => {
       }
     }
     return {
-      mode: 'gemini',
+      mode: 'live',
       geminiApiKey: '',
       model: 'server-managed',
       temperature: 0.3
@@ -383,8 +384,8 @@ export const App: React.FC = () => {
 
   // Phân giải User và gán đúng vai trò theo DB (P0.2 & P0.4)
   const resolveUserSession = async (
-    email: string, 
-    fullName?: string, 
+    email: string,
+    fullName?: string,
     authProviderId?: string,
     isExplicitLogin = false
   ) => {
@@ -641,7 +642,7 @@ export const App: React.FC = () => {
       // 2. SIGNED_IN: Chỉ xử lý nếu chưa có user hoặc user thực sự thay đổi
       if (event === 'SIGNED_IN') {
         if (isLoggingOutRef.current) return;
-        
+
         // Nếu user này đã có currentUser trùng email, không làm gì cả (tránh reset khi browser tab focus)
         if (currentUserRef.current && session?.user?.email && currentUserRef.current.email === session.user.email) {
           return;
@@ -676,25 +677,24 @@ export const App: React.FC = () => {
     const fetchClasses = async () => {
       try {
         const dbClasses = await dbService.getClassesWithDetails();
-        const lessonCounts = await dbService.getPublishedLessonCounts(dbClasses.map((item) => item.course_id));
+        const targetClasses = reviewClassCode
+          ? dbClasses.filter(c => c.class_code === reviewClassCode || c.id === reviewClassCode)
+          : dbClasses;
+        const lessonCounts = await dbService.getPublishedLessonCounts(targetClasses.map((item) => item.course_id));
         if (isMounted) {
-          const targetClasses = reviewClassCode
-            ? dbClasses.filter(c => c.class_code === reviewClassCode || c.id === reviewClassCode)
-            : dbClasses;
-
-          const mappedCohorts: ClassCohort[] = targetClasses.map((c) => ({
-              id: c.id,
-              classCode: c.class_code,
-              name: c.course?.title || c.class_code,
-              organization: c.client?.name || '',
-              industry: c.client?.industry || '',
-              department: c.department,
-              expiryDurationHours: 8,
-              expiryDateText: reviewClassCode ? 'Access expires at 18:00 today' : 'Hết hạn lúc 18:00 hôm nay',
-              description: c.course?.description || 'Executive Prompt Engineering Curriculum.',
-              iconName: c.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
-              isPublic: c.enrollment_mode === 'self_enroll',
-              totalLessons: lessonCounts[c.course_id] || 0,
+          const mappedCohorts: ClassCohort[] = targetClasses.map(c => ({
+            id: c.id,
+            classCode: c.class_code,
+            name: c.course?.title || c.class_code,
+            organization: c.client?.name || '',
+            industry: c.client?.industry || '',
+            department: c.department,
+            expiryDurationHours: 8,
+            expiryDateText: reviewClassCode ? 'Access expires at 18:00 today' : 'Hết hạn lúc 18:00 hôm nay',
+            description: c.course?.description || (reviewClassCode ? 'Executive Prompt Engineering Curriculum.' : 'Chương trình đào tạo Prompt Engineering.'),
+            iconName: c.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
+            isPublic: c.enrollment_mode === 'self_enroll',
+            totalLessons: lessonCounts[c.course_id] || 0,
           }));
           setCohorts(mappedCohorts);
         }
@@ -831,7 +831,7 @@ export const App: React.FC = () => {
     cohort.isPublic || enrolledClassIds.includes(cohort.id) || (hasActiveEnrollment && cohort.id === selectedCohort.id)
   ));
 
-  // Enforce review cohort when VITE_REVIEW_CLASS_CODE is set: reset any stale Vietnamese or other class
+  // Enforce review cohort when VITE_REVIEW_CLASS_CODE is set
   useEffect(() => {
     if (reviewClassCode && cohorts.length > 0) {
       const reviewCohort = cohorts.find((c) => c.classCode === reviewClassCode || c.id === reviewClassCode);
@@ -841,7 +841,7 @@ export const App: React.FC = () => {
         localStorage.setItem('promptify_cohort', JSON.stringify(reviewCohort));
       }
     }
-  }, [cohorts, selectedCohort.id, selectedCohort.classCode]);
+  }, [reviewClassCode, cohorts, selectedCohort.id, selectedCohort.classCode]);
 
   const handleProductNavigate = (view: AppView) => {
     if (view === 'dashboard') {
@@ -1057,23 +1057,29 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1">
+      <footer className={`bg-white border-t border-slate-200 text-xs text-slate-500 ${
+        currentView === 'lesson'
+          ? 'py-2.5 px-4 mt-6 bg-slate-50/50'
+          : 'py-6 mt-12'
+      }`}>
+        <div className={`mx-auto flex flex-wrap items-center justify-between gap-4 ${
+          currentView === 'lesson' ? 'max-w-[1560px] px-2 sm:px-4' : 'max-w-7xl px-4 sm:px-6 lg:px-8'
+        }`}>
+          <div className="space-y-0.5">
             <p className="font-bold text-slate-700">
               Promptify • Executive AI & Prompt Engineering Training
             </p>
-            <p className="text-slate-600">
+            <p className="text-slate-500 text-[11px]">
               Course: {selectedCohort.name}
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] text-slate-600">
+          <div className="flex items-center gap-3 text-[11px] text-slate-500">
             <span className="text-emerald-700 font-medium">Server AI Engine (Active)</span>
             <span>•</span>
             <button
               onClick={() => setCurrentView('history')}
-              className="text-indigo-600 font-medium hover:underline cursor-pointer"
+              className="text-slate-600 hover:text-emerald-700 font-medium transition cursor-pointer"
             >
               Practice History ({history.length})
             </button>
