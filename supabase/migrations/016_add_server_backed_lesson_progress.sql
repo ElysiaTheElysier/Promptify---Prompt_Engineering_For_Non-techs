@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS public.lesson_progress (
   CONSTRAINT lesson_progress_learner_class_lesson_key
     UNIQUE (learner_id, class_id, lesson_id)
 );
-
+GRANT SELECT
+ON TABLE public.lesson_progress
+TO service_role;
 CREATE INDEX IF NOT EXISTS idx_lesson_progress_learner_class
   ON public.lesson_progress(learner_id, class_id);
 CREATE INDEX IF NOT EXISTS idx_lesson_progress_class_lesson
