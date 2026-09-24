@@ -27,9 +27,15 @@ export interface LessonBriefPanelProps {
   hasViewedSolution: boolean;
   onRequestViewHints: () => void;
   onRequestViewSolution: () => void;
+  onStartPractice?: () => void;
 }
 
 export type LessonPanelTab = 'theory' | 'exercise' | 'hints' | 'solution';
+
+export const normalizePromptFormatting = (text?: string): string => {
+  if (!text) return '';
+  return text.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+};
 
 export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
   lab,
@@ -39,6 +45,7 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
   hasViewedSolution,
   onRequestViewHints,
   onRequestViewSolution,
+  onStartPractice,
 }) => {
   const [activeTab, setActiveTab] = useState<LessonPanelTab>('theory');
   const [isSolutionCopied, setIsSolutionCopied] = useState<boolean>(false);
@@ -74,9 +81,10 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
     ? `DỮ LIỆU MINH HỌA — chỉ dùng trong hướng dẫn\nNhiệm vụ: ${lab.taskGoal}\nĐịnh dạng mong muốn: ${lab.expectedOutputFormat}`
     : '');
 
+
   const handleCopySolution = () => {
     if (lab.improvedPrompt) {
-      navigator.clipboard.writeText(lab.improvedPrompt);
+      navigator.clipboard.writeText(normalizePromptFormatting(lab.improvedPrompt));
       setIsSolutionCopied(true);
       setTimeout(() => setIsSolutionCopied(false), 2000);
     }
@@ -204,8 +212,11 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
             <div className="pt-2 flex justify-end">
               <button
                 type="button"
-                onClick={() => setActiveTab('exercise')}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition cursor-pointer shadow-xs active:scale-95"
+                onClick={() => {
+                  setActiveTab('exercise');
+                  if (onStartPractice) onStartPractice();
+                }}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition cursor-pointer shadow-xs"
               >
                 <span>Bắt đầu làm bài tập</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -407,8 +418,8 @@ export const LessonBriefPanel: React.FC<LessonBriefPanelProps> = ({
                     </div>
                   </div>
 
-                  <pre className="p-3 bg-slate-950 text-emerald-300 font-mono text-[11px] rounded-xl border border-slate-800 whitespace-pre-wrap max-h-56 overflow-y-auto custom-scrollbar-dark leading-relaxed">
-                    {lab.improvedPrompt}
+                  <pre className="p-3.5 bg-slate-50/90 text-slate-800 font-sans text-xs rounded-xl border border-slate-200/90 whitespace-pre-wrap max-h-56 overflow-y-auto custom-scrollbar-light leading-relaxed select-text shadow-2xs">
+                    {normalizePromptFormatting(lab.improvedPrompt)}
                   </pre>
                 </div>
 
