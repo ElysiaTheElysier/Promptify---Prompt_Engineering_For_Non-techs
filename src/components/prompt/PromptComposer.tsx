@@ -99,18 +99,17 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
   const [tabnineSuggestion, setTabnineSuggestion] = useState<TabnineSuggestion | null>(null);
   const [suggestionDismissed, setSuggestionDismissed] = useState<boolean>(false);
 
-  // Quản lý trạng thái các đề xuất Diff sau khi Giám khảo LLM chấm điểm
+  // Manage diff suggestion state post LLM evaluation
   const [dismissedDiffIds, setDismissedDiffIds] = useState<string[]>([]);
   const [activeHighlightedDiffId, setActiveHighlightedDiffId] = useState<string | null>(null);
 
-  // Tự động làm mới danh sách đề xuất khi có kết quả chấm điểm LLM mới
+  // Refresh suggestions when a new evaluation arrives
   React.useEffect(() => {
     setDismissedDiffIds([]);
     setActiveHighlightedDiffId(null);
   }, [aiEvaluation]);
 
-  // Gợi ý Diff & Đề xuất sửa CHỈ áp dụng sau khi chạy chấm prompt và có kết quả đánh giá LLM
-  // Nếu câu lệnh chưa chạy chấm, tuyệt đối KHÔNG hiển thị gợi ý
+  // Diff & suggestions ONLY apply after prompt has been evaluated by the AI Judge
   const isCurrentPromptEvaluated = Boolean(
     aiEvaluation &&
     lastEvaluatedPromptText &&
@@ -123,22 +122,22 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
 
     const items: DiffSuggestionItem[] = [];
 
-    // 1. Quét PII nhạy cảm thật trong prompt
+    // 1. Scan sensitive PII in prompt
     const piiCheck = detectPiiEntities(promptText);
     if (piiCheck.hasPii) {
       const lines = promptText.split('\n');
       piiCheck.piiItems.forEach((item, idx) => {
-        let replacement = '{{BIẾN}}';
-        if (item.type === 'cccd') replacement = '{{SO_CCCD}}';
-        else if (item.type === 'phone') replacement = '{{SO_DIEN_THOAI}}';
-        else if (item.type === 'bank_account') replacement = '{{SO_TK_NGAN_HANG}}';
-        else if (item.type === 'contract_id') replacement = '{{MA_HDTD}}';
+        let replacement = '{{VARIABLE}}';
+        if (item.type === 'cccd') replacement = '{{SSN_OR_ID}}';
+        else if (item.type === 'phone') replacement = '{{PHONE_NUMBER}}';
+        else if (item.type === 'bank_account') replacement = '{{BANK_ACCOUNT}}';
+        else if (item.type === 'contract_id') replacement = '{{CONTRACT_ID}}';
         else if (item.type === 'person_name') {
-          if (item.value.includes('Tèo')) replacement = '{{TEN_KH}}';
-          else if (item.value.includes('Mận')) replacement = '{{VO_KH}}';
-          else replacement = '{{TEN_NGUOI}}';
+          if (item.value.includes('Tèo')) replacement = '{{CUSTOMER_NAME}}';
+          else if (item.value.includes('Mận')) replacement = '{{SPOUSE_NAME}}';
+          else replacement = '{{PERSON_NAME}}';
         } else if (item.type === 'serial_id') {
-          replacement = '{{SERI_SO_DO}}';
+          replacement = '{{DOCUMENT_SERIAL}}';
         }
 
         const fullOrig = lines.find(l => l.includes(item.value)) || item.value;
@@ -148,79 +147,79 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
           id: `diff-pii-${idx}-${item.value}`,
           originalText: item.value,
           replacementText: replacement,
-          label: `Bảo mật PII: Khử ${item.label}`,
+          label: `PII Redactor: Sanitize ${item.label}`,
           fullOriginalLine: fullOrig.trim(),
           fullReplacementLine: fullRepl.trim()
         });
       });
     }
 
-    // 2. Quét các tiêu chí chấm điểm từ Giám khảo LLM (scores & rubric) nếu chưa đạt 10/10
+    // 2. Scan scoring criteria from AI Judge if < 10/10
     const scores = aiEvaluation.scores;
     if (scores) {
       const promptLower = promptText.toLowerCase();
 
-      // Hoàn thành nhiệm vụ của đúng lesson hiện tại
-      if (scores.taskCompletion < 2 && !promptLower.includes('nhiệm vụ')) {
-        const repl = `NHIỆM VỤ: ${lab.taskGoal || `Thực hiện đúng yêu cầu của bài ${lab.title}.`}`;
+      // Task completion
+      if (scores.taskCompletion < 2 && !promptLower.includes('task') && !promptLower.includes('nhiệm vụ')) {
+        const repl = `TASK: ${lab.taskGoal || `Execute requirements for lesson ${lab.title}.`}`;
         items.push({
           id: 'diff-task',
-          originalText: '(Chưa nêu nhiệm vụ cần thực hiện)',
+          originalText: '(Task objective not explicitly defined)',
           replacementText: repl,
-          label: 'Cấu trúc: Bổ sung nhiệm vụ của bài',
-          fullOriginalLine: '(Chưa có nhiệm vụ rõ ràng)',
+          label: 'Structure: Add task objective',
+          fullOriginalLine: '(No explicit task defined)',
           fullReplacementLine: repl,
         });
       }
 
-      // Kiểm tra định dạng đầu ra (formatAdherence < 2)
-      if (scores.formatAdherence < 2 && !promptLower.includes('định dạng') && !promptLower.includes('bảng') && !promptText.includes('|')) {
-        const repl = `ĐỊNH DẠNG ĐẦU RA: ${lab.expectedOutputFormat || 'Trình bày kết quả ngắn gọn, rõ ràng và đúng cấu trúc yêu cầu.'}`;
+      // Format adherence
+      if (scores.formatAdherence < 2 && !promptLower.includes('format') && !promptLower.includes('table') && !promptLower.includes('định dạng') && !promptLower.includes('bảng') && !promptText.includes('|')) {
+        const repl = `OUTPUT FORMAT: ${lab.expectedOutputFormat || 'Present output concisely, clearly, and adhering to required structure.'}`;
         items.push({
           id: 'diff-format',
-          originalText: '(Chưa quy định định dạng đầu ra)',
+          originalText: '(Target output format not specified)',
           replacementText: repl,
-          label: 'Cấu trúc: Bổ sung khuôn dạng bảng Markdown',
-          fullOriginalLine: '(Chưa có định dạng đầu ra)',
+          label: 'Structure: Add markdown format specification',
+          fullOriginalLine: '(No output format specified)',
           fullReplacementLine: repl
         });
       }
 
-      // Kiểm tra ràng buộc an toàn & kiểm soát (constraintCompliance < 2)
-      if (scores.constraintCompliance < 2 && !promptLower.includes('ràng buộc') && !promptLower.includes('tuyệt đối')) {
-        const repl = `RÀNG BUỘC: ${lab.systemInstruction || 'Chỉ sử dụng dữ liệu được cung cấp, không tự suy diễn hoặc bổ sung thông tin ngoài nguồn.'}`;
+      // Constraint compliance
+      if (scores.constraintCompliance < 2 && !promptLower.includes('constraint') && !promptLower.includes('ràng buộc') && !promptLower.includes('tuyệt đối')) {
+        const repl = `CONSTRAINTS: ${lab.systemInstruction || 'Only rely on provided context; do not extrapolate or hallucinate ungrounded facts.'}`;
         items.push({
           id: 'diff-constraint',
-          originalText: '(Chưa có ràng buộc kiểm soát & an toàn)',
+          originalText: '(Missing safety constraints and guardrails)',
           replacementText: repl,
-          label: 'Cấu trúc: Bổ sung ràng buộc kiểm soát',
-          fullOriginalLine: '(Chưa có ràng buộc an toàn)',
+          label: 'Structure: Add safety constraints',
+          fullOriginalLine: '(No safety constraints)',
           fullReplacementLine: repl
         });
       }
 
-      // Kiểm tra bối cảnh nghiệp vụ (groundedness < 2)
-      if (scores.groundedness < 2 && !promptLower.includes('bối cảnh') && !promptLower.includes('căn cứ')) {
-        const repl = `BỐI CẢNH / DỮ LIỆU ĐẦU VÀO: ${lab.sampleInputContext || lab.scenario || 'Nêu rõ dữ liệu nguồn cần dùng cho nhiệm vụ này.'}`;
+      // Groundedness
+      if (scores.groundedness < 2 && !promptLower.includes('context') && !promptLower.includes('bối cảnh') && !promptLower.includes('căn cứ')) {
+        const repl = `CONTEXT / INPUT DATA: ${lab.sampleInputContext || lab.scenario || 'Specify source data required for this task.'}`;
         items.push({
           id: 'diff-context',
-          originalText: '(Chưa xác định bối cảnh hoặc dữ liệu đầu vào)',
+          originalText: '(Context or input data not grounded)',
           replacementText: repl,
-          label: 'Cấu trúc: Bổ sung dữ liệu của bài',
-          fullOriginalLine: '(Chưa có bối cảnh hoặc dữ liệu đầu vào)',
+          label: 'Structure: Add context / input data',
+          fullOriginalLine: '(No context or input data)',
           fullReplacementLine: repl
         });
       }
 
-      // Kiểm tra vai trò chuyên gia (businessUsability < 2)
-      if (scores.businessUsability < 2 && !promptLower.includes('vai trò') && !promptLower.includes('bạn là')) {
-        const repl = `VAI TRÒ: Bạn là trợ lý chuyên môn phù hợp với bài "${lab.title}".`;
+      // Business usability
+      if (scores.businessUsability < 2 && !promptLower.includes('role') && !promptLower.includes('vai trò') && !promptLower.includes('bạn là')) {
+        const repl = `ROLE: You are an expert specialist tailored for "${lab.title}".`;
         items.push({
           id: 'diff-role',
-          originalText: '(Chưa định nghĩa vai trò chuyên môn)',
+          originalText: '(Professional role not specified)',
           replacementText: repl,
-          label: 'Cấu trúc: Bổ sung vai trò chuyên gia',
-          fullOriginalLine: '(Chưa có vai trò chuyên gia)',
+          label: 'Structure: Add expert persona role',
+          fullOriginalLine: '(No professional role)',
           fullReplacementLine: repl
         });
       }
@@ -229,10 +228,10 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     return items;
   }, [isCurrentPromptEvaluated, aiEvaluation, promptText, lab]);
 
-  // Lọc bỏ những mục đã được chấp nhận hoặc bỏ qua
+  // Filter out dismissed items
   const activeDiffItems = evaluatedDiffItems.filter(item => !dismissedDiffIds.includes(item.id));
 
-  // 1. DI CHUYỂN TỚI VÀ HIGHLIGHT NƠI SẼ THAY ĐỔI TRONG Ô TEXTAREA KHI ẤN VÀO CARD
+  // 1. Navigate to & highlight diff item in textarea
   const handleNavigateToDiffItem = (item: DiffSuggestionItem) => {
     setActiveHighlightedDiffId(item.id);
     const textarea = textareaRef.current;
@@ -242,25 +241,21 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     const index = promptText.indexOf(target);
 
     if (index !== -1) {
-      // Tính toán cuộn textarea tới đúng dòng cần sửa
       const textBefore = promptText.substring(0, index);
       const lineNumber = textBefore.split('\n').length;
       const lineHeight = 22;
       textarea.scrollTop = Math.max(0, (lineNumber - 3) * lineHeight);
 
-      // Focus và bôi đen vùng text cần sửa
       textarea.focus();
       textarea.setSelectionRange(index, index + target.length);
     } else {
-      // Nếu là khối bổ sung mới, cuộn xuống cuối
       textarea.focus();
       textarea.scrollTop = textarea.scrollHeight;
       textarea.setSelectionRange(promptText.length, promptText.length);
     }
 
-    // Hiệu ứng flash highlight màu hổ phách (amber) rõ nét trên textarea
     textarea.classList.remove('ring-4', 'ring-amber-400', 'border-amber-400');
-    void textarea.offsetWidth; // trigger reflow
+    void textarea.offsetWidth;
     textarea.classList.add('ring-4', 'ring-amber-400', 'border-amber-400');
 
     setTimeout(() => {
@@ -268,7 +263,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }, 1600);
   };
 
-  // 2. ACCEPT ĐƠN LẺ (CHẤP NHẬN TỪNG THAY ĐỔI MỘT)
+  // 2. Accept single diff item
   const handleAcceptSingleDiffItem = (item: DiffSuggestionItem) => {
     const textarea = textareaRef.current;
     let newPrompt = promptText;
@@ -279,7 +274,6 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
       newPrompt = promptText.substring(0, index) + item.replacementText + promptText.substring(index + item.originalText.length);
       newCursorPos = index + item.replacementText.length;
     } else {
-      // Bổ sung vào cuối nếu là mục gợi ý cấu trúc mới
       newPrompt = promptText.trim() ? `${promptText.trim()}\n\n${item.replacementText}` : item.replacementText;
       newCursorPos = newPrompt.length;
     }
@@ -290,7 +284,6 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
       setActiveHighlightedDiffId(null);
     }
 
-    // Flash xanh lá xác nhận thay đổi đơn lẻ thành công
     setTimeout(() => {
       if (textarea) {
         textarea.focus();
@@ -305,7 +298,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }, 40);
   };
 
-  // 3. REJECT ĐƠN LẺ
+  // 3. Reject single diff item
   const handleRejectSingleDiffItem = (item: DiffSuggestionItem) => {
     setDismissedDiffIds(prev => [...prev, item.id]);
     if (activeHighlightedDiffId === item.id) {
@@ -313,7 +306,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }
   };
 
-  // 4. ACCEPT TOÀN BỘ (ACCEPT ALL)
+  // 4. Accept all diff items
   const handleAcceptAllDiffItems = () => {
     let updatedText = promptText;
 
@@ -328,7 +321,6 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
       }
     }
 
-    // Khử triệt để PII nếu còn sót
     const piiCheck = detectPiiEntities(updatedText);
     if (piiCheck.hasPii) {
       updatedText = sanitizePii(updatedText);
@@ -348,7 +340,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }
   };
 
-  // 5. REJECT TOÀN BỘ (REJECT ALL)
+  // 5. Reject all diff items
   const handleRejectAllDiffItems = () => {
     setDismissedDiffIds(prev => [...prev, ...activeDiffItems.map(i => i.id)]);
     setActiveHighlightedDiffId(null);
@@ -382,7 +374,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }, 30);
   };
 
-  // Chèn một thành phần cấu trúc ngắn (Scaffold tag) vào vị trí con trỏ hoặc cuối prompt
+  // Insert scaffold tag into prompt
   const insertScaffoldTag = (label: string) => {
     const textarea = textareaRef.current;
     const tagToInsert = `\n${label}: `;
@@ -414,14 +406,14 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
     }
   };
 
-  // Chèn trọn bộ khung sườn 5 thành phần nếu ô prompt đang trống
+  // Insert full 5-element skeleton
   const insertFullSkeleton = () => {
-    const skeleton = `Vai trò: \nBối cảnh: \nNhiệm vụ: \nRàng buộc: \nĐịnh dạng đầu ra: `;
+    const skeleton = `Role: \nContext: \nTask: \nConstraints: \nOutput Format: `;
     setPromptText(skeleton);
     setTimeout(() => {
       if (textareaRef.current) {
         textareaRef.current.focus();
-        textareaRef.current.setSelectionRange(9, 9); // đặt sau "Vai trò: "
+        textareaRef.current.setSelectionRange(6, 6); // placed after "Role: "
       }
     }, 50);
   };
@@ -436,17 +428,17 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-4" data-tour="tour-prompt">
-      {/* 1. Header của vùng soạn thảo: Tiêu đề & 3 tầng trợ giúp */}
+      {/* 1. Header: Title & Assistance levels */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold text-slate-900">
-            Ô Soạn thảo Prompt
+            Prompt Composer
           </h3>
           <span className="text-[11px] text-slate-500 font-normal hidden sm:inline">
-            (Tự viết để rèn tư duy)
+            (Draft manually to build intuition)
           </span>
 
-          {/* Badge trạng thái AI Engine & Click mở Cấu hình API */}
+          {/* AI Engine Status Badge & Modal Trigger */}
           {onOpenApiModal && (
             <button
               type="button"
@@ -456,12 +448,12 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
                   : 'bg-indigo-50 text-indigo-700 border-indigo-300 hover:bg-indigo-100'
               }`}
-              title="Nhấp để cấu hình API Key, đổi mô hình hoặc xem hướng dẫn 4 bước"
+              title="Configure API key, switch model, or inspect provider settings"
             >
               {apiConfig?.mode === 'simulated' ? (
                 <>
                   <Zap className="w-3 h-3 text-emerald-600" />
-                  <span>Mô phỏng</span>
+                  <span>Simulated</span>
                 </>
               ) : (
                 <>
@@ -473,21 +465,21 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
           )}
         </div>
 
-        {/* Prompt mẫu chỉ để tham khảo, không tự chèn hoặc ghi đè bài làm. */}
+        {/* Reference prompt modal trigger */}
         <div className="flex items-center gap-2 text-xs">
           <button
             type="button"
             onClick={() => setShowSampleModal(true)}
             className="text-emerald-700 hover:text-emerald-900 font-semibold flex items-center gap-1 transition cursor-pointer"
-            title="Xem gợi ý câu lệnh chuẩn mẫu (không tự động ghi đè bài làm của bạn)"
+            title="View reference prompt (will not overwrite your draft)"
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>Xem mẫu chuẩn</span>
+            <span>View Reference</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Thanh chuyển đổi phiên bản câu lệnh (Lần thử 1 | Lần thử 2 | Lần thử 3...) */}
+      {/* 2. Version Navigation Bar */}
       {versions.length > 0 && (
         <PromptVersionBar
           versions={versions}
@@ -496,51 +488,38 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
           onRestorePrompt={onRestorePrompt}
           onOpenCompare={onOpenCompare}
           onSaveToLibrary={onSaveToLibrary}
+          currentPromptText={promptText}
         />
       )}
 
-      {/* 3. Tầng 2: Cấu trúc & Gợi ý chèn thẻ Prompt hợp nhất */}
+      {/* 3. Scaffold / Structure Panel */}
       <PromptStructurePanel
         analysis={promptAnalysis}
-        focusComponents={lab.focusComponents}
         selectedSpan={selectedSpan}
         onSelectComponent={onSelectComponent}
         onInsertTag={insertScaffoldTag}
         onInsertSkeleton={insertFullSkeleton}
-        canInsertSkeleton={!promptText.trim()}
+        focusComponents={lab.focusComponents}
       />
 
-      {/* 4. Khung Input Field Soạn thảo Prompt với Gợi ý & Diff tích hợp trực tiếp bên trong */}
-      <div className="relative rounded-2xl border border-slate-300 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 bg-slate-50/60 focus-within:bg-white overflow-hidden transition shadow-2xs">
-        {/* Textarea chính */}
+      {/* 4. Textarea Input Field */}
+      <div className="relative rounded-xl border border-slate-200 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 bg-slate-50/50 transition overflow-hidden">
         <textarea
           ref={textareaRef}
-          rows={8}
           value={promptText}
+          rows={7}
           onChange={(e) => {
             const val = e.target.value;
             setPromptText(val);
             if (onManualPromptChange) {
               onManualPromptChange(val);
             }
-            if (errorMessage) setErrorMessage(null);
-            setSuggestionDismissed(false);
-            setTabnineSuggestion(null);
-          }}
-          onKeyUp={(e) => {
             if (isCurrentPromptEvaluated) {
-              const target = e.target as HTMLTextAreaElement;
-              handleCheckSuggestion(target.value, target.selectionStart);
-            }
-          }}
-          onClick={(e) => {
-            if (isCurrentPromptEvaluated) {
-              const target = e.target as HTMLTextAreaElement;
-              handleCheckSuggestion(target.value, target.selectionStart);
+              handleCheckSuggestion(val, e.target.selectionStart);
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Tab' && tabnineSuggestion && isCurrentPromptEvaluated) {
+            if (e.key === 'Tab' && tabnineSuggestion && isCurrentPromptEvaluated && !suggestionDismissed) {
               e.preventDefault();
               handleAcceptTabnine();
             } else if (e.key === 'Escape' && tabnineSuggestion) {
@@ -548,17 +527,17 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
               setSuggestionDismissed(true);
             }
           }}
-          placeholder={lab.promptPlaceholder || "Nhập câu lệnh của bạn tại đây... (Ví dụ: Bạn là chuyên viên...)"}
+          placeholder={lab.promptPlaceholder || "Enter your prompt here... (e.g., You are an expert business analyst...)"}
           className="w-full p-4 text-xs sm:text-sm font-mono text-slate-900 bg-transparent focus:outline-none leading-relaxed transition resize-y custom-scrollbar-light"
         />
 
-        {/* Gợi ý hoàn thiện (Tabnine style) gắn liền ngay chân input field - CHỈ hiển thị sau khi chạy chấm */}
+        {/* Inline Suggestion (Tabnine style) */}
         {isCurrentPromptEvaluated && tabnineSuggestion && !suggestionDismissed && (
           <div className="flex items-center justify-between px-3.5 py-2 bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 text-white text-xs border-t border-emerald-500/40 animate-fadeIn">
             <div className="flex items-center gap-2 overflow-hidden mr-2">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0 animate-pulse" />
               <span className="font-bold text-emerald-400 shrink-0 text-[11px]">
-                Gợi ý chèn (Tabnine style):
+                Inline suggestion (Tabnine style):
               </span>
               <span className="text-slate-200 font-mono text-[11px] truncate">
                 "{tabnineSuggestion.suggestionText.trim()}"
@@ -569,9 +548,9 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                 type="button"
                 onClick={handleAcceptTabnine}
                 className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-[11px] flex items-center gap-1.5 transition cursor-pointer shadow-xs active:scale-95"
-                title="Nhấn phím Tab để chèn ngay"
+                title="Press Tab to accept"
               >
-                <span>Chèn</span>
+                <span>Insert</span>
                 <kbd className="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded text-[9px] font-mono shadow-2xs">Tab ⇥</kbd>
               </button>
               <button
@@ -581,7 +560,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                   setSuggestionDismissed(true);
                 }}
                 className="text-slate-400 hover:text-white px-1.5 py-0.5 text-xs transition cursor-pointer"
-                title="Bỏ qua (Esc)"
+                title="Dismiss (Esc)"
               >
                 ✕
               </button>
@@ -589,12 +568,12 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
           </div>
         )}
 
-        {/* Bảng Diff Đề Xuất Chuẩn IDE - CHỈ hiển thị sau khi chạy chấm prompt qua lớp chấm LLM */}
+        {/* Inline Diff Suggestion Card */}
         {isCurrentPromptEvaluated && activeDiffItems.length > 0 && (
           <div className="border-t border-slate-700/80 p-2.5 bg-[#12121a]">
             <InlineDiffSuggestionCard
               items={activeDiffItems}
-              title="Đề xuất tối ưu sau khi Giám khảo LLM chấm điểm"
+              title="Optimal suggestions based on AI Judge rubric evaluation"
               evaluationScore={aiEvaluation?.total}
               activeItemId={activeHighlightedDiffId}
               onItemClick={handleNavigateToDiffItem}
@@ -607,7 +586,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
         )}
       </div>
 
-      {/* 6. Thiết lập nâng cao (Vai trò hệ thống - System Instruction) */}
+      {/* 5. Advanced Settings (System Instruction) */}
       <div className="border-t border-slate-100 pt-3">
         <button
           type="button"
@@ -615,27 +594,27 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
           className="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition cursor-pointer"
         >
           <Settings2 className="w-3.5 h-3.5" />
-          <span>Thiết lập nâng cao (Vai trò hệ thống)</span>
+          <span>Advanced Settings (System Instruction)</span>
           {showAdvancedSettings ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
         </button>
 
         {showAdvancedSettings && (
           <div className="mt-2.5 p-3 bg-slate-50 rounded-xl space-y-1.5 animate-fadeIn border border-slate-200">
             <label className="text-xs font-semibold text-slate-700 block">
-              Vai trò hệ thống (Chỉ dẫn ngầm cho AI):
+              System Instruction (Background steering for AI):
             </label>
             <input
               type="text"
               value={systemText}
               onChange={(e) => setSystemText(e.target.value)}
-              placeholder="Ví dụ: Bạn là trợ lý chuyên môn cho nhiệm vụ này..."
+              placeholder="e.g. You are an expert specialist for this task..."
               className="w-full px-3 py-2 text-xs bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800 font-mono"
             />
           </div>
         )}
       </div>
 
-      {/* 7. Thông báo lỗi nếu có */}
+      {/* 6. Error Message Display */}
       {errorMessage && (
         <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2 animate-fadeIn">
           <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
@@ -645,7 +624,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
         </div>
       )}
 
-      {/* 8. CTA chính: CHẠY PROMPT */}
+      {/* 7. Primary CTA: Run Prompt */}
       <button
         type="button"
         onClick={onRun}
@@ -656,16 +635,16 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
         <Play className={`w-4 h-4 ${isRunning ? 'animate-spin' : 'fill-white'}`} />
         <span>
           {runStatus === 'generating' 
-            ? 'Đang tạo câu trả lời...' 
+            ? 'Generating response...' 
             : runStatus === 'evaluating' 
-            ? 'AI đang đánh giá câu lệnh...' 
+            ? 'AI is evaluating prompt...' 
             : isRunning 
-            ? 'Đang xử lý...' 
-            : 'Chạy Prompt'}
+            ? 'Processing...' 
+            : 'Run Prompt'}
         </span>
       </button>
 
-      {/* MODAL THAM KHẢO CÂU LỆNH MẪU (TIER 3) */}
+      {/* 8. Reference Prompt Modal */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto">
@@ -673,7 +652,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-emerald-600" />
                 <h4 className="text-sm font-bold text-slate-900">
-                  Prompt mẫu tham khảo — {lab.title}
+                  Reference Prompt — {lab.title}
                 </h4>
               </div>
               <button
@@ -688,13 +667,13 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
             <div className="p-3 bg-amber-50 rounded-xl text-xs text-amber-800 flex items-start gap-2 border border-amber-200/70">
               <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <strong>Đây là một cách làm tốt, không phải đáp án duy nhất.</strong> Hãy đối chiếu với cấu trúc prompt bạn đã tự viết. Mẫu không tự chèn hoặc ghi đè bài làm.
+                <strong>This is one high-performing approach, not the only answer.</strong> Compare it against your own drafted prompt structure. Reference does not overwrite your workspace.
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-700">Nội dung câu lệnh mẫu:</span>
+                <span className="text-xs font-semibold text-slate-700">Reference Prompt Content:</span>
                 <button
                   type="button"
                   onClick={handleCopySample}
@@ -702,20 +681,20 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                   className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold flex items-center gap-1 transition"
                 >
                   {isSampleCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{isSampleCopied ? 'Đã sao chép' : 'Sao chép mẫu'}</span>
+                  <span>{isSampleCopied ? 'Copied' : 'Copy Reference'}</span>
                 </button>
               </div>
 
               {lab.improvedPrompt.trim() ? (
                 <pre className="p-3.5 bg-slate-900 text-slate-100 rounded-xl text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto border border-slate-800">{lab.improvedPrompt}</pre>
               ) : (
-                <p className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">Lesson này chưa có prompt mẫu.</p>
+                <p className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">No reference prompt available for this lesson.</p>
               )}
             </div>
 
             {lab.expectedOutputFormat && (
               <div className="p-2.5 bg-slate-50 rounded-xl text-xs text-slate-600 border border-slate-200">
-                <span className="font-semibold text-slate-700">Định dạng kỳ vọng:</span> {lab.expectedOutputFormat}
+                <span className="font-semibold text-slate-700">Expected Format:</span> {lab.expectedOutputFormat}
               </div>
             )}
 
@@ -725,7 +704,7 @@ export const PromptComposer: React.FC<PromptComposerProps> = ({
                 onClick={() => setShowSampleModal(false)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
               >
-                Đóng
+                Close
               </button>
             </div>
           </div>

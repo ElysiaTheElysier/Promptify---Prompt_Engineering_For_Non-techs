@@ -17,19 +17,19 @@ export class AiEvaluationValidationError extends Error {
 
 function requireStringArray(value: unknown, field: string): string[] {
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
-    throw new AiEvaluationValidationError(`${field} phải là một mảng chuỗi.`);
+    throw new AiEvaluationValidationError(`${field} must be an array of strings.`);
   }
   return value;
 }
 
 export function validateAiEvaluationPayload(payload: unknown): AiEvaluationResult {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-    throw new AiEvaluationValidationError('Evaluation phải là một JSON object.');
+    throw new AiEvaluationValidationError('Evaluation payload must be a JSON object.');
   }
 
   const candidate = payload as Record<string, unknown>;
   if (!candidate.scores || typeof candidate.scores !== 'object' || Array.isArray(candidate.scores)) {
-    throw new AiEvaluationValidationError('Evaluation thiếu scores hợp lệ.');
+    throw new AiEvaluationValidationError('Evaluation is missing valid scores.');
   }
 
   const rawScores = candidate.scores as Record<string, unknown>;
@@ -37,14 +37,14 @@ export function validateAiEvaluationPayload(payload: unknown): AiEvaluationResul
   for (const key of SCORE_KEYS) {
     const value = rawScores[key];
     if (typeof value !== 'number' || !Number.isInteger(value) || value < 0 || value > 2) {
-      throw new AiEvaluationValidationError(`scores.${key} phải là số nguyên từ 0 đến 2.`);
+      throw new AiEvaluationValidationError(`scores.${key} must be an integer between 0 and 2.`);
     }
     scores[key] = value;
   }
 
   const nextHint = candidate.nextHint;
   if (typeof nextHint !== 'string' || !nextHint.trim()) {
-    throw new AiEvaluationValidationError('nextHint phải là chuỗi không rỗng.');
+    throw new AiEvaluationValidationError('nextHint must be a non-empty string.');
   }
 
   const total = SCORE_KEYS.reduce((sum, key) => sum + scores[key], 0);
@@ -67,7 +67,7 @@ export function parseAiEvaluationText(rawText: string): AiEvaluationResult {
     return validateAiEvaluationPayload(JSON.parse(cleaned));
   } catch (error) {
     if (error instanceof AiEvaluationValidationError) throw error;
-    throw new AiEvaluationValidationError('AI Judge trả về JSON không hợp lệ.');
+    throw new AiEvaluationValidationError('AI Judge returned invalid JSON.');
   }
 }
 

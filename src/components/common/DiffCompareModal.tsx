@@ -12,7 +12,7 @@ interface Props {
 }
 
 /**
- * Wrapper chuyển tiếp về ABCompareModal để đảm bảo tính đồng nhất trên toàn hệ thống
+ * Forwarding wrapper to ABCompareModal to ensure system-wide consistency
  */
 export const DiffCompareModal: React.FC<Props> = ({ isOpen, onClose, lab, versions }) => {
   const defaultVersions: PromptVersion[] = versions && versions.length > 0 ? versions : [
@@ -22,9 +22,9 @@ export const DiffCompareModal: React.FC<Props> = ({ isOpen, onClose, lab, versio
       labId: lab.id,
       promptText: lab.baselinePrompt,
       output: lab.simulatedBaselineOutput,
-      techniqueUsed: 'Prompt thô ban đầu',
+      techniqueUsed: 'Initial draft prompt',
       detectedChanges: detectPromptComponents(lab.baselinePrompt),
-      timestamp: 'Lần thử 1',
+      timestamp: 'Attempt 1',
       businessEvaluation: evaluateBusinessMetrics(lab.baselinePrompt, lab.simulatedBaselineOutput, lab.sampleInputContext),
     },
     {
@@ -33,9 +33,9 @@ export const DiffCompareModal: React.FC<Props> = ({ isOpen, onClose, lab, versio
       labId: lab.id,
       promptText: lab.improvedPrompt,
       output: lab.simulatedImprovedOutput,
-      techniqueUsed: 'Prompt chuẩn hóa',
+      techniqueUsed: 'Standardized prompt',
       detectedChanges: detectPromptComponents(lab.improvedPrompt),
-      timestamp: 'Lần thử 2',
+      timestamp: 'Attempt 2',
       businessEvaluation: evaluateBusinessMetrics(lab.improvedPrompt, lab.simulatedImprovedOutput, lab.sampleInputContext),
     }
   ];

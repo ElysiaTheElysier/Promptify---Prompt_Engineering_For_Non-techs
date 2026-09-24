@@ -50,53 +50,53 @@ export const COMPONENT_METADATA: Record<PromptComponentType, {
   exampleSnippet: string;
 }> = {
   role: {
-    label: 'Vai trò (Role)',
-    shortLabel: 'Vai trò',
-    explanation: 'Xác định tư cách và vị trí chuyên môn của AI.',
-    businessImpact: 'Giúp AI chọn góc nhìn chuyên gia và văn phong phù hợp với tiêu chuẩn nghiệp vụ.',
-    exampleSnippet: 'Bạn là Chuyên gia Truyền thông & Báo chí Agribank với 10 năm kinh nghiệm gắn bó cùng người nông dân Tam nông.'
+    label: 'Role',
+    shortLabel: 'Role',
+    explanation: 'Defines the persona and professional perspective of the AI.',
+    businessImpact: 'Guides the AI to adopt expert domain standards and tone.',
+    exampleSnippet: 'You are a Senior Credit Risk Analyst with 10 years of commercial underwriting experience.'
   },
   context: {
-    label: 'Bối cảnh (Context)',
-    shortLabel: 'Bối cảnh',
-    explanation: 'Cung cấp dữ liệu đầu vào và tình huống làm việc thực tế.',
-    businessImpact: 'Giúp câu trả lời bám đúng tình huống công việc và dữ liệu thực tế.',
-    exampleSnippet: 'Dưới đây là trích lục hồ sơ vay vốn và biên bản hỗ trợ khẩn cấp sau bão lũ tại Chi nhánh Trấn Yên.'
+    label: 'Context',
+    shortLabel: 'Context',
+    explanation: 'Provides essential background information and source business scenario.',
+    businessImpact: 'Ensures the generated output is tailored to specific operational realities.',
+    exampleSnippet: 'Below is the credit dossier, operational summary, and emergency support log.'
   },
   task: {
-    label: 'Nhiệm vụ (Task)',
-    shortLabel: 'Nhiệm vụ',
-    explanation: 'Chỉ rõ hành động cụ thể AI cần làm.',
-    businessImpact: 'Làm rõ hành vi nghiệp vụ cốt lõi mà AI thực sự cần thực hiện.',
-    exampleSnippet: 'Hãy phác thảo 03 góc tiếp cận tiêu đề và đoạn mở đầu ngắn gọn (30-50 từ) cho bài phóng sự trên website.'
+    label: 'Task',
+    shortLabel: 'Task',
+    explanation: 'Specifies the explicit action the AI model must perform.',
+    businessImpact: 'Clarifies the core deliverable without ambiguity.',
+    exampleSnippet: 'Draft 3 headline angles and a concise opening executive summary (30-50 words).'
   },
   constraint: {
-    label: 'Ràng buộc (Constraint)',
-    shortLabel: 'Ràng buộc',
-    explanation: 'Giới hạn phạm vi, độ dài hoặc điều cấm.',
-    businessImpact: 'Kiểm soát phạm vi, giảm output ngoài phạm vi hoặc không phù hợp yêu cầu.',
-    exampleSnippet: 'Tuyệt đối không dùng từ ngữ quảng cáo giật gân (siêu rẻ, bùng nổ, hot deal); độ dài thông cáo dưới 300 từ.'
+    label: 'Constraint',
+    shortLabel: 'Constraints',
+    explanation: 'Sets guardrails, operational limits, or negative rules.',
+    businessImpact: 'Controls output boundaries and eliminates ungrounded assumptions.',
+    exampleSnippet: 'Strictly avoid marketing buzzwords; keep overall statement under 300 words.'
   },
   output_format: {
-    label: 'Định dạng (Output Format)',
-    shortLabel: 'Định dạng',
-    explanation: 'Yêu cầu hình thức biểu diễn kết quả.',
-    businessImpact: 'Giúp kết quả sẵn sàng để đưa vào báo cáo, email hoặc bảng tính.',
-    exampleSnippet: 'Trình bày kết quả dưới dạng bảng Markdown gồm 4 cột: [Chỉ tiêu], [Số liệu], [Đơn vị], [Đánh giá an toàn].'
+    label: 'Output Format',
+    shortLabel: 'Format',
+    explanation: 'Prescribes the visual structure and layout of the response.',
+    businessImpact: 'Makes output immediately ready for reports, emails, or spreadsheets.',
+    exampleSnippet: 'Present results in a Markdown table with 4 columns: [Metric], [Value], [Unit], [Risk Assessment].'
   },
   example: {
-    label: 'Ví dụ (Example)',
-    shortLabel: 'Ví dụ',
-    explanation: 'Đưa ra mẫu đầu vào hoặc đầu ra mong đợi.',
-    businessImpact: 'Cho AI thấy mẫu output hoặc phong cách mong muốn để mô phỏng chính xác.',
-    exampleSnippet: 'Mẫu tham chiếu: "🌾 Có một mái ấm vững chãi để mùa đông nay bớt lạnh hơn... Ước mơ của bác Mùa A Súa nay đã thành hiện thực."'
+    label: 'Example',
+    shortLabel: 'Example',
+    explanation: 'Provides few-shot input/output demonstrations.',
+    businessImpact: 'Guides model response format and stylistic nuances via concrete demonstrations.',
+    exampleSnippet: 'Reference demonstration: "Input: Debt ratio 45% -> Output: Moderate leverage with stable reserves."'
   },
   grounding: {
-    label: 'Bằng chứng (Grounding)',
-    shortLabel: 'Bằng chứng',
-    explanation: 'Buộc câu trả lời phải neo chặt vào tài liệu được cung cấp.',
-    businessImpact: 'Buộc câu trả lời bám vào dữ liệu/bằng chứng được cung cấp, triệt tiêu ảo giác.',
-    exampleSnippet: 'Chỉ sử dụng dữ liệu trong trích lục đã cấp; toàn bộ thông tin nhạy cảm đã ẩn danh bằng biến {{TEN_KH}}, {{SO_CCCD}}.'
+    label: 'Grounding',
+    shortLabel: 'Grounding',
+    explanation: 'Directs the model to anchor output strictly to provided context facts.',
+    businessImpact: 'Forces the model to stay grounded in source evidence and suppresses hallucinations.',
+    exampleSnippet: 'Rely strictly on provided dossier facts; all personal data sanitized via {{CUSTOMER_NAME}}, {{SSN_OR_ID}}.'
   }
 };
 

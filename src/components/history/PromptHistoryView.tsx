@@ -5,13 +5,9 @@ import {
   Download, 
   Trash2, 
   Clock, 
-  ChevronDown, 
-  ChevronUp, 
   Copy, 
   Check, 
-  FileText,
-  Sparkles,
-  Zap
+  Sparkles
 } from 'lucide-react';
 import { PromptRun, ClassCohort } from '../../types';
 import { MarkdownView } from '../common/MarkdownView';
@@ -43,17 +39,17 @@ export const PromptHistoryView: React.FC<Props> = ({
   };
 
   const handleExportMarkdown = () => {
-    let content = `# NHẬT KÝ THỰC HÀNH PROMPT ENGINEERING\n`;
-    content += `Khóa học: ${cohort.name}\n`;
-    content += `Thời gian xuất: ${new Date().toLocaleString('vi-VN')}\n`;
-    content += `Tổng số lần thử: ${history.length}\n\n`;
+    let content = `# PROMPT ENGINEERING EXECUTION LOG\n`;
+    content += `Course: ${cohort.name}\n`;
+    content += `Exported: ${new Date().toISOString()}\n`;
+    content += `Total attempts: ${history.length}\n\n`;
     content += `---\n\n`;
 
     history.forEach((item, index) => {
-      content += `## Lần thử #${history.length - index} [${item.labId.toUpperCase()}] - ${item.timestamp}\n`;
-      content += `**Chế độ:** ${item.mode} | **Độ trễ:** ${item.latencyMs}ms | **Tokens:** ${item.tokenCount}\n\n`;
+      content += `## Attempt #${history.length - index} [${item.labId.toUpperCase()}] - ${item.timestamp}\n`;
+      content += `**Mode:** ${item.mode} | **Latency:** ${item.latencyMs}ms | **Tokens:** ${item.tokenCount}\n\n`;
       content += `### Prompt:\n\`\`\`\n${item.promptText}\n\`\`\`\n\n`;
-      content += `### Kết quả AI:\n${item.output}\n\n`;
+      content += `### AI Output:\n${item.output}\n\n`;
       content += `---\n\n`;
     });
 
@@ -77,14 +73,14 @@ export const PromptHistoryView: React.FC<Props> = ({
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition mb-1 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Quay lại Dashboard</span>
+            <span>Back to Dashboard</span>
           </button>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
             <History className="w-6 h-6 text-indigo-600" />
-            <span>Lịch sử Câu lệnh & Kết quả</span>
+            <span>Prompt Execution History</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Xem lại quá trình thử nghiệm, so sánh prompt và kết quả qua các lần chạy
+            Review execution history, compare prompts, and inspect responses across iterations
           </p>
         </div>
 
@@ -95,19 +91,19 @@ export const PromptHistoryView: React.FC<Props> = ({
               <button
                 onClick={handleExportMarkdown}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer"
-                title="Tải về nhật ký thực hành dưới dạng file Markdown"
+                title="Download execution history as a Markdown file"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Xuất file Markdown</span>
+                <span>Export Markdown</span>
               </button>
 
               <button
                 onClick={onClearHistory}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold transition cursor-pointer"
-                title="Xóa toàn bộ lịch sử chạy"
+                title="Clear all execution history"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Xóa lịch sử</span>
+                <span>Clear History</span>
               </button>
             </>
           )}
@@ -117,24 +113,24 @@ export const PromptHistoryView: React.FC<Props> = ({
       {history.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
           <History className="w-10 h-10 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-700">Chưa có lần chạy nào được ghi nhận</h3>
+          <h3 className="text-base font-bold text-slate-700">No execution records yet</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
-            Khi bạn bấm nút "Chạy Prompt" trong bài học hoặc Playground, các phiên bản câu lệnh và phản hồi từ AI sẽ tự động được lưu lại tại đây.
+            When you execute a prompt in a lesson workspace, prompt versions and AI responses are automatically logged here.
           </p>
           <button
             onClick={onBackToDashboard}
             className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition cursor-pointer"
           >
-            <span>Vào làm bài ngay</span>
+            <span>Start Practice</span>
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: List of runs (4 cols) */}
+          {/* Left Column: List of runs (5 cols) */}
           <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-4 space-y-2 max-h-[750px] overflow-y-auto">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider pb-2 border-b border-slate-100 flex items-center justify-between">
-              <span>Danh sách các lần thử ({history.length})</span>
-              <span className="text-[11px] font-normal text-slate-400">Mới nhất ở trên</span>
+              <span>Attempt History ({history.length})</span>
+              <span className="text-[11px] font-normal text-slate-400">Newest on top</span>
             </div>
 
             {history.map((item, index) => {
@@ -153,7 +149,7 @@ export const PromptHistoryView: React.FC<Props> = ({
                 >
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-slate-900">
-                      Lần thử #{runNumber}
+                      Attempt #{runNumber}
                     </span>
                     <span className="text-[11px] text-slate-400 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -169,7 +165,7 @@ export const PromptHistoryView: React.FC<Props> = ({
                       {item.versionTag}
                     </span>
                     <span className="text-slate-400">
-                      • {item.mode === 'openai' ? 'OpenAI' : item.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
+                      • {item.mode === 'openai' ? 'OpenAI' : item.mode === 'simulated' ? 'Simulated' : 'Gemini'}
                     </span>
                   </div>
 
@@ -188,10 +184,10 @@ export const PromptHistoryView: React.FC<Props> = ({
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
                   <div>
                     <h3 className="text-base font-bold text-slate-900">
-                      Chi tiết Lần thử [Bài: {selectedRun.labId.toUpperCase()}]
+                      Attempt Details [Lesson: {selectedRun.labId.toUpperCase()}]
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Thời điểm chạy: {selectedRun.timestamp} • Động cơ: {selectedRun.mode}
+                      Executed at: {selectedRun.timestamp} • Engine: {selectedRun.mode}
                     </p>
                   </div>
 
@@ -209,7 +205,7 @@ export const PromptHistoryView: React.FC<Props> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Câu lệnh (Prompt đã gửi)
+                      Submitted Prompt Text
                     </span>
                     <button
                       onClick={() => handleCopy(selectedRun.promptText, `p_${selectedRun.id}`)}
@@ -218,12 +214,12 @@ export const PromptHistoryView: React.FC<Props> = ({
                       {copiedId === `p_${selectedRun.id}` ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-600">Đã chép</span>
+                          <span className="text-emerald-600">Copied</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Sao chép Prompt</span>
+                          <span>Copy Prompt</span>
                         </>
                       )}
                     </button>
@@ -238,7 +234,7 @@ export const PromptHistoryView: React.FC<Props> = ({
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Kết quả phản hồi từ AI</span>
+                      <span>AI Model Response</span>
                     </span>
                     <button
                       onClick={() => handleCopy(selectedRun.output, `o_${selectedRun.id}`)}
@@ -247,12 +243,12 @@ export const PromptHistoryView: React.FC<Props> = ({
                       {copiedId === `o_${selectedRun.id}` ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-600">Đã chép</span>
+                          <span className="text-emerald-600">Copied</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5" />
-                          <span>Sao chép Kết quả</span>
+                          <span>Copy Output</span>
                         </>
                       )}
                     </button>

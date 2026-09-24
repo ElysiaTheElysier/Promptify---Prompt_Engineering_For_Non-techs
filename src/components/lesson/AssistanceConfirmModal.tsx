@@ -41,7 +41,7 @@ export const AssistanceConfirmModal: React.FC<AssistanceConfirmModalProps> = ({
         className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header theo loại modal */}
+        {/* Header */}
         <div className={`p-4 flex items-start gap-3.5 border-b ${
           isHint 
             ? 'bg-amber-50/80 border-amber-200/80 text-amber-950' 
@@ -57,10 +57,10 @@ export const AssistanceConfirmModal: React.FC<AssistanceConfirmModalProps> = ({
             <span className={`text-[11px] font-bold uppercase tracking-wider block ${
               isHint ? 'text-amber-700' : 'text-rose-700'
             }`}>
-              {isHint ? 'Xác nhận mở Gợi ý tư duy' : 'Cảnh báo mở Lời giải & Đáp án mẫu'}
+              {isHint ? 'Confirm Unlocking Hints' : 'Unlock Exemplary Solution Warning'}
             </span>
             <h3 className="text-sm font-bold text-slate-900 leading-snug truncate">
-              Bài {labOrder}: {labTitle}
+              Lesson {labOrder}: {labTitle}
             </h3>
           </div>
 
@@ -68,24 +68,24 @@ export const AssistanceConfirmModal: React.FC<AssistanceConfirmModalProps> = ({
             type="button"
             onClick={onCancel}
             className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-            title="Đóng hộp thoại"
+            title="Close dialog"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Thân cảnh báo */}
+        {/* Body */}
         <div className="p-5 space-y-3.5 text-xs text-slate-600 leading-relaxed">
           {isHint ? (
             <>
               <div className="flex items-start gap-2.5 p-3 bg-amber-50/60 rounded-xl border border-amber-200/70 text-amber-900">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p>
-                  Việc mở gợi ý sẽ được lưu vào lịch sử làm bài để hệ thống và Giảng viên ghi nhận mức độ tự chủ của bạn trong bài tập này.
+                  Unlocking hints will be recorded in your attempt history to help the instructor assess your autonomous problem-solving level.
                 </p>
               </div>
               <p className="text-slate-600">
-                Gợi ý sẽ bóc tách các hướng tư duy từng bước mà không làm mất đi trải nghiệm tự thử thách của bạn.
+                Hints scaffold problem-solving step by step without spoiling the self-directed learning experience.
               </p>
             </>
           ) : (
@@ -94,33 +94,33 @@ export const AssistanceConfirmModal: React.FC<AssistanceConfirmModalProps> = ({
                 <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <div>
                   <strong className="font-bold text-rose-950 block mb-0.5">
-                    Hành động sẽ được ghi nhận vào bảng đánh giá:
+                    This action will be recorded on your scorecard:
                   </strong>
                   <p>
-                    Bài nộp sẽ được gắn cờ <strong>"Đã tham khảo đáp án mẫu"</strong> trong hồ sơ của Giảng viên. Khuyến nghị bạn hãy tự chạy thử nghiệm câu lệnh ít nhất 1 lần trước khi xem!
+                    Your attempt will be flagged as <strong>"Referenced Solution"</strong> in the instructor audit log. We strongly recommend testing at least one drafted prompt before inspecting!
                   </p>
                 </div>
               </div>
               <p className="text-slate-600">
-                Đáp án bao gồm câu lệnh mẫu chuẩn mực và lời giải bóc tách chi tiết từng bước kèm giải thích lý do vì sao.
+                The solution includes an exemplary reference prompt with step-by-step rationale explaining why it works.
               </p>
             </>
           )}
 
           <div className="pt-1 flex items-center justify-between text-[11px] text-slate-400 font-medium border-t border-slate-100">
-            <span>Bạn có muốn tiếp tục không?</span>
-            <span className="font-mono text-slate-500">Phím Esc để hủy</span>
+            <span>Do you wish to proceed?</span>
+            <span className="font-mono text-slate-500">Press Esc to cancel</span>
           </div>
         </div>
 
-        {/* Nút hành động */}
+        {/* Actions */}
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onCancel}
             className="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer shadow-2xs"
           >
-            {isHint ? 'Tự suy nghĩ tiếp' : 'Tự làm tiếp'}
+            {isHint ? 'Keep Thinking' : 'Keep Trying'}
           </button>
 
           <button
@@ -132,7 +132,7 @@ export const AssistanceConfirmModal: React.FC<AssistanceConfirmModalProps> = ({
                 : 'bg-rose-600 hover:bg-rose-500'
             }`}
           >
-            <span>{isHint ? 'Xác nhận xem gợi ý' : 'Tôi hiểu, mở khóa đáp án'}</span>
+            <span>{isHint ? 'Confirm & View Hint' : 'I Understand, Unlock Solution'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

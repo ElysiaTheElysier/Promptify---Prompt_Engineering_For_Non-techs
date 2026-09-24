@@ -65,7 +65,7 @@ export const NotebookView: React.FC<Props> = ({
       case 3: return 'One-shot';
       case 4: return 'Few-shot';
       case 5: return 'Grounding';
-      default: return `Bài ${order}`;
+      default: return `Lesson ${order}`;
     }
   };
 
@@ -112,16 +112,16 @@ export const NotebookView: React.FC<Props> = ({
           <div className="flex items-center justify-between gap-2 text-xs font-semibold text-slate-500">
             <div className="flex items-center gap-2 uppercase tracking-wider">
               <BookOpen className="w-4 h-4 text-emerald-600" />
-              <span>Vở bài tập tương tác · Prompt Engineering</span>
+              <span>Interactive Workbook · Prompt Engineering</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-semibold text-slate-700">
-                Bài {currentActiveLab.order} / {labs.length} · Bước {currentRunCount > 0 ? '2' : '1'} / 2
+                Lesson {currentActiveLab.order} / {labs.length} · Step {currentRunCount > 0 ? '2' : '1'} / 2
               </span>
               {currentRunCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
                   <Check className="w-3 h-3 text-emerald-600" />
-                  <span>Đã hoàn thành</span>
+                  <span>Completed</span>
                 </span>
               )}
             </div>
@@ -129,15 +129,15 @@ export const NotebookView: React.FC<Props> = ({
 
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-              Thực Hành Chuẩn Hóa Câu Lệnh Nghiệp Vụ
+              Standardized Business Prompt Engineering Lab
             </h1>
             <span className="text-xs text-slate-500 font-medium">
-              Đã hoàn thành {completedCount}/{labs.length} bài
+              Completed {completedCount}/{labs.length} lessons
             </span>
           </div>
 
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            Học viên làm bài lần lượt theo từng bước bên dưới. Mỗi phần là một bài tập thực hành tương tác trực tiếp với mô hình AI.
+            Complete each interactive exercise in order below. Each section represents a live prompt challenge with the AI model.
           </p>
 
           {/* THANH TIẾN TRÌNH HỌC TẬP (LEARNING PROGRESSION) */}
@@ -208,10 +208,10 @@ export const NotebookView: React.FC<Props> = ({
         {/* Chân trang cuốn vở bài tập */}
         <div className="pt-8 border-t border-slate-200 text-center text-xs text-slate-400 space-y-1">
           <p className="font-medium text-slate-600">
-            Bạn đã xem qua lộ trình 5 kỹ thuật: Zero-shot → Structured Prompt → One-shot → Few-shot → Grounding.
+            Learning progression: Zero-shot → Structured Prompt → One-shot → Few-shot → Grounding.
           </p>
           <p>
-            Mọi thao tác thử nghiệm đều được ghi nhận trực tiếp vào Nhật ký Telemetry để giáo viên đánh giá.
+            All attempts and evaluations are logged to the telemetry stream for review.
           </p>
         </div>
       </div>

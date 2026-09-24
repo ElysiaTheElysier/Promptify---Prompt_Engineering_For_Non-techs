@@ -9,49 +9,56 @@ export interface BadgesState {
 }
 
 /**
- * Kiểm tra các hành vi học tập thực tế trong câu lệnh prompt của học viên
+ * Detect learning behaviors and applied techniques in learner prompts
  */
 export function detectLearningBadges(promptText: string): BadgesState {
   const text = promptText.toLowerCase();
 
-  // 1. Badge Đã thêm Context: gán ngữ cảnh dữ liệu, biến số hoặc bối cảnh ngân hàng
+  // 1. Context Badge: context provided, variables, or business background
   const hasContext = 
     text.includes('{{') || 
+    text.includes('context') || 
+    text.includes('background') || 
+    text.includes('scenario') || 
+    text.includes('data') || 
     text.includes('bối cảnh') || 
     text.includes('ngữ cảnh') || 
     text.includes('tình huống') || 
     text.includes('dữ liệu') || 
-    text.includes('phản hồi') || 
-    text.includes('agribank') || 
-    text.includes('khách hàng');
+    text.includes('customer');
 
-  // 2. Badge Đã dùng Output Format: bảng markdown, cột, định dạng rõ ràng
+  // 2. Output Format Badge: markdown table, columns, structured format
   const hasFormat = 
-    text.includes('bảng') || 
+    text.includes('table') || 
     text.includes('markdown') || 
+    text.includes('column') || 
+    text.includes('format') || 
+    text.includes('bullet') || 
+    text.includes('bảng') || 
     text.includes('cột') || 
     text.includes('định dạng') || 
-    text.includes('format') || 
-    text.includes('|') || 
-    text.includes('gạch đầu dòng');
+    text.includes('|');
 
-  // 3. Badge Đã dùng Example: có ví dụ mẫu, input mẫu, output mẫu
+  // 3. Example Badge: few-shot samples, input/output pairs
   const hasExample = 
-    text.includes('ví dụ') || 
-    text.includes('mẫu') || 
     text.includes('example') || 
-    text.includes('minh họa') || 
-    text.includes('đầu ra mẫu');
+    text.includes('sample') || 
+    text.includes('few-shot') || 
+    text.includes('one-shot') || 
+    text.includes('ví dụ') || 
+    text.includes('mẫu');
 
-  // 4. Badge Đã Ground bằng tài liệu: neo tài liệu, trích dẫn, chỉ dựa trên văn bản
+  // 4. Grounding Badge: document grounding, citations, strictly based on text
   const hasGrounding = 
+    text.includes('only based on') || 
+    text.includes('provided document') || 
+    text.includes('do not extrapolate') || 
+    text.includes('do not hallucinate') || 
+    text.includes('grounding') || 
+    text.includes('source') || 
     text.includes('chỉ dựa trên') || 
     text.includes('tài liệu') || 
-    text.includes('không suy diễn') || 
-    text.includes('trích dẫn') || 
-    text.includes('căn cứ vào') || 
-    text.includes('bằng chứng') || 
-    text.includes('grounding');
+    text.includes('không suy diễn');
 
   return { hasContext, hasFormat, hasExample, hasGrounding };
 }
@@ -78,48 +85,46 @@ export const LearningBadges: React.FC<Props> = ({
 
   return (
     <div className={`space-y-2 font-sans ${className}`}>
-      {/* Thông tin số phiên bản đã cải thiện */}
       {runCount >= 2 && (
         <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200/80 w-fit">
           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Bạn đã cải thiện câu lệnh qua {runCount} lần thử!</span>
+          <span>You've refined your prompt across {runCount} attempts!</span>
         </div>
       )}
 
-      {/* Danh sách các Badge hành vi đã đạt được */}
       {earnedCount > 0 && (
         <div className="space-y-1">
           {!compact && (
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
-              Hành vi kỹ thuật bạn đã áp dụng:
+              Techniques applied:
             </span>
           )}
           <div className="flex flex-wrap gap-1.5">
             {badges.hasContext && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-emerald-300 text-emerald-900 text-xs font-medium shadow-2xs">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Đã thêm Context</span>
+                <span>Context Added</span>
               </span>
             )}
 
             {badges.hasFormat && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-emerald-300 text-emerald-900 text-xs font-medium shadow-2xs">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Đã dùng Output Format</span>
+                <span>Output Format Specified</span>
               </span>
             )}
 
             {badges.hasExample && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-emerald-300 text-emerald-900 text-xs font-medium shadow-2xs">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Đã dùng Example</span>
+                <span>Examples Included</span>
               </span>
             )}
 
             {badges.hasGrounding && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-emerald-300 text-emerald-900 text-xs font-medium shadow-2xs">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Đã Ground bằng tài liệu</span>
+                <span>Document Grounding Applied</span>
               </span>
             )}
           </div>
@@ -128,4 +133,3 @@ export const LearningBadges: React.FC<Props> = ({
     </div>
   );
 };
-

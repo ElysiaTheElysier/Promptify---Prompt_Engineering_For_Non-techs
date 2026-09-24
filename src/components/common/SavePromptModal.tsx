@@ -17,20 +17,19 @@ export const SavePromptModal: React.FC<Props> = ({
   onClose,
   lab,
   version,
-  currentCohortName = 'Khối Tín dụng - Agribank',
+  currentCohortName = 'Enterprise Review Cohort',
   onSavedSuccess,
 }) => {
   const [title, setTitle] = useState<string>(() => {
-    return `${lab.title} - Lần thử ${version.versionNumber} (Đã tối ưu)`;
+    return `${lab.title} - Attempt ${version.versionNumber} (Optimized)`;
   });
   const [useCase, setUseCase] = useState<string>(lab.taskGoal);
   const [department, setDepartment] = useState<string>(currentCohortName);
   const [isSaved, setIsSaved] = useState<boolean>(false);
 
-  // Cập nhật giá trị mặc định khi mở với version mới
   React.useEffect(() => {
     if (isOpen) {
-      setTitle(`${lab.title} - Lần thử ${version.versionNumber} (Đã tối ưu)`);
+      setTitle(`${lab.title} - Attempt ${version.versionNumber} (Optimized)`);
       setUseCase(lab.taskGoal);
       setIsSaved(false);
     }
@@ -48,11 +47,11 @@ export const SavePromptModal: React.FC<Props> = ({
       labId: lab.id,
       promptText: version.promptText,
       systemInstruction: version.systemInstruction,
-      techniqueUsed: version.techniqueUsed || `Kỹ thuật bài ${lab.order}`,
+      techniqueUsed: version.techniqueUsed || `Lesson ${lab.order} Technique`,
       versionNumber: version.versionNumber,
       businessEvaluation: version.businessEvaluation,
       department: department.trim(),
-      author: 'Cán bộ Nghiệp vụ',
+      author: 'Business Specialist',
       isRecommended: true,
       sampleOutputSnippet: version.output.slice(0, 150) + '...',
     });
@@ -75,14 +74,14 @@ export const SavePromptModal: React.FC<Props> = ({
               <BookmarkPlus className="w-4 h-4 text-slate-950" />
             </div>
             <div>
-              <h3 className="font-bold text-sm sm:text-base">Lưu Vào Thư Viện Prompt (SOP)</h3>
-              <p className="text-[11px] text-slate-400">Đóng gói câu lệnh chuẩn để chia sẻ và tái sử dụng</p>
+              <h3 className="font-bold text-sm sm:text-base">Save to Prompt Library (SOP)</h3>
+              <p className="text-[11px] text-slate-400">Package proven prompts for team collaboration and reuse</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -90,10 +89,10 @@ export const SavePromptModal: React.FC<Props> = ({
 
         {/* Form */}
         <form onSubmit={handleSave} className="p-5 space-y-4 text-xs">
-          {/* Tên Prompt */}
+          {/* Prompt Title */}
           <div className="space-y-1">
             <label className="font-bold text-slate-800 block">
-              Tên mẫu Prompt (Dễ nhận biết):
+              Prompt Template Name:
             </label>
             <input
               type="text"
@@ -101,73 +100,73 @@ export const SavePromptModal: React.FC<Props> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium text-slate-900"
-              placeholder="Ví dụ: Prompt phân tích báo cáo tài chính SME"
+              placeholder="e.g. Prompt for SME financial statement analysis"
             />
           </div>
 
-          {/* Tình huống / Nhiệm vụ */}
+          {/* Business Use Case */}
           <div className="space-y-1">
             <label className="font-bold text-slate-800 block">
-              Tình huống nghiệp vụ (Use case):
+              Business Use Case:
             </label>
             <input
               type="text"
               value={useCase}
               onChange={(e) => setUseCase(e.target.value)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-700"
-              placeholder="Mục đích sử dụng của câu lệnh..."
+              placeholder="Target operational context or purpose..."
             />
           </div>
 
-          {/* Phòng ban / Khối */}
+          {/* Department / Function */}
           <div className="space-y-1">
             <label className="font-bold text-slate-800 block">
-              Phòng ban / Khối chuyên trách:
+              Department / Function:
             </label>
             <input
               type="text"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-700"
-              placeholder="Ví dụ: Khối Tín dụng & Quản trị Rủi ro"
+              placeholder="e.g. Risk Management / Operations"
             />
           </div>
 
-          {/* Xem trước Prompt */}
+          {/* Prompt Preview */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[11px] text-slate-500">
-              <span className="font-semibold">Nội dung câu lệnh (Lần thử {version.versionNumber}):</span>
-              <span className="font-mono">{version.promptText.length} ký tự</span>
+              <span className="font-semibold">Prompt Content (Attempt {version.versionNumber}):</span>
+              <span className="font-mono">{version.promptText.length} chars</span>
             </div>
             <pre className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 font-mono text-[11px] max-h-32 overflow-y-auto whitespace-pre-wrap leading-relaxed">
               {version.promptText}
             </pre>
           </div>
 
-          {/* Footer nút hành động */}
+          {/* Actions */}
           <div className="pt-2 flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition"
+              className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition cursor-pointer"
             >
-              Hủy
+              Cancel
             </button>
 
             <button
               type="submit"
               disabled={isSaved}
-              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold transition shadow-xs"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold transition shadow-xs cursor-pointer"
             >
               {isSaved ? (
                 <>
                   <Check className="w-4 h-4 text-slate-950" />
-                  <span>Đã lưu thành công!</span>
+                  <span>Saved Successfully!</span>
                 </>
               ) : (
                 <>
                   <BookmarkPlus className="w-4 h-4 text-slate-950" />
-                  <span>Xác nhận lưu vào Thư viện</span>
+                  <span>Save to Library</span>
                 </>
               )}
             </button>

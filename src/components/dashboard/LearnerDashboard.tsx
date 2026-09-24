@@ -29,31 +29,33 @@ export const LearnerDashboard: React.FC<Props> = ({
 }) => {
   const completedCount = enrollment.completedLabIds.length;
   const totalCount = labs.length;
-  const progressPercent = Math.round((completedCount / totalCount) * 100);
+  const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  // Tìm bài học tiếp theo cần học
-  const nextLab = labs.find((l) => !enrollment.completedLabIds.includes(l.id)) || labs[0];
-  const isCourseCompleted = completedCount === totalCount;
+  // Find next lesson
+  const nextLab = labs.find((l) => !enrollment.completedLabIds.includes(l.id)) || labs[0] || ({} as LabStep);
+  const isCourseCompleted = totalCount > 0 && completedCount === totalCount;
 
-  // Bản đồ tiêu đề phụ dễ hiểu theo yêu cầu bài toán
+  // Clear executive subtitles for each lesson order
   const getLessonSubtitle = (order: number) => {
     switch (order) {
       case 1:
-        return 'Zero-shot — Prompt cơ bản, chưa có ví dụ';
+        return 'Zero-shot — Direct prompting with clear task, context, and format';
       case 2:
-        return 'Structured Prompt — Thêm Role, Context, Constraint, Format';
+        return 'One-shot — Guiding the model with an explicit reference example';
       case 3:
-        return 'One-shot — Học từ một ví dụ mẫu';
+        return 'Few-shot — Teaching pattern consistency with multiple exemplars';
       case 4:
-        return 'Few-shot & Grounding — Học từ nhiều ví dụ & đối chiếu tài liệu';
+        return 'Structured Reasoning — Step-by-step thinking for verifiable conclusions';
       case 5:
-        return 'Thực hành tự do — Áp dụng vào nghiệp vụ thực tế của bạn';
+        return 'Constraints & Formatting — Strict negative boundaries & structured tables';
+      case 6:
+        return 'Grounded Prompting — Anti-hallucination anchored in verified source docs';
       default:
-        return 'Kỹ năng Prompt nâng cao cho nghiệp vụ';
+        return 'Advanced executive prompting skill';
     }
   };
 
-  const getLessonStatus = (labId: string, index: number) => {
+  const getLessonStatus = (labId: string) => {
     if (enrollment.completedLabIds.includes(labId)) {
       return 'completed';
     }
@@ -65,13 +67,13 @@ export const LearnerDashboard: React.FC<Props> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Thông tin lớp đang được chọn; lời chào và menu lớp nằm ở Trang chủ. */}
+      {/* Selected Cohort Overview */}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
             <h1 className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">
               <Layers3 className="h-6 w-6 text-emerald-600" />
-              Lộ trình học
+              Learning Path
             </h1>
             <p className="text-base font-bold text-slate-800">{cohort.name}</p>
             <p className="max-w-2xl text-sm leading-6 text-slate-500">{cohort.description}</p>
@@ -79,38 +81,38 @@ export const LearnerDashboard: React.FC<Props> = ({
 
           <div className="min-w-[260px] space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-slate-600">Tiến độ lớp này</span>
-              <span className="font-extrabold text-emerald-700">{completedCount}/{totalCount} bài · {progressPercent}%</span>
+              <span className="font-semibold text-slate-600">Cohort Progress</span>
+              <span className="font-extrabold text-emerald-700">{completedCount}/{totalCount} lessons · {progressPercent}%</span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
               <div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-teal-500" style={{ width: `${progressPercent}%` }} />
             </div>
             <p className="text-[11px] text-slate-500">
-              {isCourseCompleted ? 'Đã hoàn thành toàn bộ lộ trình.' : `Bài tiếp theo: ${nextLab.title}`}
+              {isCourseCompleted ? 'All curriculum lessons completed.' : `Next lesson: ${nextLab.title || 'Next step'}`}
             </p>
           </div>
         </div>
       </section>
 
-      {/* 2. Lộ trình Học Tập (Learning Path) */}
+      {/* 2. Learning Path */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              <span>Lộ trình {totalCount} bài học</span>
+              <span>Curriculum Path ({totalCount} Lessons)</span>
               <span className="text-xs font-normal text-slate-500 hidden sm:inline">
-                (Từ Zero-shot đến Grounding tài liệu chuẩn mực)
+                (From Zero-shot clarity to Source-Grounded reliability)
               </span>
             </h2>
             <p className="text-xs text-slate-500">
-              Bấm vào bài học bất kỳ để mở không gian làm bài tương tác
+              Click any lesson to enter the interactive workspace
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3.5">
           {labs.map((lab) => {
-            const status = getLessonStatus(lab.id, lab.order - 1);
+            const status = getLessonStatus(lab.id);
             const isCompleted = status === 'completed';
             const isCurrent = status === 'current';
 
@@ -148,7 +150,7 @@ export const LearnerDashboard: React.FC<Props> = ({
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs font-semibold font-mono text-slate-500">
-                        Bài {lab.order}
+                        Lesson {lab.order}
                       </span>
                       <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                         isCompleted
@@ -157,7 +159,7 @@ export const LearnerDashboard: React.FC<Props> = ({
                           ? 'bg-emerald-600 text-white'
                           : 'bg-slate-100 text-slate-600'
                       }`}>
-                        {isCompleted ? '✓ Đã hoàn thành' : isCurrent ? '▶ Đang học' : '○ Chưa học'}
+                        {isCompleted ? '✓ Completed' : isCurrent ? '▶ In Progress' : '○ Not Started'}
                       </span>
                       <span className="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">
                         {lab.badge}
@@ -187,7 +189,7 @@ export const LearnerDashboard: React.FC<Props> = ({
                       ? 'text-emerald-700 bg-emerald-100/60 group-hover:bg-emerald-200/60'
                       : 'text-slate-600 bg-slate-100 group-hover:bg-slate-200'
                   }`}>
-                    {isCompleted ? 'Học lại' : isCurrent ? 'Làm bài ngay' : 'Vào bài'}
+                    {isCompleted ? 'Review' : isCurrent ? 'Start Practice' : 'Enter Lesson'}
                   </span>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition" />
                 </div>
@@ -197,20 +199,20 @@ export const LearnerDashboard: React.FC<Props> = ({
         </div>
       </section>
 
-      {/* 3. Công Cụ Thực Hành (Practice Tools) */}
+      {/* 3. Supplemental Practice Tools */}
       <section className="space-y-4 pt-2">
         <div className="space-y-1">
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <span>Công cụ thực hành bổ trợ</span>
+            <span>Supplemental Practice Tools</span>
           </h2>
           <p className="text-xs text-slate-500">
-            Các tiện ích hỗ trợ người học thử nghiệm, tra cứu và lưu trữ câu lệnh mẫu
+            Utilities to test, reference, and record prompt patterns
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-          {/* Tool 2: Prompt Library */}
+          {/* Tool: Prompt Library */}
           <div
             onClick={() => onNavigate('library')}
             className="bg-white border border-slate-200/90 hover:border-emerald-500/60 rounded-2xl p-4 shadow-xs hover:shadow-md transition duration-200 cursor-pointer flex flex-col justify-between group"
@@ -220,19 +222,19 @@ export const LearnerDashboard: React.FC<Props> = ({
                 <Bookmark className="w-5 h-5" />
               </div>
               <h4 className="text-sm font-bold text-slate-900 group-hover:text-amber-700 transition">
-                Thư viện Prompt
+                Prompt Library
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Khám phá kho prompt chuẩn mực nghiệp vụ ngân hàng được chuyên gia khuyên dùng.
+                Explore expert-curated prompt templates and industry-tested patterns.
               </p>
             </div>
             <div className="pt-4 flex items-center text-xs font-semibold text-amber-600 group-hover:text-amber-700">
-              <span>Xem Thư viện</span>
+              <span>Open Library</span>
               <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition" />
             </div>
           </div>
 
-          {/* Tool 3: History */}
+          {/* Tool: History */}
           <div
             onClick={() => onNavigate('history')}
             className="bg-white border border-slate-200/90 hover:border-emerald-500/60 rounded-2xl p-4 shadow-xs hover:shadow-md transition duration-200 cursor-pointer flex flex-col justify-between group"
@@ -242,19 +244,19 @@ export const LearnerDashboard: React.FC<Props> = ({
                 <History className="w-5 h-5" />
               </div>
               <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-700 transition">
-                Lịch sử câu lệnh
+                Prompt History
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Xem lại toàn bộ các lần thử, so sánh câu lệnh trước và kết quả AI sinh ra.
+                Review all recorded attempts, compare iterations, and track AI outputs.
               </p>
             </div>
             <div className="pt-4 flex items-center text-xs font-semibold text-indigo-600 group-hover:text-indigo-700">
-              <span>Xem Lịch sử</span>
+              <span>View History</span>
               <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition" />
             </div>
           </div>
 
-          {/* Tool 4: Tutorial */}
+          {/* Tool: Tutorial */}
           <div
             onClick={onOpenTutorial}
             className="bg-white border border-slate-200/90 hover:border-emerald-500/60 rounded-2xl p-4 shadow-xs hover:shadow-md transition duration-200 cursor-pointer flex flex-col justify-between group"
@@ -264,14 +266,14 @@ export const LearnerDashboard: React.FC<Props> = ({
                 <HelpCircle className="w-5 h-5" />
               </div>
               <h4 className="text-sm font-bold text-slate-900 group-hover:text-teal-700 transition">
-                Xem lại hướng dẫn
+                Interactive Tutorial
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Khởi động lại visual walkthrough hướng dẫn quy trình học 8 bước trực quan.
+                Replay the guided visual walkthrough explaining the hands-on practice cycle.
               </p>
             </div>
             <div className="pt-4 flex items-center text-xs font-semibold text-teal-600 group-hover:text-teal-700">
-              <span>Bật hướng dẫn</span>
+              <span>Launch Guide</span>
               <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition" />
             </div>
           </div>
@@ -280,4 +282,3 @@ export const LearnerDashboard: React.FC<Props> = ({
     </div>
   );
 };
-

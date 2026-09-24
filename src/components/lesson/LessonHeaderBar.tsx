@@ -47,10 +47,10 @@ export const LessonHeaderBar: React.FC<Props> = ({
           <button
             onClick={onBackToDashboard}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold border border-slate-700 transition cursor-pointer"
-            title="Quay lại Trang chủ Dashboard của lớp học"
+            title="Return to Class Dashboard"
           >
             <ArrowLeft className="w-4 h-4 text-emerald-400" />
-            <span>Quay lại Lớp học</span>
+            <span>Back to Dashboard</span>
           </button>
 
           {/* Breadcrumb text */}
@@ -60,7 +60,7 @@ export const LessonHeaderBar: React.FC<Props> = ({
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
             <span className="text-slate-400 font-mono text-[11px]">
-              Bài {activeLab.order}
+              Lesson {activeLab.order}
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
             <span className="text-emerald-400 font-semibold truncate max-w-[200px] md:max-w-[280px]">
@@ -71,7 +71,7 @@ export const LessonHeaderBar: React.FC<Props> = ({
 
         {/* Right: Quick Actions */}
         <div className="flex items-center gap-2">
-          {/* Cấu hình Động cơ AI */}
+          {/* AI Engine Status */}
           <button
             onClick={onOpenApiModal}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
@@ -79,17 +79,17 @@ export const LessonHeaderBar: React.FC<Props> = ({
                 ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/50'
                 : 'bg-indigo-950/40 text-indigo-300 border-indigo-800/60 hover:bg-indigo-900/50'
             }`}
-            title="Cài đặt Động cơ AI (Google Gemini API thật hoặc Mô phỏng)"
+            title="Configure AI Engine"
           >
             {apiConfig?.mode === 'simulated' ? (
               <>
                 <Zap className="w-3.5 h-3.5 text-emerald-400" />
-                <span>AI: Mô phỏng</span>
+                <span>AI: Simulated</span>
               </>
             ) : (
               <>
                 <Key className="w-3.5 h-3.5 text-indigo-400" />
-                <span>AI: Gemini ({apiConfig?.model || '2.5-flash'})</span>
+                <span>AI: Server Managed</span>
               </>
             )}
           </button>
@@ -98,24 +98,23 @@ export const LessonHeaderBar: React.FC<Props> = ({
           <button
             onClick={onOpenPromptLibrary}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30 transition cursor-pointer"
-            title="Mở Thư viện Prompt Mẫu"
+            title="Open Prompt Library"
           >
             <Bookmark className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden lg:inline">Thư viện</span>
+            <span className="hidden lg:inline">Library</span>
           </button>
 
           {/* Tutorial button */}
           <button
             onClick={onOpenTutorial}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition cursor-pointer"
-            title="Xem lại hướng dẫn thao tác"
+            title="View Guided Walkthrough"
           >
             <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden lg:inline">Hướng dẫn</span>
+            <span className="hidden lg:inline">Guide</span>
           </button>
         </div>
       </div>
     </div>
   );
 };
-

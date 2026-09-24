@@ -1,74 +1,78 @@
 import { BusinessEvaluation, SavedPromptTemplate } from '../types';
 
 /**
- * Nhận diện các thành phần cấu trúc mà người dùng đã đưa vào prompt
+ * Detect structural components in user prompt
  */
 export function detectPromptComponents(promptText: string) {
   const text = promptText.toLowerCase();
 
   const hasRole = 
+    text.includes('role') ||
+    text.includes('you are') ||
+    text.includes('act as') ||
+    text.includes('as an expert') ||
     text.includes('bạn là') || 
     text.includes('đóng vai trò') || 
-    text.includes('vai trò') || 
-    text.includes('chuyên viên') || 
-    text.includes('trợ lý') ||
-    text.includes('chuyên gia') ||
-    text.includes('role');
+    text.includes('vai trò');
 
   const hasContext = 
+    text.includes('context') ||
+    text.includes('background') ||
+    text.includes('scenario') ||
+    text.includes('given that') ||
+    text.includes('below is') ||
     text.includes('bối cảnh') || 
     text.includes('ngữ cảnh') || 
     text.includes('tình huống') || 
-    text.includes('hồ sơ') || 
-    text.includes('khách hàng') ||
-    text.includes('dữ liệu') ||
-    text.includes('thông tin');
+    text.includes('dữ liệu');
 
   const hasTask = 
+    text.includes('task') ||
+    text.includes('assignment') ||
+    text.includes('analyze') ||
+    text.includes('summarize') ||
+    text.includes('draft') ||
+    text.includes('extract') ||
     text.includes('hãy') || 
     text.includes('nhiệm vụ') || 
-    text.includes('yêu cầu') || 
-    text.includes('phân tích') || 
-    text.includes('đánh giá') || 
-    text.includes('tóm tắt') || 
-    text.includes('soạn thảo') || 
-    text.includes('xác định') ||
-    text.includes('thực hiện');
+    text.includes('yêu cầu');
 
   const hasConstraint = 
+    text.includes('constraint') ||
+    text.includes('must not') ||
+    text.includes('do not') ||
+    text.includes('strictly') ||
+    text.includes('avoid') ||
+    text.includes('limit') ||
     text.includes('ràng buộc') || 
     text.includes('tuyệt đối không') || 
-    text.includes('không được') || 
-    text.includes('chỉ dựa trên') || 
-    text.includes('nguyên tắc') || 
-    text.includes('lưu ý') || 
-    text.includes('giới hạn') || 
-    text.includes('không suy đoán') || 
-    text.includes('tránh');
+    text.includes('không được');
 
   const hasFormat = 
+    text.includes('output format') ||
+    text.includes('format') ||
+    text.includes('markdown table') ||
+    text.includes('table') ||
+    text.includes('bullet') ||
+    text.includes('json') ||
     text.includes('định dạng') || 
-    text.includes('bảng') || 
-    text.includes('markdown') || 
-    text.includes('gạch đầu dòng') || 
-    text.includes('cột') || 
-    text.includes('danh sách') || 
-    text.includes('phần 1') || 
-    text.includes('mẫu');
+    text.includes('bảng');
 
   const hasExample = 
+    text.includes('example') ||
+    text.includes('few-shot') ||
+    text.includes('sample') ||
+    text.includes('demonstration') ||
     text.includes('ví dụ') || 
-    text.includes('vd:') || 
-    text.includes('mẫu:') || 
-    text.includes('input:') || 
-    text.includes('output:');
+    text.includes('mẫu');
 
   const hasGrounding = 
+    text.includes('grounding') ||
+    text.includes('rely strictly on') ||
+    text.includes('grounded in') ||
+    text.includes('cite') ||
     text.includes('căn cứ') || 
-    text.includes('theo tài liệu') || 
-    text.includes('trích dẫn') || 
-    text.includes('dựa trên văn bản') || 
-    text.includes('số liệu trong');
+    text.includes('dựa trên');
 
   return {
     hasRole,
@@ -82,8 +86,7 @@ export function detectPromptComponents(promptText: string) {
 }
 
 /**
- * Đánh giá kết quả Output theo 5 tiêu chí Business Evaluation
- * Sử dụng phân tích định lượng và từ khóa rule-based cho V0.1
+ * Evaluate output against 5 business quality metrics
  */
 export function evaluateBusinessMetrics(
   promptText: string, 
@@ -93,54 +96,49 @@ export function evaluateBusinessMetrics(
   const p = promptText.toLowerCase();
   const o = outputText.toLowerCase();
 
-  // 1. Format Adherence: Kiểm tra output có đúng format mà prompt yêu cầu
+  // 1. Format Adherence
   let formatAdherence = true;
-  if (p.includes('bảng') || p.includes('table') || p.includes('markdown')) {
-    // Phải có định dạng bảng (|---|)
+  if (p.includes('table') || p.includes('markdown') || p.includes('bảng')) {
     formatAdherence = outputText.includes('|') && outputText.includes('---');
-  } else if (p.includes('gạch đầu dòng') || p.includes('danh sách')) {
+  } else if (p.includes('bullet') || p.includes('list') || p.includes('danh sách')) {
     formatAdherence = outputText.includes('- ') || outputText.includes('* ') || outputText.includes('1.');
   } else {
-    // Mặc định cần có phân đoạn rõ ràng
     formatAdherence = outputText.length > 50 && outputText.includes('\n');
   }
 
-  // 2. Completeness: Đầy đủ ý chính quan trọng (độ dài trên 100 ký tự và có nhiều đoạn/gạch đầu dòng)
+  // 2. Completeness
   const completeness = 
     outputText.trim().length >= 120 && 
     (outputText.split('\n').length >= 3 || outputText.includes('|'));
 
-  // 3. Actionability: Có từ ngữ chỉ hành động, giải pháp, khuyến nghị cụ thể
+  // 3. Actionability
   const actionability = 
+    o.includes('recommend') ||
+    o.includes('propose') ||
+    o.includes('solution') ||
+    o.includes('action') ||
+    o.includes('next step') ||
+    o.includes('approved') ||
     o.includes('khuyến nghị') || 
     o.includes('đề xuất') || 
-    o.includes('giải pháp') || 
-    o.includes('hành động') || 
-    o.includes('bước tiếp theo') ||
-    o.includes('kiến nghị') ||
-    o.includes('cần làm') ||
-    o.includes('phê duyệt') ||
-    o.includes('từ chối') ||
-    o.includes('chấp thuận');
+    o.includes('giải pháp');
 
-  // 4. Groundedness: Bám sát dữ liệu/tài liệu gốc đã cung cấp
+  // 4. Groundedness
   let groundedness = true;
   if (sampleData && sampleData.trim().length > 0) {
-    // Trích xuất một số số liệu hoặc từ khóa thực tế từ sampleData
     const numbers = sampleData.match(/\d+(?:[.,]\d+)?/g) || [];
     if (numbers.length > 0) {
-      // Kiểm tra xem output có nhắc lại ít nhất 1 con số cụ thể trong sample data không
       const matched = numbers.some(num => outputText.includes(num));
-      groundedness = matched || o.includes('doanh thu') || o.includes('lợi nhuận') || o.includes('khách hàng');
+      groundedness = matched || o.includes('revenue') || o.includes('profit') || o.includes('customer') || o.includes('doanh thu');
     }
   }
 
-  // 5. Tone Fit: Văn phong trang trọng, khách quan chuẩn ngân hàng
+  // 5. Tone Fit
   const hasUnprofessionalWords = 
-    o.includes('tôi nghĩ là') || 
-    o.includes('chắc là') || 
-    o.includes('xin lỗi tôi là ai') || 
     o.includes('as an ai') ||
+    o.includes('i think maybe') ||
+    o.includes('sorry but') ||
+    o.includes('tôi nghĩ là') || 
     o.includes('haha');
   const toneFit = !hasUnprofessionalWords && outputText.length > 30;
 
@@ -154,27 +152,27 @@ export function evaluateBusinessMetrics(
 }
 
 /**
- * Dữ liệu Prompt mẫu khởi tạo trong Thư viện SOP Agribank
+ * Default SOP templates initialized in the Prompt Library
  */
 export const INITIAL_SOP_TEMPLATES: SavedPromptTemplate[] = [
   {
     id: 'sop-1',
-    title: 'SOP Thẩm định Báo cáo Tài chính SME',
-    businessUseCase: 'Phân tích nhanh kết quả kinh doanh và khả năng trả nợ vay ngắn hạn của DN vừa & nhỏ',
+    title: 'SOP: Commercial Underwriting Review',
+    businessUseCase: 'Rapid analysis of corporate balance sheets and debt-service coverage for credit facility approvals',
     labId: 'lab-2',
-    promptText: `Bạn là Chuyên viên Thẩm định Tín dụng cao cấp tại Agribank.
-Nhiệm vụ: Phân tích báo cáo tài chính đính kèm của doanh nghiệp SME.
-Nguyên tắc & Ràng buộc:
-- Tuyệt đối không suy đoán số liệu ngoài hồ sơ.
-- Chỉ ra 3 điểm mạnh và 3 cảnh báo rủi ro thanh khoản.
-Định dạng: Bảng Markdown gồm 4 cột: [Chỉ tiêu tài chính | Thực tế năm nay | So với năm trước | Đánh giá rủi ro].`,
-    techniqueUsed: 'Structured Prompt (4 Thành phần chuẩn)',
+    promptText: `You are a Senior Credit Risk Analyst.
+Task: Evaluate the attached corporate financial statements.
+Constraints:
+- Strictly rely on provided audited figures; zero ungrounded speculation.
+- Identify 3 credit strengths and 3 liquidity risk alerts.
+Output Format: Markdown table with 4 columns: [Financial Metric | Current Year | YoY Change | Risk Rating].`,
+    techniqueUsed: 'Structured Prompt (4-Element Standard)',
     versionNumber: 2,
-    department: 'Khối Tín dụng & Quản trị Rủi ro',
-    author: 'Tổ Chuyên gia Tín dụng Agribank',
+    department: 'Credit Underwriting & Risk Management',
+    author: 'Enterprise Risk Committee',
     createdAt: '2026-09-15',
     isRecommended: true,
-    sampleOutputSnippet: '| Chỉ tiêu | Năm nay | So năm trước | Đánh giá |\n| Doanh thu thuần | 45.2 tỷ | +12% | Tăng trưởng ổn định |',
+    sampleOutputSnippet: '| Metric | Current Year | YoY Change | Risk Rating |\n| Net Revenue | $45.2M | +12% | Stable Growth |',
     businessEvaluation: {
       formatAdherence: true,
       completeness: true,
@@ -185,25 +183,25 @@ Nguyên tắc & Ràng buộc:
   },
   {
     id: 'sop-2',
-    title: 'SOP Xử lý Khiếu nại Giao dịch Thẻ & E-Banking',
-    businessUseCase: 'Phân loại mức độ khẩn cấp và soạn thư phản hồi chuẩn mực cho khách hàng',
+    title: 'SOP: High-Priority Customer Escalation Resolution',
+    businessUseCase: 'Triage dispute severity and formulate empathetic executive correspondence',
     labId: 'lab-1',
-    promptText: `Bạn là Trưởng bộ phận Dịch vụ Khách hàng Agribank.
-Nhiệm vụ: Đọc khiếu nại của khách hàng về giao dịch trừ tiền ATM nhưng không nhả tiền.
-Ràng buộc:
-- Giữ văn phong ân cần, chuyên nghiệp, thể hiện sự đồng cảm sâu sắc.
-- Cam kết thời gian tra soát tối đa trong 24 giờ làm việc.
-Định dạng:
-1. Xác định mức độ ưu tiên (Khẩn cấp / Bình thường)
-2. Thư phản hồi gửi khách hàng (dưới 150 từ)
-3. Chỉ dẫn nội bộ cho giao dịch viên.`,
-    techniqueUsed: 'Zero-shot có Guardrails cảm xúc',
+    promptText: `You are the Head of Client Experience.
+Task: Process customer dispute regarding uncredited transaction funds.
+Constraints:
+- Maintain empathetic, professional, and authoritative tone.
+- Commit to definitive resolution timeline within 24 business hours.
+Output Format:
+1. Priority Classification (Urgent / Standard)
+2. Customer Response Letter (< 150 words)
+3. Internal Routing Instructions for Ops Specialist`,
+    techniqueUsed: 'Zero-shot with Emotional Guardrails',
     versionNumber: 3,
-    department: 'Ban Truyền thông & Chăm sóc Khách hàng',
-    author: 'Trần Thị Mai - Phòng CSKH',
+    department: 'Client Services & Operations',
+    author: 'Customer Experience Team',
     createdAt: '2026-09-18',
     isRecommended: true,
-    sampleOutputSnippet: 'Kính gửi Quý khách, Agribank chân thành cáo lỗi vì sự cố giao dịch vừa qua...',
+    sampleOutputSnippet: 'Dear Valued Client, We sincerely apologize for the delay regarding transaction #...',
     businessEvaluation: {
       formatAdherence: true,
       completeness: true,
@@ -214,24 +212,24 @@ Ràng buộc:
   },
   {
     id: 'sop-3',
-    title: 'SOP Tóm tắt Tờ trình Trình duyệt Hạn mức',
-    businessUseCase: 'Chuyển thể tờ trình tín dụng 10 trang thành bản tóm tắt 1 trang cho Hội đồng Tín dụng',
+    title: 'SOP: Executive Credit Memorandum Synthesis',
+    businessUseCase: 'Condense 10-page underwriting packet into a 1-page executive summary for the Credit Committee',
     labId: 'lab-5',
-    promptText: `Bạn là Thư ký Hội đồng Tín dụng Agribank.
-Nhiệm vụ: Rút trích thông tin cốt lõi từ Tờ trình tín dụng đính kèm.
-Căn cứ: Chỉ lấy số liệu có trong tờ trình, nghiêm cấm ngoại suy.
-Định dạng đầu ra:
-- Khách hàng & Ngành nghề:
-- Hạn mức đề xuất & Thời hạn:
-- Tài sản bảo đảm & Tỷ lệ cấp tín dụng (LTV):
-- Nhận xét và Đề xuất của Chi nhánh:`,
+    promptText: `You are the Secretary to the Executive Credit Committee.
+Task: Extract decisive underwriting terms from the credit proposal dossier.
+Groundedness: Extract explicit numbers directly from source dossier; no ungrounded estimates.
+Output Format:
+- Borrower & Operating Sector:
+- Proposed Credit Facility & Term:
+- Collateral Appraisal & Loan-to-Value (LTV):
+- Underwriting Recommendation:`,
     techniqueUsed: 'Grounding & Document Extraction',
     versionNumber: 1,
-    department: 'Khối Tín dụng',
-    author: 'Nguyễn Văn Hùng - Ban Thẩm định',
+    department: 'Commercial Banking',
+    author: 'Senior Underwriter',
     createdAt: '2026-09-20',
     isRecommended: false,
-    sampleOutputSnippet: '- Khách hàng: Công ty CP Chế biến Nông sản An Phú\n- Hạn mức: 25 tỷ VNĐ...',
+    sampleOutputSnippet: '- Borrower: An Phu Agri-Processing Corp\n- Facility: $25M Revolver...',
     businessEvaluation: {
       formatAdherence: true,
       completeness: true,
@@ -245,7 +243,7 @@ Căn cứ: Chỉ lấy số liệu có trong tờ trình, nghiêm cấm ngoại 
 const SOP_STORAGE_KEY = 'promptify_saved_library';
 
 /**
- * Lấy danh sách các Prompt đã lưu trong thư viện
+ * Retrieve saved prompts from localStorage
  */
 export function getSavedPromptLibrary(): SavedPromptTemplate[] {
   try {
@@ -257,15 +255,14 @@ export function getSavedPromptLibrary(): SavedPromptTemplate[] {
       }
     }
   } catch (err) {
-    console.error('Lỗi khi đọc thư viện prompt từ localStorage', err);
+    console.error('Error reading prompt library from localStorage', err);
   }
-  // Mặc định lưu seed data vào localStorage
   localStorage.setItem(SOP_STORAGE_KEY, JSON.stringify(INITIAL_SOP_TEMPLATES));
   return INITIAL_SOP_TEMPLATES;
 }
 
 /**
- * Lưu một Prompt mới vào Thư viện SOP
+ * Save new prompt to library
  */
 export function savePromptToLibrary(item: Omit<SavedPromptTemplate, 'id' | 'createdAt'>): SavedPromptTemplate {
   const current = getSavedPromptLibrary();
@@ -280,7 +277,7 @@ export function savePromptToLibrary(item: Omit<SavedPromptTemplate, 'id' | 'crea
 }
 
 /**
- * Bật/tắt trạng thái Khuyên dùng (Recommended)
+ * Toggle recommended flag
  */
 export function togglePromptRecommended(id: string): SavedPromptTemplate[] {
   const current = getSavedPromptLibrary();
@@ -303,7 +300,7 @@ export interface LearningInsight {
 }
 
 /**
- * Tạo bản tóm tắt học tập trực quan (Learning Insight) cho Compare View
+ * Generate learning insights comparing two prompt iterations
  */
 export function generateLearningInsight(
   beforePrompt: string,
@@ -323,62 +320,60 @@ export function generateLearningInsight(
   const promptChanges: string[] = [];
 
   if (!bComp.hasRole && aComp.hasRole) {
-    chips.push('Đã thêm Role');
-    promptChanges.push('Bổ sung vai trò chuyên môn cụ thể (Role) để định hình góc nhìn cho AI.');
+    chips.push('Added Role');
+    promptChanges.push('Added explicit domain expert persona (Role) to anchor perspective.');
   }
   if (!bComp.hasContext && aComp.hasContext) {
-    chips.push('Đã thêm Context');
-    promptChanges.push('Cung cấp thêm ngữ cảnh và dữ liệu hồ sơ thực tế (Context).');
+    chips.push('Added Context');
+    promptChanges.push('Provided concrete scenario background and reference dossier (Context).');
   }
   if (!bComp.hasTask && aComp.hasTask) {
-    chips.push('Đã thêm Task');
-    promptChanges.push('Làm rõ nhiệm vụ trọng tâm và mục tiêu cần giải quyết (Task).');
+    chips.push('Added Task');
+    promptChanges.push('Clarified core actionable assignment and deliverable objective (Task).');
   }
   if (!bComp.hasConstraint && aComp.hasConstraint) {
-    chips.push('Đã thêm Constraint');
-    promptChanges.push('Bổ sung ràng buộc rủi ro và giới hạn không tự suy diễn số liệu (Constraint).');
+    chips.push('Added Constraints');
+    promptChanges.push('Introduced safety guardrails and prevented speculative extrapolation (Constraints).');
   }
   if (!bComp.hasFormat && aComp.hasFormat) {
-    chips.push('Đã thêm Format');
-    promptChanges.push('Yêu cầu định dạng bảng hoặc các gạch đầu dòng rõ ràng (Output Format).');
+    chips.push('Added Format');
+    promptChanges.push('Mandated structured table or bulleted output layout (Output Format).');
   }
   if ((!bComp.hasExample && aComp.hasExample) || (!bComp.hasGrounding && aComp.hasGrounding)) {
-    chips.push('Đã thêm Căn cứ / Ví dụ');
-    promptChanges.push('Bổ sung dữ liệu đối chiếu hoặc ví dụ minh họa mẫu (Example/Evidence).');
+    chips.push('Added Grounding/Examples');
+    promptChanges.push('Supplied verifiable source facts and reference examples (Example / Evidence).');
   }
 
-  // Nếu không có thay đổi nào được nhận diện tự động, dùng fallback từ lab hoặc mô tả mặc định
   if (promptChanges.length === 0) {
     if (labFallback?.promptChanges && labFallback.promptChanges.length > 0) {
       promptChanges.push(...labFallback.promptChanges);
     } else {
-      promptChanges.push('Câu lệnh được cấu trúc chặt chẽ, mạch lạc và súc tích hơn.');
+      promptChanges.push('Prompt is more clearly structured, concise, and focused.');
     }
   }
 
-  // Chips kết quả output
   const hasTable = afterOutput.includes('|') && afterOutput.includes('---');
   if (hasTable) {
-    chips.push('Bảng dữ liệu chuẩn');
+    chips.push('Structured Markdown Table');
   } else {
-    chips.push('Kết quả rõ hơn');
+    chips.push('Refined Output Quality');
   }
 
   const beforeDesc = labFallback?.outputChanges?.before || 
     (beforeOutput.length < 150 
-      ? 'Câu trả lời ngắn, nhận xét chung chung, thiếu căn cứ số liệu.' 
-      : 'Văn bản đàm thoại dài dòng, dàn trải, khó trích xuất thông tin hành động.');
+      ? 'Vague, generic response without empirical backing or structure.' 
+      : 'Conversational narrative that is verbose and difficult to extract key actions from.');
 
   const afterDesc = labFallback?.outputChanges?.after || 
     (hasTable 
-      ? 'Được trình bày thành bảng biểu mạch lạc, tách bạch rõ ràng số liệu và kiến nghị xử lý.' 
-      : 'Bố cục phân lớp rõ ràng, có tiêu chí cụ thể và đề xuất hướng xử lý thực tế.');
+      ? 'Cohesive tabular presentation with explicit metrics, clear risks, and actionable recommendations.' 
+      : 'Clear multi-layered structure with concrete criteria and practical execution steps.');
 
   const whyBetter = labFallback?.whyBetter || 
-    'Khi bạn cung cấp rõ vai trò chuyên gia và yêu cầu cụ thể định dạng (bảng/danh sách), mô hình AI không phải tự đoán mà sẽ tập trung phân tích đúng trọng tâm nghiệp vụ.';
+    'Specifying an expert role along with strict output format constraints eliminates guesswork, focusing the model on actionable business analysis.';
 
   const takeaway = 
-    'Luôn ghi nhớ công thức 4 phần: [Vai trò] + [Ngữ cảnh dữ liệu] + [Nhiệm vụ cụ thể] + [Khuôn mẫu đầu ra mong muốn] trước khi nhấn gửi.';
+    'Always anchor your prompts with: [Role] + [Context & Data] + [Explicit Task] + [Target Output Format] before execution.';
 
   return {
     promptChanges,
@@ -391,4 +386,3 @@ export function generateLearningInsight(
     chips
   };
 }
-

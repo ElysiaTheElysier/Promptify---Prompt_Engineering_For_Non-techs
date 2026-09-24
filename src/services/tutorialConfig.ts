@@ -13,20 +13,18 @@ export interface TutorialStep {
 }
 
 /**
- * Sinh danh sách 8 bước hướng dẫn làm bài chuẩn trong Promptify,
- * được cá nhân hóa câu từ theo Mode (Notebook / Hybrid / Playground) và theo Lab cụ thể.
+ * Generate 8-step guided walkthrough customized per UI Mode and active Lab
  */
 export function getTutorialSteps(mode: UIMode, lab: LabStep): TutorialStep[] {
-  // 1. Lời khuyên cụ thể theo từng loại kỹ thuật trong Lab
   let labSpecificAdvice = {
-    scenario: 'Đọc kỹ yêu cầu nghiệp vụ để xác định đúng vai trò cần nhập vai.',
-    data: 'Quan sát dữ liệu kiểm soát cố định đính kèm để dùng làm dữ liệu đầu vào.',
-    prompt: 'Bắt đầu bằng một câu lệnh cơ bản, rõ ràng.',
-    run: 'Bấm nút để AI xử lý và trả về phản hồi đầu tiên.',
-    output: 'Đọc câu trả lời xem đã đủ ý và đúng định dạng chưa.',
-    coach: 'Bấm vào Bé Trợ Lý ở góc phải nếu bạn cần gợi ý thêm.',
-    compare: 'Chạy thử ít nhất 2 lần để đối chiếu sự khác biệt giữa hai phiên bản.',
-    library: 'Lưu lại câu lệnh tốt nhất vào Thư viện để chia sẻ cho đồng nghiệp.',
+    scenario: 'Carefully read the business requirements to determine the appropriate persona.',
+    data: 'Review the fixed control dataset to use as context.',
+    prompt: 'Start with a clear, concise baseline prompt.',
+    run: 'Click Run Prompt to generate the initial AI response.',
+    output: 'Review the output to see if it meets completeness and formatting standards.',
+    coach: 'Click AI Coach in the bottom-right corner if you need pedagogical guidance.',
+    compare: 'Run at least 2 attempts to compare side-by-side progression.',
+    library: 'Save the highest-scoring prompt into the SOP Library for team reuse.',
   };
 
   const labId = lab.id.toLowerCase();
@@ -34,188 +32,176 @@ export function getTutorialSteps(mode: UIMode, lab: LabStep): TutorialStep[] {
 
   if (labId.includes('zero') || labBadge.includes('zero')) {
     labSpecificAdvice = {
-      scenario: 'Ở bài Zero-shot, bạn đang thử thách AI giải quyết bài toán mà không đưa ví dụ mẫu.',
+      scenario: 'In Zero-shot, you test whether the model can execute the task without few-shot examples.',
       data: lab.sampleInputContext
-        ? 'Mở dữ liệu cố định của bài để biết chính xác thông tin AI được phép sử dụng.'
-        : 'Bài này không có dữ liệu cố định; hướng dẫn sẽ hiển thị một dữ liệu minh họa an toàn.',
-      prompt: 'Hãy thử viết câu lệnh thô đầu tiên xem AI phản hồi ra sao trước khi bổ sung quy tắc.',
-      run: 'Bấm Chạy Prompt để xem AI có tự hiểu đúng ý bạn không.',
-      output: `Đối chiếu kết quả với định dạng yêu cầu của bài: ${lab.expectedOutputFormat}.`,
-      coach: 'Nhờ Trợ Lý AI gợi ý cách làm rõ vai trò, nhiệm vụ và định dạng đầu ra.',
-      compare: 'So sánh xem khi thêm Vai trò chuyên gia, câu trả lời bớt lan man như thế nào.',
-      library: 'Lưu prompt tốt của bài này để tái sử dụng cho tình huống tương tự.',
+        ? 'Inspect the lesson control data to verify facts the AI is permitted to use.'
+        : 'No fixed control data for this lesson; tutorial displays labeled illustrative data.',
+      prompt: 'Draft an initial prompt to establish a baseline before applying structural rules.',
+      run: 'Click Run Prompt to inspect how the model responds autonomously.',
+      output: `Compare output against expected format: ${lab.expectedOutputFormat}.`,
+      coach: 'Ask AI Coach for recommendations on clarifying role, task, and output format.',
+      compare: 'Observe how adding an expert role reduces conversational fluff.',
+      library: 'Save your proven zero-shot prompt for future operational reuse.',
     };
   } else if (labId.includes('structured') || labBadge.includes('structured')) {
     labSpecificAdvice = {
-      scenario: 'Bài Cấu trúc 4 phần yêu cầu bạn phân tách rõ: Vai trò, Ngữ cảnh, Nhiệm vụ, Định dạng.',
-      data: 'Dữ liệu khiếu nại của khách hàng là căn cứ duy nhất để AI phản hồi.',
-      prompt: 'Nhớ áp dụng công thức 4 phần để AI trả lời đúng khuôn khổ của bài.',
-      run: 'Gửi prompt có cấu trúc và quan sát tốc độ và chất lượng phản hồi.',
-      output: 'Kiểm tra xem AI đã xuất đúng bảng Markdown phân loại cảm xúc và giải pháp chưa.',
-      coach: 'Bé Trợ Lý sẽ chỉ ra bạn có đang thiếu phần Ràng buộc an toàn (Guardrails) không.',
-      compare: 'Đối chiếu xem việc chia rõ 4 phần giúp output mạch lạc gấp nhiều lần ra sao.',
-      library: 'Lưu prompt đã kiểm chứng thành SOP cho nhóm của bạn.',
+      scenario: 'Structured Prompting requires explicit separation: Role, Context, Task, Format.',
+      data: 'Rely strictly on provided case data as the ground truth.',
+      prompt: 'Apply the 4-element framework to keep model responses tightly aligned.',
+      run: 'Submit the structured prompt and observe response quality gains.',
+      output: 'Verify whether the AI produced the requested Markdown table.',
+      coach: 'AI Coach will point out if safety guardrails or constraints are missing.',
+      compare: 'Compare how separating structural elements dramatically improves clarity.',
+      library: 'Save your verified prompt as an operational SOP.',
     };
   } else if (labId.includes('one-shot') || labBadge.includes('one')) {
     labSpecificAdvice = {
-      scenario: 'Bài One-shot giúp AI hiểu đúng cấu trúc đầu ra thông qua một ví dụ mẫu.',
-      data: 'Dữ liệu gồm lịch sử giao dịch và tài liệu mẫu chuẩn.',
-      prompt: 'Cung cấp 1 cặp Input mẫu -> Output mẫu để AI bắt chước chuẩn mực.',
-      run: 'Chạy prompt để xem AI có áp dụng đúng phong cách của ví dụ mẫu không.',
-      output: 'Quan sát tính đồng nhất về văn phong giữa câu trả lời và mẫu bạn cung cấp.',
-      coach: 'Hỏi Bé Trợ Lý xem ví dụ của bạn đã đủ tiêu chuẩn cho AI học theo chưa.',
-      compare: 'So sánh giữa lúc không có mẫu (Zero-shot) và khi có 1 mẫu chuẩn (One-shot).',
-      library: 'Lưu lại câu lệnh kèm ví dụ mẫu để áp dụng cho dữ liệu mới cùng cấu trúc.',
+      scenario: 'One-shot prompting demonstrates the exact desired output through a single sample.',
+      data: 'Examine the reference sample and scenario data.',
+      prompt: 'Provide 1 exemplar Input -> Output pair to anchor format.',
+      run: 'Run the prompt to verify whether the AI mirrors the demonstration style.',
+      output: 'Assess consistency between AI response and the provided exemplar.',
+      coach: 'Consult AI Coach to verify if your demonstration is clear and unambiguous.',
+      compare: 'Compare Zero-shot (no sample) vs One-shot (with exemplar).',
+      library: 'Save the prompt with demonstration for matching workflows.',
     };
   } else if (labId.includes('few-shot') || labBadge.includes('few')) {
     labSpecificAdvice = {
-      scenario: 'Bài Few-shot cung cấp 2-3 ví dụ đa dạng để AI xử lý các trường hợp biên phức tạp.',
-      data: 'Dữ liệu gồm nhiều trường hợp hồ sơ khó cần phân loại nợ.',
-      prompt: 'Đưa 2-3 tình huống mẫu (hồ sơ tốt, hồ sơ trung bình, hồ sơ rủi ro) vào prompt.',
-      run: 'Chạy prompt để kiểm tra khả năng suy luận đa tình huống của AI.',
-      output: 'Kiểm tra xem AI có phân loại chính xác các trường hợp khó không.',
-      coach: 'Hỏi Bé Trợ Lý cách chọn 3 ví dụ mẫu mang tính đại diện cao nhất.',
-      compare: 'Đối chiếu xem thêm ví dụ thứ 2, thứ 3 giúp AI giảm thiểu sai sót ra sao.',
-      library: 'Lưu prompt Few-shot đã kiểm chứng vào Thư viện SOP.',
+      scenario: 'Few-shot prompting provides 2-3 diverse examples for complex edge cases.',
+      data: 'Review the case portfolio requiring multi-class risk categorization.',
+      prompt: 'Include 2-3 demonstrations (low risk, moderate risk, high risk) in the prompt.',
+      run: 'Run prompt to evaluate multi-case reasoning capabilities.',
+      output: 'Verify whether complex boundary cases were accurately classified.',
+      coach: 'Ask AI Coach how to select representative edge-case demonstrations.',
+      compare: 'Observe how additional examples reduce classification errors.',
+      library: 'Save the tested Few-shot prompt into the SOP Library.',
     };
   } else if (labId.includes('ground') || labBadge.includes('ground')) {
     labSpecificAdvice = {
-      scenario: 'Bài Grounding yêu cầu AI tuyệt đối chỉ trả lời dựa trên văn bản nghiệp vụ, cấm bịa đặt.',
-      data: 'Bắt buộc mở tài liệu nguồn đính kèm trước khi viết prompt.',
-      prompt: 'Thêm mệnh lệnh nghiêm ngặt: "Chỉ căn cứ vào văn bản được cung cấp, không suy diễn".',
-      run: 'Chạy prompt để kiểm tra xem AI có tuân thủ quy tắc dữ liệu gốc không.',
-      output: 'Đối chiếu số liệu trong kết quả với tài liệu gốc xem có bị sai lệch con số nào không.',
-      coach: 'Hỏi Bé Trợ Lý mẹo viết câu lệnh chống ảo giác (hallucination) cho AI.',
-      compare: 'So sánh câu lệnh không căn cứ (bị bịa số liệu) vs câu lệnh có grounding (chính xác 100%).',
-      library: 'Lưu lại prompt có kiểm soát tài liệu gốc.',
+      scenario: 'Grounding instructs the model to rely strictly on provided documentation.',
+      data: 'Review the attached source reference document before drafting.',
+      prompt: 'Add strict constraint: "Rely only on provided context; do not extrapolate."',
+      run: 'Run prompt to test factual adherence.',
+      output: 'Cross-check output metrics against source data to verify zero hallucinations.',
+      coach: 'Ask AI Coach for anti-hallucination constraint techniques.',
+      compare: 'Compare ungrounded baseline (hallucinated numbers) vs grounded prompt (100% accurate).',
+      library: 'Save your grounded prompt template.',
     };
   }
 
-  // Nội dung nghiệp vụ luôn lấy từ lesson hiện tại; nhánh kỹ thuật phía trên chỉ
-  // điều chỉnh cách học, không được mang dữ liệu của course/lab khác sang.
-  labSpecificAdvice.scenario = `Mục tiêu của bài hiện tại: ${lab.taskGoal}`;
+  labSpecificAdvice.scenario = `Current lesson objective: ${lab.taskGoal}`;
   labSpecificAdvice.data = lab.sampleInputContext
-    ? 'Dữ liệu đang hiển thị là control data của đúng bài hiện tại và không thay đổi giữa các lần thử.'
-    : 'Bài này không có control data; tutorial dùng dữ liệu minh họa có nhãn rõ ràng và không lưu vào bài làm.';
-  labSpecificAdvice.output = `Kiểm tra output theo yêu cầu của bài: ${lab.expectedOutputFormat}`;
-  labSpecificAdvice.library = `Chỉ lưu prompt khi nó đã giải đúng nhiệm vụ “${lab.title}”.`;
+    ? 'Displaying control data for the current lesson, held constant across attempts.'
+    : 'No control data for this lesson; tutorial displays labeled illustrative data.';
+  labSpecificAdvice.output = `Verify output according to requirements: ${lab.expectedOutputFormat}`;
+  labSpecificAdvice.library = `Save prompt once it successfully solves "${lab.title}".`;
 
-  // 2. Tinh chỉnh câu chữ theo từng Mode UI
-  const isNotebook = mode === 'notebook';
   const isHybrid = mode === 'hybrid';
-  const isPlayground = mode === 'playground';
-
-  const modeContextDesc = isNotebook
-    ? 'Trong chế độ Sổ tay (Notebook), bài học được thiết kế tuần tự từng ô từ trên xuống dưới như một vở bài tập tương tác.'
-    : isHybrid
-    ? 'Trong chế độ Tích hợp (Hybrid), màn hình được chia đôi: Cột trái chứa Tình huống & Dữ liệu, Cột phải là nơi Soạn thảo Prompt & Xem kết quả.'
-    : 'Trong chế độ Thực nghiệm (Playground), bạn có không gian làm việc tự do để thử nghiệm nhiều kỹ thuật prompt và tinh chỉnh tham số AI.';
 
   const steps: TutorialStep[] = [
-    // BƯỚC 1: Đọc tình huống
+    // STEP 1
     {
       id: 'step-scenario',
       stepNumber: 1,
       totalSteps: 8,
-      title: '1. Đọc Tình Huống Nghiệp Vụ',
+      title: '1. Review Business Scenario',
       targetId: 'tour-scenario',
       description: isHybrid
-        ? 'Bắt đầu ở Cột Trái: Đọc tình huống thực tế và mục tiêu để nắm rõ bài toán cần xử lý.'
-        : 'Đầu tiên, hãy đọc nhanh tình huống và mục tiêu để hiểu rõ bài toán cần xử lý.',
+        ? 'Start on the Left Column: Review the real-world scenario and objective to understand the core deliverable.'
+        : 'First, review the scenario and business objective to understand what deliverable is required.',
       labAdvice: labSpecificAdvice.scenario,
     },
 
-    // BƯỚC 2: Xem dữ liệu tham khảo
+    // STEP 2
     {
       id: 'step-data',
       stepNumber: 2,
       totalSteps: 8,
-      title: '2. Xem Dữ Liệu Tham Khảo (Control Data)',
+      title: '2. Inspect Control Data',
       targetId: 'tour-data-trigger',
-      description: 'Bấm mở mục "Xem dữ liệu" để quan sát dữ liệu đầu vào cố định (hồ sơ vay, bảng số liệu, email khách hàng). Dữ liệu này được giữ nguyên qua mọi lần thử để bạn đối chiếu.',
+      description: 'Click "View Data" to examine fixed reference data (underwriting files, customer communications). This data stays constant across attempts for controlled testing.',
       labAdvice: labSpecificAdvice.data,
-      fallbackNote: 'Mục này nằm ngay dưới phần tình huống. Bạn có thể bấm "Sao chép dữ liệu" để dán vào prompt.',
+      fallbackNote: 'Located directly under the scenario. Click "Copy Data" to paste into prompt.',
       demoAction: 'show-data',
     },
 
-    // BƯỚC 3: Viết prompt
+    // STEP 3
     {
       id: 'step-prompt',
       stepNumber: 3,
       totalSteps: 8,
-      title: '3. Soạn Thảo Câu Lệnh (Prompt)',
+      title: '3. Draft Prompt in Composer',
       targetId: 'tour-prompt',
       description: isHybrid
-        ? 'Chuyển sang Cột Phải: Đây là ô soạn thảo câu lệnh gửi cho AI. Bạn viết càng rõ vai trò, yêu cầu và biểu mẫu đầu ra, AI phản hồi càng chính xác.'
-        : 'Đây là nơi bạn giao việc cho AI. Hãy bắt đầu bằng phiên bản đầu tiên của câu lệnh. Có thể bấm "Xem gợi ý & Prompt mẫu" nếu cần tham khảo.',
+        ? 'Move to the Right Column: This is your prompt workspace. Clarify role, requirements, and target format to guide the model accurately.'
+        : 'This is where you instruct the AI model. Start with your initial prompt draft. Click "View Reference" if you need inspiration.',
       labAdvice: labSpecificAdvice.prompt,
       demoAction: 'show-prompt',
     },
 
-    // BƯỚC 4: Chạy prompt
+    // STEP 4
     {
       id: 'step-run',
       stepNumber: 4,
       totalSteps: 8,
-      title: '4. Chạy Thử Nghiệm Prompt',
+      title: '4. Execute Prompt',
       targetId: 'tour-run',
-      description: 'Sau khi viết xong câu lệnh, bấm nút "Chạy prompt" (hoặc nhấn tổ hợp phím Ctrl + Enter) để gửi yêu cầu đến mô hình AI và chấm điểm chất lượng tự động.',
+      description: 'Click "Run Prompt" (or press Ctrl + Enter) to submit your prompt to the AI model and trigger automated rubric evaluation.',
       labAdvice: labSpecificAdvice.run,
       demoAction: 'show-run',
     },
 
-    // BƯỚC 5: Quan sát kết quả
+    // STEP 5
     {
       id: 'step-output',
       stepNumber: 5,
       totalSteps: 8,
-      title: '5. Quan Sát Kết Quả & Bảng Chấm Điểm',
+      title: '5. Inspect Response & Scorecard',
       targetId: 'tour-output',
-      description: 'Đọc câu trả lời từ AI trong khung kết quả để xem văn phong đã đạt chuẩn chưa. Xem bảng điểm chất lượng (Vai trò, Nhiệm vụ, Ràng buộc, Định dạng) và lời khuyên rút ra.',
+      description: 'Review the generated response in the output pane. Check the 5-factor rubric scorecard (Task, Groundedness, Format, Constraints, Usability) and diagnostic feedback.',
       labAdvice: labSpecificAdvice.output,
-      fallbackNote: 'Vùng kết quả sẽ xuất hiện ngay sau khi bạn bấm Chạy prompt lần đầu tiên.',
+      fallbackNote: 'Output area appears immediately after your initial run.',
       demoAction: 'show-output',
     },
 
-    // BƯỚC 6: Cải thiện prompt & AI Coach
+    // STEP 6
     {
       id: 'step-coach',
       stepNumber: 6,
       totalSteps: 8,
-      title: '6. Cải Thiện Prompt Với Trợ Lý AI',
+      title: '6. Iterate with AI Coach',
       targetId: 'tour-coach-panel',
-      description: 'Nếu kết quả chưa tối ưu, bạn có thể chỉnh sửa prompt bằng cách thêm Vai trò (Role), Ngữ cảnh (Context) hoặc Định dạng bảng. Hãy bấm vào Bé Trợ Lý ở góc phải dưới nếu muốn xin gợi ý sư phạm.',
+      description: 'Refine your prompt by adding Role, Context, or formatting constraints. Click AI Coach in the bottom-right for pedagogical hints.',
       labAdvice: labSpecificAdvice.coach,
       demoAction: 'show-coach',
     },
 
-    // BƯỚC 7: So sánh trước / sau
+    // STEP 7
     {
       id: 'step-compare',
       stepNumber: 7,
       totalSteps: 8,
-      title: '7. So Sánh Tiến Bộ (Compare Mode)',
+      title: '7. Compare Progress (Compare Mode)',
       targetId: 'tour-compare-demo',
-      description: 'Sau khi chạy ít nhất 2 lần, hệ thống sẽ mở khóa nút "So sánh với lần trước". Bấm nút này để mở bảng đối chiếu 2 cột song song chuẩn Google AI Studio, thấy rõ câu lệnh sửa ở đâu và kết quả tốt hơn thế nào.',
+      description: 'After running at least 2 attempts, "Compare Attempts" unlocks. Open the side-by-side view to observe prompt diffs and metric gains.',
       labAdvice: labSpecificAdvice.compare,
-      fallbackNote: 'Nút so sánh sẽ tự động xuất hiện ngay dưới kết quả sau khi bạn chạy thử lần thứ 2.',
+      fallbackNote: 'Compare button appears under the output pane after your 2nd run.',
       demoAction: 'show-compare',
     },
 
-    // BƯỚC 8: Lưu prompt tốt vào SOP
+    // STEP 8
     {
       id: 'step-library',
       stepNumber: 8,
       totalSteps: 8,
-      title: '8. Lưu Prompt Xuất Sắc Vào Thư Viện (SOP)',
+      title: '8. Save Prompt to Library (SOP)',
       targetId: 'tour-library-demo',
-      description: 'Khi tìm ra phiên bản prompt mang lại kết quả xuất sắc, bấm nút "Lưu vào Thư viện" để lưu giữ quy trình chuẩn cho phòng ban. Bạn có thể mở Thư viện Prompt trên thanh Header bất cứ lúc nào.',
+      description: 'Once you achieve high rubric marks, click "Save to Library" to preserve your proven prompt as an enterprise SOP for team collaboration.',
       labAdvice: labSpecificAdvice.library,
-      fallbackNote: 'Nút mở Thư viện Prompt luôn có sẵn trên thanh Header toàn cục màu vàng ấm.',
+      fallbackNote: 'The Prompt Library is accessible anytime from the top navigation bar.',
       demoAction: 'show-library',
     },
   ];
 
   return steps;
 }
-

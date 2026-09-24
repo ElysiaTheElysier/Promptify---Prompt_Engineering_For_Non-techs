@@ -7,18 +7,17 @@ interface Props {
 }
 
 export const ExpirationBanner: React.FC<Props> = ({ cohort }) => {
-  const [timeLeft, setTimeLeft] = useState<string>('3 giờ 48 phút');
+  const [timeLeft, setTimeLeft] = useState<string>('3 hours 48 mins');
   const [isSyncing, setIsSyncing] = useState(false);
-  const [lastSync, setLastSync] = useState('2 phút trước');
+  const [lastSync, setLastSync] = useState('2 minutes ago');
 
   useEffect(() => {
-    // Giả lập đồng hồ đếm ngược phiên làm việc
     let totalMinutes = cohort.expiryDurationHours * 60 - 12;
     const interval = setInterval(() => {
       totalMinutes = Math.max(0, totalMinutes - 1);
       const hours = Math.floor(totalMinutes / 60);
       const mins = totalMinutes % 60;
-      setTimeLeft(`${hours} giờ ${mins} phút`);
+      setTimeLeft(`${hours} hours ${mins} mins`);
     }, 60000);
     return () => clearInterval(interval);
   }, [cohort]);
@@ -27,7 +26,7 @@ export const ExpirationBanner: React.FC<Props> = ({ cohort }) => {
     setIsSyncing(true);
     setTimeout(() => {
       setIsSyncing(false);
-      setLastSync('Vừa xong');
+      setLastSync('Just now');
     }, 800);
   };
 
@@ -36,26 +35,25 @@ export const ExpirationBanner: React.FC<Props> = ({ cohort }) => {
       <div className="flex items-center gap-2">
         <AlertTriangle className="w-4 h-4 text-[#D97706] flex-shrink-0 animate-pulse" />
         <span>
-          <strong>Phiên thực hành cấp quyền tạm thời:</strong> Bạn thuộc lớp <strong>{cohort.name}</strong> ({cohort.id}). Thời gian sử dụng còn: <span className="font-bold underline">{timeLeft}</span>.
+          <strong>Temporary access session:</strong> You are enrolled in class <strong>{cohort.name}</strong> ({cohort.id}). Remaining access: <span className="font-bold underline">{timeLeft}</span>.
         </span>
       </div>
 
       <div className="flex items-center gap-3">
         <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-[#78350F]">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-          Google Sheet Roster: Đồng bộ {lastSync}
+          Google Sheet Roster: Synced {lastSync}
         </span>
         <button
           onClick={handleForceSync}
           disabled={isSyncing}
           className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#FDE68A] hover:bg-[#FCD34D] text-[#78350F] font-medium text-xs transition border border-[#F59E0B]/30"
-          title="Đồng bộ danh sách học viên tức thì từ Google Sheet"
+          title="Synchronize learner roster immediately from Google Sheet"
         >
           <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
-          {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ lại'}
+          {isSyncing ? 'Syncing...' : 'Sync Now'}
         </button>
       </div>
     </div>
   );
 };
-

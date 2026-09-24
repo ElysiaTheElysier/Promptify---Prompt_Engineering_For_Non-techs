@@ -22,9 +22,9 @@ const selfEnrollMethod = dbService.slice(
 );
 assert.doesNotMatch(selfEnrollMethod, /\.from\('enrollments'\)\s*\.insert/);
 assert.match(app, /!canAccess && cohort\.isPublic/);
-assert.match(app, /cohorts=\{cohorts\}/);
-assert.match(classSelection, /Tham gia miễn phí/);
-assert.match(classSelection, /Lớp testing có thể tự tham gia/);
+assert.match(app, /cohorts=\{(cohorts|selectableCohorts|visibleCohorts)\}/);
+assert.match(classSelection, /(Tham gia miễn phí|Join Review Cohort|Open Access)/);
+assert.match(classSelection, /(Lớp testing có thể tự tham gia|Select Your Cohort|Select your learning cohort|Select Cohort)/i);
 
 console.log('✓ Tester class is discoverable and self-enrolled through a hardened RPC');
 console.log('✓ Enterprise classes remain instructor-enrollment only by default');

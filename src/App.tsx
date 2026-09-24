@@ -29,6 +29,7 @@ import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 import { dbService } from './services/dbService';
 import { mapCurriculumToLabs } from './services/curriculumAdapter';
 import { buildLessonUrl, readLessonId, resolveAuthorizedLessonId } from './services/lessonUrlState';
+const reviewClassCode = import.meta.env.VITE_REVIEW_CLASS_CODE?.trim();
 
 const EMPTY_COHORT: ClassCohort = {
   id: '',
@@ -40,6 +41,34 @@ const EMPTY_COHORT: ClassCohort = {
   expiryDurationHours: 0,
   description: '',
   iconName: 'BookOpen',
+};
+
+const EMPTY_LAB: LabStep = {
+  id: '',
+  badge: '',
+  title: 'Loading...',
+  focusSkill: '',
+  scenario: '',
+  taskGoal: '',
+  baselinePrompt: '',
+  improvedPrompt: '',
+  hints: [],
+  focusComponents: [],
+  expectedOutputFormat: '',
+  sampleInputContext: '',
+  promptPlaceholder: '',
+  order: 1,
+  conceptTag: '',
+  conceptTitle: '',
+  conceptExplanation: '',
+  rubricCriteria: {
+    persona: '',
+    task: '',
+    guardrails: '',
+    format: '',
+  },
+  simulatedBaselineOutput: '',
+  simulatedImprovedOutput: '',
 };
 
 export const App: React.FC = () => {
@@ -80,7 +109,8 @@ export const App: React.FC = () => {
 
   // Curriculum thật từ database; giữ LABS_DATA làm fallback khi chưa triển khai
   // migration hoặc khóa học chưa có nội dung đã xuất bản.
-  const [labs, setLabs] = useState<LabStep[]>(LABS_DATA);
+  const [labs, setLabs] = useState<LabStep[]>([]);
+  const [curriculumError, setCurriculumError] = useState<string | null>(null);
   const [curriculumReadyKey, setCurriculumReadyKey] = useState<string | null>(null);
 
   // 5. Quản lý Tiến độ ghi danh (Enrollments)
@@ -159,12 +189,12 @@ export const App: React.FC = () => {
   // Ngữ cảnh học tập hiện tại để Bé Trợ Lý AI Cute đồng hành
   const [activeLab, setActiveLab] = useState<LabStep>(() => {
     const savedId = sessionStorage.getItem('promptify_active_lab_id') || 'lab-1';
-    return labs.find((l) => l.id === savedId) || labs[0];
+    return labs.find((l) => l.id === savedId) || labs[0] || EMPTY_LAB;
   });
   const [activePrompt, setActivePrompt] = useState<string>(() => {
     const savedId = sessionStorage.getItem('promptify_active_lab_id') || 'lab-1';
     const found = labs.find((l) => l.id === savedId) || labs[0];
-    return found.baselinePrompt;
+    return found ? found.baselinePrompt : '';
   });
   const [activeRunCount, setActiveRunCount] = useState<number>(0);
 
@@ -189,24 +219,32 @@ export const App: React.FC = () => {
 
     const loadCourseCurriculum = async () => {
       try {
+        setCurriculumError(null);
         const classDetails = await dbService.getClassDetail(selectedCohort.id);
         if (!classDetails) {
-          if (!cancelled) setLabs(LABS_DATA);
+          if (!cancelled) {
+            setLabs([]);
+            setCurriculumError('Class details could not be found in the database. Please verify your enrollment.');
+          }
           return;
         }
         const curriculum = await dbService.getCourseCurriculum(classDetails.course_id);
         const databaseLabs = mapCurriculumToLabs(curriculum);
         if (cancelled) return;
         if (databaseLabs.length === 0) {
-          setLabs(LABS_DATA);
+          setLabs([]);
+          setCurriculumError('No published curriculum found for this course in the database. Please run the English review database seed.');
           return;
         }
 
         setLabs(databaseLabs);
       } catch (error) {
         // Migration chưa được deploy hoặc phiên chưa có quyền: tiếp tục dùng static fallback.
-        console.warn('[App] Không thể tải curriculum từ database, dùng LABS_DATA fallback:', error);
-        if (!cancelled) setLabs(LABS_DATA);
+        console.error('[App] Failed to load curriculum from database:', error);
+        if (!cancelled) {
+          setLabs([]);
+          setCurriculumError('Database error loading curriculum: ' + ((error as any)?.message || 'Connection error') + '. Real Supabase data is required for English review.');
+        }
       } finally {
         if (!cancelled) setCurriculumReadyKey(readyKey);
       }
@@ -412,7 +450,18 @@ export const App: React.FC = () => {
       // 3. Quyền Learner: DO DB QUYẾT ĐỊNH (public.users.role)
       const activeViews = await dbService.getLearnerActiveEnrollments(dbUser.id);
       const savedClassId = sessionStorage.getItem('promptify_selected_class_id');
-      const activeView = activeViews.find((view) => view.classDetails.id === savedClassId) || activeViews[0];
+      let activeView: (typeof activeViews)[0] | undefined;
+      if (reviewClassCode) {
+        activeView = activeViews.find(
+          (view) => view.classDetails.class_code === reviewClassCode || view.classDetails.id === reviewClassCode
+        );
+        if (savedClassId && (!activeView || activeView.classDetails.id !== savedClassId)) {
+          sessionStorage.removeItem('promptify_selected_class_id');
+          localStorage.removeItem('promptify_cohort');
+        }
+      } else {
+        activeView = activeViews.find((view) => view.classDetails.id === savedClassId) || activeViews[0];
+      }
       if (activeView) {
         const learnerData: Learner = {
           id: activeView.learner.learner_code,
@@ -444,9 +493,10 @@ export const App: React.FC = () => {
           industry: activeView.classDetails.client?.industry || '',
           department: activeView.classDetails.department,
           expiryDurationHours: 8,
-          expiryDateText: 'Hết hạn lúc 18:00 hôm nay',
-          description: activeView.classDetails.course?.description || 'Chương trình chuẩn hóa kỹ năng Prompt Engineering cho cán bộ nghiệp vụ.',
-          iconName: 'Building2'
+          expiryDateText: reviewClassCode ? 'Access expires at 18:00 today' : 'Hết hạn lúc 18:00 hôm nay',
+          description: activeView.classDetails.course?.description || 'Executive Prompt Engineering Curriculum.',
+          iconName: activeView.classDetails.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
+          isPublic: activeView.classDetails.enrollment_mode === 'self_enroll',
         };
         setSelectedCohort(cohortData);
 
@@ -456,8 +506,8 @@ export const App: React.FC = () => {
           [enrollmentKey]: {
             learnerId: activeView.learner.learner_code,
             classId: activeView.classDetails.id,
-            completedLabIds: ['lab-1'],
-            currentLabId: 'lab-2',
+            completedLabIds: prev[enrollmentKey]?.completedLabIds || [],
+            currentLabId: prev[enrollmentKey]?.currentLabId || 'lab-1',
             enrolledAt: activeView.enrollment.joined_at || new Date().toISOString(),
             expiresAt: new Date(Date.now() + 8 * 3600 * 1000).toISOString()
           }
@@ -631,18 +681,41 @@ export const App: React.FC = () => {
       try {
         const dbClasses = await dbService.getClassesWithDetails();
         if (isMounted) {
-          const mappedCohorts: ClassCohort[] = dbClasses.map(c => ({
-            id: c.id,
-            classCode: c.class_code,
-            name: c.course?.title || c.class_code,
-            organization: c.client?.name || '',
-            industry: c.client?.industry || '',
-            department: c.department,
-            expiryDurationHours: 8,
-            expiryDateText: 'Hết hạn lúc 18:00 hôm nay',
-            description: c.course?.description || 'Chương trình đào tạo Prompt Engineering.',
-            iconName: c.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
-            isPublic: c.enrollment_mode === 'self_enroll'
+          const targetClasses = reviewClassCode
+            ? dbClasses.filter(c => c.class_code === reviewClassCode || c.id === reviewClassCode)
+            : dbClasses;
+
+          const courseCurriculumCache: Record<string, number> = {};
+          const mappedCohorts: ClassCohort[] = await Promise.all(targetClasses.map(async (c) => {
+            let totalLessons: number | undefined;
+            if (c.course_id) {
+              if (courseCurriculumCache[c.course_id] !== undefined) {
+                totalLessons = courseCurriculumCache[c.course_id];
+              } else {
+                try {
+                  const curriculum = await dbService.getCourseCurriculum(c.course_id);
+                  const courseLabs = mapCurriculumToLabs(curriculum);
+                  totalLessons = courseLabs.length;
+                  courseCurriculumCache[c.course_id] = totalLessons;
+                } catch {
+                  // Fallback
+                }
+              }
+            }
+            return {
+              id: c.id,
+              classCode: c.class_code,
+              name: c.course?.title || c.class_code,
+              organization: c.client?.name || '',
+              industry: c.client?.industry || '',
+              department: c.department,
+              expiryDurationHours: 8,
+              expiryDateText: reviewClassCode ? 'Access expires at 18:00 today' : 'Hết hạn lúc 18:00 hôm nay',
+              description: c.course?.description || 'Executive Prompt Engineering Curriculum.',
+              iconName: c.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
+              isPublic: c.enrollment_mode === 'self_enroll',
+              totalLessons,
+            };
           }));
           setCohorts(mappedCohorts);
         }
@@ -758,9 +831,24 @@ export const App: React.FC = () => {
     enrolledAt: new Date().toISOString(),
     expiresAt: new Date(Date.now() + 4 * 3600 * 1000).toISOString()
   };
-  const selectableCohorts = cohorts.filter((cohort) => (
+  const selectableCohorts = (reviewClassCode
+    ? cohorts.filter((cohort) => cohort.classCode === reviewClassCode || cohort.id === reviewClassCode)
+    : cohorts
+  ).filter((cohort) => (
     cohort.isPublic || enrolledClassIds.includes(cohort.id) || (hasActiveEnrollment && cohort.id === selectedCohort.id)
   ));
+
+  // Enforce review cohort when VITE_REVIEW_CLASS_CODE is set: reset any stale Vietnamese or other class
+  useEffect(() => {
+    if (reviewClassCode && cohorts.length > 0) {
+      const reviewCohort = cohorts.find((c) => c.classCode === reviewClassCode || c.id === reviewClassCode);
+      if (reviewCohort && selectedCohort.id && selectedCohort.id !== reviewCohort.id && selectedCohort.classCode !== reviewCohort.classCode) {
+        setSelectedCohort(reviewCohort);
+        sessionStorage.setItem('promptify_selected_class_id', reviewCohort.id);
+        localStorage.setItem('promptify_cohort', JSON.stringify(reviewCohort));
+      }
+    }
+  }, [cohorts, selectedCohort.id, selectedCohort.classCode]);
 
   const handleProductNavigate = (view: AppView) => {
     if (view === 'dashboard') {
@@ -777,7 +865,7 @@ export const App: React.FC = () => {
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white space-y-4 font-sans">
         <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
         <p className="text-xs text-slate-400 font-medium">
-          {isLoggingOutRef.current ? 'Đang đăng xuất an toàn...' : 'Đang xác thực và tải dữ liệu từ máy chủ...'}
+          {isLoggingOutRef.current ? 'Signing out securely...' : 'Authenticating and loading data from server...'}
         </p>
       </div>
     );
@@ -861,6 +949,37 @@ export const App: React.FC = () => {
 
       {/* Main Content Area based on currentView */}
       <main className="flex-1">
+        {curriculumError && (
+          <div className="max-w-4xl mx-auto my-8 p-6 bg-red-50 border border-red-200 rounded-xl text-red-900 shadow-sm">
+            <div className="flex items-start space-x-3">
+              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-base">!</span>
+              <div className="flex-1">
+                <h3 className="font-semibold text-base text-red-900">Database Curriculum Required</h3>
+                <p className="mt-1 text-sm text-red-700 leading-relaxed">{curriculumError}</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold tracking-wide transition shadow-sm"
+                  >
+                    Retry Loading
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('class_select')}
+                    className="px-4 py-2 bg-white border border-red-300 text-red-800 rounded-lg text-xs font-semibold hover:bg-red-50 transition"
+                  >
+                    Select Another Class
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {!curriculumError && !curriculumReadyKey && (
+          <div className="max-w-4xl mx-auto my-16 flex flex-col items-center justify-center space-y-4">
+            <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm text-slate-500 font-medium">Loading course curriculum from Supabase...</p>
+          </div>
+        )}
         {/* VIEW 1: LEARNER DASHBOARD (Trang chủ chính) */}
         {currentView === 'dashboard' && (
           <LearnerHome
@@ -949,21 +1068,21 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <p className="font-bold text-slate-700">
-              Promptify • Hệ thống Đào tạo & Thực hành Prompt Engineering
+              Promptify • Executive AI & Prompt Engineering Training
             </p>
             <p className="text-slate-600">
-              Khóa học: {selectedCohort.name}
+              Course: {selectedCohort.name}
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-[11px] text-slate-600">
-            <span className="text-emerald-700 font-medium">AI máy chủ (OpenAI)</span>
+            <span className="text-emerald-700 font-medium">Server AI Engine (Active)</span>
             <span>•</span>
             <button
               onClick={() => setCurrentView('history')}
               className="text-indigo-600 font-medium hover:underline cursor-pointer"
             >
-              Nhật ký thực hành ({history.length})
+              Practice History ({history.length})
             </button>
           </div>
         </div>
@@ -980,7 +1099,7 @@ export const App: React.FC = () => {
       <DiffCompareModal
         isOpen={activeCompareLab !== null}
         onClose={() => setActiveCompareLab(null)}
-        lab={activeCompareLab || labs[0]}
+        lab={activeCompareLab || activeLab || EMPTY_LAB}
       />
 
       <PromptLibraryModal

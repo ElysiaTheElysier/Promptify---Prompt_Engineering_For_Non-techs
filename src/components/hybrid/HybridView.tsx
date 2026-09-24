@@ -104,7 +104,7 @@ export const HybridView: React.FC<Props> = ({
 
   // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
   const [promptText, setPromptText] = useState<string>('');
-  const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp và không tự suy diễn dữ kiện.');
+  const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'You are a professional AI assistant. Only follow the user\'s explicit instructions and do not extrapolate ungrounded details.');
   const [output, setOutput] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [runStatus, setRunStatus] = useState<'idle' | 'generating' | 'evaluating' | 'error'>('idle');
@@ -153,21 +153,21 @@ export const HybridView: React.FC<Props> = ({
         : { taskCompletion: 1, groundedness: 1, formatAdherence: 1, constraintCompliance: 0, businessUsability: 1 },
       total: improved ? 10 : 4,
       strengths: improved
-        ? ['Prompt nêu rõ nhiệm vụ và định dạng đầu ra của bài.']
-        : ['Đã có yêu cầu ban đầu để AI phản hồi.'],
+        ? ['Prompt explicitly outlines the task objective and output format.']
+        : ['Basic request established for AI model response.'],
       improvements: improved
-        ? ['Có thể tiếp tục thử với dữ liệu mới cùng cấu trúc.']
-        : ['Bổ sung vai trò, dữ liệu, ràng buộc và định dạng đầu ra.'],
+        ? ['Ready to evaluate across varying edge cases using this structure.']
+        : ['Incorporate role, context data, constraints, and target output format.'],
       nextHint: improved
-        ? 'So sánh với lần đầu để nhận ra phần cấu trúc đã cải thiện.'
-        : 'Dùng các chip cấu trúc để làm prompt cụ thể hơn.',
+        ? 'Compare with your initial attempt to observe structural gains.'
+        : 'Use structure chips to make prompt requirements more concrete.',
     });
 
     const makeTutorialVersions = (): PromptVersion[] => {
-      const baselinePrompt = currentLab.baselinePrompt || `Hãy thực hiện nhiệm vụ: ${currentLab.taskGoal}`;
-      const improvedPrompt = currentLab.improvedPrompt || `NHIỆM VỤ: ${currentLab.taskGoal}\nĐỊNH DẠNG ĐẦU RA: ${currentLab.expectedOutputFormat}`;
-      const baselineOutput = currentLab.simulatedBaselineOutput || 'Đây là output minh họa ban đầu, còn thiếu cấu trúc và chi tiết.';
-      const improvedOutput = currentLab.simulatedImprovedOutput || `Output minh họa đã tuân thủ: ${currentLab.expectedOutputFormat}`;
+      const baselinePrompt = currentLab.baselinePrompt || `Execute task: ${currentLab.taskGoal}`;
+      const improvedPrompt = currentLab.improvedPrompt || `TASK: ${currentLab.taskGoal}\nOUTPUT FORMAT: ${currentLab.expectedOutputFormat}`;
+      const baselineOutput = currentLab.simulatedBaselineOutput || 'This is initial illustrative output before prompt structuring.';
+      const improvedOutput = currentLab.simulatedImprovedOutput || `Structured output adhering to: ${currentLab.expectedOutputFormat}`;
       return [
         {
           id: `tutorial-${currentLab.id}-1`,
@@ -176,7 +176,7 @@ export const HybridView: React.FC<Props> = ({
           promptText: baselinePrompt,
           systemInstruction: systemText,
           output: baselineOutput,
-          techniqueUsed: 'Lần thử minh họa',
+          techniqueUsed: 'Illustrative attempt',
           detectedChanges: detectPromptComponents(baselinePrompt),
           timestamp: 'Demo',
           businessEvaluation: evaluateBusinessMetrics(baselinePrompt, baselineOutput, currentLab.sampleInputContext),
@@ -235,7 +235,7 @@ export const HybridView: React.FC<Props> = ({
       }
 
       const demoPrompt = currentLab.starterPrompt
-        || `NHIỆM VỤ: ${currentLab.taskGoal}\nĐỊNH DẠNG ĐẦU RA: ${currentLab.expectedOutputFormat}`;
+        || `TASK: ${currentLab.taskGoal}\nOUTPUT FORMAT: ${currentLab.expectedOutputFormat}`;
 
       if (detail.demoAction === 'show-prompt' || detail.demoAction === 'show-run') {
         if (!promptText.trim()) setPromptText(demoPrompt);
@@ -247,7 +247,7 @@ export const HybridView: React.FC<Props> = ({
         const evaluation = makeTutorialEvaluation(false);
         const mockPrompt = promptText.trim() ? promptText : demoPrompt;
         setPromptText(mockPrompt);
-        setOutput(currentLab.simulatedBaselineOutput || 'Output minh họa của AI sẽ xuất hiện tại đây sau khi chạy prompt.');
+        setOutput(currentLab.simulatedBaselineOutput || 'AI model output will appear here after executing your prompt.');
         setAiEvaluation(evaluation);
         setLastEvaluatedPrompt(mockPrompt);
         setScoreResult(mapAiEvaluationToRubricAudit(evaluation));
@@ -309,7 +309,7 @@ export const HybridView: React.FC<Props> = ({
     try {
       localStorage.setItem('promptify_lab_assistance', JSON.stringify(assistanceByLab));
     } catch (e) {
-      console.warn('[HybridView] Không thể lưu trạng thái trợ giúp vào localStorage:', e);
+      console.warn('[HybridView] Failed to save assistance state to localStorage:', e);
     }
   }, [assistanceByLab]);
 
@@ -444,7 +444,7 @@ export const HybridView: React.FC<Props> = ({
   // Đồng bộ khi chuyển bài lab
   useEffect(() => {
     setPromptText('');
-    setSystemText(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp và không tự suy diễn dữ kiện.');
+    setSystemText(currentLab.systemInstruction || 'You are a professional AI assistant. Only follow the user\'s explicit instructions and do not extrapolate ungrounded details.');
     setOutput('');
     setScoreResult(null);
     setAiEvaluation(null);
@@ -479,7 +479,7 @@ export const HybridView: React.FC<Props> = ({
               try {
                 storedEvaluation = validateAiEvaluationPayload(attempt.evaluation_json);
               } catch (error) {
-                console.warn('[HybridView] Bỏ qua evaluation_json không đúng contract:', error);
+                console.warn('[HybridView] Ignoring evaluation_json not matching contract:', error);
               }
             }
             return {
@@ -516,7 +516,7 @@ export const HybridView: React.FC<Props> = ({
           setScoreResult(null);
         })
         .catch(err => {
-          console.warn('[HybridView] Lỗi tải prompt_attempts:', err);
+          console.warn('[HybridView] Error loading prompt_attempts:', err);
         });
     }
     return () => { isMounted = false; };
@@ -531,7 +531,7 @@ export const HybridView: React.FC<Props> = ({
 
   const handleRun = async () => {
     if (!promptText.trim()) {
-      setErrorMessage('Vui lòng nhập câu lệnh prompt trước khi nhấn Chạy.');
+      setErrorMessage('Please enter a prompt before running.');
       return;
     }
 
@@ -587,7 +587,7 @@ export const HybridView: React.FC<Props> = ({
         console.warn('[HybridView] AI Judge evaluation failed:', judgeErr);
         evalResult = null;
         setEvaluationError(
-          judgeErr?.message || 'Không thể đánh giá lúc này. Máy chủ AI chấm điểm phản hồi chậm hoặc tạm thời gián đoạn.'
+          judgeErr?.message || 'Unable to evaluate at this time. The AI Judge service timed out or was temporarily interrupted.'
         );
       }
 
@@ -612,7 +612,7 @@ export const HybridView: React.FC<Props> = ({
 
       onRecordRun({
         id: `run-${Date.now()}`,
-        timestamp: new Date().toLocaleTimeString('vi-VN'),
+        timestamp: new Date().toLocaleTimeString('en-US'),
         labId: currentLab.id,
         promptText,
         systemInstruction: systemText,
@@ -649,7 +649,7 @@ export const HybridView: React.FC<Props> = ({
             setCurrentAttemptId(recorded.id);
           }
         } catch (dbErr) {
-          console.warn('[HybridView] Lỗi lưu attempt vào DB:', dbErr);
+          console.warn('[HybridView] Error saving attempt to DB:', dbErr);
         }
       }
 
@@ -678,7 +678,7 @@ export const HybridView: React.FC<Props> = ({
       setSelectedVersionNumber(newVerNum);
     } catch (err: any) {
       console.error(err);
-      setErrorMessage(err.message || 'Đã xảy ra lỗi khi thực thi câu lệnh. Vui lòng thử lại.');
+      setErrorMessage(err.message || 'An error occurred while executing the prompt. Please try again.');
       setOutput('');
     } finally {
       setIsRunning(false);
@@ -699,7 +699,7 @@ export const HybridView: React.FC<Props> = ({
     const targetAttemptId = activeVer?.id || currentAttemptId;
 
     if (!targetPrompt.trim() || !targetOutput.trim()) {
-      setEvaluationError('Không tìm thấy nội dung câu lệnh hoặc kết quả để đánh giá lại.');
+      setEvaluationError('No prompt text or output available for re-evaluation.');
       return;
     }
 
@@ -745,7 +745,7 @@ export const HybridView: React.FC<Props> = ({
         try {
           await dbService.updatePromptAttemptEvaluation(targetAttemptId, evalResult);
         } catch (dbErr) {
-          console.warn('[HybridView] Lỗi cập nhật re-evaluation vào DB:', dbErr);
+          console.warn('[HybridView] Error updating re-evaluation in DB:', dbErr);
         }
       }
 
@@ -757,7 +757,7 @@ export const HybridView: React.FC<Props> = ({
       }
     } catch (err: any) {
       console.warn('[HybridView] Retry evaluation failed:', err);
-      setEvaluationError(err?.message || 'Không thể đánh giá lúc này. Vui lòng thử lại sau giây lát.');
+      setEvaluationError(err?.message || 'Unable to evaluate at this time. Please try again shortly.');
       setAiEvaluation(null);
       setScoreResult(null);
     } finally {
@@ -809,10 +809,10 @@ export const HybridView: React.FC<Props> = ({
 
   // Tên bước tiến trình
   const stepLabel = currentStep === 1 
-    ? 'Bước 1 / 3: Thử nghiệm ban đầu' 
+    ? 'Step 1 / 3: Initial Draft' 
     : currentStep === 2 
-    ? 'Bước 2 / 3: Cải tiến cấu trúc' 
-    : 'Bước 3 / 3: Hoàn thành đạt chuẩn';
+    ? 'Step 2 / 3: Structural Refinement' 
+    : 'Step 3 / 3: Mastered & Validated';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
@@ -837,7 +837,7 @@ export const HybridView: React.FC<Props> = ({
               >
                 {labs.map((lab, index) => (
                   <option key={lab.id} value={index}>
-                    Bài {lab.order} / {labs.length}: {lab.badge}
+                    Lesson {lab.order} / {labs.length}: {lab.badge}
                   </option>
                 ))}
               </select>
@@ -855,7 +855,7 @@ export const HybridView: React.FC<Props> = ({
             {(currentStep === 3 || (scoreResult && scoreResult.totalScore >= 75)) && (
               <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 animate-fadeIn">
                 <Check className="w-3 h-3 text-emerald-600" />
-                <span>Đã hoàn thành</span>
+                <span>Completed</span>
               </span>
             )}
           </div>
@@ -867,10 +867,10 @@ export const HybridView: React.FC<Props> = ({
                 type="button"
                 onClick={onOpenTutorial}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200 transition"
-                title="Xem lại quy trình làm bài (Guided Walkthrough)"
+                title="Review lab walkthrough (Guided Walkthrough)"
               >
                 <Compass className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Xem lại hướng dẫn</span>
+                <span>View Guide</span>
               </button>
             )}
 
@@ -880,7 +880,7 @@ export const HybridView: React.FC<Props> = ({
                 onClick={handleNextStepOrLab}
                 className="flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm animate-fadeIn"
               >
-                <span>{currentStep === 1 ? 'Tiếp tục bước 2' : currentLabIndex < labs.length - 1 ? 'Sang bài tiếp theo' : 'Đã hoàn thành'}</span>
+                <span>{currentStep === 1 ? 'Proceed to Step 2' : currentLabIndex < labs.length - 1 ? 'Next Lesson' : 'Completed'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -940,7 +940,7 @@ export const HybridView: React.FC<Props> = ({
                   setAiEvaluation(null);
                   setLastEvaluatedPrompt(null);
                   setScoreResult(null);
-                  setEvaluationError('Lần thử này chưa có kết quả đánh giá AI.');
+                  setEvaluationError('This attempt does not have an AI evaluation.');
                 }
               }
             }}
@@ -981,10 +981,10 @@ export const HybridView: React.FC<Props> = ({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold text-slate-900">
-                      Kết quả từ AI
+                      AI Generated Output
                     </h3>
                     <span className="text-xs text-slate-500 font-medium">
-                      (Lần thử {selectedVersionNumber > 0 ? selectedVersionNumber : currentLabRunCount})
+                      (Attempt {selectedVersionNumber > 0 ? selectedVersionNumber : currentLabRunCount})
                     </span>
 
                     {/* Nút lưu nhanh version này vào thư viện Prompt */}
@@ -999,10 +999,10 @@ export const HybridView: React.FC<Props> = ({
                           }
                         }}
                         className="text-[11px] font-semibold text-amber-900 hover:text-amber-950 bg-amber-50 hover:bg-amber-100 px-2.5 py-0.5 rounded-lg border border-amber-300 transition flex items-center gap-1 shadow-2xs"
-                        title="Lưu phiên bản này thành Prompt chuẩn (SOP)"
+                        title="Save this version to Prompt Library (SOP)"
                       >
                         <BookmarkPlus className="w-3 h-3 text-amber-600" />
-                        <span>Lưu vào Thư viện</span>
+                        <span>Save to Library</span>
                       </button>
                     )}
                   </div>
@@ -1013,7 +1013,7 @@ export const HybridView: React.FC<Props> = ({
                       className="text-xs text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 transition"
                     >
                       {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{isCopied ? 'Đã sao chép' : 'Sao chép kết quả'}</span>
+                      <span>{isCopied ? 'Copied' : 'Copy Output'}</span>
                     </button>
                   )}
                 </div>
@@ -1023,7 +1023,7 @@ export const HybridView: React.FC<Props> = ({
                     <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-2 animate-fadeIn">
                       <div className="font-semibold flex items-center gap-1.5 text-rose-900 text-sm">
                         <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                        <span>Không thể kết nối dịch vụ AI</span>
+                        <span>Unable to connect to AI service</span>
                       </div>
                       <p className="text-rose-700 leading-relaxed">{errorMessage}</p>
                       {onOpenApiModal && (
@@ -1034,7 +1034,7 @@ export const HybridView: React.FC<Props> = ({
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-300 rounded-lg text-xs font-semibold text-rose-800 hover:bg-rose-100 transition shadow-2xs"
                           >
                             <Settings2 className="w-3.5 h-3.5" />
-                            Cập nhật API Key trong Cài đặt
+                            Update API Configuration in Settings
                           </button>
                         </div>
                       )}
@@ -1042,7 +1042,7 @@ export const HybridView: React.FC<Props> = ({
                   ) : runStatus === 'generating' && !output ? (
                     <div className="flex items-center gap-2 text-slate-500 py-6">
                       <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                      <span>Đang nhận phản hồi từ mô hình...</span>
+                      <span>Receiving response from AI model...</span>
                     </div>
                   ) : (selectedVersionNumber > 0 ? currentLabVersions.find(v => v.versionNumber === selectedVersionNumber)?.output : output) ? (
                     <div className="text-xs sm:text-sm leading-relaxed">
@@ -1054,7 +1054,7 @@ export const HybridView: React.FC<Props> = ({
                     </div>
                   ) : (
                     <div className="text-slate-400 py-4 text-xs">
-                      Chưa có kết quả phản hồi.
+                      No response output received yet.
                     </div>
                   )}
                 </div>
@@ -1066,13 +1066,13 @@ export const HybridView: React.FC<Props> = ({
                       onClick={() => setShowTechDetails(!showTechDetails)}
                       className="text-[11px] text-slate-400 hover:text-slate-600 flex items-center gap-1 transition"
                     >
-                      <span>Chi tiết kỹ thuật</span>
+                      <span>Technical Details</span>
                       {showTechDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                     </button>
 
                     {showTechDetails && (
                       <span className="text-[11px] font-mono text-slate-500">
-                        {metrics.latency}ms · {metrics.tokens} tokens · {metrics.mode === 'simulated' ? 'Mô phỏng' : 'Gemini'}
+                        {metrics.latency}ms · {metrics.tokens} tokens · {metrics.mode === 'simulated' ? 'Simulated' : 'Live LLM'}
                       </span>
                     )}
                   </div>
@@ -1085,8 +1085,8 @@ export const HybridView: React.FC<Props> = ({
                   <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin shrink-0" />
                   <span className="font-semibold">
                     {isRetryingEvaluation 
-                      ? 'Đang kết nối lại AI Judge để chấm điểm câu lệnh...' 
-                      : 'AI đang phân tích và chấm điểm câu lệnh theo 5 tiêu chí Rubric...'}
+                      ? 'Reconnecting to AI Judge to evaluate prompt...' 
+                      : 'AI is analyzing and scoring prompt against 5 rubric dimensions...'}
                   </span>
                 </div>
               )}
@@ -1114,28 +1114,28 @@ export const HybridView: React.FC<Props> = ({
                             <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
                             <div className="space-y-1">
                               <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wide">
-                                Thẻ Đỏ: Rò rỉ Thông Tin PII Thật (Vi Phạm Nghị Định 13/2023/NĐ-CP)
+                                Red Card: Real PII Leaked (Data Privacy Violation)
                               </h4>
                               <p className="text-xs text-rose-800 leading-relaxed">
-                                Phát hiện {piiCheck.piiItems.length} thông tin định danh cá nhân thật chưa qua Bút xóa PII: {' '}
+                                Detected {piiCheck.piiItems.length} unredacted PII entities: {' '}
                                 <span className="font-semibold text-rose-950 font-mono">
                                   {piiCheck.piiItems.map(i => `${i.label} "${i.value}"`).join(', ')}
-                                </span>. Hãy khử định danh trước khi tiếp tục sử dụng dữ liệu này với AI.
+                                </span>. Please sanitize personal data before using with AI.
                               </p>
                             </div>
                           </div>
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-rose-200">
                             <span className="text-[11px] font-semibold text-rose-700">
-                              Áp dụng ngay Bút xóa PII để thay thế bằng biến giữ chỗ an toàn:
+                              Apply PII Redactor to replace sensitive data with safe placeholders:
                             </span>
                             <button
                               type="button"
                               onClick={handleAutoSanitizePii}
                               className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition cursor-pointer"
-                              title="Tự động thay thế CCCD, SĐT, STK bằng biến {{BIẾN}}"
+                              title="Automatically replace sensitive IDs, phone numbers, and bank accounts with {{PLACEHOLDER}}"
                             >
                               <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-                              <span>Tự động Bút xóa PII 1-chạm</span>
+                              <span>1-Click Auto Redact PII</span>
                             </button>
                           </div>
                         </div>
@@ -1145,7 +1145,7 @@ export const HybridView: React.FC<Props> = ({
                         <div className="flex items-center gap-2">
                           <Award className="w-4 h-4 text-emerald-600" />
                           <span className="text-xs font-bold text-slate-800">
-                            AI Feedback & Đánh giá Rubric:
+                            AI Feedback & Rubric Evaluation:
                           </span>
                           <span className={`px-2.5 py-0.5 rounded-full font-bold text-xs ${
                             activeAiEval.total >= 8 
@@ -1154,7 +1154,7 @@ export const HybridView: React.FC<Props> = ({
                               ? 'bg-amber-100 text-amber-800' 
                               : 'bg-rose-100 text-rose-800'
                           }`}>
-                            {activeAiEval.total} / 10 điểm
+                            {activeAiEval.total} / 10 pts
                           </span>
                         </div>
 
@@ -1164,7 +1164,7 @@ export const HybridView: React.FC<Props> = ({
                             onClick={() => setShowScoreBreakdown(!showScoreBreakdown)}
                             className="text-xs text-slate-500 hover:text-slate-800 font-medium transition cursor-pointer"
                           >
-                            {showScoreBreakdown ? 'Thu gọn' : 'Xem chi tiết'}
+                            {showScoreBreakdown ? 'Collapse' : 'View details'}
                           </button>
                         </div>
                       </div>
@@ -1172,11 +1172,11 @@ export const HybridView: React.FC<Props> = ({
                       {/* 5 tiêu chí Rubric chi tiết (Thang điểm 10 chuẩn mực) */}
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
                         {[
-                          { label: 'Hoàn thành nhiệm vụ', score: activeAiEval.scores.taskCompletion },
-                          { label: 'Độ chuẩn xác / Căn cứ', score: activeAiEval.scores.groundedness },
-                          { label: 'Tuân thủ cấu trúc', score: activeAiEval.scores.formatAdherence },
-                          { label: 'Tuân thủ ràng buộc', score: activeAiEval.scores.constraintCompliance },
-                          { label: 'Tính ứng dụng thực tế', score: activeAiEval.scores.businessUsability },
+                          { label: 'Task Completion', score: activeAiEval.scores.taskCompletion },
+                          { label: 'Groundedness / Accuracy', score: activeAiEval.scores.groundedness },
+                          { label: 'Format Adherence', score: activeAiEval.scores.formatAdherence },
+                          { label: 'Constraint Compliance', score: activeAiEval.scores.constraintCompliance },
+                          { label: 'Business Usability', score: activeAiEval.scores.businessUsability },
                         ].map((item, idx) => {
                           const score10 = item.score * 5; // Quy đổi thang điểm 10 chuẩn mực
                           const isPassed = score10 >= 8;
@@ -1196,7 +1196,7 @@ export const HybridView: React.FC<Props> = ({
                                       ? 'bg-amber-100 text-amber-800' 
                                       : 'bg-rose-100 text-rose-800'
                                   }`}>
-                                    {isPassed ? 'Đạt chuẩn' : isPartial ? 'Cần sửa' : 'Chưa đạt'}
+                                    {isPassed ? 'Exemplary' : isPartial ? 'Needs Work' : 'Incomplete'}
                                   </span>
                                 </div>
                               </div>
@@ -1220,7 +1220,7 @@ export const HybridView: React.FC<Props> = ({
                           {activeAiEval.strengths && activeAiEval.strengths.length > 0 && (
                             <div>
                               <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1 mb-1">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Điểm làm tốt:
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Key Strengths:
                               </span>
                               <ul className="text-slate-600 pl-4 list-disc space-y-0.5">
                                 {activeAiEval.strengths.map((s: string, idx: number) => (
@@ -1233,7 +1233,7 @@ export const HybridView: React.FC<Props> = ({
                           {activeAiEval.improvements && activeAiEval.improvements.length > 0 && (
                             <div>
                               <span className="text-[11px] font-semibold text-amber-700 flex items-center gap-1 mb-1">
-                                <TrendingUp className="w-3.5 h-3.5 text-amber-600" /> Cần cải thiện:
+                                <TrendingUp className="w-3.5 h-3.5 text-amber-600" /> Areas for Improvement:
                               </span>
                               <ul className="text-slate-600 pl-4 list-disc space-y-0.5">
                                 {activeAiEval.improvements.map((s: string, idx: number) => (
@@ -1250,7 +1250,7 @@ export const HybridView: React.FC<Props> = ({
                         <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-800 flex items-start gap-2">
                           <Lightbulb className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                           <div>
-                            <span className="font-semibold block mb-0.5">Gợi ý cho lần thử tiếp theo:</span>
+                            <span className="font-semibold block mb-0.5">Next Step Recommendation:</span>
                             <span>{activeAiEval.nextHint}</span>
                           </div>
                         </div>
@@ -1262,7 +1262,7 @@ export const HybridView: React.FC<Props> = ({
                           onClick={handleNextStepOrLab}
                           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition"
                         >
-                          <span>{currentStep === 1 ? 'Chuyển sang Bước 2 (Cải tiến prompt)' : currentLabIndex < labs.length - 1 ? 'Sang bài tiếp theo' : 'Hoàn thành khóa học'}</span>
+                          <span>{currentStep === 1 ? 'Proceed to Step 2 (Refine Prompt)' : currentLabIndex < labs.length - 1 ? 'Next Lesson' : 'Complete Course'}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -1279,13 +1279,13 @@ export const HybridView: React.FC<Props> = ({
                           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                           <div>
                             <h4 className="text-xs font-bold text-amber-900">
-                              AI chưa thể đánh giá lần này.
+                              AI evaluation unavailable at this moment.
                             </h4>
                             <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                              {evaluationError || 'Hệ thống AI Judge chưa thể hoàn tất chấm điểm cho câu lệnh này do kết nối bị gián đoạn.'}
+                              {evaluationError || 'The AI Judge was unable to complete the rubric evaluation due to a network interruption.'}
                             </p>
                             <p className="text-[11px] text-amber-700/80 mt-1">
-                              Kết quả sinh văn bản từ AI ở trên vẫn được lưu trữ nguyên vẹn. Bạn có thể bấm nút bên cạnh để thử đánh giá lại mà không cần chạy lại toàn bộ mô hình.
+                              The generated output above is safely preserved. You can click retry to evaluate without re-running the model.
                             </p>
                           </div>
                         </div>
@@ -1296,7 +1296,7 @@ export const HybridView: React.FC<Props> = ({
                           className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:bg-slate-200 text-white font-bold text-xs shadow-xs transition"
                         >
                           <RotateCcw className={`w-3.5 h-3.5 ${isRetryingEvaluation ? 'animate-spin' : ''}`} />
-                          <span>Thử chấm lại</span>
+                          <span>Retry Evaluation</span>
                         </button>
                       </div>
                     </div>

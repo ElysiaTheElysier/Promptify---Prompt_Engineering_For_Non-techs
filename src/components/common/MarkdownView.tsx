@@ -54,7 +54,7 @@ function sanitizeLatexAndSymbols(text: string): string {
 
 export const MarkdownView: React.FC<Props> = ({ content, className = '', size = 'xs' }) => {
   if (!content) {
-    return <div className="text-slate-400 italic text-xs">Chưa có nội dung.</div>;
+    return <div className="text-slate-400 italic text-xs">No content available.</div>;
   }
 
   const sanitizedContent = sanitizeLatexAndSymbols(content);

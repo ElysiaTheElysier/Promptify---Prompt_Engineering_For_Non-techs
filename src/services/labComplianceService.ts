@@ -116,12 +116,16 @@ export function detectPiiEntities(text: string): PiiDetectionResult {
     idx === self.findIndex(t => t.value === item.value)
   );
 
+  const isReviewMode = typeof window !== 'undefined' && Boolean(import.meta.env.VITE_REVIEW_CLASS_CODE);
+
   return {
     hasPii: uniqueItems.length > 0,
     piiItems: uniqueItems,
     summary: uniqueItems.length > 0 
-      ? `Phát hiện ${uniqueItems.length} thông tin định danh cá nhân (PII): ${uniqueItems.map(i => `${i.label} "${i.value}"`).join(', ')}`
-      : 'Dữ liệu sạch, không phát hiện PII định danh thật.'
+      ? (isReviewMode 
+          ? `Detected ${uniqueItems.length} personally identifiable information (PII) entity: ${uniqueItems.map(i => `${i.label} "${i.value}"`).join(', ')}`
+          : `Phát hiện ${uniqueItems.length} thông tin định danh cá nhân (PII): ${uniqueItems.map(i => `${i.label} "${i.value}"`).join(', ')}`)
+      : (isReviewMode ? 'Clean data. No real PII detected.' : 'Dữ liệu sạch, không phát hiện PII định danh thật.')
   };
 }
 
@@ -307,32 +311,34 @@ export function getTabnineContextualSuggestion(
     };
   }
 
+  const isReviewMode = typeof window !== 'undefined' && Boolean(import.meta.env.VITE_REVIEW_CLASS_CODE);
+
   // C. Gợi ý Nhiệm vụ (Task)
-  if (trimmedLine === 'nhiệm vụ:' || trimmedLine === 'nhiệm vụ' || trimmedLine === 'hãy:' || trimmedLine === 'yêu cầu:') {
+  if (trimmedLine === 'nhiệm vụ:' || trimmedLine === 'nhiệm vụ' || trimmedLine === 'hãy:' || trimmedLine === 'yêu cầu:' || trimmedLine === 'task:' || trimmedLine === 'task' || trimmedLine === 'goal:') {
     return {
       triggerPrefix: currentLine,
-      suggestionText: ` ${lab.taskGoal || 'Thực hiện đúng nhiệm vụ được mô tả trong bài.'}`,
-      displayLabel: `Nhiệm vụ của ${lab.title || 'bài hiện tại'}`,
+      suggestionText: ` ${lab.taskGoal || (isReviewMode ? 'Execute task according to specified instructions.' : 'Thực hiện đúng nhiệm vụ được mô tả trong bài.')}`,
+      displayLabel: isReviewMode ? `Task: ${lab.title || 'current lesson'}` : `Nhiệm vụ của ${lab.title || 'bài hiện tại'}`,
       category: 'task'
     };
   }
 
   // D. Gợi ý Định dạng (Format)
-  if (trimmedLine === 'định dạng đầu ra:' || trimmedLine === 'định dạng:' || trimmedLine === 'khuôn mẫu:' || trimmedLine === 'đầu ra:') {
+  if (trimmedLine === 'định dạng đầu ra:' || trimmedLine === 'định dạng:' || trimmedLine === 'khuôn mẫu:' || trimmedLine === 'đầu ra:' || trimmedLine === 'format:' || trimmedLine === 'output format:' || trimmedLine === 'structure:') {
     return {
       triggerPrefix: currentLine,
-      suggestionText: ` ${lab.expectedOutputFormat || 'Trình bày kết quả ngắn gọn, rõ ràng.'}`,
-      displayLabel: 'Định dạng đầu ra của bài hiện tại',
+      suggestionText: ` ${lab.expectedOutputFormat || (isReviewMode ? 'Clear, concise, and structured output.' : 'Trình bày kết quả ngắn gọn, rõ ràng.')}`,
+      displayLabel: isReviewMode ? 'Expected Output Format' : 'Định dạng đầu ra của bài hiện tại',
       category: 'format'
     };
   }
 
   // E. Gợi ý Bằng chứng (Grounding / Dữ liệu đã làm sạch)
-  if (trimmedLine.includes('[dán dữ liệu') || trimmedLine === 'bối cảnh:' || trimmedLine === 'dữ liệu:') {
+  if (trimmedLine.includes('[dán dữ liệu') || trimmedLine === 'bối cảnh:' || trimmedLine === 'dữ liệu:' || trimmedLine === 'context:' || trimmedLine === 'data:' || trimmedLine === 'source:') {
     return {
       triggerPrefix: currentLine,
-      suggestionText: `\n${lab.sampleInputContext || lab.scenario || '[Dán dữ liệu đầu vào của bài tại đây]'}`,
-      displayLabel: 'Dữ liệu đầu vào của bài hiện tại',
+      suggestionText: `\n${lab.sampleInputContext || lab.scenario || (isReviewMode ? '[Paste source data here]' : '[Dán dữ liệu đầu vào của bài tại đây]')}`,
+      displayLabel: isReviewMode ? 'Source Context Data' : 'Dữ liệu đầu vào của bài hiện tại',
       category: 'grounding'
     };
   }

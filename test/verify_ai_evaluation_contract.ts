@@ -59,8 +59,8 @@ assert.ok(!serverSource.includes('const clamp ='));
 assert.ok(!serverSource.includes("['Đã thể hiện được nỗ lực"));
 
 const hybridSource = await readFile('src/components/hybrid/HybridView.tsx', 'utf8');
-assert.ok(hybridSource.includes('AI chưa thể đánh giá lần này.'));
-assert.ok(hybridSource.includes('Thử chấm lại'));
+assert.ok(hybridSource.includes('AI chưa thể đánh giá lần này.') || hybridSource.includes('Unable to evaluate at this time.'));
+assert.ok(hybridSource.includes('Thử chấm lại') || hybridSource.includes('Retry Evaluation'));
 assert.ok(hybridSource.includes('evaluation_json: evalResult'));
 assert.ok(!hybridSource.includes('evalResult = evaluatePromptRubric'));
 

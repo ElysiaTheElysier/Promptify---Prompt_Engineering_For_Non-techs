@@ -49,7 +49,7 @@ export const NotebookCoach: React.FC<Props> = ({
       case 3: return 'One-shot';
       case 4: return 'Few-shot';
       case 5: return 'Grounding';
-      default: return `Bài ${order}`;
+      default: return `Lesson ${order}`;
     }
   };
 
@@ -59,17 +59,17 @@ export const NotebookCoach: React.FC<Props> = ({
   const getInitialCoachQuestion = (order: number): string => {
     switch (order) {
       case 1:
-        return 'Chào bạn! Ở bước Zero-shot này, bạn thử quan sát xem: Bạn đã nói rõ AI cần làm nhiệm vụ gì và trả về định dạng nào chưa?';
+        return 'Hello! In this Zero-shot step, check: Did you clearly define the task for the AI and specify the target format?';
       case 2:
-        return 'Chào bạn! Ở bước Structured Prompt, hãy kiểm tra lại câu lệnh của bạn có đủ 5 thành phần: Role (vai trò), Context (ngữ cảnh), Task (nhiệm vụ), Constraint (ràng buộc) và Output Format (định dạng) chưa?';
+        return 'Hello! In this Structured Prompt step, make sure your prompt includes the 5 core elements: Role, Context, Task, Constraints, and Output Format.';
       case 3:
-        return 'Chào bạn! One-shot nghĩa là dạy AI qua 1 ví dụ mẫu chuẩn. Ví dụ bạn cung cấp có thực sự đại diện cho cấu trúc output mong muốn không?';
+        return 'Hello! One-shot means teaching AI with 1 standard example. Does your sample accurately represent the target table structure?';
       case 4:
-        return 'Chào bạn! Ở bước Few-shot, các ví dụ mẫu bạn đưa ra có đủ đa dạng để bao quát các tình huống thường gặp của khách hàng không?';
+        return 'Hello! In this Few-shot step, are your examples diverse enough to cover all common customer situations?';
       case 5:
-        return 'Chào bạn! Bước Grounding yêu cầu AI trả lời bám sát sự thật. Bạn hãy tự hỏi: Kết luận này dựa trên tài liệu nào? Có bằng chứng (evidence) cụ thể trong văn bản chưa?';
+        return 'Hello! Grounding requires AI to stick strictly to facts. Ask yourself: Is this conclusion directly backed by evidence in the document?';
       default:
-        return `Chào bạn! Tôi đang đồng hành cùng bạn ở ${stageName}. Bạn cần tôi hỗ trợ góc nhìn nào?`;
+        return `Hello! I am here to assist you with ${stageName}. What would you like feedback on?`;
     }
   };
 
@@ -79,7 +79,7 @@ export const NotebookCoach: React.FC<Props> = ({
       id: `welcome-${activeLab.id}-${Date.now()}`,
       sender: 'coach',
       text: getInitialCoachQuestion(activeLab.order),
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
     setMessages([welcomeMsg]);
   }, [activeLab.id]);
@@ -97,24 +97,24 @@ export const NotebookCoach: React.FC<Props> = ({
     const userMsg: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      text: 'Gợi ý cho bước này',
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      text: 'Hint for this step',
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     let replyText = '';
     if (runCount === 0) {
-      replyText = `💡 Gợi ý nhỏ trước khi bạn chạy thử:\n\n• ${activeLab.hints[0] || 'Hãy bắt đầu bằng việc đặt vai trò cho AI.'}\n• ${activeLab.hints[1] || 'Quy định rõ định dạng bạn muốn nhận được.'}\n\n👉 Bạn cứ thử viết theo cách hiểu tự nhiên nhất rồi bấm "Chạy prompt" nhé, đừng sợ sai!`;
+      replyText = `💡 Quick hints before running test:\n\n• Start by setting a professional role for the AI.\n• Specify the exact format you want to receive.\n\n👉 Feel free to write naturally and click "Run Prompt"!`;
     } else {
-      replyText = `💡 Gợi ý nâng cấp cho ${stageName}:\n\n` + 
+      replyText = `💡 Upgrade hints for ${stageName}:\n\n` + 
         activeLab.hints.map((h, i) => `${i + 1}. ${h}`).join('\n') +
-        `\n\nBạn có muốn tôi hỗ trợ kiểm tra xem prompt hiện tại của bạn đã đáp ứng các ý này chưa?`;
+        `\n\nWould you like me to check if your current prompt meets these requirements?`;
     }
 
     const coachMsg: Message = {
       id: `coach-${Date.now() + 1}`,
       sender: 'coach',
       text: replyText,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMsg, coachMsg]);
@@ -125,26 +125,26 @@ export const NotebookCoach: React.FC<Props> = ({
     const userMsg: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      text: 'Giải thích concept bài này',
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      text: 'Explain lesson concept',
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     let explanation = '';
     switch (activeLab.order) {
       case 1:
-        explanation = '📖 Zero-shot (Không có ví dụ mẫu):\nLà khi bạn yêu cầu AI làm việc ngay mà không đưa ra ví dụ nào trước. Nếu câu lệnh quá ngắn, AI sẽ tự phỏng đoán văn phong và thường trả lời chung chung, dài dòng, khó xuất ra báo cáo.';
+        explanation = '📖 Zero-shot (No Examples):\nPrompting the AI without prior examples. If instructions are too brief, AI guesses the tone and yields generic, conversational prose.';
         break;
       case 2:
-        explanation = '📖 Structured Prompt (Cấu trúc hóa câu lệnh):\nThay vì nói vu vơ, bạn đóng khung câu lệnh thành 5 phần: Vai trò (Ai làm?) - Ngữ cảnh (Ở đâu?) - Nhiệm vụ (Làm gì?) - Ràng buộc (Không được làm gì?) - Định dạng (Bảng hay danh sách?). Giúp AI trả lời trúng đích ngay lần đầu.';
+        explanation = '📖 Structured Prompt Framework:\nFrame your prompt with 5 parts: Role, Context, Task, Constraints, and Output Format. Guides AI directly to target on the first run.';
         break;
       case 3:
-        explanation = '📖 One-shot Prompting (Dạy bằng 1 ví dụ):\nBạn cung cấp cho AI đúng 1 cặp "Đầu vào mẫu ➔ Đầu ra mẫu". AI sẽ nhìn vào ví dụ đó để bắt chước chính xác cấu trúc cột bảng và cách hành văn nghiệp vụ.';
+        explanation = '📖 One-shot Prompting (1 Example):\nProvide exactly 1 standard Input ➔ Output example. AI mirrors the exact columns and tone.';
         break;
       case 4:
-        explanation = '📖 Few-shot Prompting (Dạy bằng nhiều ví dụ):\nKhi nghiệp vụ phức tạp có nhiều trường hợp (Khen ngợi, Khiếu nại, Góp ý), việc đưa 2-3 ví dụ đa dạng sẽ giúp AI không bị nhầm lẫn giữa các nhóm phản hồi.';
+        explanation = '📖 Few-shot Prompting (Multiple Examples):\nProvide 2-3 diverse examples to prevent misclassification across edge cases.';
         break;
       case 5:
-        explanation = '📖 Grounding (Neo dữ liệu thực tế):\nNgăn ngừa hiện tượng AI "tự bịa" (ảo giác) bằng cách bắt buộc AI: Chỉ được trả lời dựa trên văn bản đính kèm, tuyệt đối không suy diễn thêm thông tin ngoài tài liệu.';
+        explanation = '📖 Grounding (Source Document Anchoring):\nPrevent hallucinations by strictly requiring: Answer ONLY based on provided source documents without external speculation.';
         break;
       default:
         explanation = `📖 ${activeLab.conceptTitle}:\n${activeLab.conceptExplanation}`;
@@ -154,7 +154,7 @@ export const NotebookCoach: React.FC<Props> = ({
       id: `coach-${Date.now() + 1}`,
       sender: 'coach',
       text: explanation,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMsg, coachMsg]);
@@ -165,43 +165,43 @@ export const NotebookCoach: React.FC<Props> = ({
     const userMsg: Message = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      text: 'Kiểm tra prompt của tôi',
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      text: 'Review my prompt',
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     const audit = evaluatePromptRubric(currentPrompt);
     let feedback = '';
 
     if (!currentPrompt.trim()) {
-      feedback = '🔍 Ô prompt của bạn hiện đang để trống. Hãy thử gõ một câu lệnh theo cách bạn muốn giao việc cho trợ lý, rồi bấm lại để tôi góp ý nhé!';
+      feedback = '🔍 Your prompt composer is currently empty. Try drafting an instruction as you would assign a task to an assistant, then click here for feedback!';
     } else {
       const points: string[] = [];
       if (audit.personaScore < 15) {
-        points.push('• Bạn chưa chỉ định rõ vai trò chuyên môn cho AI (ví dụ: Chuyên viên phân tích hay Cán bộ tín dụng).');
+        points.push('• Missing an explicit professional role (e.g., Credit Analyst or Senior Auditor).');
       } else {
-        points.push('• ✅ Vai trò chuyên môn đã được nêu rõ ràng.');
+        points.push('• ✅ Professional role is clearly defined.');
       }
 
       if (audit.formatScore < 15) {
-        points.push('• Chưa có yêu cầu rõ về định dạng đầu ra (ví dụ: yêu cầu xuất bảng Markdown 5 cột để dễ copy vào Excel).');
+        points.push('• Missing output formatting instructions (e.g., 5-column Markdown table).');
       } else {
-        points.push('• ✅ Định dạng đầu ra đã được quy định cụ thể.');
+        points.push('• ✅ Output format is well-specified.');
       }
 
       if (audit.guardrailsScore < 10) {
-        points.push('• Nên thêm ràng buộc tiêu cực: "Bỏ qua lời chào xã giao, chỉ trả về nội dung chính" để báo cáo gọn gàng.');
+        points.push('• Recommended constraint: "Skip conversational pleasantries; proceed directly to findings."');
       }
 
-      feedback = `🔍 Nhận xét nhanh về Prompt hiện tại của bạn (${audit.totalScore}/100 điểm):\n\n` + 
+      feedback = `🔍 Quick Review on Your Current Prompt (${audit.totalScore}/100 points):\n\n` + 
         points.join('\n') + 
-        `\n\n💡 Lời khuyên: ${audit.actionableAdvice}\n\nHãy thử tinh chỉnh thêm rồi bấm "Chạy prompt" để xem kết quả thực tế nhé!`;
+        `\n\n💡 Advice: ${audit.actionableAdvice}\n\nTry refining further and click "Run Prompt" to test results!`;
     }
 
     const coachMsg: Message = {
       id: `coach-${Date.now() + 1}`,
       sender: 'coach',
       text: feedback,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMsg, coachMsg]);
@@ -219,7 +219,7 @@ export const NotebookCoach: React.FC<Props> = ({
       id: `user-${Date.now()}`,
       sender: 'user',
       text: userText,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     // Phản hồi dựa trên guardrails: gợi mở, không làm thay, ngôn ngữ tự nhiên
@@ -228,21 +228,21 @@ export const NotebookCoach: React.FC<Props> = ({
 
     if (lower.includes('đáp án') || lower.includes('cho tôi prompt') || lower.includes('viết hộ') || lower.includes('làm mẫu')) {
       if (runCount >= 2) {
-        coachReply = `Tôi nhận thấy bạn đã thử nghiệm ${runCount} lần trong bài này. Bạn có thể bấm nút "Gợi ý prompt chuẩn" ngay trên đầu ô Prompt để tham khảo mẫu chuẩn đã được tối ưu cho bài toán này nhé!`;
+        coachReply = `I see you have run ${runCount} attempts on this lesson! Click "Reference Solution" to compare with the benchmark prompt.`;
       } else {
-        coachReply = `Để bạn nắm vững kỹ năng, tôi khuyên bạn nên tự gõ thử ít nhất 1 lần trước. Bạn chỉ cần tập trung vào 3 ý: "AI đóng vai ai", "Làm gì với dữ liệu này", và "Trả lời bằng bảng hay văn bản". Thử bấm "Chạy prompt" một lần xem sao nhé!`;
+        coachReply = `To master prompt skills, try at least one draft on your own first! Focus on: Role, Task with Data, and Output Format. Give it a run!`;
       }
     } else if (lower.includes('tại sao') || lower.includes('vì sao')) {
-      coachReply = `Khi bạn không quy định rõ ràng, AI sẽ chọn phương án xác suất phổ biến nhất — thường là trả lời dạng đàm thoại lịch sự và nhận xét chung chung. Đưa khuôn khổ cụ thể sẽ buộc AI phải tập trung 100% vào việc xử lý dữ liệu bạn cần.`;
+      coachReply = `When instructions are vague, AI picks the most statistically probable path — conversational prose. Clear constraints channel 100% of model capacity into your specific task.`;
     } else {
-      coachReply = `Câu hỏi rất hay! Trong nghiệp vụ thực tế tại Agribank, bạn hãy luôn nhớ nguyên tắc: "Giao việc cho AI như giao việc cho một thực tập sinh thông minh nhưng chưa quen việc: Cần nói rõ vai trò, mục tiêu và hình thức nộp báo cáo." Bạn có muốn tôi kiểm tra lại câu lệnh bạn vừa soạn không?`;
+      coachReply = `Delegate to AI as you would to a new team member: specify role, context, goal, constraints, and output format. Would you like me to review your prompt?`;
     }
 
     const coachMsg: Message = {
       id: `coach-${Date.now() + 1}`,
       sender: 'coach',
       text: coachReply,
-      timestamp: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages(prev => [...prev, userMsg, coachMsg]);
@@ -255,7 +255,7 @@ export const NotebookCoach: React.FC<Props> = ({
         <button
           onClick={() => setIsOpen(true)}
           className="group flex items-center gap-2.5 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-full shadow-xl border border-slate-700/80 transition-all hover:scale-105 active:scale-95"
-          title="Mở AI Learning Coach"
+          title="Open AI Learning Coach"
         >
           <div className="relative">
             <div className="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white">
@@ -287,7 +287,7 @@ export const NotebookCoach: React.FC<Props> = ({
                   </span>
                 </h4>
                 <p className="text-[11px] text-slate-400">
-                  Bài {activeLab.order}: {activeLab.focusSkill}
+                  Lesson {activeLab.order}: {activeLab.focusSkill}
                 </p>
               </div>
             </div>
@@ -295,7 +295,7 @@ export const NotebookCoach: React.FC<Props> = ({
             <button
               onClick={() => setIsOpen(false)}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              title="Thu gọn"
+              title="Collapse"
             >
               <X className="w-4 h-4" />
             </button>
@@ -337,7 +337,7 @@ export const NotebookCoach: React.FC<Props> = ({
               className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition flex items-center gap-1"
             >
               <Lightbulb className="w-3 h-3 text-emerald-600" />
-              <span>Gợi ý cho bước này</span>
+              <span>Step Hint</span>
             </button>
 
             <button
@@ -345,7 +345,7 @@ export const NotebookCoach: React.FC<Props> = ({
               className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition flex items-center gap-1"
             >
               <BookOpen className="w-3 h-3 text-indigo-600" />
-              <span>Giải thích concept</span>
+              <span>Explain Concept</span>
             </button>
 
             <button
@@ -353,7 +353,7 @@ export const NotebookCoach: React.FC<Props> = ({
               className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition flex items-center gap-1"
             >
               <CheckCircle2 className="w-3 h-3 text-amber-700" />
-              <span>Kiểm tra prompt của tôi</span>
+              <span>Review Prompt</span>
             </button>
           </div>
 
@@ -366,14 +366,14 @@ export const NotebookCoach: React.FC<Props> = ({
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Đặt câu hỏi cho Coach..."
+              placeholder="Ask Coach a question..."
               className="flex-1 text-xs px-3 py-2 bg-slate-100 rounded-xl focus:outline-none focus:bg-white focus:ring-1 focus:ring-slate-400 text-slate-800 placeholder-slate-400"
             />
             <button
               type="submit"
               disabled={!inputText.trim()}
               className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-40 text-white transition flex-shrink-0"
-              title="Gửi"
+              title="Send"
             >
               <Send className="w-3.5 h-3.5" />
             </button>

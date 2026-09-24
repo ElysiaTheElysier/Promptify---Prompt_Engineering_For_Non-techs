@@ -102,10 +102,10 @@ async function callOpenAiJudge(apiKey: string, prompt: string): Promise<string> 
     console.error(`[OpenAI Judge] HTTP ${response.status}.`);
     throw new AiServerError(
       response.status === 401 || response.status === 403
-        ? 'OPENAI_API_KEY trên máy chủ không hợp lệ hoặc không có quyền dùng model Judge.'
+        ? 'OPENAI_API_KEY on the server is invalid or unauthorized for the Judge model.'
         : response.status === 429
-          ? 'OpenAI Judge đang vượt giới hạn sử dụng. Vui lòng thử lại.'
-          : 'OpenAI Judge tạm thời không khả dụng. Vui lòng thử lại.',
+          ? 'OpenAI Judge rate limit exceeded. Please try again.'
+          : 'OpenAI Judge service temporarily unavailable. Please try again.',
       response.status === 429 ? 503 : 502,
     );
   }
@@ -113,7 +113,7 @@ async function callOpenAiJudge(apiKey: string, prompt: string): Promise<string> 
   const data = await response.json() as any;
   const outputText = data.output_text
     || data.output?.flatMap((item: any) => item.content || []).find((item: any) => item.type === 'output_text')?.text;
-  if (!outputText) throw new AiServerError('OpenAI Judge không trả về nội dung hợp lệ.', 502);
+  if (!outputText) throw new AiServerError('OpenAI Judge did not return a valid response.', 502);
   return outputText;
 }
 
@@ -124,7 +124,7 @@ async function callOpenAiGenerate(
 ): Promise<{ output: string; model: string; tokens?: number }> {
   const model = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
   const instructions = systemInstruction?.trim()
-    || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp; không tự suy diễn dữ kiện hoặc âm thầm hoàn thành một bài tập không có trong prompt.';
+    || 'You are a professional AI assistant. Only follow the user\'s explicit instructions; do not assume facts, extrapolate ungrounded details, or silently perform tasks not requested in the prompt. Respond in clear, professional English unless explicitly instructed otherwise.';
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
@@ -145,10 +145,10 @@ async function callOpenAiGenerate(
     console.error(`[OpenAI Generate] HTTP ${response.status}.`);
     throw new AiServerError(
       response.status === 401 || response.status === 403
-        ? 'OPENAI_API_KEY trên máy chủ không hợp lệ hoặc không có quyền dùng model đã cấu hình.'
+        ? 'OPENAI_API_KEY on the server is invalid or unauthorized for the configured model.'
         : response.status === 429
-          ? 'OpenAI đang vượt giới hạn sử dụng. Vui lòng thử lại.'
-          : 'OpenAI tạm thời không khả dụng. Vui lòng thử lại.',
+          ? 'OpenAI rate limit exceeded. Please try again in a few moments.'
+          : 'OpenAI service is temporarily unavailable. Please try again.',
       response.status === 429 ? 503 : 502,
     );
   }
@@ -156,7 +156,7 @@ async function callOpenAiGenerate(
   const data = await response.json() as any;
   const output = data.output_text
     || data.output?.flatMap((item: any) => item.content || []).find((item: any) => item.type === 'output_text')?.text;
-  if (!output) throw new AiServerError('OpenAI không trả về nội dung hợp lệ.', 502);
+  if (!output) throw new AiServerError('OpenAI did not return a valid response.', 502);
   return { output, model, tokens: data.usage?.total_tokens };
 }
 
@@ -213,8 +213,8 @@ async function callGeminiWithFallback(
         if (response.status === 503 || response.status === 429) {
           lastError = new AiServerError(
             response.status === 429
-              ? 'Dịch vụ AI đang vượt giới hạn sử dụng. Vui lòng thử lại sau ít phút.'
-              : 'Dịch vụ AI tạm thời quá tải. Vui lòng thử lại.',
+              ? 'The AI service rate limit has been exceeded. Please try again in a few moments.'
+              : 'The AI service is temporarily overloaded. Please try again.',
             503,
           );
           console.warn(`[Gemini API] Model ${model} trả về HTTP ${response.status} (attempt ${attempt}). Chuyển fallback...`);
@@ -229,12 +229,12 @@ async function callGeminiWithFallback(
             const isLeaked = response.status === 403 && upstreamMessage?.toLowerCase().includes('leaked');
             lastError = new AiServerError(
               response.status === 400
-                ? `Gemini từ chối request${upstreamMessage ? `: ${upstreamMessage}` : '.'}`
+                ? `Gemini rejected the request${upstreamMessage ? `: ${upstreamMessage}` : '.'}`
                 : isLeaked
-                  ? 'API Key của bạn đã bị vô hiệu hóa do Google phát hiện rò rỉ (leaked key). Vui lòng cập nhật API Key mới trong Cài đặt.'
+                  ? 'Your API Key was disabled because Google detected a leaked key. Please update your API Key.'
                   : response.status === 401 || response.status === 403
-                    ? `GEMINI_API_KEY không hợp lệ hoặc bị từ chối (${upstreamMessage || 'Permission Denied'}).`
-                    : 'Không thể nhận phản hồi hợp lệ từ dịch vụ AI.',
+                    ? `GEMINI_API_KEY is invalid or rejected (${upstreamMessage || 'Permission Denied'}).`
+                    : 'Unable to receive a valid response from the AI service.',
               response.status === 400 ? 400 : 502,
             );
           }
@@ -243,8 +243,8 @@ async function callGeminiWithFallback(
       } catch (err: any) {
         lastError = new AiServerError(
           err?.name === 'TimeoutError' || err?.name === 'AbortError'
-            ? 'Dịch vụ AI phản hồi quá chậm. Vui lòng thử lại.'
-            : 'Không thể kết nối với dịch vụ AI. Vui lòng thử lại.',
+            ? 'AI service timed out. Please try again.'
+            : 'Unable to connect to AI service. Please try again.',
           503,
         );
         if (attempt < 2) {
@@ -254,7 +254,7 @@ async function callGeminiWithFallback(
     }
   }
 
-  throw lastError || new Error('Không thể kết nối với dịch vụ AI. Vui lòng thử lại sau giây lát.');
+  throw lastError || new Error('Unable to connect to AI service. Please try again in a moment.');
 }
 
 /**
@@ -264,7 +264,7 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
   const { prompt, systemInstruction } = body;
 
   if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-    throw new AiServerError('Câu lệnh prompt không được để trống.', 400);
+    throw new AiServerError('Prompt cannot be empty.', 400);
   }
 
   const openAiApiKey = getOpenAiApiKey();
@@ -291,7 +291,7 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
     const payload = {
       contents: [{ role: 'user', parts: userParts }],
       systemInstruction: {
-        parts: [{ text: systemInstruction?.trim() || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp; không tự suy diễn dữ kiện hoặc âm thầm hoàn thành một bài tập không có trong prompt.' }]
+        parts: [{ text: systemInstruction?.trim() || 'You are a professional AI assistant. Only follow the user\'s explicit instructions; do not assume facts, extrapolate ungrounded details, or silently perform tasks not requested in the prompt. Respond in clear, professional English unless explicitly instructed otherwise.' }]
       },
       generationConfig: {
         temperature: 0.3,
@@ -303,7 +303,7 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
     const candidate = data.candidates?.[0];
     const outputText = candidate?.content?.parts?.[0]?.text;
     if (!outputText) {
-      throw new Error('Mô hình không trả về nội dung hợp lệ.');
+      throw new Error('The model did not return a valid response.');
     }
     const latencyMs = Math.round(performance.now() - startTime);
     const tokens = data.usageMetadata?.totalTokenCount || Math.ceil(outputText.length / 4);
@@ -316,7 +316,7 @@ export async function handleGenerateRequest(body: GenerateRequestBody): Promise<
     };
   }
 
-  throw new AiServerError('Máy chủ chưa cấu hình OPENAI_API_KEY hoặc GEMINI_API_KEY cho môi trường deployment.', 503);
+  throw new AiServerError('Server is not configured with OPENAI_API_KEY or GEMINI_API_KEY.', 503);
 }
 
 /**
@@ -334,7 +334,7 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
   } = body;
 
   if (!learnerPrompt || !learnerPrompt.trim()) {
-    throw new AiServerError('Learner prompt không được để trống khi đánh giá.', 400);
+    throw new AiServerError('Learner prompt cannot be empty for evaluation.', 400);
   }
 
   const openAiApiKey = getOpenAiApiKey();
@@ -342,27 +342,27 @@ export async function handleEvaluateRequest(body: EvaluateRequestBody): Promise<
 
   if (!openAiApiKey && !geminiApiKey) {
     throw new AiServerError(
-      'Chưa cấu hình API_KEY trên máy chủ. Vui lòng thiết lập biến môi trường OPENAI_API_KEY hoặc GEMINI_API_KEY để thực hiện AI Evaluation.',
+      'No AI API key configured on the server. Please set OPENAI_API_KEY or GEMINI_API_KEY.',
       503
     );
   }
 
   const rubricDescription = lessonRubric 
     ? typeof lessonRubric === 'string' ? lessonRubric : JSON.stringify(lessonRubric, null, 2)
-    : 'Yêu cầu chuẩn: Đúng vai trò, bám sát dữ liệu đầu vào, xuất bảng hoặc định dạng chuẩn, không đàm thoại lan man.';
+    : 'Standard criteria: Role adherence, strictly grounded in source data, structured tabular or clean formatting, no conversational fluff.';
 
-  const evaluationPrompt = `Bạn là AI Judge. Chấm learner prompt và AI output theo đúng bài tập.
-Mỗi tiêu chí là số nguyên 0–2: taskCompletion, groundedness, formatAdherence, constraintCompliance, businessUsability.
-0 = không đạt; 1 = đạt một phần; 2 = đạt đầy đủ. Không trả chain-of-thought.
+  const evaluationPrompt = `You are an expert AI Judge. Objectively evaluate the learner prompt and the resulting AI output according to the assignment requirements.
+Each rubric dimension must be an integer from 0 to 2: taskCompletion, groundedness, formatAdherence, constraintCompliance, businessUsability.
+Scale: 0 = not met; 1 = partially met; 2 = fully met. Do not output any chain-of-thought or reasoning text outside the JSON. All text in strengths, improvements, and nextHint MUST be written in clear, concise, professional business English.
 
-SCENARIO: ${scenario || 'Không có'}
-CONTROL DATA: ${controlData || 'Không có'}
-TASK: ${taskRequirement || 'Không có'}
+SCENARIO: ${scenario || 'None'}
+CONTROL DATA: ${controlData || 'None'}
+TASK: ${taskRequirement || 'None'}
 LESSON RUBRIC: ${rubricDescription}
 LEARNER PROMPT: ${learnerPrompt}
-AI OUTPUT: ${generatedOutput || '(Không có output)'}
+AI OUTPUT: ${generatedOutput || '(No output provided)'}
 
-Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trường và không dùng điểm mặc định.`;
+Return ONLY valid JSON matching the exact schema. No markdown wrapping, no additional keys, and do not default to generic scores.`;
 
   let rawText: string;
   if (openAiApiKey) {
@@ -413,8 +413,8 @@ Chỉ trả JSON theo schema đã yêu cầu. Không markdown, không thêm trư
     }
     throw new AiServerError(
       parseErr instanceof AiEvaluationValidationError
-        ? `AI Judge trả về evaluation không hợp lệ: ${parseErr.message}`
-        : 'Không thể phân tích kết quả AI Judge. Vui lòng thử chấm lại.',
+        ? `AI Judge returned an invalid evaluation: ${parseErr.message}`
+        : 'Unable to parse AI Judge response. Please try evaluating again.',
       502,
     );
   }

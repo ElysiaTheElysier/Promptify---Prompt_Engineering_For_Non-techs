@@ -32,6 +32,7 @@ export interface ClassCohort {
   description: string;
   iconName: string;
   isPublic?: boolean;
+  totalLessons?: number;
 }
 
 export interface Enrollment {

@@ -62,7 +62,7 @@ assert.match(appSource, /promptify_selected_class_id/);
 
 const navbarSource = await readFile('src/components/navigation/ProductNavbar.tsx', 'utf8');
 assert.match(navbarSource, /availableCohorts\.map/);
-assert.match(navbarSource, /aria-label="Chọn lớp đang học"/);
+assert.match(navbarSource, /aria-label="(Chọn lớp đang học|Select active class)"/);
 
 console.log('✓ Enrolled learner can access only their assigned class');
 console.log('✓ Unassigned learner has no active enrollment or class access');

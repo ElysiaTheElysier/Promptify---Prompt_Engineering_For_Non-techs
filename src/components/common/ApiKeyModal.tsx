@@ -24,28 +24,43 @@ export const ApiKeyModal: React.FC<Props> = ({ isOpen, onClose, config, onSaveCo
         <div className="flex items-center justify-between bg-slate-900 px-6 py-4 text-white">
           <div className="flex items-center gap-2.5">
             <Cpu className="h-5 w-5 text-emerald-400" />
-            <div><h3 className="font-semibold">Cấu hình Động cơ AI</h3><p className="text-xs text-slate-400">API key được quản lý an toàn trên máy chủ</p></div>
+            <div>
+              <h3 className="font-semibold">AI Engine Configuration</h3>
+              <p className="text-xs text-slate-400">API keys are securely managed on the server</p>
+            </div>
           </div>
-          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white">
+            <X className="h-5 w-5" />
+          </button>
         </div>
         <div className="space-y-5 p-6">
           <div className="flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
             <ShieldCheck className="h-5 w-5 shrink-0" />
-            <p>Không nhập hoặc lưu API key trong trình duyệt. Live AI sử dụng credential được cấu hình trong môi trường triển khai của máy chủ.</p>
+            <p>Never store API keys in the browser. Live AI uses secure credentials configured in the server deployment environment.</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <button type="button" onClick={() => setMode('gemini')} className={`rounded-xl border p-4 text-left ${mode === 'gemini' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200'}`}>
-              <div className="flex items-center justify-between font-semibold text-slate-900"><span>Live AI</span>{mode === 'gemini' && <Check className="h-4 w-4 text-emerald-600" />}</div>
-              <p className="mt-1 text-xs text-slate-500">OpenAI/Gemini do server quản lý.</p>
+              <div className="flex items-center justify-between font-semibold text-slate-900">
+                <span>Live AI</span>
+                {mode === 'gemini' && <Check className="h-4 w-4 text-emerald-600" />}
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Server-managed LLM execution.</p>
             </button>
             <button type="button" onClick={() => setMode('simulated')} className={`rounded-xl border p-4 text-left ${mode === 'simulated' ? 'border-amber-500 bg-amber-50' : 'border-slate-200'}`}>
-              <div className="flex items-center justify-between font-semibold text-slate-900"><span className="flex items-center gap-1"><Zap className="h-4 w-4" />Mô phỏng</span>{mode === 'simulated' && <Check className="h-4 w-4 text-amber-600" />}</div>
-              <p className="mt-1 text-xs text-slate-500">Không gọi dịch vụ AI bên ngoài.</p>
+              <div className="flex items-center justify-between font-semibold text-slate-900">
+                <span className="flex items-center gap-1"><Zap className="h-4 w-4" />Simulated</span>
+                {mode === 'simulated' && <Check className="h-4 w-4 text-amber-600" />}
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Offline heuristic mode without external API calls.</p>
             </button>
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Hủy</button>
-            <button type="button" onClick={save} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Lưu cấu hình</button>
+            <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">
+              Cancel
+            </button>
+            <button type="button" onClick={save} className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+              Save Configuration
+            </button>
           </div>
         </div>
       </div>

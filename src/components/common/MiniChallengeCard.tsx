@@ -40,20 +40,20 @@ export const MiniChallengeCard: React.FC<Props> = ({
           <div>
             <div className="flex items-center gap-2">
               <h5 className="text-xs sm:text-sm font-bold text-slate-900">
-                Thử thách nhỏ: {challenge.title}
+                Mini Challenge: {challenge.title}
               </h5>
               <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                Tùy chọn
+                Optional
               </span>
             </div>
             <p className="text-[11px] text-slate-500">
-              Áp dụng kỹ năng vừa học vào tình huống thực tế khác (không bắt buộc)
+              Apply your newly acquired skills to another business scenario (optional)
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-1 text-slate-400 text-xs">
-          <span>{isOpen ? 'Thu gọn' : 'Xem thử thách'}</span>
+          <span>{isOpen ? 'Collapse' : 'View Challenge'}</span>
           {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </div>
       </button>
@@ -66,14 +66,14 @@ export const MiniChallengeCard: React.FC<Props> = ({
             </p>
             {challenge.tip && (
               <p className="text-[11px] text-amber-900 bg-amber-50 p-2 rounded border border-amber-200">
-                💡 <strong>Gợi ý thử thách:</strong> {challenge.tip}
+                💡 <strong>Challenge Tip:</strong> {challenge.tip}
               </p>
             )}
           </div>
 
           <div className="flex items-center justify-between pt-1">
             <span className="text-[11px] text-slate-400 italic">
-              Bạn có thể làm ngay hoặc bấm "Sang bài tiếp theo" bất cứ lúc nào.
+              Practice this now or proceed to the next lesson at any time.
             </span>
 
             {challenge.context && onApplyChallengePrompt && (
@@ -83,7 +83,7 @@ export const MiniChallengeCard: React.FC<Props> = ({
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition shadow-xs"
               >
                 {isApplied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Sparkles className="w-3.5 h-3.5" />}
-                <span>{isApplied ? 'Đã đưa vào ô Prompt' : 'Thử thách thức này'}</span>
+                <span>{isApplied ? 'Loaded to Prompt' : 'Try this challenge'}</span>
               </button>
             )}
           </div>
@@ -92,4 +92,3 @@ export const MiniChallengeCard: React.FC<Props> = ({
     </div>
   );
 };
-

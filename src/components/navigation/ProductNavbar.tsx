@@ -48,7 +48,7 @@ export const ProductNavbar: React.FC<Props> = ({
             type="button"
             onClick={() => onNavigate('dashboard')}
             className="flex items-center gap-2.5 flex-shrink-0 select-none rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-            title="Về Trang chủ và chọn lớp"
+            title="Return to Home and class overview"
           >
             <PromptifyMark />
             <div>
@@ -72,7 +72,7 @@ export const ProductNavbar: React.FC<Props> = ({
               }`}
             >
               <Home className="w-3.5 h-3.5" />
-              <span>Trang chủ</span>
+              <span>Home</span>
             </button>
 
             <button
@@ -84,7 +84,7 @@ export const ProductNavbar: React.FC<Props> = ({
               }`}
             >
               <Map className="w-3.5 h-3.5" />
-              <span>Lộ trình học</span>
+              <span>Learning Path</span>
             </button>
 
             <button
@@ -96,7 +96,7 @@ export const ProductNavbar: React.FC<Props> = ({
               }`}
             >
               <Bookmark className="w-3.5 h-3.5" />
-              <span>Thư viện Prompt</span>
+              <span>Prompt Library</span>
             </button>
 
             <button
@@ -108,7 +108,7 @@ export const ProductNavbar: React.FC<Props> = ({
               }`}
             >
               <History className="w-3.5 h-3.5" />
-              <span>Lịch sử</span>
+              <span>History</span>
             </button>
           </nav>
 
@@ -117,41 +117,51 @@ export const ProductNavbar: React.FC<Props> = ({
             {/* Current Class Badge & Change Class */}
             <div className="hidden lg:flex items-center gap-2 bg-slate-800/90 hover:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700/80 text-xs">
               <div className="text-left">
-                <span className="text-[10px] text-slate-400 block font-medium">Lớp đang học:</span>
+                <span className="text-[10px] text-slate-400 block font-medium">Active Class:</span>
                 <div className="relative flex items-center">
-                  <select
-                    value={selectedCohort?.id || ''}
-                    onChange={(event) => handleClassChange(event.target.value)}
-                    className="appearance-none bg-transparent pr-5 text-emerald-400 font-bold truncate max-w-[190px] cursor-pointer outline-none"
-                    aria-label="Chọn lớp đang học"
-                    title="Chọn một lớp đã được ghi danh"
-                  >
-                    {availableCohorts.map((cohort) => (
-                      <option key={cohort.id} value={cohort.id} className="bg-slate-900 text-white">
-                        {cohort.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-slate-400" />
+                  {availableCohorts.length > 1 ? (
+                    <>
+                      <select
+                        value={selectedCohort?.id || ''}
+                        onChange={(event) => handleClassChange(event.target.value)}
+                        className="appearance-none bg-transparent pr-5 text-emerald-400 font-bold truncate max-w-[190px] cursor-pointer outline-none"
+                        aria-label="Select active class"
+                        title="Select an enrolled class"
+                      >
+                        {availableCohorts.map((cohort) => (
+                          <option key={cohort.id} value={cohort.id} className="bg-slate-900 text-white">
+                            {cohort.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-slate-400" />
+                    </>
+                  ) : (
+                    <span className="text-emerald-400 font-bold truncate max-w-[220px]">
+                      {selectedCohort?.name || availableCohorts[0]?.name || 'English Review'}
+                    </span>
+                  )}
                 </div>
               </div>
-              <button
-                onClick={onChangeClass}
-                className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition cursor-pointer"
-                title="Đổi lớp học khác"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-              </button>
+              {availableCohorts.length > 1 && (
+                <button
+                  onClick={onChangeClass}
+                  className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-700 transition cursor-pointer"
+                  title="Switch class"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
 
             {/* Learner Avatar & Logout */}
             <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
               <div className="w-8 h-8 rounded-full bg-emerald-700 border border-emerald-500/40 flex items-center justify-center text-xs font-bold text-white shadow-xs">
-                {learner?.avatarInitials || 'LP'}
+                {learner?.avatarInitials || 'RV'}
               </div>
               <div className="hidden xl:block text-left text-xs leading-tight">
                 <span className="font-semibold text-slate-200 block truncate max-w-[130px]">
-                  {learner?.name || 'Học viên'}
+                  {learner?.name || 'Reviewer'}
                 </span>
                 <span className="text-[10px] text-slate-400 block truncate max-w-[130px]">
                   {learner?.email || ''}
@@ -160,7 +170,7 @@ export const ProductNavbar: React.FC<Props> = ({
               <button
                 onClick={onLogout}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-rose-300 hover:bg-rose-950/30 transition cursor-pointer"
-                title="Đăng xuất"
+                title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -174,56 +184,63 @@ export const ProductNavbar: React.FC<Props> = ({
             onClick={() => onNavigate('dashboard')}
             className={`px-2 py-1 rounded ${currentView === 'dashboard' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
           >
-            Trang chủ
+            Home
           </button>
           <button
             onClick={() => onNavigate('learning_path')}
             className={`px-2 py-1 rounded ${currentView === 'learning_path' || currentView === 'lesson' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
           >
-            Lộ trình
+            Path
           </button>
           <button
             onClick={() => onNavigate('library')}
             className={`px-2 py-1 rounded ${currentView === 'library' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
           >
-            Thư viện
+            Library
           </button>
           <button
             onClick={() => onNavigate('history')}
             className={`px-2 py-1 rounded ${currentView === 'history' ? 'text-emerald-400 font-bold' : 'text-slate-400'}`}
           >
-            Lịch sử
+            History
           </button>
         </div>
 
-        {/* Class switcher remains available on tablet and mobile. */}
+        {/* Class switcher for tablet and mobile */}
         <div className="flex lg:hidden items-center gap-2 border-t border-slate-800 py-2">
-          <span className="shrink-0 text-[10px] font-medium text-slate-400">Lớp:</span>
-          <div className="relative min-w-0 flex-1">
-            <select
-              value={selectedCohort?.id || ''}
-              onChange={(event) => handleClassChange(event.target.value)}
-              className="w-full appearance-none truncate rounded-lg border border-slate-700 bg-slate-800 py-1.5 pl-2.5 pr-7 text-xs font-semibold text-emerald-300 outline-none focus:border-emerald-500"
-              aria-label="Chọn lớp đang học"
-            >
-              {availableCohorts.map((cohort) => (
-                <option key={cohort.id} value={cohort.id} className="bg-slate-900 text-white">
-                  {cohort.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-          </div>
-          <button
-            onClick={onChangeClass}
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
-            title="Xem tất cả lớp có thể tham gia"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-          </button>
+          <span className="shrink-0 text-[10px] font-medium text-slate-400">Class:</span>
+          {availableCohorts.length > 1 ? (
+            <>
+              <div className="relative min-w-0 flex-1">
+                <select
+                  value={selectedCohort?.id || ''}
+                  onChange={(event) => handleClassChange(event.target.value)}
+                  className="w-full appearance-none truncate rounded-lg border border-slate-700 bg-slate-800 py-1.5 pl-2.5 pr-7 text-xs font-semibold text-emerald-300 outline-none focus:border-emerald-500"
+                  aria-label="Select active class"
+                >
+                  {availableCohorts.map((cohort) => (
+                    <option key={cohort.id} value={cohort.id} className="bg-slate-900 text-white">
+                      {cohort.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+              </div>
+              <button
+                onClick={onChangeClass}
+                className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
+                title="View all available classes"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+              </button>
+            </>
+          ) : (
+            <span className="text-emerald-300 font-semibold text-xs truncate">
+              {selectedCohort?.name || availableCohorts[0]?.name || 'English Review'}
+            </span>
+          )}
         </div>
       </div>
     </header>
   );
 };
-

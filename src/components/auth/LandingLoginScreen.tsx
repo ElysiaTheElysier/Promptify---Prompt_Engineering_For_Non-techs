@@ -22,7 +22,7 @@ export const LandingLoginScreen: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Luồng Google OAuth thực tế - Giữ nguyên 100% logic
+  // Real Google OAuth Flow - Exact Logic Preserved
   const handleRealGoogleLogin = async () => {
     setLoginError(null);
     setIsLoggingIn(true);
@@ -45,7 +45,7 @@ export const LandingLoginScreen: React.FC = () => {
         window.location.href = data.url;
       }
     } catch (err: any) {
-      setLoginError(err?.message || 'Không thể kết nối đến máy chủ xác thực.');
+      setLoginError(err?.message || 'Unable to connect to authentication server.');
       setIsLoggingIn(false);
     }
   };
@@ -74,7 +74,7 @@ export const LandingLoginScreen: React.FC = () => {
                   Promptify
                 </span>
                 <span className="hidden sm:inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  Doanh nghiệp
+                  Enterprise
                 </span>
               </div>
             </div>
@@ -86,29 +86,29 @@ export const LandingLoginScreen: React.FC = () => {
               onClick={() => scrollToSection('problems')}
               className="hover:text-emerald-700 transition-colors duration-200 cursor-pointer"
             >
-              Thực trạng
+              Key Challenges
             </button>
             <button
               onClick={() => scrollToSection('core-principles')}
               className="hover:text-emerald-700 transition-colors duration-200 cursor-pointer"
             >
-              Nguyên tắc làm việc
+              Core Principles
             </button>
             <button
               onClick={() => scrollToSection('how-it-works')}
               className="hover:text-emerald-700 transition-colors duration-200 cursor-pointer"
             >
-              Cách hoạt động
+              How It Works
             </button>
             <button
               onClick={() => scrollToSection('practical-values')}
               className="hover:text-emerald-700 transition-colors duration-200 cursor-pointer"
             >
-              Ứng dụng thực tế
+              Business Impact
             </button>
           </nav>
 
-          {/* Quick Login CTA - Nút nền trắng sáng, border slate-200, icon chuẩn */}
+          {/* Quick Login CTA */}
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -134,7 +134,7 @@ export const LandingLoginScreen: React.FC = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>{isLoggingIn ? 'Đang kết nối...' : 'Đăng nhập'}</span>
+              <span>{isLoggingIn ? 'Connecting...' : 'Sign In'}</span>
             </button>
           </div>
         </div>
@@ -143,24 +143,24 @@ export const LandingLoginScreen: React.FC = () => {
       {/* Main Content Sections */}
       <main className="flex-1 relative z-10">
         
-        {/* 2. HERO SECTION - BỐ CỤC 55/45: TRÁI ACTION, PHẢI BRAND MANIFESTO */}
+        {/* 2. HERO SECTION - 55/45 EDITORIAL LAYOUT */}
         <section className="pt-16 pb-20 sm:pt-20 sm:pb-28 lg:pt-24 lg:pb-32 border-b border-slate-200/70 bg-slate-50/50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               
-              {/* CỘT TRÁI (55%): Headline lớn, Mô tả, CTAs */}
+              {/* LEFT COLUMN (55%): Headline, Subtitle, CTAs */}
               <div className="lg:col-span-7 space-y-7 animate-hero-fade">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-900 text-xs sm:text-sm font-semibold">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Kỹ năng làm việc thực chiến với AI</span>
+                  <span>Practical AI Skills for Enterprise Teams</span>
                 </div>
 
                 <div className="space-y-4">
                   <h1 className="text-4xl sm:text-5xl lg:text-[60px] font-extrabold tracking-tight text-slate-950 leading-[1.08] text-balance">
-                    Học cách làm việc hiệu quả với AI.
+                    Master Practical AI Workflows at Work.
                   </h1>
                   <p className="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-xl text-balance font-normal">
-                    Thực hành trên tình huống công việc thật, nhận phản hồi ngay và hiểu cách cải thiện prompt - không cần nền tảng kỹ thuật.
+                    Practice with authentic business scenarios, receive instant automated evaluation, and build high-performing prompts — no technical background required.
                   </p>
                 </div>
 
@@ -191,7 +191,7 @@ export const LandingLoginScreen: React.FC = () => {
                           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                         />
                       </svg>
-                      <span>{isLoggingIn ? 'Đang kết nối...' : 'Bắt đầu học với Google'}</span>
+                      <span>{isLoggingIn ? 'Connecting...' : 'Get Started with Google'}</span>
                       <ArrowRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                     </button>
 
@@ -200,7 +200,7 @@ export const LandingLoginScreen: React.FC = () => {
                       onClick={() => scrollToSection('how-it-works')}
                       className="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-800 font-bold text-base py-4 px-6 rounded-xl border border-slate-200 hover:border-slate-300 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer shadow-2xs"
                     >
-                      <span>Xem cách hoạt động</span>
+                      <span>Explore How It Works</span>
                     </button>
                   </div>
 
@@ -208,7 +208,7 @@ export const LandingLoginScreen: React.FC = () => {
                     <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-start gap-2.5">
                       <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                       <div className="flex-1">
-                        <span className="font-bold block">Không thể đăng nhập:</span>
+                        <span className="font-bold block">Sign In Failed:</span>
                         <span>{loginError}</span>
                       </div>
                       <button onClick={() => setLoginError(null)} className="text-rose-600 hover:text-rose-900 font-bold ml-1">✕</button>
@@ -217,23 +217,23 @@ export const LandingLoginScreen: React.FC = () => {
 
                   <p className="text-xs sm:text-sm text-slate-500 pt-1 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Dành cho nhân sự văn phòng, không yêu cầu kiến thức lập trình</span>
+                    <span>Designed for office and business professionals. No coding or tech background needed.</span>
                   </p>
                 </div>
               </div>
 
-              {/* CỘT PHẢI (45%): BRAND STATEMENT / MANIFESTO (EDITORIAL, KHÔNG CARD) */}
+              {/* RIGHT COLUMN (45%): BRAND STATEMENT / EDITORIAL MANIFESTO */}
               <div className="lg:col-span-5 pt-6 lg:pt-0 animate-hero-fade">
                 <div className="border-l-4 border-emerald-600 pl-6 sm:pl-9 py-3 space-y-4">
                   <p className="text-3xl sm:text-4xl lg:text-[44px] font-bold text-slate-950 leading-[1.18] tracking-tight">
-                    Đừng chỉ dùng AI.<br />
-                    Hãy biết cách{' '}
+                    Don't just query AI.<br />
+                    Learn how to{' '}
                     <span className="text-emerald-700 underline decoration-emerald-400 decoration-4 underline-offset-8">
-                      làm việc với AI.
+                      collaborate with AI.
                     </span>
                   </p>
                   <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal pt-2">
-                    Rõ yêu cầu. Kiểm soát kết quả. Áp dụng được vào công việc.
+                    Clear instructions. Controlled outputs. Verifiable business results.
                   </p>
                 </div>
               </div>
@@ -242,30 +242,30 @@ export const LandingLoginScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 3. SECTION THỰC TRẠNG - NỀN TRẮNG SÁNG, PHÂN CÁCH RÕ RÀNG */}
+        {/* 3. SECTION KEY CHALLENGES */}
         <section id="problems" className="py-20 sm:py-28 lg:py-32 bg-white border-b border-slate-200/70">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-16">
             <RevealOnScroll direction="up" delay={0}>
               <div className="text-center space-y-4 max-w-3xl mx-auto">
                 <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-bold tracking-tight text-slate-950 text-balance leading-snug">
-                  Dùng AI nhiều không có nghĩa là dùng AI hiệu quả.
+                  Using AI Frequently Doesn't Mean Using AI Effectively.
                 </h2>
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-balance">
-                  Nhiều nhân sự đã quen đặt câu hỏi cho AI, nhưng phần lớn thời gian làm việc vẫn bị lãng phí vì kết quả đầu ra chưa thể dùng ngay.
+                  Many professionals use conversational AI daily, but significant work hours are wasted rewriting ungrounded, generic, or off-target outputs.
                 </p>
               </div>
             </RevealOnScroll>
 
-            {/* 3 Thực trạng dạng Editorial Top-Dividers với Stagger Animation */}
+            {/* 3 Challenges - Editorial Top Dividers */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pt-2">
               <RevealOnScroll direction="up" delay={80}>
                 <div className="border-t-2 border-slate-200 pt-6 space-y-3">
                   <span className="text-sm font-mono font-bold text-slate-400">01</span>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Kết quả không ổn định
+                    Inconsistent Results
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Cùng một công việc nhưng mỗi lần hỏi AI lại trả về một kiểu khác nhau, lúc trúng ý lúc lan man thiếu trọng tâm.
+                    The same business task yields wildly different answers every time — ranging from brilliant to unfocused, verbose, and off-point.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -274,10 +274,10 @@ export const LandingLoginScreen: React.FC = () => {
                 <div className="border-t-2 border-slate-200 pt-6 space-y-3">
                   <span className="text-sm font-mono font-bold text-slate-400">02</span>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Phải sửa lại nhiều lần
+                    Endless Rewriting Cycles
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Mất nhiều thời gian giải thích thêm vì chưa biết cách giao việc đủ ngữ cảnh, ràng buộc và định dạng mong muốn ngay từ đầu.
+                    Valuable time is lost back-and-forth because prompts lack explicit context, boundary constraints, and structured output formatting from the start.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -286,10 +286,10 @@ export const LandingLoginScreen: React.FC = () => {
                 <div className="border-t-2 border-slate-200 pt-6 space-y-3">
                   <span className="text-sm font-mono font-bold text-slate-400">03</span>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Khó biết prompt sai ở đâu
+                    Blind Prompt Debugging
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Khi kết quả chưa đạt, người dùng thường chỉ gõ lại ngẫu nhiên mà không rõ mình đang thiếu thành phần nào trong câu lệnh.
+                    When output misses the mark, users guess random tweaks without understanding which prompt components were missing or broken.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -297,30 +297,30 @@ export const LandingLoginScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 4. SECTION NGUYÊN TẮC LÀM VIỆC - NỀN XANH MINT NHẸ, PHÂN CÁCH NỔI BẬT */}
+        {/* 4. SECTION CORE PRINCIPLES */}
         <section id="core-principles" className="py-20 sm:py-28 lg:py-32 bg-emerald-50/30 border-b border-emerald-100/70">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-16">
             <RevealOnScroll direction="up" delay={0}>
               <div className="max-w-2xl space-y-3">
                 <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-bold tracking-tight text-slate-950 leading-snug">
-                  Ba nguyên tắc làm việc với AI
+                  Three Pillars of Executive AI Collaboration
                 </h2>
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                  Nắm vững cách kiểm soát đầu ra để ứng dụng an toàn và chuẩn xác trong công việc hằng ngày.
+                  Learn to govern AI output with certainty, reliability, and precision across daily enterprise workflows.
                 </p>
               </div>
             </RevealOnScroll>
 
-            {/* 3 CỘT KHÔNG CARD: Typography + Whitespace + Top Divider + Emerald Accent */}
+            {/* 3 Pillars */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
               <RevealOnScroll direction="up" delay={100}>
                 <div className="border-t-2 border-emerald-600 pt-6 space-y-3.5">
                   <span className="text-sm font-mono font-bold text-emerald-700">01</span>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Giao việc rõ ràng
+                    Clear Task Delegation
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Biết cách nói cho AI chính xác mình cần gì và kết quả nên trông thế nào.
+                    Direct the model with exact persona, business context, and explicit expectations for the final deliverables.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -329,10 +329,10 @@ export const LandingLoginScreen: React.FC = () => {
                 <div className="border-t-2 border-slate-300 hover:border-emerald-600 transition-colors duration-200 pt-6 space-y-3.5">
                   <span className="text-sm font-mono font-bold text-slate-400">02</span>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Kiểm soát kết quả
+                    Output Control & Guardrails
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Dùng ví dụ, giới hạn và cấu trúc để giảm việc phải sửa đi sửa lại.
+                    Use one-shot patterns, negative constraints, and structured formats to eliminate redundant back-and-forth.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -341,10 +341,10 @@ export const LandingLoginScreen: React.FC = () => {
                 <div className="border-t-2 border-slate-300 hover:border-emerald-600 transition-colors duration-200 pt-6 space-y-3.5">
                   <span className="text-sm font-mono font-bold text-slate-400">03</span>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Làm việc với dữ liệu đáng tin cậy
+                    Grounded in Truth
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Biết khi nào AI cần bám tài liệu, nguồn dữ liệu hoặc quy định có sẵn.
+                    Anchor model reasoning strictly in source documents, organizational policy, and verified enterprise data.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -352,21 +352,21 @@ export const LandingLoginScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 5. SECTION CÁCH HOẠT ĐỘNG - NỀN TRẮNG, 3 BƯỚC TUẦN TỰ */}
+        {/* 5. SECTION HOW IT WORKS */}
         <section id="how-it-works" className="py-20 sm:py-28 lg:py-32 bg-white border-b border-slate-200/70">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-16">
             <RevealOnScroll direction="up" delay={0}>
               <div className="text-center space-y-4 max-w-3xl mx-auto">
                 <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-bold tracking-tight text-slate-950 text-balance leading-snug">
-                  Cách Promptify giúp bạn tiến bộ
+                  How Promptify Accelerates Your AI Fluency
                 </h2>
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-balance">
-                  Học qua thực hành có đối chiếu: viết, thử nghiệm và nhận phản hồi tức thì để hình thành phản xạ giao việc chuẩn xác.
+                  Learn through deliberate practice: compose, execute against live LLMs, and refine with instant automated rubric feedback.
                 </p>
               </div>
             </RevealOnScroll>
 
-            {/* 3 Bước thực hành tuần tự với Stagger Reveal */}
+            {/* 3 Sequential Steps */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               <RevealOnScroll direction="up" delay={100}>
                 <div className="space-y-4">
@@ -374,13 +374,13 @@ export const LandingLoginScreen: React.FC = () => {
                     <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold flex items-center justify-center">
                       1
                     </span>
-                    <span className="text-xs sm:text-sm font-bold text-emerald-700 tracking-wide uppercase">Bước đầu tiên</span>
+                    <span className="text-xs sm:text-sm font-bold text-emerald-700 tracking-wide uppercase">First Step</span>
                   </div>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Viết prompt theo tình huống thật
+                    Draft Prompts for Real Business Scenarios
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Đối diện trực tiếp với tài liệu, tờ trình hoặc email thực tế. Tự tay viết câu lệnh giao việc theo tư duy nghiệp vụ của bạn.
+                    Tackle authentic workplace documents, memos, emails, and data reports using your business domain knowledge.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -391,13 +391,13 @@ export const LandingLoginScreen: React.FC = () => {
                     <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold flex items-center justify-center">
                       2
                     </span>
-                    <span className="text-xs sm:text-sm font-bold text-emerald-700 tracking-wide uppercase">Thực thi trực tiếp</span>
+                    <span className="text-xs sm:text-sm font-bold text-emerald-700 tracking-wide uppercase">Live Execution</span>
                   </div>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Chạy với mô hình AI
+                    Execute with Live AI Models
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Gửi câu lệnh tới AI và quan sát ngay kết quả tạo ra. Kiểm tra xem văn bản có đúng ý định và đúng yêu cầu công việc hay chưa.
+                    Submit directly to enterprise LLMs and observe real-time results against authentic business acceptance criteria.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -408,13 +408,13 @@ export const LandingLoginScreen: React.FC = () => {
                     <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 text-sm font-bold flex items-center justify-center">
                       3
                     </span>
-                    <span className="text-xs sm:text-sm font-bold text-emerald-700 tracking-wide uppercase">Cải thiện liên tục</span>
+                    <span className="text-xs sm:text-sm font-bold text-emerald-700 tracking-wide uppercase">Continuous Refinement</span>
                   </div>
                   <h3 className="text-xl font-bold text-slate-950">
-                    Nhận feedback và cải thiện
+                    Receive Feedback & Level Up
                   </h3>
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Hệ thống phân tích cấu trúc prompt, chỉ ra điểm làm tốt, phần còn thiếu và gợi ý cách điều chỉnh để lần chạy sau đạt kết quả cao hơn.
+                    Automated rubric scoring analyzes prompt structure, highlights key strengths, and gives targeted hints for immediate revision.
                   </p>
                 </div>
               </RevealOnScroll>
@@ -422,29 +422,29 @@ export const LandingLoginScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 6. SECTION ỨNG DỤNG THỰC TẾ - NỀN XÁM NHẠT, 6 CARDS RÕ RÀNG */}
+        {/* 6. SECTION BUSINESS IMPACT */}
         <section id="practical-values" className="py-20 sm:py-28 lg:py-32 bg-slate-50/70 border-b border-slate-200/70">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-16">
             <RevealOnScroll direction="up" delay={0}>
               <div className="text-center space-y-4 max-w-3xl mx-auto">
                 <h2 className="text-3xl sm:text-4xl lg:text-[40px] font-bold tracking-tight text-slate-950 text-balance leading-snug">
-                  Áp dụng ngay vào công việc hằng ngày
+                  Immediate Value in Everyday Business Tasks
                 </h2>
                 <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-balance">
-                  Biến kỹ năng giao việc cho AI thành năng suất cụ thể cho các tác vụ văn phòng quen thuộc.
+                  Turn generative AI capability into quantifiable productivity across core administrative and executive workflows.
                 </p>
               </div>
             </RevealOnScroll>
 
-            {/* 6 Work use cases dạng Card hoàn chỉnh, stagger delay */}
+            {/* 6 Work Use Cases */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
               <RevealOnScroll direction="up" delay={50}>
                 <div className="p-6 sm:p-7 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:shadow-xs hover:-translate-y-1 hover:border-emerald-200 transition-all duration-300 space-y-3">
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <Mail className="w-5 h-5" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900">Soạn thảo Email</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">Soạn thư từ chối, giải thích quy định hoặc trao đổi đối tác đúng chuẩn mực.</p>
+                  <h4 className="text-lg font-bold text-slate-900">Email & Communications</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">Draft diplomatic rebuttals, policy explanations, and executive stakeholder updates with precision.</p>
                 </div>
               </RevealOnScroll>
 
@@ -453,8 +453,8 @@ export const LandingLoginScreen: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <FileText className="w-5 h-5" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900">Lập báo cáo</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">Tổng hợp thông tin đa nguồn thành báo cáo định kỳ rõ ràng, mạch lạc.</p>
+                  <h4 className="text-lg font-bold text-slate-900">Executive Reporting</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">Consolidate multi-source inputs into clear, concise periodic performance and status reports.</p>
                 </div>
               </RevealOnScroll>
 
@@ -463,8 +463,8 @@ export const LandingLoginScreen: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <Layers className="w-5 h-5" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900">Tóm tắt văn bản dài</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">Rút ngắn tờ trình, hợp đồng, biên bản họp thành các điểm mấu chốt.</p>
+                  <h4 className="text-lg font-bold text-slate-900">Document Summarization</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">Condense complex contracts, board minutes, and regulatory filings into key actionable takeaways.</p>
                 </div>
               </RevealOnScroll>
 
@@ -473,8 +473,8 @@ export const LandingLoginScreen: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <Users className="w-5 h-5" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900">Phân loại hồ sơ</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">Phân luồng phản ánh khách hàng, mức độ ưu tiên hoặc tiêu chí phân loại.</p>
+                  <h4 className="text-lg font-bold text-slate-900">Case & Request Triage</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">Categorize customer feedback, compliance queries, and priority levels with high consistency.</p>
                 </div>
               </RevealOnScroll>
 
@@ -483,8 +483,8 @@ export const LandingLoginScreen: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <FileSpreadsheet className="w-5 h-5" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900">Trích xuất bảng biểu</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">Bóc tách chỉ tiêu từ văn bản thô dán thẳng vào bảng tính Excel hoặc Sheets.</p>
+                  <h4 className="text-lg font-bold text-slate-900">Structured Data Extraction</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">Extract unstructured narrative points into clean tables ready for spreadsheets and BI analysis.</p>
                 </div>
               </RevealOnScroll>
 
@@ -493,29 +493,29 @@ export const LandingLoginScreen: React.FC = () => {
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
                     <Search className="w-5 h-5" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900">Tra cứu tài liệu nội bộ</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">Tìm kiếm điều khoản và căn cứ trong cẩm nang quy trình nghiệp vụ.</p>
+                  <h4 className="text-lg font-bold text-slate-900">Internal Policy Querying</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed">Verify specific clauses and compliance rules against standard operating procedures.</p>
                 </div>
               </RevealOnScroll>
             </div>
           </div>
         </section>
 
-        {/* 7. SECTION FINAL CTA - CONTAINER SÁNG CAO CẤP, KHÔNG HỘP ĐEN */}
+        {/* 7. SECTION FINAL CTA */}
         <section className="py-20 sm:py-28 lg:py-32 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <RevealOnScroll direction="up" delay={50} duration={700}>
               <div className="p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 border-2 border-emerald-200/80 text-center space-y-7 shadow-xs">
                 <div className="space-y-3 max-w-xl mx-auto">
                   <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold tracking-tight text-slate-950 leading-tight">
-                    Bắt đầu làm việc với AI rõ ràng hơn.
+                    Start Collaborating with AI with Precision.
                   </h2>
                   <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                    Thực hành ngay hôm nay để biến AI thành cộng sự đắc lực trong công việc của bạn.
+                    Begin practicing today to make AI your most reliable, productive workplace co-pilot.
                   </p>
                 </div>
 
-                {/* Google CTA: Nền trắng, viền emerald nổi bật, không hộp đen */}
+                {/* Google CTA */}
                 <div className="pt-2 flex justify-center">
                   <button
                     type="button"
@@ -541,14 +541,14 @@ export const LandingLoginScreen: React.FC = () => {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                       />
                     </svg>
-                    <span>{isLoggingIn ? 'Đang chuyển hướng sang Google...' : 'Đăng nhập với Google'}</span>
+                    <span>{isLoggingIn ? 'Redirecting to Google...' : 'Sign In with Google'}</span>
                     <ArrowRight className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                   </button>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500">
                   <Lock className="w-4 h-4 text-emerald-600" />
-                  <span>Môi trường đào tạo nội bộ an toàn và bảo mật</span>
+                  <span>Secure, enterprise-grade internal training sandbox</span>
                 </div>
               </div>
             </RevealOnScroll>
@@ -559,7 +559,7 @@ export const LandingLoginScreen: React.FC = () => {
       {/* 8. FOOTER */}
       <footer className="relative z-10 border-t border-slate-200 py-10 px-4 sm:px-6 bg-slate-50 text-center text-sm text-slate-500">
         <p>
-          Promptify © 2026 • Nền tảng thực hành kỹ năng Prompt Engineering cho nhân sự doanh nghiệp
+          Promptify © 2026 • Enterprise AI & Prompt Engineering Training Platform
         </p>
       </footer>
     </div>

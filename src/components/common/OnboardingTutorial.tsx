@@ -12,38 +12,38 @@ interface Step {
 const TUTORIAL_STEPS: Step[] = [
   {
     stepIndex: 1,
-    title: '1. Đọc Tình huống & Nhiệm vụ',
+    title: '1. Read the Scenario & Mission',
     targetId: 'tour-scenario',
-    description: 'Đây là bài toán nghiệp vụ thực tế bạn cần xử lý. Hãy đọc nhanh để biết bạn đang đóng vai trò gì và cần giải quyết việc gì.',
-    tip: '💡 Mẹo: Nhìn vào dòng "Bạn cần làm gì" để nắm nhanh mục tiêu trong 3 giây.'
+    description: 'This is the real-world business challenge you need to handle. Quickly review to understand your professional role and the core objective.',
+    tip: '💡 Tip: Scan the "What You Need to Do" section to grasp your objective in 3 seconds.'
   },
   {
     stepIndex: 2,
-    title: '2. Ô Soạn thảo Câu lệnh (Prompt)',
+    title: '2. Prompt Composer',
     targetId: 'tour-prompt',
-    description: 'Đây là nơi bạn giao việc cho AI. Bạn hướng dẫn càng rõ ràng về vai trò, nhiệm vụ và định dạng bảng, AI trả lời càng chính xác.',
-    tip: '💡 Bạn có thể tự gõ thử trước, hoặc bấm "Xem gợi ý" nếu chưa biết bắt đầu từ đâu.'
+    description: 'This is where you delegate tasks to the AI. The clearer your instructions regarding role, task, constraints, and tabular output, the more accurate the AI output.',
+    tip: '💡 Tip: Draft your own prompt first, or click "View Suggestions" if you need inspiration.'
   },
   {
     stepIndex: 3,
-    title: '3. Nút Chạy Thử Nghiệm',
+    title: '3. Run Test Button',
     targetId: 'tour-run',
-    description: 'Sau khi soạn xong prompt, bấm nút này (hoặc nhấn phím tắt Ctrl + Enter) để gửi yêu cầu đến mô hình AI và xem kết quả tức thì.',
-    tip: '💡 Hệ thống sẽ tự động đánh giá và chấm điểm chất lượng câu lệnh của bạn.'
+    description: 'Once your prompt is ready, click this button (or press Ctrl + Enter) to submit instructions to the AI model and inspect instant results.',
+    tip: '💡 Tip: The system will automatically evaluate and score your prompt against enterprise rubrics.'
   },
   {
     stepIndex: 4,
-    title: '4. Quan sát Kết quả & Tiến bộ',
+    title: '4. Inspect Output & Track Progress',
     targetId: 'tour-output',
-    description: 'Quan sát câu trả lời từ AI xem đã đúng ý bạn chưa. Sau khi chạy thử lần thứ 2, hệ thống sẽ mở khóa bảng "So sánh Đối chiếu" để bạn thấy rõ sự tiến bộ.',
-    tip: '💡 Trọng tâm là thấy được: Mình đã sửa prompt ở đâu, và kết quả tốt hơn thế nào.'
+    description: 'Review the AI response to verify accuracy. After your 2nd attempt, the system unlocks the Side-by-Side Comparison to highlight your progress.',
+    tip: '💡 Tip: Focus on understanding: What did you adjust in the prompt, and how did the output improve?'
   },
   {
     stepIndex: 5,
-    title: '5. Bé Trợ Lý AI Học Tập',
+    title: '5. AI Learning Coach',
     targetId: 'tour-coach',
-    description: 'Bất cứ khi nào bạn gặp khó khăn, hãy bấm vào Bé Trợ Lý ở góc dưới bên phải. Bé sẽ đặt câu hỏi gợi ý và giải thích giúp bạn tự làm bài mà không làm lộ đáp án.',
-    tip: '💡 Bé Trợ Lý có sẵn các nút tác vụ nhanh: "Gợi ý cho bước này", "Kiểm tra prompt của tôi".'
+    description: 'Whenever you get stuck, click the AI Coach in the bottom right corner. The coach asks guiding questions and provides hints without spoiling the answer.',
+    tip: '💡 Tip: The AI Coach provides one-click actions: "Hint for this step" and "Review my prompt".'
   }
 ];
 
@@ -55,14 +55,14 @@ interface Props {
 export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
 
-  // Luôn bắt đầu từ bước 1 mỗi khi mở lại tutorial
+  // Always reset to step 1 when opening the tutorial
   useEffect(() => {
     if (isOpen) {
       setCurrentStepIndex(0);
     }
   }, [isOpen]);
 
-  // Cuộn nhẹ đến phần tử được hướng dẫn nếu tìm thấy
+  // Smooth scroll to target element if present
   useEffect(() => {
     if (!isOpen) return;
     const currentStep = TUTORIAL_STEPS[currentStepIndex];
@@ -111,20 +111,20 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
               <Sparkles className="w-3.5 h-3.5 text-white" />
             </div>
             <h4 className="font-bold text-sm">
-              Hướng dẫn nhanh trong 60 giây ({currentStep.stepIndex} / {TUTORIAL_STEPS.length})
+              60-Second Quick Tour ({currentStep.stepIndex} of {TUTORIAL_STEPS.length})
             </h4>
           </div>
 
           <button
             onClick={handleSkip}
             className="text-slate-400 hover:text-white p-1 rounded transition"
-            title="Bỏ qua hướng dẫn"
+            title="Skip tutorial"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Thanh tiến trình bước (Dots) */}
+        {/* Step Progress Indicators */}
         <div className="w-full bg-slate-100 h-1 flex">
           {TUTORIAL_STEPS.map((_, idx) => (
             <div
@@ -136,7 +136,7 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
           ))}
         </div>
 
-        {/* Thân Hướng Dẫn */}
+        {/* Content Body */}
         <div className="p-6 space-y-4">
           <div className="space-y-2">
             <h3 className="text-base sm:text-lg font-bold text-slate-900">
@@ -147,19 +147,19 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          {/* Hộp Mẹo nhỏ */}
+          {/* Tip Box */}
           <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-950 text-xs leading-relaxed">
             {currentStep.tip}
           </div>
         </div>
 
-        {/* Footer Điều Khiển */}
+        {/* Controls Footer */}
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
           <button
             onClick={handleSkip}
             className="text-xs text-slate-400 hover:text-slate-700 font-medium transition"
           >
-            Bỏ qua hướng dẫn
+            Skip tour
           </button>
 
           <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
                 className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-100 transition"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Quay lại</span>
+                <span>Back</span>
               </button>
             )}
 
@@ -177,7 +177,7 @@ export const OnboardingTutorial: React.FC<Props> = ({ isOpen, onClose }) => {
               onClick={handleNext}
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition"
             >
-              <span>{isLastStep ? 'Bắt đầu học ngay!' : 'Tiếp tục'}</span>
+              <span>{isLastStep ? 'Start Learning Now!' : 'Continue'}</span>
               {isLastStep ? <Check className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
             </button>
           </div>

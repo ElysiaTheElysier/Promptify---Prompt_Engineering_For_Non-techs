@@ -17,11 +17,19 @@ const rubricText = (lesson: CourseCurriculumLesson, index: number, fallback: str
   return criterion ? `${criterion.label}: ${criterion.description}` : fallback;
 };
 
-/**
- * Adapter chuẩn hóa giữa curriculum trong database và LabStep mà UI học sử dụng.
- * Kế thừa đầy đủ các trường phong phú (Before/After outputs, comparison highlights, mini challenges)
- * từ SEED_LABS_DATA để đảm bảo trải nghiệm sư phạm tốt nhất.
- */
+const reviewClassCode = typeof window !== 'undefined' && import.meta.env.VITE_REVIEW_CLASS_CODE?.trim();
+
+function formatLessonTitle(title: string, index: number, isEnglish: boolean): string {
+  const trimmed = title.trim();
+  if (/^(Lesson|Bài|Lab)\s*\d+[:.]/i.test(trimmed)) {
+    return trimmed;
+  }
+  if (isEnglish) {
+    return `Lesson ${index + 1}: ${trimmed}`;
+  }
+  return `Bài ${index + 1}: ${trimmed}`;
+}
+
 export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[] {
   const lessons = modules
     .filter((module) => module.status === 'published')
@@ -35,12 +43,18 @@ export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[
       (l) => l.id === lesson.id || l.conceptTag.toLowerCase() === lesson.lesson_key.toLowerCase()
     );
 
+    const isEnglishLesson = Boolean(
+      reviewClassCode ||
+      lesson.lesson_key?.toUpperCase().includes('EN') ||
+      !/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđĐ]/.test(lesson.title)
+    );
+
     return {
       id: lesson.id,
       order: index + 1,
-      title: lesson.title.startsWith('Bài') ? lesson.title : `Bài ${index + 1}: ${lesson.title}`,
-      badge: lesson.badge || `Lab ${String(index + 1).padStart(2, '0')}`,
-      focusSkill: lesson.focus_skill || 'Kỹ nghệ prompt thực hành',
+      title: formatLessonTitle(lesson.title, index, isEnglishLesson),
+      badge: lesson.badge || (isEnglishLesson ? `Lab ${String(index + 1).padStart(2, '0')}` : `Lab ${String(index + 1).padStart(2, '0')}`),
+      focusSkill: lesson.focus_skill || (isEnglishLesson ? 'Hands-on Prompt Engineering' : 'Kỹ nghệ prompt thực hành'),
       scenario: lesson.scenario || '',
       taskGoal: lesson.task_goal || '',
       conceptTag: lesson.lesson_key,
@@ -55,18 +69,18 @@ export function mapCurriculumToLabs(modules: CourseCurriculumModule[]): LabStep[
       hints: lesson.hints,
       expectedOutputFormat: lesson.expected_output_format || '',
       rubricCriteria: {
-        persona: rubricText(lesson, 0, 'Đúng vai trò và bối cảnh nghiệp vụ.'),
-        task: rubricText(lesson, 1, 'Hoàn thành đúng nhiệm vụ.'),
-        guardrails: rubricText(lesson, 2, 'Tuân thủ các chốt chặn và dữ liệu nguồn.'),
-        format: rubricText(lesson, 3, 'Đúng định dạng đầu ra.'),
+        persona: rubricText(lesson, 0, isEnglishLesson ? 'Persona and context compliance.' : 'Đúng vai trò và bối cảnh nghiệp vụ.'),
+        task: rubricText(lesson, 1, isEnglishLesson ? 'Task execution and goal achievement.' : 'Hoàn thành đúng nhiệm vụ.'),
+        guardrails: rubricText(lesson, 2, isEnglishLesson ? 'Guardrails and source truth adherence.' : 'Tuân thủ các chốt chặn và dữ liệu nguồn.'),
+        format: rubricText(lesson, 3, isEnglishLesson ? 'Output format correctness.' : 'Đúng định dạng đầu ra.'),
       },
       focusComponents: lesson.focus_components.filter(
         (component): component is PromptComponentType => ALLOWED_COMPONENTS.has(component as PromptComponentType),
       ),
       comparisonHighlights: seedLab?.comparisonHighlights,
       miniChallenge: seedLab?.miniChallenge,
-      simulatedBaselineOutput: seedLab?.simulatedBaselineOutput || 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt baseline để tạo kết quả thực tế.',
-      simulatedImprovedOutput: seedLab?.simulatedImprovedOutput || 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt cải thiện để tạo kết quả thực tế.',
+      simulatedBaselineOutput: seedLab?.simulatedBaselineOutput || (isEnglishLesson ? 'Run the baseline prompt to generate live AI output.' : 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt baseline để tạo kết quả thực tế.'),
+      simulatedImprovedOutput: seedLab?.simulatedImprovedOutput || (isEnglishLesson ? 'Run the improved prompt to generate live AI output.' : 'Đặc tả nguồn chưa cung cấp đầu ra mẫu hoàn chỉnh. Hãy chạy prompt cải thiện để tạo kết quả thực tế.'),
     };
   });
 }

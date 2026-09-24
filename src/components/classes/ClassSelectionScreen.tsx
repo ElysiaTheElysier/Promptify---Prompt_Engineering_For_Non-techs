@@ -49,16 +49,14 @@ export const ClassSelectionScreen: React.FC<Props> = ({
       {/* Top Bar */}
       <header className="bg-slate-900 text-white border-b border-slate-800 px-6 py-4 shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div 
-            className="flex items-center gap-3 select-none"
-          >
+          <div className="flex items-center gap-3 select-none">
             <PromptifyMark />
             <div>
               <span className="font-extrabold text-base tracking-tight text-white font-display">
                 Promptify
               </span>
               <span className="text-[11px] text-slate-400 block">
-                Cổng đào tạo Cán bộ Nghiệp vụ
+                Executive Prompt Engineering Portal
               </span>
             </div>
           </div>
@@ -66,10 +64,10 @@ export const ClassSelectionScreen: React.FC<Props> = ({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 pr-3 border-r border-slate-700 text-xs">
               <div className="w-7 h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold">
-                {learner?.avatarInitials || 'LP'}
+                {learner?.avatarInitials || 'RV'}
               </div>
               <div className="hidden sm:block text-left">
-                <span className="font-semibold text-slate-200 block">{learner?.name || 'Học viên'}</span>
+                <span className="font-semibold text-slate-200 block">{learner?.name || 'Reviewer'}</span>
                 <span className="text-[10px] text-slate-400">{learner?.email || ''}</span>
               </div>
             </div>
@@ -77,10 +75,10 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             <button
               onClick={onLogout}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer"
-              title="Đăng xuất khỏi tài khoản"
+              title="Sign out of account"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Đăng xuất</span>
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         </div>
@@ -92,14 +90,17 @@ export const ClassSelectionScreen: React.FC<Props> = ({
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Không gian học tập của bạn</span>
+            <span>Your Learning Workspace</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            Chọn lớp học của bạn
+            Select Your Cohort
           </h1>
           <p className="text-sm text-slate-600 max-w-2xl">
-            Chào mừng <strong>{learner?.name || 'Học viên'}</strong>. Lớp công khai luôn có thể tham gia; các lớp riêng chỉ xuất hiện khi giảng viên đã ghi danh bạn.
+            Welcome, <strong>{learner?.name || 'Reviewer'}</strong>. Open cohorts are immediately accessible; private enterprise cohorts appear once enrolled by an instructor.
           </p>
+          {joinError && (
+            <p className="text-xs text-rose-600 font-medium">{joinError}</p>
+          )}
         </div>
 
         {/* Classes Grid */}
@@ -107,9 +108,9 @@ export const ClassSelectionScreen: React.FC<Props> = ({
           {cohorts.length === 0 && (
             <div className="md:col-span-2 lg:col-span-3 rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
               <ShieldAlert className="mx-auto h-9 w-9 text-amber-600" />
-              <h2 className="mt-3 text-base font-bold text-amber-950">Bạn chưa được ghi danh vào khóa học</h2>
+              <h2 className="mt-3 text-base font-bold text-amber-950">No Enrolled Classes Found</h2>
               <p className="mx-auto mt-2 max-w-xl text-xs leading-relaxed text-amber-800">
-                Hãy liên hệ giảng viên hoặc quản trị viên để được thêm vào một lớp. Đăng nhập hoặc biết mã lớp không tự động cấp quyền học và làm bài.
+                Please contact your administrator or instructor to be added to a cohort. Signing in does not grant automatic access without enrollment.
               </p>
             </div>
           )}
@@ -117,7 +118,8 @@ export const ClassSelectionScreen: React.FC<Props> = ({
             const enrollmentKey = learner ? `${learner.id}_${cohort.id}` : '';
             const enrollment = enrollments[enrollmentKey];
             const completedCount = enrollment ? enrollment.completedLabIds.length : 0;
-            const safeTotal = Math.max(1, totalLabCount);
+            const cohortTotal = cohort.totalLessons ?? totalLabCount;
+            const safeTotal = Math.max(1, cohortTotal);
             const progressPercent = Math.round((completedCount / safeTotal) * 100);
 
             return (
@@ -134,7 +136,7 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                     <div className="flex items-center gap-1.5">
                       {cohort.isPublic && (
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          Công khai
+                          Open Access
                         </span>
                       )}
                     </div>
@@ -153,8 +155,8 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                   {/* Progress bar */}
                   <div className="space-y-1.5 pt-1">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500 font-medium">Tiến độ bài học:</span>
-                      <span className="font-bold text-slate-800">{completedCount} / {totalLabCount} bài ({progressPercent}%)</span>
+                      <span className="text-slate-500 font-medium">Curriculum Progress:</span>
+                      <span className="font-bold text-slate-800">{completedCount} / {cohortTotal} lessons ({progressPercent}%)</span>
                     </div>
                     <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                       <div 
@@ -170,11 +172,11 @@ export const ClassSelectionScreen: React.FC<Props> = ({
                   <button
                     onClick={async () => {
                       const ok = await onSelectClass(cohort);
-                      if (!ok) setJoinError('Quyền truy cập lớp đã hết hạn hoặc bị thu hồi.');
+                      if (!ok) setJoinError('Class access has expired or was revoked.');
                     }}
                     className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl transition shadow-sm cursor-pointer"
                   >
-                    <span>{completedCount > 0 ? 'Tiếp tục học' : cohort.isPublic ? 'Tham gia miễn phí' : 'Vào lớp học'}</span>
+                    <span>{completedCount > 0 ? 'Continue Learning' : cohort.isPublic ? 'Join Review Cohort' : 'Enter Class'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>

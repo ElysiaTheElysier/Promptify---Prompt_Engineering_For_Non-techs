@@ -24,11 +24,11 @@ export const RubricScorecard: React.FC<Props> = ({ audit, compact = false }) => 
   };
 
   const criteria = [
-    { name: '1. Rõ ràng vai trò chuyên môn (Role / Persona)', score: audit.personaScore, note: audit.personaNote },
-    { name: '2. Cụ thể hóa nhiệm vụ & mục tiêu (Task)', score: audit.taskScore, note: audit.taskNote },
-    { name: '3. Ràng buộc & Hạn chế rủi ro (Constraints)', score: audit.guardrailsScore, note: audit.guardrailsNote },
-    { name: '4. Tham số hóa dữ liệu đầu vào {{biến_số}}', score: audit.variableScore, note: audit.variableNote },
-    { name: '5. Quy định khuôn dạng đầu ra (Bảng Markdown)', score: audit.formatScore, note: audit.formatNote },
+    { name: '1. Role & Persona Clarity (Role)', score: audit.personaScore, note: audit.personaNote },
+    { name: '2. Explicit Task & Deliverable Objective (Task)', score: audit.taskScore, note: audit.taskNote },
+    { name: '3. Guardrails & Risk Constraints (Constraints)', score: audit.guardrailsScore, note: audit.guardrailsNote },
+    { name: '4. Parameterization & Variable Inputs {{variable}}', score: audit.variableScore, note: audit.variableNote },
+    { name: '5. Target Output Layout (Markdown Table)', score: audit.formatScore, note: audit.formatNote },
   ];
 
   return (
@@ -45,10 +45,10 @@ export const RubricScorecard: React.FC<Props> = ({ audit, compact = false }) => 
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                Bảng chấm điểm Prompt tự động
+                Automated Prompt Scorecard
               </span>
               <span className={`text-xs px-2 py-0.5 rounded-full border font-bold ${getBadgeStyle(audit.totalScore)}`}>
-                {audit.totalScore} / 100 điểm
+                {audit.totalScore} / 100 pts
               </span>
             </div>
             <p className="text-[11px] text-slate-500 line-clamp-1">
@@ -60,9 +60,9 @@ export const RubricScorecard: React.FC<Props> = ({ audit, compact = false }) => 
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium"
+            className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium cursor-pointer"
           >
-            {isExpanded ? 'Thu gọn' : 'Chi tiết'}
+            {isExpanded ? 'Collapse' : 'Details'}
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>
@@ -94,7 +94,7 @@ export const RubricScorecard: React.FC<Props> = ({ audit, compact = false }) => 
           <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 space-y-1">
             <div className="flex items-center gap-1.5 font-bold text-xs text-amber-800">
               <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              Chẩn đoán & Hướng dẫn cải tiến:
+              Diagnosis & Iteration Recommendations:
             </div>
             <p className="text-[11px] leading-relaxed text-amber-800">
               {audit.actionableAdvice}
@@ -105,4 +105,3 @@ export const RubricScorecard: React.FC<Props> = ({ audit, compact = false }) => 
     </div>
   );
 };
-

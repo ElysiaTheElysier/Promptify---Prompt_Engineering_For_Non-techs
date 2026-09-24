@@ -321,10 +321,10 @@ export const GuidedWalkthrough: React.FC<Props> = ({
     : '#FFFFFF'; // Chạm vào thân card màu trắng
 
   const modeLabel = currentMode === 'notebook' 
-    ? '📓 Sổ tay tuần tự' 
+    ? '📓 Notebook' 
     : currentMode === 'hybrid' 
-    ? '⚡ Tích hợp song song' 
-    : '🎛️ Phòng thực nghiệm';
+    ? '⚡ Hybrid Workspace' 
+    : '🎛️ Playground';
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden font-sans select-none animate-fadeIn">
@@ -400,7 +400,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
                 {modeLabel}
               </span>
               <span className="text-xs text-slate-300 font-medium">
-                Bước {currentStep.stepNumber} / {currentStep.totalSteps}
+                Step {currentStep.stepNumber} of {currentStep.totalSteps}
               </span>
             </div>
             <button onClick={handleSkip} className="text-slate-400 hover:text-white p-1">
@@ -426,13 +426,13 @@ export const GuidedWalkthrough: React.FC<Props> = ({
 
           {/* Footer */}
           <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <button onClick={handleSkip} className="text-xs text-slate-500">Bỏ qua</button>
+            <button onClick={handleSkip} className="text-xs text-slate-500">Skip</button>
             <div className="flex items-center gap-2">
               {currentStepIndex > 0 && (
-                <button onClick={handlePrev} className="px-3 py-1 rounded-lg border border-slate-300 text-xs">Quay lại</button>
+                <button onClick={handlePrev} className="px-3 py-1 rounded-lg border border-slate-300 text-xs">Back</button>
               )}
               <button onClick={handleNext} className="px-4 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-semibold">
-                {isLastStep ? 'Hoàn tất' : 'Tiếp tục'}
+                {isLastStep ? 'Finish' : 'Next'}
               </button>
             </div>
           </div>
@@ -468,14 +468,14 @@ export const GuidedWalkthrough: React.FC<Props> = ({
                 {modeLabel}
               </span>
               <span className="text-xs text-slate-300 font-medium">
-                Bước {currentStep.stepNumber} / {currentStep.totalSteps}
+                Step {currentStep.stepNumber} of {currentStep.totalSteps}
               </span>
             </div>
 
             <button
               onClick={handleSkip}
               className="text-slate-400 hover:text-white p-1 rounded transition"
-              title="Đóng hướng dẫn (Esc)"
+              title="Close walkthrough (Esc)"
             >
               <X className="w-4 h-4" />
             </button>
@@ -512,7 +512,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
             <div className="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200/90 text-emerald-950 text-xs space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-emerald-900 text-[11px]">
                 <Lightbulb className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                <span>Gợi ý cho {activeLab.title}:</span>
+                <span>Tip for {activeLab.title}:</span>
               </div>
               <p className="text-[11px] text-emerald-900 leading-relaxed pl-5">
                 {currentStep.labAdvice}
@@ -533,9 +533,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
             <button
               onClick={handleSkip}
               className="text-xs text-slate-500 hover:text-slate-800 font-medium transition px-2 py-1"
-            >
-              Bỏ qua
-            </button>
+            >Skip</button>
 
             <div className="flex items-center gap-2">
               {currentStepIndex > 0 && (
@@ -544,7 +542,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
                   className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-100 transition"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Quay lại</span>
+                  <span>Back</span>
                 </button>
               )}
 
@@ -552,7 +550,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
                 onClick={handleNext}
                 className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition"
               >
-                <span>{isLastStep ? 'Hoàn tất' : 'Tiếp tục'}</span>
+                <span>{isLastStep ? 'Finish' : 'Next'}</span>
                 {isLastStep ? <Check className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
               </button>
             </div>
@@ -578,7 +576,7 @@ export const GuidedWalkthrough: React.FC<Props> = ({
                 {modeLabel}
               </span>
               <span className="text-xs text-slate-300 font-medium">
-                Bước {currentStep.stepNumber} / {currentStep.totalSteps}
+                Step {currentStep.stepNumber} of {currentStep.totalSteps}
               </span>
             </div>
             <button onClick={handleSkip} className="text-slate-400 hover:text-white p-1">
@@ -608,13 +606,13 @@ export const GuidedWalkthrough: React.FC<Props> = ({
           </div>
 
           <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <button onClick={handleSkip} className="text-xs text-slate-500">Bỏ qua</button>
+            <button onClick={handleSkip} className="text-xs text-slate-500">Skip</button>
             <div className="flex items-center gap-2">
               {currentStepIndex > 0 && (
-                <button onClick={handlePrev} className="px-3 py-1 rounded-lg border border-slate-300 text-xs">Quay lại</button>
+                <button onClick={handlePrev} className="px-3 py-1 rounded-lg border border-slate-300 text-xs">Back</button>
               )}
               <button onClick={handleNext} className="px-4 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-semibold">
-                {isLastStep ? 'Hoàn tất' : 'Tiếp tục'}
+                {isLastStep ? 'Finish' : 'Next'}
               </button>
             </div>
           </div>

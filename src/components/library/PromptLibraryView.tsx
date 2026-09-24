@@ -6,11 +6,7 @@ import {
   Search, 
   Star, 
   ArrowRight, 
-  Sliders, 
-  Tag, 
   ArrowLeft,
-  Filter,
-  Sparkles,
   BookOpen
 } from 'lucide-react';
 import { SavedPromptTemplate, ClassCohort } from '../../types';
@@ -33,7 +29,6 @@ export const PromptLibraryView: React.FC<Props> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Lọc danh sách
   const filteredTemplates = library.filter((item) => {
     const matchesSearch = 
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -73,14 +68,14 @@ export const PromptLibraryView: React.FC<Props> = ({
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition mb-1 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Quay lại Dashboard</span>
+            <span>Back to Dashboard</span>
           </button>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
             <Bookmark className="w-6 h-6 text-amber-600" />
-            <span>Thư viện Prompt Chuẩn Nghiệp vụ</span>
+            <span>Enterprise Prompt Library</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Kho câu lệnh mẫu để tham khảo, lưu lại và tái sử dụng khi thực hành
+            Repository of verified prompt templates to reference, store, and reuse in practice
           </p>
         </div>
 
@@ -91,7 +86,7 @@ export const PromptLibraryView: React.FC<Props> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo tên prompt, kỹ thuật, tình huống..."
+            placeholder="Search by title, technique, business use case..."
             className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
           />
         </div>
@@ -107,7 +102,7 @@ export const PromptLibraryView: React.FC<Props> = ({
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Tất cả ({library.length})
+          All ({library.length})
         </button>
 
         <button
@@ -119,7 +114,7 @@ export const PromptLibraryView: React.FC<Props> = ({
           }`}
         >
           <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
-          <span>Khuyên dùng (SOP)</span>
+          <span>Recommended (SOP)</span>
         </button>
 
         <button
@@ -130,7 +125,7 @@ export const PromptLibraryView: React.FC<Props> = ({
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Cấu trúc 5 thành tố
+          5-Element Structure
         </button>
 
         <button
@@ -141,7 +136,7 @@ export const PromptLibraryView: React.FC<Props> = ({
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Có ví dụ mẫu
+          With Demonstrations
         </button>
 
         <button
@@ -152,7 +147,7 @@ export const PromptLibraryView: React.FC<Props> = ({
               : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          Đối chiếu tài liệu
+          Document Grounding
         </button>
       </div>
 
@@ -160,9 +155,9 @@ export const PromptLibraryView: React.FC<Props> = ({
       {filteredTemplates.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
           <Bookmark className="w-10 h-10 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-700">Không tìm thấy prompt phù hợp</h3>
+          <h3 className="text-base font-bold text-slate-700">No matching prompts found</h3>
           <p className="text-xs text-slate-500">
-            Hãy thử tìm bằng từ khóa khác hoặc xóa bộ lọc để xem toàn bộ danh mục.
+            Try searching with different keywords or clear filters to view all templates.
           </p>
         </div>
       ) : (
@@ -183,7 +178,7 @@ export const PromptLibraryView: React.FC<Props> = ({
                       {tpl.isRecommended && (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
                           <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
-                          <span>Khuyên dùng (SOP)</span>
+                          <span>Recommended (SOP)</span>
                         </span>
                       )}
                       <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
@@ -197,7 +192,7 @@ export const PromptLibraryView: React.FC<Props> = ({
                     <button
                       onClick={(e) => handleToggleStar(tpl.id, e)}
                       className="text-slate-300 hover:text-amber-500 transition p-1 cursor-pointer"
-                      title={tpl.isRecommended ? 'Bỏ đánh dấu khuyên dùng' : 'Đánh dấu khuyên dùng'}
+                      title={tpl.isRecommended ? 'Remove recommended bookmark' : 'Mark as recommended'}
                     >
                       <Star className={`w-4 h-4 ${tpl.isRecommended ? 'fill-amber-400 text-amber-500' : ''}`} />
                     </button>
@@ -224,7 +219,7 @@ export const PromptLibraryView: React.FC<Props> = ({
                         onClick={() => setExpandedId(isExpanded ? null : tpl.id)}
                         className="text-[11px] text-emerald-600 hover:text-emerald-700 font-semibold mt-1 cursor-pointer"
                       >
-                        {isExpanded ? 'Thu gọn' : 'Xem toàn bộ prompt...'}
+                        {isExpanded ? 'Collapse' : 'Expand full prompt...'}
                       </button>
                     )}
                   </div>
@@ -239,12 +234,12 @@ export const PromptLibraryView: React.FC<Props> = ({
                     {isCopied ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-600">Đã sao chép!</span>
+                        <span className="text-emerald-600">Copied!</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Sao chép</span>
+                        <span>Copy</span>
                       </>
                     )}
                   </button>
@@ -252,10 +247,10 @@ export const PromptLibraryView: React.FC<Props> = ({
                   <button
                     onClick={() => onOpenInPlayground(tpl.promptText)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-semibold transition cursor-pointer"
-                    title="Đưa câu lệnh này vào bài thực hành để chỉnh sửa và chạy ngay"
+                    title="Load this prompt into active workspace to edit and run"
                   >
                     <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Đưa vào bài thực hành</span>
+                    <span>Load into Workspace</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>

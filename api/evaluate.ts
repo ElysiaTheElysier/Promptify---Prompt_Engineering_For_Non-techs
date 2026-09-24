@@ -27,6 +27,6 @@ export default async function handler(req: any, res: any) {
   } catch (error: any) {
     console.error('Error in /api/evaluate:', error);
     const status = error instanceof ApiAccessError || error instanceof AiServerError ? error.statusCode : 500;
-    return res.status(status).json({ error: error.message || 'Lỗi xử lý đánh giá AI' });
+    return res.status(status).json({ error: error.message || 'AI evaluation error' });
   }
 }
