@@ -20,6 +20,7 @@ BEGIN
   END IF;
   IF to_regprocedure('public.record_prompt_attempt_and_progress(uuid,uuid,text,text,jsonb,text,integer)') IS NULL
      OR to_regprocedure('public.update_prompt_attempt_evaluation_and_progress(uuid,jsonb)') IS NULL
+     OR to_regprocedure('public.sync_lesson_progress_from_prompt_attempt()') IS NULL
      OR to_regprocedure('public.valid_evaluation_total(jsonb)') IS NULL THEN
     RAISE EXCEPTION 'one or more migration 016 functions are missing';
   END IF;
@@ -71,6 +72,28 @@ SELECT set_config(
 
 DO $$
 BEGIN
+  BEGIN
+    INSERT INTO public.prompt_attempts (
+      learner_id, class_id, lesson_id, lesson_ref_id, attempt_number,
+      prompt_text, ai_output, evaluation_json, model, latency_ms
+    ) VALUES (
+      'b7000000-0000-4000-8000-000000000001',
+      'b3000000-0000-4000-8000-000000000001',
+      'b5000000-0000-4000-8000-000000000004',
+      'b5000000-0000-4000-8000-000000000004',
+      98, 'staging-direct-atomicity-probe', 'must roll back', NULL, 'staging-probe', 1
+    );
+    RAISE EXCEPTION 'direct INSERT unexpectedly succeeded while progress trigger rejected the write';
+  EXCEPTION
+    WHEN OTHERS THEN
+      IF SQLERRM = 'direct INSERT unexpectedly succeeded while progress trigger rejected the write' THEN RAISE; END IF;
+      IF SQLERRM NOT LIKE '%intentional staging progress failure%' THEN RAISE; END IF;
+  END;
+
+  IF EXISTS (SELECT 1 FROM public.prompt_attempts WHERE prompt_text = 'staging-direct-atomicity-probe') THEN
+    RAISE EXCEPTION 'atomicity failure: direct prompt_attempt survived failed trigger progress write';
+  END IF;
+
   BEGIN
     PERFORM public.record_prompt_attempt_and_progress(
       'b3000000-0000-4000-8000-000000000001',
