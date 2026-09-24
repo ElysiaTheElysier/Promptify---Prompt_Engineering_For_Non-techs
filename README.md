@@ -1,7 +1,11 @@
 # Promptify
 
 > **Học Prompt Engineering qua các tình huống công việc thực tế**  
-> *Nền tảng đào tạo kỹ năng Prompt AI cho cán bộ & chuyên viên nghiệp vụ (Non-tech / Business Users)*
+> *Nền tảng đào tạo kỹ năng Prompt AI cho cán bộ & chuyên viên nghiệp vụ (Non-tech / Business Users)*  
+>  
+> 📌 **Tài liệu Bàn giao Toàn diện:** Xem ngay file [`HANDOFF.md`](file:///c:/Users/Admin/Documents/ThayDucStartup/Promptify---Prompt_Engineering_For_Non-techs/HANDOFF.md) để bắt đầu!  
+> 📚 **Giáo trình 22 Modules Đa Tầng:** [`curriculum-levels/README.md`](file:///c:/Users/Admin/Documents/ThayDucStartup/Promptify---Prompt_Engineering_For_Non-techs/curriculum-levels/README.md)  
+> 🧪 **Kế hoạch Kiểm thử & Test Log:** [`TEST_PLAN_AND_EXECUTION_LOG.md`](file:///c:/Users/Admin/Documents/ThayDucStartup/Promptify---Prompt_Engineering_For_Non-techs/TEST_PLAN_AND_EXECUTION_LOG.md)  
 
 ---
 
