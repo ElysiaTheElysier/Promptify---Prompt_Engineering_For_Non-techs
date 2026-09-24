@@ -72,14 +72,10 @@ function mapDbClassToInstructorClass(
       .map((progress) => progress.lesson_id));
     return (lessons.filter((lesson) => completedLessonIds.has(lesson.id)).length / lessons.length) * 100;
   });
+  // Preserve the existing product semantic: class completion is the enrollment
+  // lifecycle status, while lesson/class percentages come from learning events.
   const completedLearnerIds = enrolledLearners
-    .filter((learner) => {
-      if (lessons.length === 0) return false;
-      const completed = new Set(realProgress
-        .filter((progress) => progress.learner_id === learner.learner_id && progress.status === 'completed')
-        .map((progress) => progress.lesson_id));
-      return lessons.every((lesson) => completed.has(lesson.id));
-    })
+    .filter((learner) => learner.enrollment_status === 'completed')
     .map((learner) => learner.learner_id);
   const avgProgress = learnerProgress.length > 0
     ? Math.round(learnerProgress.reduce((sum, value) => sum + value, 0) / learnerProgress.length)

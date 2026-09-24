@@ -45,10 +45,17 @@ DECLARE
   score_key TEXT;
   score_value NUMERIC;
   score_total NUMERIC := 0;
+  declared_total NUMERIC;
 BEGIN
   IF payload IS NULL
      OR jsonb_typeof(payload) <> 'object'
-     OR jsonb_typeof(payload -> 'scores') <> 'object' THEN
+     OR jsonb_typeof(payload -> 'scores') <> 'object'
+     OR jsonb_typeof(payload -> 'total') <> 'number' THEN
+    RETURN NULL;
+  END IF;
+
+  declared_total := (payload ->> 'total')::NUMERIC;
+  IF declared_total <> trunc(declared_total) OR declared_total < 0 OR declared_total > 10 THEN
     RETURN NULL;
   END IF;
 
@@ -63,7 +70,11 @@ BEGIN
     score_total := score_total + score_value;
   END LOOP;
 
-  RETURN score_total;
+  IF declared_total <> score_total THEN
+    RETURN NULL;
+  END IF;
+
+  RETURN declared_total;
 EXCEPTION WHEN invalid_text_representation OR numeric_value_out_of_range THEN
   RETURN NULL;
 END;
@@ -211,11 +222,6 @@ END $$;
 ALTER TABLE public.lesson_progress ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.lesson_progress FROM PUBLIC, anon;
 GRANT SELECT ON TABLE public.lesson_progress TO authenticated;
-
--- All browser writes must use the atomic RPCs below. Existing SELECT access and
--- instructor DELETE behavior remain unchanged; direct INSERT/UPDATE can create
--- an event without updating canonical progress and are therefore revoked.
-REVOKE INSERT, UPDATE ON TABLE public.prompt_attempts FROM authenticated;
 
 DROP POLICY IF EXISTS "Learners read own lesson progress" ON public.lesson_progress;
 CREATE POLICY "Learners read own lesson progress"
