@@ -29,3 +29,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Tooling and scratch renders
+.aider-desk/
+.codex-docs/
+.agents/
+skills-lock.json
+logo.png
+

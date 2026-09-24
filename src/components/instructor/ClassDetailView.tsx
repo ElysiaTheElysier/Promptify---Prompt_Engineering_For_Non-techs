@@ -50,11 +50,7 @@ export const ClassDetailView: React.FC<Props> = ({
       setIsCurriculumLoading(true);
       setCurriculumError(null);
       try {
-        const classDetail = await dbService.getClassDetail(cohortClass.id);
-        if (!classDetail?.course_id) {
-          throw new Error('Không tìm thấy khóa học được gắn với lớp này.');
-        }
-        const modules = await dbService.getCourseCurriculum(classDetail.course_id);
+        const modules = await dbService.getInstructorCourseCurriculum(cohortClass.courseId);
         if (isMounted) setCurriculum(modules);
       } catch (error) {
         if (isMounted) {
@@ -78,9 +74,15 @@ export const ClassDetailView: React.FC<Props> = ({
   };
 
   const notStartedCount = cohortClass.totalLearners - cohortClass.startedLearners;
-  const inProgressCount = cohortClass.startedLearners - cohortClass.completedLearners;
+  const inProgressCount = Math.max(0, cohortClass.startedLearners - cohortClass.completedLearners);
   const learnerTotal = cohortClass.totalLearners || 0;
   const lessonCount = curriculum.reduce((total, module) => total + module.lessons.length, 0);
+  const classStatusLabel = {
+    active: 'Đang diễn ra',
+    upcoming: 'Sắp diễn ra',
+    completed: 'Đã hoàn thành',
+    archived: 'Đã lưu trữ',
+  }[cohortClass.status];
   const publicationLabel = (status: 'draft' | 'published' | 'archived') => ({
     draft: 'Bản nháp',
     published: 'Đã xuất bản',
@@ -122,7 +124,7 @@ export const ClassDetailView: React.FC<Props> = ({
                 Mã Lớp: {cohortClass.classCode}
               </span>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                ● {cohortClass.status === 'active' ? 'Đang diễn ra' : 'Lưu trữ'}
+                ● {classStatusLabel}
               </span>
             </div>
 
@@ -132,11 +134,15 @@ export const ClassDetailView: React.FC<Props> = ({
                 <Building2 className="w-3.5 h-3.5 text-slate-500" />
                 <span>Doanh nghiệp:</span> {cohortClass.organization}
               </span>
-              <span className="text-slate-300">|</span>
-              <span className="flex items-center gap-1">
-                <span className="text-slate-400 font-medium">Ngành:</span>
-                <strong className="text-slate-700 font-semibold">Ngân hàng & Tài chính</strong>
-              </span>
+              {cohortClass.industry && (
+                <>
+                  <span className="text-slate-300">|</span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-slate-400 font-medium">Ngành:</span>
+                    <strong className="text-slate-700 font-semibold">{cohortClass.industry}</strong>
+                  </span>
+                </>
+              )}
               <span className="text-slate-300">|</span>
               <span className="flex items-center gap-1">
                 <span className="text-slate-400 font-medium">Phòng ban:</span>

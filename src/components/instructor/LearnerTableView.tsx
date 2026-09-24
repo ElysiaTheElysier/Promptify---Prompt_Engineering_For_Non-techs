@@ -17,7 +17,6 @@ import {
 import { InstructorLearner } from '../../types/instructor';
 import { LearnerInClassDetail, EnrollmentStatus } from '../../types/database';
 import { dbService } from '../../services/dbService';
-import { INSTRUCTOR_CLASSES } from '../../data/instructorData';
 import { AddLearnerModal } from './AddLearnerModal';
 
 interface Props {
@@ -63,20 +62,16 @@ export const LearnerTableView: React.FC<Props> = ({
   // Load Classes list from DB
   const loadClasses = async () => {
     try {
-      const cls = await dbService.getClassesWithDetails();
+      const cls = await dbService.getInstructorClassesWithDetails();
       setClassesList(cls.map(c => ({
         id: c.id,
         name: c.course?.title || c.class_code,
         code: c.class_code,
         department: c.department
       })));
-    } catch {
-      setClassesList(INSTRUCTOR_CLASSES.map(c => ({
-        id: c.id,
-        name: c.name,
-        code: c.classCode,
-        department: c.department
-      })));
+    } catch (err: any) {
+      setClassesList([]);
+      setFeedback({ type: 'error', message: err.message || 'Không thể tải lớp học từ Supabase.' });
     }
   };
 
@@ -84,7 +79,7 @@ export const LearnerTableView: React.FC<Props> = ({
   const loadLearners = async () => {
     setLoading(true);
     try {
-      const list = await dbService.getLearnersInClass(selectedClassId);
+      const list = await dbService.getInstructorLearnersInClass(selectedClassId);
       setDbLearners(list);
     } catch (err: any) {
       console.error('Lỗi nạp danh sách học viên:', err);
@@ -98,7 +93,7 @@ export const LearnerTableView: React.FC<Props> = ({
     let isMounted = true;
     const fetchCls = async () => {
       try {
-        const cls = await dbService.getClassesWithDetails();
+        const cls = await dbService.getInstructorClassesWithDetails();
         if (isMounted) {
           setClassesList(cls.map(c => ({
             id: c.id,
@@ -107,14 +102,10 @@ export const LearnerTableView: React.FC<Props> = ({
             department: c.department
           })));
         }
-      } catch {
+      } catch (err: any) {
         if (isMounted) {
-          setClassesList(INSTRUCTOR_CLASSES.map(c => ({
-            id: c.id,
-            name: c.name,
-            code: c.classCode,
-            department: c.department
-          })));
+          setClassesList([]);
+          setFeedback({ type: 'error', message: err.message || 'Không thể tải lớp học từ Supabase.' });
         }
       }
     };
@@ -127,7 +118,7 @@ export const LearnerTableView: React.FC<Props> = ({
     const fetchLearners = async () => {
       setLoading(true);
       try {
-        const list = await dbService.getLearnersInClass(selectedClassId);
+        const list = await dbService.getInstructorLearnersInClass(selectedClassId);
         if (isMounted) setDbLearners(list);
       } catch (err: any) {
         if (isMounted) {

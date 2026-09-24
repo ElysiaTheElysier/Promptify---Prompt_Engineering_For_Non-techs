@@ -2,15 +2,19 @@ export type InstructorViewMode = 'dashboard' | 'classes' | 'class_detail' | 'lea
 
 export interface InstructorClass {
   id: string;
+  courseId: string;
   classCode: string;
   name: string;
   organization: string;
+  industry?: string;
   department: string;
   totalLearners: number;
+  learnerIds: string[];
   startedLearners: number;
   completedLearners: number;
+  completedLearnerIds: string[];
   avgProgressPercent: number;
-  status: 'active' | 'ending_soon' | 'completed';
+  status: 'active' | 'upcoming' | 'completed' | 'archived';
   timeRemainingText: string;
   startDate: string;
   description: string;

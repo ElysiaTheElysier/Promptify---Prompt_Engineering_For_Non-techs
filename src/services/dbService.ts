@@ -433,6 +433,13 @@ export const dbService = {
     return list.find(c => c.id === classId || c.class_code === classId) || null;
   },
 
+  async getInstructorClassesWithDetails(): Promise<ClassWithDetails[]> {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase chưa được cấu hình. Instructor View không sử dụng dữ liệu local/mock.');
+    }
+    return this.getClassesWithDetails();
+  },
+
   // ----------------------------------------------------------------------------
   // P0.5 — COURSE CRUD
   // ----------------------------------------------------------------------------
@@ -604,6 +611,13 @@ export const dbService = {
           .sort((a, b) => a.position - b.position),
       }))
       .sort((a, b) => a.position - b.position);
+  },
+
+  async getInstructorCourseCurriculum(courseId: string): Promise<CourseCurriculumModule[]> {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase chưa được cấu hình. Không thể tải curriculum thật.');
+    }
+    return this.getCourseCurriculum(courseId);
   },
 
   async createCourseModule(data: Omit<DbCourseModule, 'id' | 'created_at' | 'updated_at'>): Promise<DbCourseModule> {
@@ -809,6 +823,13 @@ export const dbService = {
         joined_at: e.joined_at || new Date().toISOString(),
       };
     });
+  },
+
+  async getInstructorLearnersInClass(classId?: string): Promise<LearnerInClassDetail[]> {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase chưa được cấu hình. Không thể tải học viên thật.');
+    }
+    return this.getLearnersInClass(classId);
   },
 
   /**
@@ -1334,6 +1355,30 @@ export const dbService = {
     return localAttempts
       .filter(a => (a.learner_id === learnerId || a.learner_id.includes(learnerId)) && (a.class_id === classId || a.class_id.includes(classId)) && a.lesson_id === lessonId)
       .sort((a, b) => a.attempt_number - b.attempt_number);
+  },
+
+  /**
+   * Instructor monitoring source. This intentionally has no local/mock fallback:
+   * when Supabase is unavailable the instructor UI must show an error/empty state,
+   * never fabricated learning activity.
+   */
+  async getInstructorPromptAttempts(classIds: string[] = []): Promise<DbPromptAttempt[]> {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase chưa được cấu hình. Không thể tải hoạt động học tập thật.');
+    }
+
+    let query = supabase
+      .from('prompt_attempts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (classIds.length > 0) {
+      query = query.in('class_id', classIds);
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(`Lỗi tải hoạt động học tập: ${error.message}`);
+    return (data || []) as DbPromptAttempt[];
   },
 
   /**

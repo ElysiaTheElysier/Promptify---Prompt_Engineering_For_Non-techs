@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { InstructorClass, InstructorViewMode } from '../../types/instructor';
-import { INSTRUCTOR_CLASSES } from '../../data/instructorData';
+import { InstructorActivity, InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { dbService } from '../../services/dbService';
-import { ClassWithDetails } from '../../types/database';
+import { ClassWithDetails, CourseCurriculumModule, DbPromptAttempt, LearnerInClassDetail } from '../../types/database';
 import { InstructorNavbar } from './InstructorNavbar';
 import { InstructorDashboard } from './InstructorDashboard';
 import { ClassDetailView } from './ClassDetailView';
@@ -23,32 +22,127 @@ interface Props {
   onLogout: () => void;
 }
 
-function mapDbClassToInstructorClass(cls: ClassWithDetails): InstructorClass {
-  const learnerCount = cls.learner_count || 0;
-  const completedCount = Math.round(learnerCount * 0.4);
-  const startedCount = learnerCount;
-  const avgProgress = learnerCount > 0 ? 55 : 0;
+function formatTimeRemaining(endDate?: string | null): string {
+  if (!endDate) return 'Không giới hạn';
+  const remainingMs = new Date(endDate).getTime() - Date.now();
+  if (!Number.isFinite(remainingMs) || remainingMs <= 0) return 'Đã kết thúc';
+  const hours = Math.ceil(remainingMs / 3_600_000);
+  return hours < 24 ? `${hours} giờ` : `${Math.ceil(hours / 24)} ngày`;
+}
+
+function formatTimeAgo(timestamp?: string): string {
+  if (!timestamp) return 'Không rõ thời gian';
+  const minutes = Math.floor(Math.max(0, Date.now() - new Date(timestamp).getTime()) / 60_000);
+  if (minutes < 1) return 'Vừa xong';
+  if (minutes < 60) return `${minutes} phút trước`;
+  const hours = Math.floor(minutes / 60);
+  return hours < 24 ? `${hours} giờ trước` : `${Math.floor(hours / 24)} ngày trước`;
+}
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return (parts.length > 1 ? `${parts[0][0]}${parts[parts.length - 1]?.[0] || ''}` : parts[0]?.slice(0, 2) || 'HV').toUpperCase();
+}
+
+function publishedLessons(curriculum: CourseCurriculumModule[]) {
+  return curriculum
+    .filter((module) => module.status === 'published')
+    .flatMap((module) => module.lessons.filter((lesson) => lesson.status === 'published'));
+}
+
+function attemptMatchesLesson(attempt: DbPromptAttempt, lesson: ReturnType<typeof publishedLessons>[number]): boolean {
+  return attempt.lesson_ref_id === lesson.id || attempt.lesson_id === lesson.id || attempt.lesson_id === lesson.lesson_key;
+}
+
+function mapDbClassToInstructorClass(
+  cls: ClassWithDetails,
+  learners: LearnerInClassDetail[],
+  curriculum: CourseCurriculumModule[],
+  attempts: DbPromptAttempt[],
+): InstructorClass {
+  const enrolledLearners = learners.filter((learner) => learner.enrollment_status !== 'removed');
+  const enrolledIds = new Set(enrolledLearners.map((learner) => learner.learner_id));
+  const realAttempts = attempts.filter((attempt) => enrolledIds.has(attempt.learner_id));
+  const lessons = publishedLessons(curriculum);
+  const startedLearnerIds = new Set(realAttempts.map((attempt) => attempt.learner_id));
+  const completedCount = enrolledLearners.filter((learner) => learner.enrollment_status === 'completed').length;
+  const learnerProgress = enrolledLearners.map((learner) => {
+    if (lessons.length === 0) return 0;
+    const ownAttempts = realAttempts.filter((attempt) => attempt.learner_id === learner.learner_id);
+    const attemptedLessons = lessons.filter((lesson) => ownAttempts.some((attempt) => attemptMatchesLesson(attempt, lesson))).length;
+    return (attemptedLessons / lessons.length) * 100;
+  });
+  const avgProgress = learnerProgress.length > 0
+    ? Math.round(learnerProgress.reduce((sum, value) => sum + value, 0) / learnerProgress.length)
+    : 0;
 
   return {
     id: cls.id,
+    courseId: cls.course_id,
     classCode: cls.class_code,
     name: cls.course?.title || cls.class_code,
-    organization: cls.client?.name || 'Agribank Việt Nam',
-    department: cls.department,
-    totalLearners: learnerCount,
-    startedLearners: startedCount,
+    organization: cls.client?.name || '',
+    industry: cls.client?.industry || '',
+    department: cls.department || '',
+    totalLearners: enrolledLearners.length,
+    learnerIds: [...enrolledIds],
+    startedLearners: startedLearnerIds.size,
     completedLearners: completedCount,
+    completedLearnerIds: enrolledLearners
+      .filter((learner) => learner.enrollment_status === 'completed')
+      .map((learner) => learner.learner_id),
     avgProgressPercent: avgProgress,
-    status: cls.status === 'completed' ? 'completed' : 'active',
-    timeRemainingText: '6 giờ',
-    startDate: cls.start_date || new Date().toISOString(),
-    description: cls.course?.description || 'Chương trình chuẩn hóa kỹ năng Prompt Engineering cho cán bộ nghiệp vụ.',
-    lessonProgress: [
-      { labId: 'lab-1', labTitle: 'Lab 1: Cấu trúc lệnh nghiệp vụ', completedCount: learnerCount, totalCount: learnerCount, completionPercent: 100 },
-      { labId: 'lab-2', labTitle: 'Lab 2: Bảng biểu & Excel Markdown', completedCount: Math.round(learnerCount * 0.7), totalCount: learnerCount, completionPercent: 70 },
-      { labId: 'lab-3', labTitle: 'Lab 3: Kiểm soát rủi ro & Chống ảo giác', completedCount: completedCount, totalCount: learnerCount, completionPercent: 40 }
-    ]
+    status: cls.status,
+    timeRemainingText: formatTimeRemaining(cls.end_date),
+    startDate: cls.start_date,
+    description: cls.course?.description || '',
+    lessonProgress: lessons.map((lesson) => {
+      const attemptedBy = new Set(realAttempts.filter((attempt) => attemptMatchesLesson(attempt, lesson)).map((attempt) => attempt.learner_id));
+      return {
+        labId: lesson.id,
+        labTitle: lesson.title,
+        completedCount: attemptedBy.size,
+        totalCount: enrolledLearners.length,
+        completionPercent: enrolledLearners.length > 0 ? Math.round((attemptedBy.size / enrolledLearners.length) * 100) : 0,
+      };
+    }),
   };
+}
+
+function buildActivities(
+  attempts: DbPromptAttempt[],
+  classes: InstructorClass[],
+  learnersByClass: Map<string, LearnerInClassDetail[]>,
+  curriculaByCourse: Map<string, CourseCurriculumModule[]>,
+  dbClasses: ClassWithDetails[],
+): InstructorActivity[] {
+  const classById = new Map(classes.map((item) => [item.id, item]));
+  const dbClassById = new Map(dbClasses.map((item) => [item.id, item]));
+  return [...attempts]
+    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+    .map((attempt) => {
+      const dbClass = dbClassById.get(attempt.class_id);
+      const learner = (learnersByClass.get(attempt.class_id) || []).find((item) => item.learner_id === attempt.learner_id);
+      const lesson = publishedLessons(curriculaByCourse.get(dbClass?.course_id || '') || [])
+        .find((item) => attemptMatchesLesson(attempt, item));
+      const learnerName = learner?.full_name || learner?.learner_code || 'Học viên';
+      const score = attempt.evaluation_json?.total;
+      return {
+        id: attempt.id,
+        timestamp: attempt.created_at || '',
+        timeAgo: formatTimeAgo(attempt.created_at),
+        learnerId: attempt.learner_id,
+        learnerName,
+        learnerAvatar: initials(learnerName),
+        classId: attempt.class_id,
+        className: classById.get(attempt.class_id)?.name || dbClass?.class_code || 'Lớp học',
+        actionType: 'run_prompt' as const,
+        actionText: 'Chạy Prompt',
+        detail: `Đã chạy prompt lần ${attempt.attempt_number}${typeof score === 'number' ? ` · Điểm ${score}/10` : ' · Chưa có đánh giá'}`,
+        labId: lesson?.id || attempt.lesson_ref_id || attempt.lesson_id,
+        labName: lesson?.title || attempt.lesson_id,
+      };
+    });
 }
 
 export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) => {
@@ -60,7 +154,9 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
     return 'dashboard';
   });
   const [classes, setClasses] = useState<InstructorClass[]>([]);
+  const [activities, setActivities] = useState<InstructorActivity[]>([]);
   const [isLoadingClasses, setIsLoadingClasses] = useState<boolean>(true);
+  const [classesError, setClassesError] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<InstructorClass | null>(null);
 
   // Sync instructor view to sessionStorage
@@ -79,12 +175,34 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
   const reloadClasses = async (isMounted = true) => {
     if (!currentUser) return;
     setIsLoadingClasses(true);
+    setClassesError(null);
     try {
-      const dbClasses = await dbService.getClassesWithDetails();
+      const dbClasses = await dbService.getInstructorClassesWithDetails();
       if (!isMounted) return;
       if (dbClasses && dbClasses.length > 0) {
-        const mapped = dbClasses.map(mapDbClassToInstructorClass);
+        const courseIds = [...new Set(dbClasses.map((item) => item.course_id))];
+        const curriculaByCourse = new Map(await Promise.all(courseIds.map(async (courseId) => (
+          [courseId, await dbService.getInstructorCourseCurriculum(courseId)] as const
+        ))));
+        const learnersByClass = new Map(await Promise.all(dbClasses.map(async (item) => (
+          [item.id, await dbService.getInstructorLearnersInClass(item.id)] as const
+        ))));
+        const allAttempts = await dbService.getInstructorPromptAttempts(dbClasses.map((item) => item.id));
+        const attemptsByClass = new Map<string, DbPromptAttempt[]>();
+        allAttempts.forEach((attempt) => {
+          const list = attemptsByClass.get(attempt.class_id) || [];
+          list.push(attempt);
+          attemptsByClass.set(attempt.class_id, list);
+        });
+        if (!isMounted) return;
+        const mapped = dbClasses.map((item) => mapDbClassToInstructorClass(
+          item,
+          learnersByClass.get(item.id) || [],
+          curriculaByCourse.get(item.course_id) || [],
+          attemptsByClass.get(item.id) || [],
+        ));
         setClasses(mapped);
+        setActivities(buildActivities(allAttempts, mapped, learnersByClass, curriculaByCourse, dbClasses));
         const savedClassId = sessionStorage.getItem('promptify_instructor_class_id');
         setSelectedClass(prev => {
           if (prev) {
@@ -97,9 +215,18 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
           }
           return mapped[0];
         });
+      } else {
+        setClasses([]);
+        setActivities([]);
+        setSelectedClass(null);
       }
     } catch (err) {
-      if (isMounted) console.error('Lỗi tải danh sách lớp học:', err);
+      if (isMounted) {
+        console.error('Lỗi tải dữ liệu giám sát lớp học:', err);
+        setClasses([]);
+        setActivities([]);
+        setClassesError(err instanceof Error ? err.message : 'Không thể tải dữ liệu giám sát từ cơ sở dữ liệu.');
+      }
     } finally {
       if (isMounted) setIsLoadingClasses(false);
     }
@@ -171,6 +298,11 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {classesError && (
+          <div className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            Không thể tải dữ liệu giám sát từ Supabase: {classesError}
+          </div>
+        )}
         {/* VIEW 1: DASHBOARD OVERVIEW */}
         {currentView === 'dashboard' && (
           <InstructorDashboard
@@ -178,6 +310,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
             onNavigate={setCurrentView}
             onOpenTutorial={() => handleOpenTutorial('dashboard')}
             classes={classes}
+            activities={activities}
             isLoading={isLoadingClasses}
           />
         )}
@@ -217,7 +350,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
                         {cls.classCode}
                       </span>
                       <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        Đang diễn ra
+                        {{ active: 'Đang diễn ra', upcoming: 'Sắp diễn ra', completed: 'Đã hoàn thành', archived: 'Đã lưu trữ' }[cls.status]}
                       </span>
                     </div>
 
@@ -225,7 +358,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
                       {cls.name}
                     </h3>
                     <p className="text-xs text-slate-500 line-clamp-2">
-                      {cls.organization} • {cls.department}
+                      {[cls.organization, cls.department].filter(Boolean).join(' • ') || 'Chưa có thông tin đơn vị'}
                     </p>
 
                     <div className="bg-slate-50 rounded-xl p-3 space-y-2 border border-slate-100">
@@ -303,7 +436,12 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
         {/* VIEW 5: ACTIVITY STREAM */}
         {currentView === 'activity' && (
           <div className="space-y-4">
-            <ActivityStreamView onOpenTutorial={() => handleOpenTutorial('activity')} />
+            <ActivityStreamView
+              onOpenTutorial={() => handleOpenTutorial('activity')}
+              classes={classes}
+              activities={activities}
+              isLoading={isLoadingClasses}
+            />
           </div>
         )}
       </main>

@@ -10,14 +10,14 @@ import {
   Activity,
   HelpCircle
 } from 'lucide-react';
-import { InstructorClass, InstructorViewMode } from '../../types/instructor';
-import { INSTRUCTOR_ACTIVITIES } from '../../data/instructorData';
+import { InstructorActivity, InstructorClass, InstructorViewMode } from '../../types/instructor';
 
 interface Props {
   onSelectClass: (cohortClass: InstructorClass) => void;
   onNavigate: (view: InstructorViewMode) => void;
   onOpenTutorial?: () => void;
   classes?: InstructorClass[];
+  activities?: InstructorActivity[];
   isLoading?: boolean;
 }
 
@@ -26,6 +26,7 @@ export const InstructorDashboard: React.FC<Props> = ({
   onNavigate, 
   onOpenTutorial,
   classes = [],
+  activities = [],
   isLoading = false
 }) => {
   if (isLoading) {
@@ -42,7 +43,7 @@ export const InstructorDashboard: React.FC<Props> = ({
     );
   }
 
-  const activeClassList = classes;
+  const activeClassList = classes.filter((item) => item.status === 'active');
   const primaryClass = activeClassList.length > 0
     ? [...activeClassList].sort((a, b) => a.avgProgressPercent - b.avgProgressPercent)[0]
     : null;
@@ -51,9 +52,9 @@ export const InstructorDashboard: React.FC<Props> = ({
   const primaryNotStarted = primaryClass ? Math.max(0, primaryClass.totalLearners - primaryClass.startedLearners) : 0;
   const primaryInProgress = primaryClass ? Math.max(0, primaryClass.startedLearners - primaryClass.completedLearners) : 0;
 
-  // Real database stats calculation (NO mock fallbacks)
-  const totalLearnersCount = activeClassList.reduce((acc, c) => acc + c.totalLearners, 0);
-  const completedLearnersCount = activeClassList.reduce((acc, c) => acc + c.completedLearners, 0);
+  // Aggregates are computed from Supabase-backed enrollment and prompt-attempt data.
+  const totalLearnersCount = new Set(activeClassList.flatMap((item) => item.learnerIds)).size;
+  const completedLearnersCount = new Set(activeClassList.flatMap((item) => item.completedLearnerIds)).size;
   const activeClassesCount = activeClassList.filter(c => c.status === 'active').length;
   const completionRatio = totalLearnersCount > 0 ? Math.round((completedLearnersCount / totalLearnersCount) * 100) : 0;
 
@@ -311,7 +312,12 @@ export const InstructorDashboard: React.FC<Props> = ({
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs divide-y divide-slate-100 overflow-hidden">
-          {INSTRUCTOR_ACTIVITIES.slice(0, 4).map((act) => (
+          {activities.length === 0 && (
+            <div className="p-6 text-center text-xs text-slate-500">
+              Chưa có lần chạy prompt nào được lưu trong cơ sở dữ liệu.
+            </div>
+          )}
+          {activities.slice(0, 4).map((act) => (
             <div key={act.id} className="p-3.5 sm:px-5 flex items-center justify-between gap-4 text-xs">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] flex items-center justify-center flex-shrink-0">

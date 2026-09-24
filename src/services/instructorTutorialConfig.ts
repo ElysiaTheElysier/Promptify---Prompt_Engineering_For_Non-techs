@@ -207,18 +207,18 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
         stepNumber: 1,
         totalSteps: 3,
         targetId: 'activity-header',
-        title: 'Dòng sự kiện trực tiếp (Live Stream)',
-        description: 'Ghi nhận mọi thao tác của học viên theo thời gian thực: nộp bài, chạy prompt thử nghiệm, hoàn thành bài lab.',
-        tip: '💡 Dữ liệu hiển thị trực tiếp theo trình tự thời gian, sự kiện mới nhất nằm ở trên cùng.'
+        title: 'Lịch sử chạy Prompt từ cơ sở dữ liệu',
+        description: 'Hiển thị các lần chạy prompt đã được ghi vào bảng prompt_attempts, kèm bài học, lần thử và điểm đánh giá nếu có.',
+        tip: '💡 Sự kiện mới nhất nằm ở trên cùng; màn hình không tạo hoạt động mô phỏng.'
       },
       {
         id: 'activity-step-2',
         stepNumber: 2,
         totalSteps: 3,
         targetId: 'activity-filters',
-        title: 'Bộ lọc hoạt động theo lớp & hành động',
+        title: 'Bộ lọc hoạt động theo lớp',
         description: 'Lọc luồng sự kiện theo từng lớp riêng biệt để instructor tập trung theo dõi lớp mình đang đứng giảng.',
-        tip: '💡 Bạn cũng có thể lọc riêng các sự kiện "Hoàn thành bài học" để theo dõi những người về đích.'
+        tip: '💡 Danh sách lớp trong bộ lọc được tải trực tiếp từ Supabase.'
       },
       {
         id: 'activity-step-3',
@@ -226,8 +226,8 @@ export const INSTRUCTOR_TUTORIAL_DATA: Record<InstructorViewMode, TabTourConfig>
         totalSteps: 3,
         targetId: 'activity-stream-list',
         title: 'Dòng thời gian sự kiện học viên',
-        description: 'Mỗi sự kiện hiển thị thời điểm diễn ra, tên học viên, lớp học và hành động cụ thể kèm điểm số hoặc bài lab tương ứng.',
-        tip: '💡 Nhịp độ hoạt động liên tục chứng minh học viên đang chủ động thực hành và tiến bộ.'
+        description: 'Mỗi sự kiện hiển thị thời điểm, học viên, lớp, bài học, số lần thử và điểm evaluation đã lưu.',
+        tip: '💡 Nếu chưa có prompt_attempts thật, danh sách sẽ để trống thay vì hiển thị dữ liệu mẫu.'
       }
     ]
   }
