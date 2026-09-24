@@ -1,8 +1,8 @@
 -- =============================================================================
 -- MIGRATION 016: SERVER-BACKED LEARNING PROGRESS
 -- prompt_attempts remains the event history. lesson_progress is the canonical
--- current state for a learner/class/lesson. Browser clients write both only
--- through the atomic SECURITY DEFINER functions below.
+-- current state for a learner/class/lesson. During the zero-downtime transition,
+-- legacy table writes and new RPC writes share one canonical trigger sync path.
 -- =============================================================================
 
 BEGIN;
@@ -81,6 +81,100 @@ END;
 $$ LANGUAGE plpgsql IMMUTABLE SET search_path = public, pg_temp;
 
 REVOKE ALL ON FUNCTION public.valid_evaluation_total(JSONB) FROM PUBLIC, anon, authenticated;
+
+-- Canonical synchronization path for BOTH legacy direct writes and the new
+-- RPCs. Because this is an AFTER trigger, the prompt_attempt already has its
+-- final id and the lesson_progress.last_attempt_id foreign key is valid. Any
+-- exception here aborts the surrounding INSERT/UPDATE transaction.
+CREATE OR REPLACE FUNCTION public.sync_lesson_progress_from_prompt_attempt()
+RETURNS TRIGGER AS $$
+DECLARE
+  canonical_lesson_id UUID;
+  candidate_count INTEGER;
+  valid_score NUMERIC;
+  event_time TIMESTAMPTZ;
+BEGIN
+  SELECT
+    count(DISTINCT l.id),
+    (array_agg(DISTINCT l.id ORDER BY l.id))[1]
+  INTO candidate_count, canonical_lesson_id
+  FROM public.classes c
+  JOIN public.course_modules m ON m.course_id = c.course_id
+  JOIN public.lessons l ON l.module_id = m.id
+  WHERE c.id = NEW.class_id
+    AND (
+      (NEW.lesson_ref_id IS NOT NULL AND l.id = NEW.lesson_ref_id)
+      OR (
+        NEW.lesson_ref_id IS NULL
+        AND NEW.lesson_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+        AND l.id = CASE
+          WHEN NEW.lesson_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          THEN NEW.lesson_id::UUID ELSE NULL END
+      )
+      OR (NEW.lesson_ref_id IS NULL AND l.lesson_key = NEW.lesson_id)
+    );
+
+  IF candidate_count <> 1 OR canonical_lesson_id IS NULL THEN
+    RAISE EXCEPTION 'Prompt attempt cannot be mapped to exactly one lesson in its class course.';
+  END IF;
+
+  valid_score := public.valid_evaluation_total(NEW.evaluation_json);
+
+  IF TG_OP = 'INSERT' THEN
+    event_time := coalesce(NEW.created_at, now());
+    INSERT INTO public.lesson_progress (
+      learner_id, class_id, lesson_id, status, attempts_count, best_score,
+      last_attempt_id, started_at, completed_at, updated_at
+    ) VALUES (
+      NEW.learner_id, NEW.class_id, canonical_lesson_id, 'completed', 1, valid_score,
+      NEW.id, event_time, event_time, event_time
+    )
+    ON CONFLICT (learner_id, class_id, lesson_id) DO UPDATE SET
+      status = 'completed',
+      attempts_count = public.lesson_progress.attempts_count + 1,
+      best_score = CASE
+        WHEN valid_score IS NULL THEN public.lesson_progress.best_score
+        WHEN public.lesson_progress.best_score IS NULL THEN valid_score
+        ELSE greatest(public.lesson_progress.best_score, valid_score)
+      END,
+      last_attempt_id = NEW.id,
+      started_at = coalesce(public.lesson_progress.started_at, event_time),
+      completed_at = coalesce(public.lesson_progress.completed_at, event_time),
+      updated_at = event_time;
+  ELSIF TG_OP = 'UPDATE' AND NEW.evaluation_json IS DISTINCT FROM OLD.evaluation_json THEN
+    UPDATE public.lesson_progress lp
+    SET best_score = CASE
+          WHEN valid_score IS NULL THEN lp.best_score
+          WHEN lp.best_score IS NULL THEN valid_score
+          ELSE greatest(lp.best_score, valid_score)
+        END,
+        updated_at = now()
+    WHERE lp.learner_id = NEW.learner_id
+      AND lp.class_id = NEW.class_id
+      AND lp.lesson_id = canonical_lesson_id;
+
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Canonical lesson progress is missing for updated prompt attempt.';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+REVOKE ALL ON FUNCTION public.sync_lesson_progress_from_prompt_attempt() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS trg_sync_prompt_attempt_progress_insert ON public.prompt_attempts;
+CREATE TRIGGER trg_sync_prompt_attempt_progress_insert
+AFTER INSERT ON public.prompt_attempts
+FOR EACH ROW EXECUTE FUNCTION public.sync_lesson_progress_from_prompt_attempt();
+
+DROP TRIGGER IF EXISTS trg_sync_prompt_attempt_progress_evaluation ON public.prompt_attempts;
+CREATE TRIGGER trg_sync_prompt_attempt_progress_evaluation
+AFTER UPDATE OF evaluation_json ON public.prompt_attempts
+FOR EACH ROW
+WHEN (NEW.evaluation_json IS DISTINCT FROM OLD.evaluation_json)
+EXECUTE FUNCTION public.sync_lesson_progress_from_prompt_attempt();
 
 -- Backfill only deterministic mappings within the attempt's class/course.
 WITH mapping_candidates AS (
@@ -228,8 +322,11 @@ CREATE POLICY "Learners read own lesson progress"
 ON public.lesson_progress FOR SELECT TO authenticated
 USING (
   public.is_instructor()
-  OR learner_id IN (
-    SELECT l.id FROM public.learners l WHERE l.user_id = public.current_user_id()
+  OR (
+    learner_id IN (
+      SELECT l.id FROM public.learners l WHERE l.user_id = public.current_user_id()
+    )
+    AND public.has_active_class_enrollment(class_id)
   )
 );
 
@@ -249,7 +346,6 @@ DECLARE
   next_attempt_number INTEGER;
   inserted_attempt public.prompt_attempts%ROWTYPE;
   upserted_progress public.lesson_progress%ROWTYPE;
-  valid_score NUMERIC;
   event_time TIMESTAMPTZ := now();
 BEGIN
   resolved_user_id := public.current_user_id();
@@ -309,28 +405,17 @@ BEGIN
     coalesce(nullif(btrim(p_model), ''), 'unknown'), greatest(coalesce(p_latency_ms, 0), 0), event_time
   ) RETURNING * INTO inserted_attempt;
 
-  valid_score := public.valid_evaluation_total(p_evaluation_json);
+  -- The INSERT trigger is the only writer of lesson_progress. Select the row it
+  -- synchronized so the client still receives attempt + progress atomically.
+  SELECT * INTO upserted_progress
+  FROM public.lesson_progress lp
+  WHERE lp.learner_id = resolved_learner_id
+    AND lp.class_id = p_class_id
+    AND lp.lesson_id = p_lesson_id;
 
-  INSERT INTO public.lesson_progress (
-    learner_id, class_id, lesson_id, status, attempts_count, best_score,
-    last_attempt_id, started_at, completed_at, updated_at
-  ) VALUES (
-    resolved_learner_id, p_class_id, p_lesson_id, 'completed', 1, valid_score,
-    inserted_attempt.id, event_time, event_time, event_time
-  )
-  ON CONFLICT (learner_id, class_id, lesson_id) DO UPDATE SET
-    status = 'completed',
-    attempts_count = public.lesson_progress.attempts_count + 1,
-    best_score = CASE
-      WHEN valid_score IS NULL THEN public.lesson_progress.best_score
-      WHEN public.lesson_progress.best_score IS NULL THEN valid_score
-      ELSE greatest(public.lesson_progress.best_score, valid_score)
-    END,
-    last_attempt_id = inserted_attempt.id,
-    started_at = coalesce(public.lesson_progress.started_at, event_time),
-    completed_at = coalesce(public.lesson_progress.completed_at, event_time),
-    updated_at = event_time
-  RETURNING * INTO upserted_progress;
+  IF upserted_progress.id IS NULL THEN
+    RAISE EXCEPTION 'Prompt attempt trigger did not synchronize lesson progress.';
+  END IF;
 
   RETURN jsonb_build_object(
     'attempt', to_jsonb(inserted_attempt),
@@ -349,7 +434,6 @@ DECLARE
   resolved_learner_id UUID;
   target_attempt public.prompt_attempts%ROWTYPE;
   updated_progress public.lesson_progress%ROWTYPE;
-  valid_score NUMERIC;
 BEGIN
   resolved_user_id := public.current_user_id();
   SELECT l.id INTO resolved_learner_id
@@ -379,18 +463,16 @@ BEGIN
   WHERE id = target_attempt.id
   RETURNING * INTO target_attempt;
 
-  valid_score := public.valid_evaluation_total(p_evaluation_json);
-  UPDATE public.lesson_progress lp
-  SET best_score = CASE
-        WHEN valid_score IS NULL THEN lp.best_score
-        WHEN lp.best_score IS NULL THEN valid_score
-        ELSE greatest(lp.best_score, valid_score)
-      END,
-      updated_at = now()
+  -- The UPDATE trigger is the only writer of best_score.
+  SELECT * INTO updated_progress
+  FROM public.lesson_progress lp
   WHERE lp.learner_id = resolved_learner_id
     AND lp.class_id = target_attempt.class_id
-    AND lp.lesson_id = target_attempt.lesson_ref_id
-  RETURNING * INTO updated_progress;
+    AND lp.lesson_id = target_attempt.lesson_ref_id;
+
+  IF updated_progress.id IS NULL THEN
+    RAISE EXCEPTION 'Prompt attempt trigger did not synchronize lesson progress.';
+  END IF;
 
   RETURN jsonb_build_object(
     'attempt', to_jsonb(target_attempt),
@@ -414,5 +496,8 @@ NOTIFY pgrst, 'reload schema';
 -- Rollback plan before application dependency:
 -- DROP FUNCTION IF EXISTS public.update_prompt_attempt_evaluation_and_progress(UUID, JSONB);
 -- DROP FUNCTION IF EXISTS public.record_prompt_attempt_and_progress(UUID, UUID, TEXT, TEXT, JSONB, TEXT, INTEGER);
+-- DROP TRIGGER IF EXISTS trg_sync_prompt_attempt_progress_evaluation ON public.prompt_attempts;
+-- DROP TRIGGER IF EXISTS trg_sync_prompt_attempt_progress_insert ON public.prompt_attempts;
+-- DROP FUNCTION IF EXISTS public.sync_lesson_progress_from_prompt_attempt();
 -- DROP FUNCTION IF EXISTS public.valid_evaluation_total(JSONB);
 -- DROP TABLE IF EXISTS public.lesson_progress;

@@ -6,6 +6,9 @@ BEGIN;
 
 DROP FUNCTION IF EXISTS public.update_prompt_attempt_evaluation_and_progress(UUID, JSONB);
 DROP FUNCTION IF EXISTS public.record_prompt_attempt_and_progress(UUID, UUID, TEXT, TEXT, JSONB, TEXT, INTEGER);
+DROP TRIGGER IF EXISTS trg_sync_prompt_attempt_progress_evaluation ON public.prompt_attempts;
+DROP TRIGGER IF EXISTS trg_sync_prompt_attempt_progress_insert ON public.prompt_attempts;
+DROP FUNCTION IF EXISTS public.sync_lesson_progress_from_prompt_attempt();
 DROP FUNCTION IF EXISTS public.valid_evaluation_total(JSONB);
 DROP TABLE IF EXISTS public.lesson_progress;
 

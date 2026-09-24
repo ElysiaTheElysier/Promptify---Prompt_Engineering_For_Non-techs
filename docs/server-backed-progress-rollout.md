@@ -13,6 +13,8 @@
 
 Safe order: apply 016, deploy and verify new code on both deployments, then apply 017.
 
+Migration 016 installs its `prompt_attempts` synchronization trigger before the historical backfill. `CREATE TRIGGER` takes a table lock that conflicts with concurrent writes and the entire migration is one transaction. Writers that began earlier finish before the lock is acquired and are visible to the later backfill statement. Writers arriving after the lock wait until commit, then execute with the trigger active. Existing rows do not fire the trigger; the backfill sets exact grouped counts. New rows fire the trigger once. This prevents the transition gap, missed rows, and double counting.
+
 ## Direct `prompt_attempts` write audit
 
 - Production learner create: `HybridView` calls `dbService.recordPromptAttemptAndProgress`, which calls the atomic RPC.

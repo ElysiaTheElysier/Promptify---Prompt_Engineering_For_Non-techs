@@ -100,9 +100,14 @@ assert.ok(learnerBView.length > 0 && learnerBView.every((row) => row.learner_id 
 const { data: instructorView, error: instructorReadError } = await instructor.from('lesson_progress').select('*').in('learner_id', fixtureLearnerIds);
 if (instructorReadError) throw instructorReadError;
 assert.equal(instructorView.length, expected.lessonProgressRows.length, 'Instructor cannot read expected fixture progress.');
+const { data: removedView, error: removedReadError } = await removedLearner.from('lesson_progress').select('*');
+if (removedReadError) throw removedReadError;
+assert.equal(removedView.length, 0, 'Removed learner must not read historical progress for the removed class.');
 
 const trackedAttemptIds: string[] = [];
 try {
+  const valid10 = { scores: { taskCompletion: 2, groundedness: 2, formatAdherence: 2, constraintCompliance: 2, businessUsability: 2 }, total: 10, strengths: [], improvements: [], nextHint: 'Synthetic' };
+  const valid5 = { scores: { taskCompletion: 1, groundedness: 1, formatAdherence: 1, constraintCompliance: 1, businessUsability: 1 }, total: 5, strengths: [], improvements: [], nextHint: 'Synthetic' };
   const directId = randomUUID();
   const directInsert = await learnerA.from('prompt_attempts').insert({
     id: directId,
@@ -124,13 +129,28 @@ try {
     assert.ok(directInsert.error, 'Direct INSERT must be denied after 017.');
   }
   const directUpdate = await learnerA.from('prompt_attempts')
-    .update({ latency_ms: 2 })
+    .update({ evaluation_json: valid5 })
     .eq('id', phase === '016' ? directId : fixtureAttemptIds[0]);
   if (phase === '016') assert.equal(directUpdate.error, null, 'Old-code direct UPDATE must remain available after 016.');
   else assert.ok(directUpdate.error, 'Direct UPDATE must be denied after 017.');
 
-  const valid10 = { scores: { taskCompletion: 2, groundedness: 2, formatAdherence: 2, constraintCompliance: 2, businessUsability: 2 }, total: 10, strengths: [], improvements: [], nextHint: 'Synthetic' };
-  const valid5 = { scores: { taskCompletion: 1, groundedness: 1, formatAdherence: 1, constraintCompliance: 1, businessUsability: 1 }, total: 5, strengths: [], improvements: [], nextHint: 'Synthetic' };
+  if (phase === '016') {
+    const { data: directProgress, error: directProgressError } = await service
+      .from('lesson_progress')
+      .select('*')
+      .eq('learner_id', fixtureLearnerIds[0])
+      .eq('class_id', 'b3000000-0000-4000-8000-000000000001')
+      .eq('lesson_id', 'b5000000-0000-4000-8000-000000000004')
+      .single();
+    if (directProgressError) throw directProgressError;
+    assert.equal(directProgress.attempts_count, 1, 'Legacy direct INSERT must synchronize progress exactly once.');
+    assert.equal(Number(directProgress.best_score), 5, 'Legacy direct UPDATE must synchronize best_score.');
+    assert.equal(directProgress.last_attempt_id, directId);
+    await service.from('prompt_attempts').delete().eq('id', directId);
+    await service.from('lesson_progress').delete().eq('id', directProgress.id);
+    trackedAttemptIds.splice(trackedAttemptIds.indexOf(directId), 1);
+  }
+
   const first = await learnerA.rpc('record_prompt_attempt_and_progress', {
     p_class_id: 'b3000000-0000-4000-8000-000000000001', p_lesson_id: 'b5000000-0000-4000-8000-000000000004',
     p_prompt_text: 'Staging atomic prompt one', p_ai_output: 'Synthetic output one', p_evaluation_json: valid5, p_model: 'staging-probe', p_latency_ms: 2,

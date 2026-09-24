@@ -62,14 +62,14 @@ Do not put these values in `.env`, source control, screenshots, or reports. The 
 3. Apply `server_backed_progress_fixture.sql`.
 4. Record the `prompt_attempts` count and existing grants.
 5. Apply `016_add_server_backed_lesson_progress.sql`; save its NOTICE output.
-6. Run `verify_016_database.sql` in SQL Editor. It proves structural/grant compatibility and forced transaction rollback without retaining probe data.
+6. Run `verify_016_database.sql` in SQL Editor. It proves structural/grant compatibility plus forced rollback for both legacy direct INSERT and RPC INSERT without retaining probe data.
 7. Set the staging-only environment variables with `STAGING_PROGRESS_PHASE=016` and run `npm run test:progress:staging`.
 8. Compare the migration NOTICE: total fixture attempts 9, mapped 8, unmapped 1, and the expected unmapped ID.
 9. Run rollback 016. Confirm fixture attempts are byte-for-byte unchanged and pre-016 grants remain.
 10. Re-apply 016, re-run both verifiers, and confirm the same seven progress rows with no duplicates.
 11. Configure temporary VI and EN staging deployments against this same staging project. Never reuse production credentials.
 12. Execute the same-account/same-class cross-deployment, refresh, and incognito scenarios manually.
-13. Confirm browser/network traffic uses the two RPC endpoints and contains no direct `prompt_attempts` writes.
+13. Confirm browser/network traffic uses the two RPC endpoints. Also confirm a deliberate legacy direct write is synchronized by the compatibility trigger during the transition window.
 14. Apply migration 017.
 15. Run `verify_017_grants.sql`.
 16. Set `STAGING_PROGRESS_PHASE=017` and run `npm run test:progress:staging`; direct insert must fail and RPC tests must pass.
