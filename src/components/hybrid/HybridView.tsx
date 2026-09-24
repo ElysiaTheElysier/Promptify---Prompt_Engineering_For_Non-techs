@@ -610,8 +610,47 @@ export const HybridView: React.FC<Props> = ({
       }
       setRunStatus('idle');
 
+      // 3. PERSIST ATTEMPT + PROGRESS ATOMIC. Chỉ confirm completion sau RPC thành công.
+      const labVers = versionsByLab[currentLab.id] || [];
+      const newVerNum = labVers.length + 1;
+      let persistedAttemptId: string | null = null;
+
+      if (!currentLearnerId || !currentClassId) {
+        setErrorMessage('Không thể xác định learner hoặc lớp để lưu tiến độ. Kết quả AI chưa được ghi nhận.');
+        return;
+      }
+
+      try {
+        const saved = await dbService.recordPromptAttemptAndProgress({
+          learner_id: currentLearnerId,
+          class_id: currentClassId,
+          lesson_id: currentLab.id,
+          lesson_ref_id: /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(currentLab.id)
+            ? currentLab.id
+            : null,
+          attempt_number: newVerNum,
+          prompt_text: promptText,
+          ai_output: result.output,
+          evaluation_json: evalResult,
+          model: result.model || 'gemini-2.5-flash',
+          latency_ms: result.latencyMs
+        });
+        if (saved.attempt?.id) {
+          persistedAttemptId = saved.attempt.id;
+          setCurrentAttemptId(saved.attempt.id);
+        }
+      } catch (dbErr) {
+        console.warn('[HybridView] Lỗi atomic save attempt/progress:', dbErr);
+        setErrorMessage(
+          dbErr instanceof Error
+            ? `Kết quả AI đã tạo nhưng chưa lưu được tiến độ: ${dbErr.message}`
+            : 'Kết quả AI đã tạo nhưng chưa lưu được tiến độ. Vui lòng chạy lại.'
+        );
+        return;
+      }
+
       onRecordRun({
-        id: `run-${Date.now()}`,
+        id: persistedAttemptId || `run-${Date.now()}`,
         timestamp: new Date().toLocaleTimeString('vi-VN'),
         labId: currentLab.id,
         promptText,
@@ -622,36 +661,6 @@ export const HybridView: React.FC<Props> = ({
         mode: result.mode,
         versionTag: promptText.length > 250 ? 'improved' : 'baseline'
       });
-
-      // 3. PERSIST ATTEMPT VÀO DATABASE (Bảng prompt_attempts)
-      const labVers = versionsByLab[currentLab.id] || [];
-      const newVerNum = labVers.length + 1;
-      let persistedAttemptId: string | null = null;
-
-      if (currentLearnerId && currentClassId) {
-        try {
-          const recorded = await dbService.recordPromptAttempt({
-            learner_id: currentLearnerId,
-            class_id: currentClassId,
-            lesson_id: currentLab.id,
-            lesson_ref_id: /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(currentLab.id)
-              ? currentLab.id
-              : null,
-            attempt_number: newVerNum,
-            prompt_text: promptText,
-            ai_output: result.output,
-            evaluation_json: evalResult,
-            model: result.model || 'gemini-2.5-flash',
-            latency_ms: result.latencyMs
-          });
-          if (recorded?.id) {
-            persistedAttemptId = recorded.id;
-            setCurrentAttemptId(recorded.id);
-          }
-        } catch (dbErr) {
-          console.warn('[HybridView] Lỗi lưu attempt vào DB:', dbErr);
-        }
-      }
 
       // 4. LƯU PHIÊN BẢN (PROMPT VERSIONING CHO COMPARE MODE)
       const bizEval = evaluateBusinessMetrics(promptText, result.output, currentLab.sampleInputContext);
