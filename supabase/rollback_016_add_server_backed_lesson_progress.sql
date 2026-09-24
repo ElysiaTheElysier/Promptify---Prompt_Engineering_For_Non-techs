@@ -9,8 +9,5 @@ DROP FUNCTION IF EXISTS public.record_prompt_attempt_and_progress(UUID, UUID, TE
 DROP FUNCTION IF EXISTS public.valid_evaluation_total(JSONB);
 DROP TABLE IF EXISTS public.lesson_progress;
 
--- Restore the pre-016 browser grants if rolling the application code back too.
-GRANT INSERT, UPDATE ON TABLE public.prompt_attempts TO authenticated;
-
 COMMIT;
 NOTIFY pgrst, 'reload schema';
