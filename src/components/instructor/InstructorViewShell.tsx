@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { InstructorActivity, InstructorClass, InstructorViewMode } from '../../types/instructor';
 import { dbService } from '../../services/dbService';
-import { ClassWithDetails, CourseCurriculumModule, DbPromptAttempt, LearnerInClassDetail } from '../../types/database';
+import { ClassWithDetails, CourseCurriculumModule, DbLessonProgress, DbPromptAttempt, LearnerInClassDetail } from '../../types/database';
 import { InstructorNavbar } from './InstructorNavbar';
 import { InstructorDashboard } from './InstructorDashboard';
 import { ClassDetailView } from './ClassDetailView';
@@ -58,20 +58,29 @@ function mapDbClassToInstructorClass(
   cls: ClassWithDetails,
   learners: LearnerInClassDetail[],
   curriculum: CourseCurriculumModule[],
-  attempts: DbPromptAttempt[],
+  progressRows: DbLessonProgress[],
 ): InstructorClass {
   const enrolledLearners = learners.filter((learner) => learner.enrollment_status !== 'removed');
   const enrolledIds = new Set(enrolledLearners.map((learner) => learner.learner_id));
-  const realAttempts = attempts.filter((attempt) => enrolledIds.has(attempt.learner_id));
+  const realProgress = progressRows.filter((progress) => enrolledIds.has(progress.learner_id));
   const lessons = publishedLessons(curriculum);
-  const startedLearnerIds = new Set(realAttempts.map((attempt) => attempt.learner_id));
-  const completedCount = enrolledLearners.filter((learner) => learner.enrollment_status === 'completed').length;
+  const startedLearnerIds = new Set(realProgress.filter((progress) => progress.attempts_count > 0).map((progress) => progress.learner_id));
   const learnerProgress = enrolledLearners.map((learner) => {
     if (lessons.length === 0) return 0;
-    const ownAttempts = realAttempts.filter((attempt) => attempt.learner_id === learner.learner_id);
-    const attemptedLessons = lessons.filter((lesson) => ownAttempts.some((attempt) => attemptMatchesLesson(attempt, lesson))).length;
-    return (attemptedLessons / lessons.length) * 100;
+    const completedLessonIds = new Set(realProgress
+      .filter((progress) => progress.learner_id === learner.learner_id && progress.status === 'completed')
+      .map((progress) => progress.lesson_id));
+    return (lessons.filter((lesson) => completedLessonIds.has(lesson.id)).length / lessons.length) * 100;
   });
+  const completedLearnerIds = enrolledLearners
+    .filter((learner) => {
+      if (lessons.length === 0) return false;
+      const completed = new Set(realProgress
+        .filter((progress) => progress.learner_id === learner.learner_id && progress.status === 'completed')
+        .map((progress) => progress.lesson_id));
+      return lessons.every((lesson) => completed.has(lesson.id));
+    })
+    .map((learner) => learner.learner_id);
   const avgProgress = learnerProgress.length > 0
     ? Math.round(learnerProgress.reduce((sum, value) => sum + value, 0) / learnerProgress.length)
     : 0;
@@ -87,17 +96,17 @@ function mapDbClassToInstructorClass(
     totalLearners: enrolledLearners.length,
     learnerIds: [...enrolledIds],
     startedLearners: startedLearnerIds.size,
-    completedLearners: completedCount,
-    completedLearnerIds: enrolledLearners
-      .filter((learner) => learner.enrollment_status === 'completed')
-      .map((learner) => learner.learner_id),
+    completedLearners: completedLearnerIds.length,
+    completedLearnerIds,
     avgProgressPercent: avgProgress,
     status: cls.status,
     timeRemainingText: formatTimeRemaining(cls.end_date),
     startDate: cls.start_date,
     description: cls.course?.description || '',
     lessonProgress: lessons.map((lesson) => {
-      const attemptedBy = new Set(realAttempts.filter((attempt) => attemptMatchesLesson(attempt, lesson)).map((attempt) => attempt.learner_id));
+      const attemptedBy = new Set(realProgress
+        .filter((progress) => progress.lesson_id === lesson.id && progress.status === 'completed')
+        .map((progress) => progress.learner_id));
       return {
         labId: lesson.id,
         labTitle: lesson.title,
@@ -188,6 +197,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
           [item.id, await dbService.getInstructorLearnersInClass(item.id)] as const
         ))));
         const allAttempts = await dbService.getInstructorPromptAttempts(dbClasses.map((item) => item.id));
+        const allProgress = await dbService.getInstructorLessonProgress(dbClasses.map((item) => item.id));
         const attemptsByClass = new Map<string, DbPromptAttempt[]>();
         allAttempts.forEach((attempt) => {
           const list = attemptsByClass.get(attempt.class_id) || [];
@@ -199,7 +209,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
           item,
           learnersByClass.get(item.id) || [],
           curriculaByCourse.get(item.course_id) || [],
-          attemptsByClass.get(item.id) || [],
+          allProgress.filter((progress) => progress.class_id === item.id),
         ));
         setClasses(mapped);
         setActivities(buildActivities(allAttempts, mapped, learnersByClass, curriculaByCourse, dbClasses));

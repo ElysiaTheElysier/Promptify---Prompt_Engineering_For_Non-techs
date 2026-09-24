@@ -222,3 +222,24 @@ export interface DbPromptAttempt {
   created_at?: string;
 }
 
+export type LessonProgressStatus = 'not_started' | 'in_progress' | 'completed';
+
+export interface DbLessonProgress {
+  id: string;
+  learner_id: string;
+  class_id: string;
+  lesson_id: string;
+  status: LessonProgressStatus;
+  attempts_count: number;
+  best_score: number | null;
+  last_attempt_id: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  updated_at: string;
+}
+
+export interface PromptAttemptProgressResult {
+  attempt: DbPromptAttempt;
+  progress: DbLessonProgress;
+}
+
