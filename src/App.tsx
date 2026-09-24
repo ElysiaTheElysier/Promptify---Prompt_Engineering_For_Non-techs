@@ -84,17 +84,7 @@ export const App: React.FC = () => {
   const [curriculumReadyKey, setCurriculumReadyKey] = useState<string | null>(null);
 
   // 5. Quản lý Tiến độ ghi danh (Enrollments)
-  const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>(() => {
-    const saved = localStorage.getItem('promptify_enrollments');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        // fallback
-      }
-    }
-    return {};
-  });
+  const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>({});
 
   // 6. Chế độ giao diện trong bài học (Hybrid song song hoặc Notebook tuần tự)
   const [preferredLessonMode, setPreferredLessonMode] = useState<UIMode>(() => {
@@ -268,6 +258,11 @@ export const App: React.FC = () => {
     }
   }, [currentLearner]);
 
+  // One-time cleanup of the retired browser-backed learning-progress cache.
+  useEffect(() => {
+    localStorage.removeItem('promptify_enrollments');
+  }, []);
+
   useEffect(() => {
     if (currentView && currentView !== 'landing') {
       sessionStorage.setItem('promptify_current_view', currentView);
@@ -284,10 +279,6 @@ export const App: React.FC = () => {
       sessionStorage.setItem('promptify_selected_class_id', selectedCohort.id);
     }
   }, [selectedCohort]);
-
-  useEffect(() => {
-    localStorage.setItem('promptify_enrollments', JSON.stringify(enrollments));
-  }, [enrollments]);
 
   useEffect(() => {
     localStorage.setItem('promptify_api_config', JSON.stringify(apiConfig));
@@ -307,7 +298,7 @@ export const App: React.FC = () => {
     if (runCount !== undefined) setActiveRunCount(runCount);
   };
 
-  // Record Run & Update Enrollment Progress
+  // Record Run is called only after the atomic DB write confirms progress.
   const handleRecordRun = (run: PromptRun) => {
     setHistory((prev) => [run, ...prev]);
     const lab = labs.find((l) => l.id === run.labId);
@@ -315,7 +306,7 @@ export const App: React.FC = () => {
     setActivePrompt(run.promptText);
     setActiveRunCount((prev) => prev + 1);
 
-    // Cập nhật tiến độ học của learner cho lab này
+    // Mirror confirmed server state in memory only. Refresh/login always reloads DB.
     if (currentLearner) {
       const enrollmentKey = `${currentLearner.id}_${selectedCohort.id}`;
       setEnrollments((prev) => {
@@ -450,18 +441,22 @@ export const App: React.FC = () => {
         };
         setSelectedCohort(cohortData);
 
-        const enrollmentKey = `${activeView.learner.learner_code}_${activeView.classDetails.id}`;
-        setEnrollments((prev) => ({
-          ...prev,
-          [enrollmentKey]: {
-            learnerId: activeView.learner.learner_code,
-            classId: activeView.classDetails.id,
-            completedLabIds: ['lab-1'],
-            currentLabId: 'lab-2',
-            enrolledAt: activeView.enrollment.joined_at || new Date().toISOString(),
-            expiresAt: new Date(Date.now() + 8 * 3600 * 1000).toISOString()
-          }
+        const progressByClass = await Promise.all(activeViews.map(async (view) => {
+          const progressRows = await dbService.getLessonProgress(view.classDetails.id);
+          const completedRows = progressRows.filter((row) => row.status === 'completed');
+          return [
+            `${view.learner.learner_code}_${view.classDetails.id}`,
+            {
+              learnerId: view.learner.learner_code,
+              classId: view.classDetails.id,
+              completedLabIds: completedRows.map((row) => row.lesson_id),
+              currentLabId: progressRows[0]?.lesson_id || '',
+              enrolledAt: view.enrollment.joined_at || new Date().toISOString(),
+              expiresAt: view.classDetails.end_date || new Date(Date.now() + 8 * 3600 * 1000).toISOString(),
+            } satisfies Enrollment,
+          ] as const;
         }));
+        setEnrollments(Object.fromEntries(progressByClass));
 
         // Khôi phục view của học viên nếu đang trong bài học hoặc tab khác
         setCurrentView(prevView => {
@@ -496,6 +491,7 @@ export const App: React.FC = () => {
         setHasActiveEnrollment(false);
         setEnrolledClassIds([]);
         setCohorts([]);
+        setEnrollments({});
         setCurrentView('class_select');
       }
     } catch (err) {
@@ -630,6 +626,7 @@ export const App: React.FC = () => {
     const fetchClasses = async () => {
       try {
         const dbClasses = await dbService.getClassesWithDetails();
+        const lessonCounts = await dbService.getPublishedLessonCounts(dbClasses.map((item) => item.course_id));
         if (isMounted) {
           const mappedCohorts: ClassCohort[] = dbClasses.map(c => ({
             id: c.id,
@@ -642,7 +639,8 @@ export const App: React.FC = () => {
             expiryDateText: 'Hết hạn lúc 18:00 hôm nay',
             description: c.course?.description || 'Chương trình đào tạo Prompt Engineering.',
             iconName: c.enrollment_mode === 'self_enroll' ? 'Sparkles' : 'Building2',
-            isPublic: c.enrollment_mode === 'self_enroll'
+            isPublic: c.enrollment_mode === 'self_enroll',
+            totalLessons: lessonCounts[c.course_id] || 0,
           }));
           setCohorts(mappedCohorts);
         }
@@ -695,11 +693,13 @@ export const App: React.FC = () => {
   // Xử lý Chọn lớp
   const handleSelectClass = async (cohort: ClassCohort): Promise<boolean> => {
     if (!currentUser || userRole !== 'LEARNER') return false;
+    let learnerCode = currentLearner?.id || '';
     let canAccess = await dbService.canUserAccessClass(currentUser.id, cohort.id);
     if (!canAccess && cohort.isPublic) {
       const selfEnrollment = await dbService.selfEnrollInPublicClass(cohort.id);
       if (selfEnrollment) {
         canAccess = true;
+        learnerCode = selfEnrollment.learnerCode;
         setEnrolledClassIds((ids) => ids.includes(cohort.id) ? ids : [...ids, cohort.id]);
         setCurrentLearner((learner) => learner ? {
           ...learner,
@@ -715,6 +715,18 @@ export const App: React.FC = () => {
     setHasActiveEnrollment(true);
     setEnrolledClassIds((ids) => ids.includes(cohort.id) ? ids : [...ids, cohort.id]);
     setSelectedCohort(cohort);
+    const progressRows = await dbService.getLessonProgress(cohort.id);
+    setEnrollments((previous) => ({
+      ...previous,
+      [`${learnerCode}_${cohort.id}`]: {
+        learnerId: learnerCode,
+        classId: cohort.id,
+        completedLabIds: progressRows.filter((row) => row.status === 'completed').map((row) => row.lesson_id),
+        currentLabId: progressRows[0]?.lesson_id || '',
+        enrolledAt: previous[`${learnerCode}_${cohort.id}`]?.enrolledAt || new Date().toISOString(),
+        expiresAt: previous[`${learnerCode}_${cohort.id}`]?.expiresAt || new Date(Date.now() + 4 * 3600 * 1000).toISOString(),
+      },
+    }));
     const classUrl = new URL(window.location.href);
     classUrl.searchParams.delete('lesson');
     window.history.replaceState({}, '', classUrl.toString());

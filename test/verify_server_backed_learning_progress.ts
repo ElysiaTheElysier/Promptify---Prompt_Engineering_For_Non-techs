@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+
+const migration = await readFile('supabase/migrations/016_server_backed_lesson_progress.sql', 'utf8');
+const app = await readFile('src/App.tsx', 'utf8');
+const hybrid = await readFile('src/components/hybrid/HybridView.tsx', 'utf8');
+const db = await readFile('src/services/dbService.ts', 'utf8');
+const instructor = await readFile('src/components/instructor/InstructorViewShell.tsx', 'utf8');
+const rollback = await readFile('supabase/rollback_016_server_backed_lesson_progress.sql', 'utf8');
+
+assert.match(migration, /CREATE TABLE IF NOT EXISTS public\.lesson_progress/);
+assert.match(migration, /UNIQUE \(learner_id, class_id, lesson_id\)/);
+assert.match(migration, /record_prompt_attempt_and_progress/);
+assert.match(migration, /SECURITY DEFINER SET search_path = public, pg_temp/);
+assert.match(migration, /public\.current_user_id\(\)/);
+assert.match(migration, /public\.has_active_class_enrollment\(p_class_id\)/);
+assert.match(migration, /JOIN public\.course_modules/);
+assert.match(migration, /JOIN public\.lessons/);
+assert.match(migration, /INSERT INTO public\.prompt_attempts/);
+assert.match(migration, /ON CONFLICT \(learner_id, class_id, lesson_id\) DO UPDATE/);
+assert.match(migration, /attempts_count = public\.lesson_progress\.attempts_count \+ 1/);
+assert.match(migration, /last_attempt_id = inserted_attempt\.id/);
+assert.match(migration, /greatest\(public\.lesson_progress\.best_score, valid_score\)/);
+assert.match(migration, /status = 'completed'/);
+assert.match(migration, /valid_evaluation_total/);
+assert.match(migration, /HAVING count\(DISTINCT canonical_lesson_id\) = 1/);
+assert.match(migration, /REVOKE ALL ON TABLE public\.lesson_progress FROM PUBLIC, anon/);
+assert.match(migration, /GRANT SELECT ON TABLE public\.lesson_progress TO authenticated/);
+assert.match(migration, /REVOKE INSERT, UPDATE ON TABLE public\.prompt_attempts FROM authenticated/);
+assert.doesNotMatch(migration, /GRANT (?:INSERT|UPDATE|DELETE).*lesson_progress.*authenticated/);
+assert.match(rollback, /DROP TABLE IF EXISTS public\.lesson_progress/);
+assert.doesNotMatch(rollback, /DELETE FROM public\.prompt_attempts|DROP TABLE IF EXISTS public\.prompt_attempts/);
+
+// Browser storage may be cleaned up, but must never be read/written as truth.
+assert.doesNotMatch(app, /localStorage\.getItem\('promptify_enrollments'\)/);
+assert.doesNotMatch(app, /localStorage\.setItem\('promptify_enrollments'/);
+assert.match(app, /dbService\.getLessonProgress/);
+assert.doesNotMatch(app, /completedLabIds:\s*\['lab-1'\]/);
+
+const atomicSaveIndex = hybrid.indexOf('recordPromptAttemptAndProgress');
+const completionCallbackIndex = hybrid.indexOf('onRecordRun({', atomicSaveIndex);
+assert.ok(atomicSaveIndex >= 0, 'HybridView must use the atomic attempt/progress RPC adapter');
+assert.ok(completionCallbackIndex > atomicSaveIndex, 'Completion callback must happen after atomic save confirmation');
+
+assert.match(db, /\.rpc\('record_prompt_attempt_and_progress'/);
+assert.match(db, /\.rpc\('update_prompt_attempt_evaluation_and_progress'/);
+assert.match(db, /\.from\('lesson_progress'\)/);
+assert.match(instructor, /getInstructorLessonProgress/);
+assert.match(instructor, /progress\.status === 'completed'/);
+
+console.log('Server-backed learning progress contract verification passed.');

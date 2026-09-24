@@ -18,6 +18,8 @@ import {
   DbLearner, 
   DbEnrollment, 
   DbPromptAttempt,
+  DbLessonProgress,
+  PromptAttemptProgressResult,
   AiEvaluationResult,
   ClassWithDetails, 
   LearnerInClassDetail, 
@@ -611,6 +613,31 @@ export const dbService = {
           .sort((a, b) => a.position - b.position),
       }))
       .sort((a, b) => a.position - b.position);
+  },
+
+  async getPublishedLessonCounts(courseIds: string[]): Promise<Record<string, number>> {
+    const uniqueCourseIds = [...new Set(courseIds.filter(Boolean))];
+    if (uniqueCourseIds.length === 0) return {};
+    if (!isSupabaseConfigured) {
+      const modules = localStore.getCourseModules().filter((module) => uniqueCourseIds.includes(module.course_id) && module.status === 'published');
+      const moduleCourse = new Map(modules.map((module) => [module.id, module.course_id]));
+      return localStore.getLessons().reduce<Record<string, number>>((counts, lesson) => {
+        const courseId = moduleCourse.get(lesson.module_id);
+        if (courseId && lesson.status === 'published') counts[courseId] = (counts[courseId] || 0) + 1;
+        return counts;
+      }, {});
+    }
+    const { data, error } = await supabase
+      .from('course_modules')
+      .select('course_id, lessons(id, status)')
+      .in('course_id', uniqueCourseIds)
+      .eq('status', 'published');
+    if (error) throw new Error(`Lỗi tải tổng số bài học: ${error.message}`);
+    return (data || []).reduce<Record<string, number>>((counts, module: any) => {
+      const publishedCount = (module.lessons || []).filter((lesson: any) => lesson.status === 'published').length;
+      counts[module.course_id] = (counts[module.course_id] || 0) + publishedCount;
+      return counts;
+    }, {});
   },
 
   async getInstructorCourseCurriculum(courseId: string): Promise<CourseCurriculumModule[]> {
@@ -1245,56 +1272,50 @@ export const dbService = {
   /**
    * Lưu một lần chạy prompt thật (V1, V2, ...) vào Supabase hoặc Local fallback
    */
+  async recordPromptAttemptAndProgress(
+    attempt: Omit<DbPromptAttempt, 'id' | 'created_at'>
+  ): Promise<PromptAttemptProgressResult> {
+    if (isSupabaseConfigured) {
+      if (!attempt.lesson_ref_id) {
+        throw new Error('Bài học phải có UUID canonical trước khi lưu tiến độ.');
+      }
+      const { data, error } = await supabase.rpc('record_prompt_attempt_and_progress', {
+        p_class_id: attempt.class_id,
+        p_lesson_id: attempt.lesson_ref_id,
+        p_prompt_text: attempt.prompt_text,
+        p_ai_output: attempt.ai_output,
+        p_evaluation_json: attempt.evaluation_json,
+        p_model: attempt.model,
+        p_latency_ms: attempt.latency_ms,
+      });
+      if (error || !data?.attempt) {
+        throw new Error(`Lỗi lưu attempt và tiến độ vào CSDL: ${error?.message || 'RPC không trả attempt.'}`);
+      }
+      return data as PromptAttemptProgressResult;
+    }
+
+    const createdAttempt = await this.recordPromptAttempt(attempt);
+    return {
+      attempt: createdAttempt,
+      progress: {
+        id: `progress-${createdAttempt.id}`,
+        learner_id: attempt.learner_id,
+        class_id: attempt.class_id,
+        lesson_id: attempt.lesson_ref_id || attempt.lesson_id,
+        status: 'completed',
+        attempts_count: 1,
+        best_score: attempt.evaluation_json?.total ?? null,
+        last_attempt_id: createdAttempt.id,
+        started_at: createdAttempt.created_at || null,
+        completed_at: createdAttempt.created_at || null,
+        updated_at: createdAttempt.created_at || new Date().toISOString(),
+      },
+    };
+  },
+
   async recordPromptAttempt(attempt: Omit<DbPromptAttempt, 'id' | 'created_at'>): Promise<DbPromptAttempt> {
     if (isSupabaseConfigured) {
-      try {
-        let actualLearnerId = attempt.learner_id;
-        let actualClassId = attempt.class_id;
-
-        // Auto-resolve learner UUID if passed learner_code or user_id
-        if (actualLearnerId.startsWith('LRN-')) {
-          const { data: lrn } = await supabase
-            .from('learners')
-            .select('id')
-            .eq('learner_code', actualLearnerId)
-            .maybeSingle();
-          if (lrn?.id) actualLearnerId = lrn.id;
-        }
-
-        // Auto-resolve class UUID if passed class_code
-        if (actualClassId.includes('AGRI-') || actualClassId.includes('CORP-')) {
-          const { data: cls } = await supabase
-            .from('classes')
-            .select('id')
-            .eq('class_code', actualClassId)
-            .maybeSingle();
-          if (cls?.id) actualClassId = cls.id;
-        }
-
-        const toInsert = {
-          ...attempt,
-          learner_id: actualLearnerId,
-          class_id: actualClassId
-        };
-
-        const { data, error } = await supabase
-          .from('prompt_attempts')
-          .insert(toInsert)
-          .select()
-          .single();
-
-        if (error) {
-          console.error('[dbService] Lỗi ghi nhận prompt_attempts vào Supabase:', error);
-          throw new Error(`Lỗi lưu lần thử vào CSDL: ${error.message}`);
-        }
-
-        if (data) {
-          return data as DbPromptAttempt;
-        }
-      } catch (err) {
-        console.error('[dbService] Exception inserting prompt_attempt:', err);
-        throw err instanceof Error ? err : new Error('Lỗi lưu prompt_attempts vào database.');
-      }
+      return (await this.recordPromptAttemptAndProgress(attempt)).attempt;
     }
 
     const localAttempts = localStore.getPromptAttempts();
@@ -1306,6 +1327,18 @@ export const dbService = {
     localAttempts.push(created);
     localStore.setPromptAttempts(localAttempts);
     return created;
+  },
+
+  /** Server-backed source of truth for one learner's lesson progress. */
+  async getLessonProgress(classId: string): Promise<DbLessonProgress[]> {
+    if (!isSupabaseConfigured) return [];
+    const { data, error } = await supabase
+      .from('lesson_progress')
+      .select('*')
+      .eq('class_id', classId)
+      .order('updated_at', { ascending: false });
+    if (error) throw new Error(`Lỗi tải tiến độ bài học: ${error.message}`);
+    return (data || []) as DbLessonProgress[];
   },
 
   /**
@@ -1381,6 +1414,20 @@ export const dbService = {
     return (data || []) as DbPromptAttempt[];
   },
 
+  async getInstructorLessonProgress(classIds: string[] = []): Promise<DbLessonProgress[]> {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase chưa được cấu hình. Không thể tải tiến độ học tập thật.');
+    }
+    let query = supabase
+      .from('lesson_progress')
+      .select('*')
+      .order('updated_at', { ascending: false });
+    if (classIds.length > 0) query = query.in('class_id', classIds);
+    const { data, error } = await query;
+    if (error) throw new Error(`Lỗi tải lesson_progress: ${error.message}`);
+    return (data || []) as DbLessonProgress[];
+  },
+
   /**
    * Cập nhật kết quả đánh giá AI (evaluation_json) cho một lần thử đã lưu
    * Phục vụ chức năng 'Thử đánh giá lại' (Retry Evaluation) khi lần gọi ban đầu gặp sự cố
@@ -1390,21 +1437,14 @@ export const dbService = {
     evaluation: AiEvaluationResult | null
   ): Promise<boolean> {
     if (isSupabaseConfigured) {
-      try {
-        const { error } = await supabase
-          .from('prompt_attempts')
-          .update({ evaluation_json: evaluation })
-          .eq('id', attemptId);
-
-        if (error) {
-          console.error('[dbService] Supabase update prompt_attempts error:', error);
-          throw new Error(`Lỗi cập nhật đánh giá vào CSDL: ${error.message}`);
-        }
-        return true;
-      } catch (err) {
-        console.error('[dbService] Exception updating prompt_attempt evaluation:', err);
-        throw err;
+      const { data, error } = await supabase.rpc('update_prompt_attempt_evaluation_and_progress', {
+        p_attempt_id: attemptId,
+        p_evaluation_json: evaluation,
+      });
+      if (error || !data?.attempt) {
+        throw new Error(`Lỗi cập nhật đánh giá và tiến độ: ${error?.message || 'RPC không trả attempt.'}`);
       }
+      return true;
     }
 
     const localAttempts = localStore.getPromptAttempts();

@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "curriculum:seed": "node scripts/generate-curriculum-seed.mjs",
     "test:curriculum": "tsx test/verify_course_curriculum.ts",
-    "test:access": "tsx test/verify_enrollment_access.ts"
+    "test:access": "tsx test/verify_enrollment_access.ts",
+    "test:progress": "tsx test/verify_server_backed_learning_progress.ts"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.20",
