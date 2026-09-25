@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   ArrowRight, 
-  CheckCircle2, 
   ShieldCheck, 
   AlertCircle,
   FileText,
@@ -10,13 +9,13 @@ import {
   Layers,
   Search,
   Users,
-  Lock,
-  Sparkles
+  Lock
 } from 'lucide-react';
 import { supabase } from '../../services/supabaseClient';
 import { PromptifyMark } from '../common/PromptifyMark';
 import { RevealOnScroll } from '../landing/RevealOnScroll';
 import { AnimatedBrandWatermark } from '../landing/AnimatedBrandWatermark';
+import { PromptCompareVisual, PromptDirectionVisual } from '../landing/LandingKeyVisuals';
 
 export const LandingLoginScreen: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -81,7 +80,7 @@ export const LandingLoginScreen: React.FC = () => {
           </div>
 
           {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-600">
             <button
               onClick={() => scrollToSection('problems')}
               className="hover:text-emerald-700 transition-colors duration-200 cursor-pointer"
@@ -143,24 +142,24 @@ export const LandingLoginScreen: React.FC = () => {
       {/* Main Content Sections */}
       <main className="flex-1 relative z-10">
         
-        {/* 2. HERO SECTION - 55/45 EDITORIAL LAYOUT */}
-        <section className="pt-16 pb-20 sm:pt-20 sm:pb-28 lg:pt-24 lg:pb-32 border-b border-slate-200/70 bg-slate-50/50">
+        {/* 2. HERO SECTION - PROMPT / OUTPUT COMPARISON */}
+        <section className="pt-10 pb-14 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20 border-b border-slate-200/70 bg-slate-50/50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               
-              {/* LEFT COLUMN (55%): Headline, Subtitle, CTAs */}
-              <div className="lg:col-span-7 space-y-7 animate-hero-fade">
+              {/* MESSAGE AND EXISTING SIGN-IN FLOW */}
+              <div className="order-1 lg:col-span-5 space-y-6 animate-hero-fade">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-900 text-xs sm:text-sm font-semibold">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Practical AI Skills for Enterprise Teams</span>
                 </div>
 
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-5xl lg:text-[60px] font-extrabold tracking-tight text-slate-950 leading-[1.08] text-balance">
-                    Master Practical AI Workflows at Work.
+                  <h1 className="text-4xl sm:text-5xl lg:text-[48px] font-extrabold tracking-tight text-slate-950 leading-[1.08] text-balance">
+                    Better prompts. Usable output.
                   </h1>
-                  <p className="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-xl text-balance font-normal">
-                    Practice with authentic business scenarios, receive instant automated evaluation, and build high-performing prompts — no technical background required.
+                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl font-normal">
+                    Turn vague AI requests into clear business results through practice, feedback, and guided retries.
                   </p>
                 </div>
 
@@ -215,32 +214,19 @@ export const LandingLoginScreen: React.FC = () => {
                     </div>
                   )}
 
-                  <p className="text-xs sm:text-sm text-slate-500 pt-1 flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Designed for office and business professionals. No coding or tech background needed.</span>
-                  </p>
                 </div>
               </div>
 
-              {/* RIGHT COLUMN (45%): BRAND STATEMENT / EDITORIAL MANIFESTO */}
-              <div className="lg:col-span-5 pt-6 lg:pt-0 animate-hero-fade">
-                <div className="border-l-4 border-emerald-600 pl-6 sm:pl-9 py-3 space-y-4">
-                  <p className="text-3xl sm:text-4xl lg:text-[44px] font-bold text-slate-950 leading-[1.18] tracking-tight">
-                    Don't just query AI.<br />
-                    Learn how to{' '}
-                    <span className="text-emerald-700 underline decoration-emerald-400 decoration-4 underline-offset-8">
-                      collaborate with AI.
-                    </span>
-                  </p>
-                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal pt-2">
-                    Clear instructions. Controlled outputs. Verifiable business results.
-                  </p>
-                </div>
+              {/* COMPARE VISUAL ON THE RIGHT OF THE HERO */}
+              <div className="order-2 lg:col-span-7 animate-hero-fade">
+                <PromptCompareVisual />
               </div>
 
             </div>
           </div>
         </section>
+
+        <PromptDirectionVisual />
 
         {/* 3. SECTION KEY CHALLENGES */}
         <section id="problems" className="py-20 sm:py-28 lg:py-32 bg-white border-b border-slate-200/70">
