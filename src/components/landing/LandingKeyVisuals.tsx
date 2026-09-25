@@ -160,7 +160,7 @@ export const PromptDirectionVisual: React.FC<{ locale?: LandingLocale }> = ({ lo
                 <strong>{copy.wrongResult}</strong>
                 <small>{copy.wrongOutcome}</small>
                 <div className="kv-map-fallout">
-                  {copy.wrongCosts.map((item) => <span key={item}>{item}</span>)}
+                  {copy.wrongCosts.map((item) => <span key={item}><ArrowRight aria-hidden="true" size={12} />{item}</span>)}
                 </div>
               </div>
             </div>

@@ -191,11 +191,7 @@
 .kv-map-end-dot { width: 9px; height: 9px; border-radius: 50%; background: #c5aaa1; }
 .kv-map-lane-good .kv-map-end-dot { background: #10a36b; box-shadow: 0 0 0 5px #cef0db; }
 .kv-map-fallout { position: relative; display: grid; gap: 3px; width: 100%; margin-top: 6px; padding: 7px 0 0 12px; border-top: 1px solid #d3c4c0; }
-.kv-map-fallout::before { position: absolute; top: 9px; bottom: 5px; left: 3px; border-left: 1px solid #bda8a3; content: ''; }
-.kv-map-fallout span { position: relative; display: flex; align-items: center; color: #785d58; font-size: 10px; font-weight: 750; line-height: 1.2; }
-.kv-map-fallout span::before { position: absolute; top: 50%; left: -9px; width: 8px; border-top: 1px solid #bda8a3; content: ''; }
-.kv-map-fallout span:nth-child(2) { margin-left: 9px; }
-.kv-map-fallout span:nth-child(3) { margin-left: 18px; }
+.kv-map-fallout span { display: flex; align-items: center; gap: 5px; color: #785d58; font-size: 10px; font-weight: 750; line-height: 1.2; }
 
 @media (prefers-reduced-motion: no-preference) {
   .kv-typed-line { clip-path: inset(0 100% 0 0); opacity: 0; animation-duration: 11s; animation-iteration-count: infinite; animation-timing-function: steps(16, end); }
