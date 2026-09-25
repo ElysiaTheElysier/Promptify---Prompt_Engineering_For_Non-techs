@@ -30,15 +30,15 @@ const visualCopy = {
     goal: 'Prioritize project work',
     wrongLabel: 'Vague direction',
     wrongPrompt: '“What should we do?”',
-    wrongStep: 'No status, deadlines, or criteria',
+    wrongStep: 'No role, context, or constraints',
     wrongResult: 'Generic ideas',
     wrongOutcome: 'More rewriting before anyone can act',
     wrongCosts: ['Time wasted', 'Memory clutter', 'Digital clutter'],
     rightLabel: 'Clear direction',
-    rightPrompt: 'Status + deadlines + owners',
-    rightStep: 'Ask for 3 prioritized actions',
-    rightResult: 'Decision-ready plan',
-    rightOutcome: 'Next action, owner, and due date',
+    rightPrompt: 'Role + task + constraints',
+    rightStep: 'Act as project lead. Use the status and deadlines to rank 3 next steps.',
+    rightResult: 'Priorities ready to assign',
+    rightOutcome: 'Each action has an owner, due date, and reason',
   },
   vi: {
     compareTitle: 'Cùng một việc. Hai kết quả.',
@@ -65,15 +65,15 @@ const visualCopy = {
     goal: 'Ưu tiên công việc dự án',
     wrongLabel: 'Hướng đi mơ hồ',
     wrongPrompt: '“Giờ nên làm gì?”',
-    wrongStep: 'Không tiến độ, hạn chót hay tiêu chí',
+    wrongStep: 'Thiếu vai trò, bối cảnh và ràng buộc',
     wrongResult: 'Gợi ý chung chung',
     wrongOutcome: 'Phải sửa thêm mới giao việc được',
     wrongCosts: ['Tốn thời gian', 'Rác bộ nhớ', 'Rác dữ liệu số'],
     rightLabel: 'Hướng đi rõ ràng',
-    rightPrompt: 'Tiến độ + hạn chót + người phụ trách',
-    rightStep: 'Yêu cầu 3 việc cần ưu tiên',
-    rightResult: 'Kế hoạch có thể dùng',
-    rightOutcome: 'Rõ việc tiếp theo, người làm và thời hạn',
+    rightPrompt: 'Vai trò + nhiệm vụ + ràng buộc',
+    rightStep: 'Đóng vai quản lý dự án. Dựa vào tiến độ và hạn chót, chọn 3 việc ưu tiên.',
+    rightResult: 'Việc ưu tiên có thể giao ngay',
+    rightOutcome: 'Mỗi việc có người phụ trách, hạn chót và lý do',
   },
 } as const;
 
@@ -159,7 +159,7 @@ export const PromptDirectionVisual: React.FC<{ locale?: LandingLocale }> = ({ lo
                 <strong>{copy.wrongResult}</strong>
                 <small>{copy.wrongOutcome}</small>
                 <div className="kv-map-fallout">
-                  {copy.wrongCosts.map((item) => <span key={item}><ArrowRight aria-hidden="true" size={12} />{item}</span>)}
+                  {copy.wrongCosts.map((item) => <span key={item}>{item}</span>)}
                 </div>
               </div>
             </div>

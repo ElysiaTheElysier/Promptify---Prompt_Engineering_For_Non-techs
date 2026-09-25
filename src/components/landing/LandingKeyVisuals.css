@@ -192,21 +192,21 @@
 .kv-map-lane-good .kv-map-end-dot { background: #10a36b; box-shadow: 0 0 0 5px #cef0db; }
 .kv-map-fallout { position: relative; display: grid; gap: 3px; width: 100%; margin-top: 6px; padding: 7px 0 0 12px; border-top: 1px solid #d3c4c0; }
 .kv-map-fallout::before { position: absolute; top: 9px; bottom: 5px; left: 3px; border-left: 1px solid #bda8a3; content: ''; }
-.kv-map-fallout span { position: relative; display: flex; align-items: center; gap: 5px; color: #785d58; font-size: 10px; font-weight: 750; line-height: 1.2; }
+.kv-map-fallout span { position: relative; display: flex; align-items: center; color: #785d58; font-size: 10px; font-weight: 750; line-height: 1.2; }
 .kv-map-fallout span::before { position: absolute; top: 50%; left: -9px; width: 8px; border-top: 1px solid #bda8a3; content: ''; }
 .kv-map-fallout span:nth-child(2) { margin-left: 9px; }
 .kv-map-fallout span:nth-child(3) { margin-left: 18px; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .kv-typed-line { clip-path: inset(0 100% 0 0); opacity: 0; animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: steps(16, end); }
+  .kv-typed-line { clip-path: inset(0 100% 0 0); opacity: 0; animation-duration: 11s; animation-iteration-count: infinite; animation-timing-function: steps(16, end); }
   .kv-vague-line-1 { animation-name: kv-type-vague-one; }
   .kv-vague-line-2 { animation-name: kv-type-vague-two; }
   .kv-structured-line-1 { animation-name: kv-type-structured-one; }
   .kv-structured-line-2 { animation-name: kv-type-structured-two; }
   .kv-structured-line-3 { animation-name: kv-type-structured-three; }
   .kv-structured-line-4 { animation-name: kv-type-structured-four; }
-  .kv-weak-output { animation: kv-show-weak 8s ease infinite; }
-  .kv-improved-output { animation: kv-show-improved 8s ease infinite; }
+  .kv-weak-output { animation: kv-show-weak 11s ease infinite; }
+  .kv-improved-output { animation: kv-show-improved 11s ease infinite; }
   .kv-map-line-progress { stroke-dasharray: 1; stroke-dashoffset: 1; animation-duration: 10s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
   .kv-map-line-progress.kv-map-line-bad { animation-name: kv-map-bad-route; }
   .kv-map-line-progress.kv-map-line-good { animation-name: kv-map-good-route; }
@@ -222,14 +222,14 @@
   .kv-map-fallout span:nth-child(3) { animation-name: kv-map-cost-three; }
 }
 
-@keyframes kv-type-vague-one { 0%, 2% { clip-path: inset(0 100% 0 0); opacity: 0; } 10%, 93% { clip-path: inset(0 0 0 0); opacity: 1; } 98%, 100% { opacity: 0; } }
-@keyframes kv-type-vague-two { 0%, 9% { clip-path: inset(0 100% 0 0); opacity: 0; } 17%, 93% { clip-path: inset(0 0 0 0); opacity: 1; } 98%, 100% { opacity: 0; } }
-@keyframes kv-show-weak { 0%, 18% { opacity: 0; transform: translateY(8px); } 24%, 93% { opacity: 1; transform: translateY(0); } 98%, 100% { opacity: 0; } }
-@keyframes kv-type-structured-one { 0%, 29% { clip-path: inset(0 100% 0 0); opacity: 0; } 37%, 93% { clip-path: inset(0 0 0 0); opacity: 1; } 98%, 100% { opacity: 0; } }
-@keyframes kv-type-structured-two { 0%, 37% { clip-path: inset(0 100% 0 0); opacity: 0; } 45%, 93% { clip-path: inset(0 0 0 0); opacity: 1; } 98%, 100% { opacity: 0; } }
-@keyframes kv-type-structured-three { 0%, 45% { clip-path: inset(0 100% 0 0); opacity: 0; } 53%, 93% { clip-path: inset(0 0 0 0); opacity: 1; } 98%, 100% { opacity: 0; } }
-@keyframes kv-type-structured-four { 0%, 53% { clip-path: inset(0 100% 0 0); opacity: 0; } 61%, 93% { clip-path: inset(0 0 0 0); opacity: 1; } 98%, 100% { opacity: 0; } }
-@keyframes kv-show-improved { 0%, 63% { opacity: 0; transform: translateY(8px); } 71%, 93% { opacity: 1; transform: translateY(0); } 98%, 100% { opacity: 0; } }
+@keyframes kv-type-vague-one { 0%, 1.5% { clip-path: inset(0 100% 0 0); opacity: 0; } 7%, 96% { clip-path: inset(0 0 0 0); opacity: 1; } 99%, 100% { opacity: 0; } }
+@keyframes kv-type-vague-two { 0%, 6.5% { clip-path: inset(0 100% 0 0); opacity: 0; } 12.5%, 96% { clip-path: inset(0 0 0 0); opacity: 1; } 99%, 100% { opacity: 0; } }
+@keyframes kv-show-weak { 0%, 13% { opacity: 0; transform: translateY(8px); } 18%, 96% { opacity: 1; transform: translateY(0); } 99%, 100% { opacity: 0; } }
+@keyframes kv-type-structured-one { 0%, 21% { clip-path: inset(0 100% 0 0); opacity: 0; } 27%, 96% { clip-path: inset(0 0 0 0); opacity: 1; } 99%, 100% { opacity: 0; } }
+@keyframes kv-type-structured-two { 0%, 27% { clip-path: inset(0 100% 0 0); opacity: 0; } 33%, 96% { clip-path: inset(0 0 0 0); opacity: 1; } 99%, 100% { opacity: 0; } }
+@keyframes kv-type-structured-three { 0%, 33% { clip-path: inset(0 100% 0 0); opacity: 0; } 39%, 96% { clip-path: inset(0 0 0 0); opacity: 1; } 99%, 100% { opacity: 0; } }
+@keyframes kv-type-structured-four { 0%, 39% { clip-path: inset(0 100% 0 0); opacity: 0; } 45%, 96% { clip-path: inset(0 0 0 0); opacity: 1; } 99%, 100% { opacity: 0; } }
+@keyframes kv-show-improved { 0%, 47% { opacity: 0; transform: translateY(8px); } 53%, 96% { opacity: 1; transform: translateY(0); } 99%, 100% { opacity: 0; } }
 @keyframes kv-map-bad-route { 0%, 7% { stroke-dashoffset: 1; opacity: 1; } 24%, 69% { stroke-dashoffset: 0; opacity: 1; } 94%, 100% { stroke-dashoffset: 0; opacity: .28; } }
 @keyframes kv-map-good-route { 0%, 3% { stroke-dashoffset: 1; } 12%, 94% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 1; } }
 @keyframes kv-map-bad-run { 0%, 24% { transform: scaleX(0); } 70%, 94% { transform: scaleX(1); opacity: .6; } 100% { transform: scaleX(0); } }
