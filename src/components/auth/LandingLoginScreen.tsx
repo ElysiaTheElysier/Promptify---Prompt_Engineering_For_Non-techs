@@ -17,6 +17,7 @@ import { supabase } from '../../services/supabaseClient';
 import { PromptifyMark } from '../common/PromptifyMark';
 import { RevealOnScroll } from '../landing/RevealOnScroll';
 import { AnimatedBrandWatermark } from '../landing/AnimatedBrandWatermark';
+import { PromptCompareVisual, PromptDirectionVisual } from '../landing/LandingKeyVisuals';
 
 export const LandingLoginScreen: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -143,20 +144,20 @@ export const LandingLoginScreen: React.FC = () => {
       {/* Main Content Sections */}
       <main className="flex-1 relative z-10">
         
-        {/* 2. HERO SECTION - BỐ CỤC 55/45: TRÁI ACTION, PHẢI BRAND MANIFESTO */}
-        <section className="pt-16 pb-20 sm:pt-20 sm:pb-28 lg:pt-24 lg:pb-32 border-b border-slate-200/70 bg-slate-50/50">
+        {/* 2. HERO SECTION - COMPARE VISUAL BÊN PHẢI */}
+        <section className="pt-10 pb-14 sm:pt-14 sm:pb-16 lg:pt-16 lg:pb-20 border-b border-slate-200/70 bg-slate-50/50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
               
-              {/* CỘT TRÁI (55%): Headline lớn, Mô tả, CTAs */}
-              <div className="lg:col-span-7 space-y-7 animate-hero-fade">
+              {/* CỘT TRÁI: Headline, mô tả và CTAs giữ nguyên */}
+              <div className="lg:col-span-5 space-y-6 animate-hero-fade">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-900 text-xs sm:text-sm font-semibold">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Kỹ năng làm việc thực chiến với AI</span>
                 </div>
 
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-5xl lg:text-[60px] font-extrabold tracking-tight text-slate-950 leading-[1.08] text-balance">
+                  <h1 className="text-4xl sm:text-5xl lg:text-[44px] font-extrabold tracking-tight text-slate-950 leading-[1.08] text-balance">
                     Học cách làm việc hiệu quả với AI.
                   </h1>
                   <p className="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-xl text-balance font-normal">
@@ -222,25 +223,16 @@ export const LandingLoginScreen: React.FC = () => {
                 </div>
               </div>
 
-              {/* CỘT PHẢI (45%): BRAND STATEMENT / MANIFESTO (EDITORIAL, KHÔNG CARD) */}
-              <div className="lg:col-span-5 pt-6 lg:pt-0 animate-hero-fade">
-                <div className="border-l-4 border-emerald-600 pl-6 sm:pl-9 py-3 space-y-4">
-                  <p className="text-3xl sm:text-4xl lg:text-[44px] font-bold text-slate-950 leading-[1.18] tracking-tight">
-                    Đừng chỉ dùng AI.<br />
-                    Hãy biết cách{' '}
-                    <span className="text-emerald-700 underline decoration-emerald-400 decoration-4 underline-offset-8">
-                      làm việc với AI.
-                    </span>
-                  </p>
-                  <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal pt-2">
-                    Rõ yêu cầu. Kiểm soát kết quả. Áp dụng được vào công việc.
-                  </p>
-                </div>
+              {/* CỘT PHẢI: Cùng tác vụ, hai prompt và hai kết quả */}
+              <div className="lg:col-span-7 animate-hero-fade">
+                <PromptCompareVisual locale="vi" />
               </div>
 
             </div>
           </div>
         </section>
+
+        <PromptDirectionVisual locale="vi" />
 
         {/* 3. SECTION THỰC TRẠNG - NỀN TRẮNG SÁNG, PHÂN CÁCH RÕ RÀNG */}
         <section id="problems" className="py-20 sm:py-28 lg:py-32 bg-white border-b border-slate-200/70">
