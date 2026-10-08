@@ -16,14 +16,16 @@ The requested deliverable is all16 revised UIs with real backend behavior. It is
 
 ### Workshop/roster/SOP continuation
 
-SQL020–021 execution is confirmed by the user's success screenshot; database role and concurrency tests remain unverified. New code and unapplied migrations022–025 add:
+SQL020–021 execution is confirmed by the user's success screenshot. The user also confirmed successful execution of022–025. Database role and concurrency tests remain unverified. Migrations022–025 add:
 
 - Class broadcast with durable message receipts, assigned editor authorization, and retry request keys. Learner delivery currently polls every10 seconds, rather than a realtime subscription.
 - CSV roster preview/validation and atomic imports of up to500 rows. Imports preserve existing identity roles and inactive enrollments, create public learner profiles, and do not create Auth passwords or send invitations. Department comes from the selected class; current import format is Email,FullName only.
 - Immutable text SOP versions and class/lesson bindings. Learners see only versions bound to published lessons/modules. Generation and Judge use the server snapshot of those bound sources. PDF/Drive ingestion is not implemented.
 - Append-only trainer notes and manual clearance records, with request-key retry protection. Clearance is separate from AI scores and does not change automated completion.
 
-Native React panels are mounted in class detail and learner workspace. No claim is made that the full16 revised visual layouts are ported. SQL022–025 is prepared at `outputs/rebuild-setup/05_upgrade_workshop_roster_sops.sql`; it has not been applied or validated on a live database. Backend generation now requires024 and fails closed if source lookup is unavailable. SOP publishing does not yet support request-key recovery after an uncertain network outcome; inspect version history before resubmission.
+Native React panels are mounted in class detail and learner workspace. No claim is made that the full16 revised visual layouts are ported. SQL022–025 execution is user-confirmed, rather than independently verified. Backend generation requires024 and fails closed if source lookup is unavailable. SOP publishing does not yet support request-key recovery after an uncertain network outcome; inspect version history before resubmission.
+
+Migration026 and client subscriptions add Postgres INSERT notifications for durable class broadcasts and private trainer hints. Notifications trigger authoritative reloads, reconnect triggers a catch-up read, and10-second polling remains for reconciliation. Table grants/RLS protect message content; this is not a public client Broadcast channel.026 is not yet applied. Prepared SQL: `outputs/rebuild-setup/06_enable_message_realtime.sql`. A rollback-only scope smoke script is at `outputs/rebuild-setup/07_verify_workshop_scope.sql`; it is prepared, not executed. Actual two-browser delivery/revocation tests are still required. Reference: https://supabase.com/docs/guides/realtime/postgres-changes
 
 | UI | Work remaining before full acceptance |
 |---|---|
