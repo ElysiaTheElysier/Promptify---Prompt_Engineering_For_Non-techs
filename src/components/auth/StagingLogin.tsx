@@ -11,8 +11,8 @@ export const StagingLogin: React.FC = () => {
   const enabled = import.meta.env.DEV && import.meta.env.MODE === 'rebuild'
     && supabaseUrl === 'https://aixhryqzgpptuhstiflx.supabase.co';
   if (!enabled) return null;
-  return <section className="relative z-10 mx-auto my-6 w-full max-w-md rounded-xl border border-emerald-200 bg-white p-6">
-    <h2 className="text-lg font-semibold text-slate-900">Đăng nhập thử nghiệm Rebuild</h2>
+  return <details className="mt-5 border-t border-slate-200 pt-4">
+    <summary className="cursor-pointer text-sm text-slate-500 min-h-11">Đăng nhập tài khoản kiểm thử · chỉ ở máy local</summary>
     <p className="mt-2 text-sm text-slate-600">Dùng tài khoản học viên hoặc giảng viên trong project thử nghiệm.</p>
     <form className="mt-4 space-y-3" onSubmit={async event => {
       event.preventDefault();
@@ -39,5 +39,5 @@ export const StagingLogin: React.FC = () => {
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
       <button disabled={busy} className="w-full rounded-lg bg-emerald-700 p-3 font-semibold text-white disabled:opacity-60">{busy ? 'Đang đăng nhập…' : 'Đăng nhập'}</button>
     </form>
-  </section>;
+  </details>;
 };
