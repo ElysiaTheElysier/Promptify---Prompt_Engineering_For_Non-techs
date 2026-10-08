@@ -40,6 +40,7 @@ export const ClassDetailView: React.FC<Props> = ({
   onOpenTutorial,
   onRefreshClasses
 }) => {
+  const [phase,setPhase]=useState<'observe'|'prepare'|'execute'>(cohortClass.status==='active'?'execute':'prepare');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isCourseModalOpen, setIsCourseModalOpen] = useState<boolean>(false);
   const [isAddLearnerModalOpen, setIsAddLearnerModalOpen] = useState<boolean>(false);
@@ -96,12 +97,10 @@ export const ClassDetailView: React.FC<Props> = ({
 
   return (
     <div className="space-y-6">
-      <RebuildWorkshopPanel classId={cohortClass.id}/>
-      <WorkshopBroadcastComposer key={cohortClass.id} classId={cohortClass.id}/>
-      <RosterImportPanel key={`roster-${cohortClass.id}`} classId={cohortClass.id} onImported={()=>{setRefreshKey(k=>k+1);onRefreshClasses?.()}}/>
-      <SopManagementPanel key={`sop-${cohortClass.id}`} classId={cohortClass.id}/>
-      <ClassAnalytics classId={cohortClass.id}/>
-      {/* Toast notification */}
+      <header className="bg-white border rounded-2xl p-5"><button type="button" onClick={onBack} className="min-h-11 text-sm text-emerald-700">← The Pulse</button><h1 className="text-2xl font-bold">{cohortClass.name}</h1><p className="text-sm text-slate-500 mt-1">{cohortClass.classCode} · {cohortClass.department}</p><nav className="flex flex-wrap gap-2 mt-4" aria-label="Giai đoạn làm việc">{(['observe','prepare','execute'] as const).map(p=><button key={p} type="button" aria-pressed={phase===p} onClick={()=>setPhase(p)} className={`min-h-11 px-4 rounded-lg border ${phase===p?'bg-emerald-700 text-white border-emerald-700':'bg-white text-slate-700'}`}>{p==='observe'?'01 · Observe':p==='prepare'?'02 · Prepare':'03 · Execute'}</button>)}</nav></header>
+      {phase==='observe'&&<ClassAnalytics classId={cohortClass.id}/>}
+      {phase==='execute'&&<><div className="flex flex-wrap gap-3 justify-between items-center"><h2 className="text-xl font-bold">Live Workshop · Command Center</h2><button type="button" onClick={()=>setPhase('prepare')} className="min-h-11 border rounded-lg px-4">Edit in Curriculum Studio →</button></div><WorkshopBroadcastComposer key={cohortClass.id} classId={cohortClass.id}/><RebuildWorkshopPanel classId={cohortClass.id}/></>}
+      {phase==='prepare'&&<><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold">Curriculum & SOP Studio</h2><button type="button" onClick={()=>setPhase('execute')} className="min-h-11 border rounded-lg px-4">Về Command Center →</button></div><SopManagementPanel key={`sop-${cohortClass.id}`} classId={cohortClass.id}/><RosterImportPanel key={`roster-${cohortClass.id}`} classId={cohortClass.id} onImported={()=>{setRefreshKey(k=>k+1);onRefreshClasses?.()}}/>      {/* Toast notification */}
       {toastMessage && (
         <div className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center justify-between text-xs animate-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
@@ -370,6 +369,7 @@ export const ClassDetailView: React.FC<Props> = ({
         />
       </div>
 
+      </>}
       {/* Modal Quản lý Khóa học */}
       <CourseManagementModal
         isOpen={isCourseModalOpen}

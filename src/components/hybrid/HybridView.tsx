@@ -1,6 +1,7 @@
 import {TrainerHintInbox} from './TrainerHintInbox';
 import {WorkshopBroadcastInbox} from './WorkshopBroadcastInbox';
 import {SopLibrary} from './SopLibrary';
+import {WorkspaceReferenceDialog} from '../common/WorkspaceReferenceDialog';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Play,
@@ -106,6 +107,7 @@ export const HybridView: React.FC<Props> = ({
   const currentLabRunCount = runCountsByLab[currentLab.id] || 0;
 
   // Trạng thái ô nhập liệu & kết quả (Khởi tạo prompt rỗng cho bài tập tự viết, không nạp đáp án hoàn chỉnh)
+  const [referencePanel,setReferencePanel]=useState<'brief'|'sources'|null>(null);
   const [promptText, setPromptText] = useState<string>('');
   const [systemText, setSystemText] = useState<string>(currentLab.systemInstruction || 'Bạn là trợ lý AI chuyên nghiệp. Chỉ thực hiện yêu cầu người dùng cung cấp và không tự suy diễn dữ kiện.');
   const [output, setOutput] = useState<string>('');
@@ -860,7 +862,7 @@ export const HybridView: React.FC<Props> = ({
     <div className="max-w-[1560px] mx-auto px-4 sm:px-6 xl:px-8 py-5 space-y-5">
       <TrainerHintInbox classId={currentClassId} learnerId={currentLearnerId}/>
       <WorkshopBroadcastInbox classId={currentClassId}/>
-      <SopLibrary classId={currentClassId} lessonId={currentLab.id}/>
+
       {/* 1. THANH TIẾN ĐỘ MẢNH & ĐIỀU HƯỚNG TỐI GIẢN */}
       <div className="space-y-3">
         {/* Progress bar mảnh ở đầu lesson */}
@@ -933,15 +935,11 @@ export const HybridView: React.FC<Props> = ({
         </div>
       </div>
 
+      <div className="rounded-xl border bg-white p-4 flex flex-wrap gap-3 items-center justify-between"><div><p className="text-xs text-emerald-700 font-bold tracking-wider">CONSOLIDATED MASTER WORKSPACE</p><h1 className="font-bold text-lg mt-1">{currentLab.title}</h1><p className="text-sm text-slate-500">Soạn prompt → chạy AI → đối chiếu và cải tiến.</p></div><div className="flex flex-wrap gap-2"><button type="button" onClick={()=>setReferencePanel('brief')} className="min-h-11 px-4 border rounded-lg">Nhiệm vụ & hướng dẫn</button><button type="button" onClick={()=>setReferencePanel('sources')} className="min-h-11 px-4 border rounded-lg">SOP & nguồn</button><button type="button" onClick={()=>setIsABModalOpen(true)} className="min-h-11 px-4 border rounded-lg">So sánh phiên bản</button></div></div>
       {/* 2. BỐ CỤC CHÍNH (PROFESSIONAL AI WORKBENCH) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 2xl:grid-cols-12 gap-5 items-start">
         {/* CỘT 1: TÌNH HUỐNG, LÝ THUYẾT & NHIỆM VỤ - STICKY DESKTOP */}
-        <div className={`space-y-4 lg:sticky lg:top-20 transition-all duration-300 ${
-          hasOutputOrRunning
-            ? 'lg:col-span-5 xl:col-span-3 2xl:col-span-3'
-            : 'lg:col-span-5 xl:col-span-4 2xl:col-span-3'
-        }`}>
-          <LessonBriefPanel
+        {referencePanel && <WorkspaceReferenceDialog title={referencePanel==='brief'?'Nhiệm vụ & hướng dẫn':'SOP & nguồn tham chiếu'} onClose={()=>setReferencePanel(null)}>{referencePanel==='brief'?(          <LessonBriefPanel
             lab={currentLab}
             showDataAccordion={showDataAccordion}
             setShowDataAccordion={setShowDataAccordion}
@@ -952,15 +950,10 @@ export const HybridView: React.FC<Props> = ({
             onRequestViewHints={handleRequestViewHints}
             onRequestViewSolution={handleRequestViewSolution}
             onStartPractice={handleStartPractice}
-          />
-        </div>
+          />):<SopLibrary classId={currentClassId} lessonId={currentLab.id}/>}</WorkspaceReferenceDialog>}
 
         {/* CỘT 2: Ô SOẠN THẢO PROMPT (KHÔNG GIAN LÀM BÀI CHÍNH - RỘNG NHẤT) */}
-        <div className={`space-y-5 transition-all duration-300 ${
-          hasOutputOrRunning
-            ? 'lg:col-span-7 xl:col-span-5 2xl:col-span-5'
-            : 'lg:col-span-7 xl:col-span-8 2xl:col-span-5'
-        }`}>
+        <div className="space-y-5 lg:col-span-7">
           <PromptComposer
             lab={currentLab}
             promptText={promptText}
@@ -1029,14 +1022,10 @@ export const HybridView: React.FC<Props> = ({
         </div>
 
         {/* CỘT 3: KẾT QUẢ AI & ĐÁNH GIÁ RUBRIC */}
-        <div className={`space-y-4 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto custom-scrollbar-light transition-all duration-300 ${
-          hasOutputOrRunning
-            ? 'lg:col-span-7 lg:col-start-6 xl:col-span-4 xl:col-start-auto 2xl:col-span-4 2xl:col-start-auto'
-            : 'hidden 2xl:flex 2xl:col-span-4 2xl:col-start-auto'
-        }`}>
+        <div className="space-y-4 lg:col-span-5">
           {/* Trạng thái CHƯA CÓ KẾT QUẢ (Trước khi Run): chỉ hiện standby card tinh tế ở màn hình 2xl, không chiếm chỗ ở màn nhỏ */}
           {!hasOutputOrRunning ? (
-            <div className="hidden 2xl:flex flex-col items-center justify-center p-8 bg-white/70 backdrop-blur-xs rounded-2xl border border-dashed border-slate-200 text-center space-y-3 min-h-[380px] shadow-2xs">
+            <div className="flex flex-col items-center justify-center p-8 bg-white/70 backdrop-blur-xs rounded-2xl border border-dashed border-slate-200 text-center space-y-3 min-h-[380px] shadow-2xs">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-2xs">
                 <Sparkles className="w-6 h-6 stroke-[1.8]" />
               </div>

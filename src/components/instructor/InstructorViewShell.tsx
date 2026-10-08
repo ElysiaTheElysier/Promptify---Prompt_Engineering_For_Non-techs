@@ -3,7 +3,7 @@ import { InstructorActivity, InstructorClass, InstructorViewMode } from '../../t
 import { dbService } from '../../services/dbService';
 import { ClassWithDetails, CourseCurriculumModule, DbLessonProgress, DbPromptAttempt, LearnerInClassDetail } from '../../types/database';
 import { InstructorNavbar } from './InstructorNavbar';
-import { InstructorDashboard } from './InstructorDashboard';
+import { FacilitatorPulse } from './FacilitatorPulse';
 import { ClassDetailView } from './ClassDetailView';
 import { LearnerTableView } from './LearnerTableView';
 import { ActivityStreamView } from './ActivityStreamView';
@@ -311,14 +311,7 @@ export const InstructorViewShell: React.FC<Props> = ({ currentUser, onLogout }) 
         )}
         {/* VIEW 1: DASHBOARD OVERVIEW */}
         {currentView === 'dashboard' && (
-          <InstructorDashboard
-            onSelectClass={handleSelectClass}
-            onNavigate={setCurrentView}
-            onOpenTutorial={() => handleOpenTutorial('dashboard')}
-            classes={classes}
-            activities={activities}
-            isLoading={isLoadingClasses}
-          />
+          <FacilitatorPulse classes={classes} isLoading={isLoadingClasses} onSelectClass={handleSelectClass} onNavigate={setCurrentView}/>
         )}
 
         {/* VIEW 2: CLASSES LIST */}
