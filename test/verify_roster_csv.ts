@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {parseRosterCsv} from '../src/services/rosterImportService';
+assert.deepEqual(parseRosterCsv('\uFEFFEmail,FullName\r\nA@example.com,"Nguyễn, An"'),[{email:'a@example.com',fullName:'Nguyễn, An'}]);
+assert.equal(parseRosterCsv('FullName,Email\n"Nguyễn ""An""",a@example.com')[0].fullName,'Nguyễn "An"');
+assert.throws(()=>parseRosterCsv('Email,FullName\na@example.com,An\nA@example.com,Bình'),/trùng/);
+assert.throws(()=>parseRosterCsv('Email,FullName\ninvalid,An'),/không hợp lệ/);
+assert.throws(()=>parseRosterCsv('Email,FullName,Role\na@example.com,An,admin'),/hai cột/);
+assert.throws(()=>parseRosterCsv('Email,FullName\na@example.com,"An'),/chưa đóng/);
+assert.throws(()=>parseRosterCsv('Email,FullName\n'+Array.from({length:501},(_,i)=>`a${i}@example.com,An`).join('\n')),/500/);
+console.log('Roster CSV validation passed. No database calls made.');

@@ -15,6 +15,12 @@ async function context(authorization: string, classId: string, lessonId: string)
   if (authError || !identity.user) throw new ApiAccessError('Phiên đăng nhập không hợp lệ.', 401);
   const { data: lesson, error } = await reader.from('lessons').select('*, lesson_resources(*), lesson_rubric_criteria(*)').eq('id', lessonId).eq('status', 'published').single();
   if (error || !lesson) throw new ApiAccessError('Không tải được bài học đã xuất bản.', 403);
+  const {data:sops,error:sopError}=await reader.rpc('rebuild_class_sops',{p_class:classId,p_lesson:lessonId});
+  if(sopError)throw new ApiAccessError('Chưa tải được SOP canonical. Kiểm tra schema và quyền truy cập.',503);
+  const sourceText=(sops||[]).map((s:any)=>`${s.citation} ${s.title}\n${s.content}`).join('\n\n');
+  if(sourceText.length>100000)throw new ApiAccessError('Tài liệu SOP của bài vượt giới hạn 100000 ký tự. Giảng viên cần thu gọn nguồn.',422);
+  lesson.rebuild_sop_versions=sops||[];
+  lesson.sample_input_context=[lesson.sample_input_context,sourceText].filter(Boolean).join('\n\n');
   const server = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   return { reader, server, lesson, subject: identity.user.id };
 }

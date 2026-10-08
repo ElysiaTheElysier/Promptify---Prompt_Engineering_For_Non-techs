@@ -1,4 +1,7 @@
 import {RebuildWorkshopPanel} from './RebuildWorkshopPanel';
+import {WorkshopBroadcastComposer} from './WorkshopBroadcastComposer';
+import {RosterImportPanel} from './RosterImportPanel';
+import {SopManagementPanel} from './SopManagementPanel';
 import {ClassAnalytics} from './ClassAnalytics';
 import React, { useEffect, useState } from 'react';
 import { 
@@ -94,6 +97,9 @@ export const ClassDetailView: React.FC<Props> = ({
   return (
     <div className="space-y-6">
       <RebuildWorkshopPanel classId={cohortClass.id}/>
+      <WorkshopBroadcastComposer key={cohortClass.id} classId={cohortClass.id}/>
+      <RosterImportPanel key={`roster-${cohortClass.id}`} classId={cohortClass.id} onImported={()=>{setRefreshKey(k=>k+1);onRefreshClasses?.()}}/>
+      <SopManagementPanel key={`sop-${cohortClass.id}`} classId={cohortClass.id}/>
       <ClassAnalytics classId={cohortClass.id}/>
       {/* Toast notification */}
       {toastMessage && (

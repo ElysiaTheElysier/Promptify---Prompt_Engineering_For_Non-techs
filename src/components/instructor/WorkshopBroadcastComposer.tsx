@@ -1,0 +1,8 @@
+import React,{useRef,useState} from 'react';
+import {workshopMessagingService} from '../../services/workshopMessagingService';
+export function WorkshopBroadcastComposer({classId}:{classId:string}){
+ const [message,setMessage]=useState(''),[busy,setBusy]=useState(false),[status,setStatus]=useState('');
+ const request=useRef<{text:string;id:string}|null>(null);
+ const send=async()=>{const text=message.trim();if(!text||busy)return;if(request.current?.text!==text)request.current={text,id:crypto.randomUUID()};setBusy(true);setStatus('');try{await workshopMessagingService.broadcast(classId,request.current.id,text);setMessage('');request.current=null;setStatus('Đã lưu thông báo cho cả lớp.')}catch{setStatus('Chưa xác nhận gửi thành công. Thử lại cùng nội dung sẽ dùng cùng mã yêu cầu.')}finally{setBusy(false)}};
+ return <section className="rounded-xl bg-white border border-slate-200 p-5 space-y-3"><h2 className="font-bold text-slate-900">Broadcast · Hỗ trợ cả lớp</h2><p className="text-sm text-slate-500">Gửi hướng dẫn chung đến học viên đang được ghi danh. Thông báo được lưu để học viên đọc và xác nhận.</p><label className="block text-sm font-medium">Nội dung thông báo<textarea rows={3} maxLength={2000} value={message} disabled={busy} onChange={e=>setMessage(e.target.value)} className="mt-2 block w-full rounded-lg border p-3"/></label><button type="button" disabled={busy||!message.trim()} onClick={send} className="min-h-11 rounded-lg bg-emerald-700 text-white px-4 disabled:opacity-50">{busy?'Đang gửi…':'Gửi cho cả lớp'}</button>{status&&<p role="status" className="text-sm">{status}</p>}</section>;
+}

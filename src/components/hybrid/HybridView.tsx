@@ -1,4 +1,6 @@
 import {TrainerHintInbox} from './TrainerHintInbox';
+import {WorkshopBroadcastInbox} from './WorkshopBroadcastInbox';
+import {SopLibrary} from './SopLibrary';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Play,
@@ -857,6 +859,8 @@ export const HybridView: React.FC<Props> = ({
   return (
     <div className="max-w-[1560px] mx-auto px-4 sm:px-6 xl:px-8 py-5 space-y-5">
       <TrainerHintInbox classId={currentClassId} learnerId={currentLearnerId}/>
+      <WorkshopBroadcastInbox classId={currentClassId}/>
+      <SopLibrary classId={currentClassId} lessonId={currentLab.id}/>
       {/* 1. THANH TIẾN ĐỘ MẢNH & ĐIỀU HƯỚNG TỐI GIẢN */}
       <div className="space-y-3">
         {/* Progress bar mảnh ở đầu lesson */}
