@@ -53,3 +53,9 @@ Build and offline progress/run/CSV validation tests pass. Judge tests assert a b
 For the existing staging project ONLY, run `outputs/rebuild-setup/04_upgrade_profiles_and_judge.sql` after019. Do not rerun the empty-database bundle. Keep code and schema rollout coordinated: Judge now needs021. Configure AI credentials server-side only after staging auth works; do not publish secrets as VITE variables.
 
 Evidence still required: learner/trainer/outsider real-session tests, scope isolation, live AI with approved quota, DB concurrency/failure tests, responsive visual review against revised16 UIs, deployment settings/observability and rollback rehearsal. No push or deployment performed.
+
+## Latest continuation
+
+The user confirmed completing the026 realtime setup and scope-check scripts. Returned query values were not provided, so permission correctness and actual realtime delivery remain unverified.
+
+UI06 now uses a native accessible dialog in HybridView with independent saved-version selectors, prompt/output tabs, line-based LCS differences, synchronized proportional scrolling and restoration into the current editor. It does not synthesize baseline/output records when history is missing. Restoration changes the draft and does not mutate attempt history or scores. Long output uses a bounded full-block diff fallback; diff rendering is capped at1000 lines with an explicit notice and full side-by-side text remains available. This is textual comparison, not semantic quality evaluation. Build and reconstruction/fallback tests passed; browser interaction with real staging history remains unverified.

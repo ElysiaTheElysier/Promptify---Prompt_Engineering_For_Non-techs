@@ -41,7 +41,7 @@ import {
   PromptSpan,
   PromptComponentType
 } from '../../services/promptStructureAnalyzer';
-import { ABCompareModal } from '../common/ABCompareModal';
+import { AttemptCompareDialog } from '../common/AttemptCompareDialog';
 import { SavePromptModal } from '../common/SavePromptModal';
 import { MarkdownView } from '../common/MarkdownView';
 import { validateAiEvaluationPayload } from '../../services/aiEvaluationContract';
@@ -1396,11 +1396,12 @@ export const HybridView: React.FC<Props> = ({
       </div>
 
       {/* Modal Đối chiếu A/B với Business Metrics & Self-check */}
-      <ABCompareModal
+      <AttemptCompareDialog
         isOpen={isABModalOpen}
         onClose={() => setIsABModalOpen(false)}
         lab={currentLab}
         versions={currentLabVersions}
+        onRestore={ver=>setPromptText(ver.promptText)}
         onSavePromptToLibrary={(ver) => {
           setVersionToSave(ver);
           setIsSaveModalOpen(true);
