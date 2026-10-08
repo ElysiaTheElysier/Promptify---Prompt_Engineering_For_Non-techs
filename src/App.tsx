@@ -11,6 +11,8 @@ import {
 } from './types';
 import { LABS_DATA } from './data/labsData';
 import { LandingLoginScreen } from './components/auth/LandingLoginScreen';
+import { ProfileConfirmation } from './components/auth/ProfileConfirmation';
+import { AccessDenied } from './components/auth/AccessDenied';
 import { ClassSelectionScreen } from './components/classes/ClassSelectionScreen';
 import { ProductNavbar } from './components/navigation/ProductNavbar';
 import { LearnerDashboard } from './components/dashboard/LearnerDashboard';
@@ -46,6 +48,8 @@ export const App: React.FC = () => {
   const reviewClassCode = ((import.meta as any).env?.VITE_REVIEW_CLASS_CODE || '').trim();
   // Trạng thái kiểm tra phiên đăng nhập (Ngăn loading vô hạn)
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+  const [needsProfileConfirmation, setNeedsProfileConfirmation] = useState(false);
+  const [profileResolutionFailed, setProfileResolutionFailed] = useState(false);
 
   // User thật từ Supabase Auth & public.users
   const [currentUser, setCurrentUser] = useState<{
@@ -353,6 +357,7 @@ export const App: React.FC = () => {
   ) => {
     if (isResolvingRef.current === email) return;
     isResolvingRef.current = email;
+    setProfileResolutionFailed(false);
 
     const isSameUser = currentUserRef.current && currentUserRef.current.email === email;
 
@@ -370,6 +375,7 @@ export const App: React.FC = () => {
       });
 
       const resolvedName = dbUser.full_name || fullName || email.split('@')[0];
+      setNeedsProfileConfirmation('profile_confirmed_at' in dbUser && !dbUser.profile_confirmed_at);
       const initials = resolvedName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'US';
 
       // 2. Quyền Instructor: DO DB QUYẾT ĐỊNH (public.users.role)
@@ -497,6 +503,7 @@ export const App: React.FC = () => {
       }
     } catch (err) {
       console.error('Lỗi phân giải phiên đăng nhập:', err);
+      setProfileResolutionFailed(true);
     } finally {
       setIsAuthLoading(false);
       isResolvingRef.current = null;
@@ -508,6 +515,8 @@ export const App: React.FC = () => {
 
   // Dọn dẹp toàn bộ dữ liệu session (Single Source of Truth)
   const clearSessionState = () => {
+    setProfileResolutionFailed(false);
+    setNeedsProfileConfirmation(false);
     setCurrentUser(null);
     setCurrentLearner(null);
     setUserRole(null);
@@ -815,6 +824,15 @@ export const App: React.FC = () => {
   }
 
   // 1. Màn hình Landing & Login (khi chưa có currentUser HOẶC view === 'landing')
+  if (profileResolutionFailed) {
+    return <AccessDenied onLogout={handleLogout} onRetry={() => {
+      void supabase.auth.getSession().then(({data}) => {
+        if (data.session?.user.email) void resolveUserSession(data.session.user.email, data.session.user.user_metadata?.full_name, data.session.user.id);
+        else void handleLogout();
+      });
+    }} />;
+  }
+
   if (!currentUser || currentView === 'landing') {
     return (
       <LandingLoginScreen />
@@ -822,6 +840,13 @@ export const App: React.FC = () => {
   }
 
   // 2. Màn hình Dành riêng cho Giảng viên / Quản lý lớp (Instructor View)
+  if (needsProfileConfirmation) {
+    return <ProfileConfirmation onLogout={handleLogout} onComplete={() => {
+      setNeedsProfileConfirmation(false);
+      if (currentUser) void resolveUserSession(currentUser.email);
+    }} />;
+  }
+
   if (userRole === 'INSTRUCTOR') {
     return (
       <InstructorViewShell

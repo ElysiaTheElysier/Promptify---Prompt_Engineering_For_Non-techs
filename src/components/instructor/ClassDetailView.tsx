@@ -1,4 +1,5 @@
 import {RebuildWorkshopPanel} from './RebuildWorkshopPanel';
+import {ClassAnalytics} from './ClassAnalytics';
 import React, { useEffect, useState } from 'react';
 import { 
   ArrowLeft, 
@@ -93,6 +94,7 @@ export const ClassDetailView: React.FC<Props> = ({
   return (
     <div className="space-y-6">
       <RebuildWorkshopPanel classId={cohortClass.id}/>
+      <ClassAnalytics classId={cohortClass.id}/>
       {/* Toast notification */}
       {toastMessage && (
         <div className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-lg flex items-center justify-between text-xs animate-in slide-in-from-top-2">

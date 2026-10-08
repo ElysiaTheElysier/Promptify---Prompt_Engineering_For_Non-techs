@@ -20,11 +20,16 @@ export const LearnerHome: React.FC<Props> = ({
   onChooseClass,
 }) => {
   const [loadingClassId, setLoadingClassId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'active'>('all');
+  const [openError, setOpenError] = useState('');
 
   const chooseClass = async (cohort: ClassCohort) => {
     setLoadingClassId(cohort.id);
+    setOpenError('');
     try {
       await onChooseClass(cohort);
+    } catch {
+      setOpenError('Không mở được lớp. Vui lòng thử lại hoặc liên hệ giảng viên.');
     } finally {
       setLoadingClassId(null);
     }
@@ -37,18 +42,23 @@ export const LearnerHome: React.FC<Props> = ({
         <div className="relative max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200">
             <Sparkles className="h-3.5 w-3.5" />
-            Không gian học tập của bạn
+            Department Training Zone · Khu vực đào tạo phòng ban
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-            Xin chào, {learner.name} 👋
+            Chào mừng trở lại, {learner.name}!
           </h1>
           <p className="text-sm leading-6 text-slate-600 sm:text-base">
-            Chọn một lớp bên dưới để mở đúng lộ trình và nội dung bài học được giao cho bạn.
+            Thực hành làm chủ kỹ năng Prompting qua các bài Codelab gắn liền với tài liệu công việc thực tế.
           </p>
         </div>
       </section>
 
       <section className="space-y-4">
+        {openError && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">{openError}</p>}
+        <div role="group" aria-label="Lọc lớp học" className="flex gap-2">
+          <button type="button" aria-pressed={filter === 'all'} onClick={() => setFilter('all')} className={`rounded-lg border px-4 py-2 text-sm ${filter === 'all' ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-slate-200 bg-white'}`}>Tất cả ({cohorts.length})</button>
+          <button type="button" aria-pressed={filter === 'active'} onClick={() => setFilter('active')} className={`rounded-lg border px-4 py-2 text-sm ${filter === 'active' ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-slate-200 bg-white'}`}>Đã ghi danh</button>
+        </div>
         <div>
           <h2 className="text-xl font-bold text-slate-950">Lớp học của bạn</h2>
           <p className="mt-1 text-sm text-slate-500">
@@ -57,7 +67,7 @@ export const LearnerHome: React.FC<Props> = ({
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {cohorts.map((cohort) => {
+          {cohorts.filter(cohort => filter === 'all' || enrollments[`${learner.id}_${cohort.id}`] !== undefined).map((cohort) => {
             const enrollment = enrollments[`${learner.id}_${cohort.id}`];
             const completedCount = enrollment?.completedLabIds.length || 0;
             const progress = totalLabCount > 0

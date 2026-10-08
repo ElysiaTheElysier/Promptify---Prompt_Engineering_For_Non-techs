@@ -43,9 +43,14 @@ async function evaluateSavedRun(authorization: string, body: any) {
   if (!run) throw new ApiAccessError('Attempt thiếu snapshot server; không chấm dữ liệu do client gửi.', 409);
   if (attempt.evaluation_json) return attempt.evaluation_json;
   const s = run.snapshot;
+  const claimId = crypto.randomUUID();
+  const { data: claim, error: claimError } = await c.server.rpc('rebuild_claim_judge', { p_subject: c.subject, p_attempt: attempt.id, p_claim: claimId });
+  if (claimError || !claim) throw new ApiAccessError('Chưa xác nhận được lượt chấm điểm trên server.', 503);
+  if (claim.status === 'complete') return claim.evaluation;
+  if (claim.status !== 'claimed') throw new ApiAccessError('Judge đang xử lý hoặc chưa rõ kết quả. Liên hệ giảng viên trước khi chấm lại.', 409);
   const evaluation = await evaluate({ learnerPrompt: attempt.prompt_text, generatedOutput: attempt.ai_output, scenario: s.scenario, taskRequirement: s.task_goal, controlData: s.sample_input_context, lessonRubric: s.lesson_rubric_criteria });
-  const { error: saveError } = await c.server.rpc('rebuild_save_evaluation', { p_subject: c.subject, p_attempt: attempt.id, p_evaluation: evaluation });
-  if (saveError) throw new ApiAccessError('Chưa lưu được điểm; hãy retry Judge, không chạy lại prompt.', 503);
+  const { error: saveError } = await c.server.rpc('rebuild_finish_judge', { p_subject: c.subject, p_attempt: attempt.id, p_claim: claimId, p_evaluation: evaluation });
+  if (saveError) throw new ApiAccessError('Chưa lưu được điểm. Lượt Judge đã nhận; liên hệ giảng viên kiểm tra trước khi chấm lại.', 503);
   return evaluation;
 }
 

@@ -13,11 +13,13 @@ replay=null;failSave=true;await assert.rejects(()=>svc.generateSavedRun('Bearer 
 await assert.rejects(()=>svc.generateSavedRun('Bearer test',{...input,prompt:''}),/Prompt/);
 await assert.rejects(()=>svc.generateSavedRun('Bearer test',{...input,requestId:null}),/request ID/);
 const denied=createRebuildRunService(async()=>{throw new Error('Scope denied')},provider);const count=calls;await assert.rejects(()=>denied.generateSavedRun('Bearer test',input),/Scope denied/);assert.equal(calls,count);
-let judgeInput:any;let writes=0;
+let judgeInput:any;let writes=0;let claimStatus='claimed';let judgeCalls=0;
 const rows:any={prompt_attempts:{id,learner_id:id,prompt_text:'PERSISTED PROMPT',ai_output:'PERSISTED OUTPUT'},users:{id},learners:{id},rebuild_runs:{snapshot:{scenario:'SERVER SCENARIO',task_goal:'SERVER TASK',sample_input_context:'SERVER DATA',lesson_rubric_criteria:['SERVER RUBRIC']}}};
-const client:any={from:(table:string)=>{const q:any={select:()=>q,eq:()=>q,single:async()=>({data:rows[table]})};return q},rpc:async()=>{writes++;return {data:{}}}};
-const judge=createRebuildRunService(async()=>({reader:client,server:client,subject:id,lesson:{}} as any),provider,async(input:any)=>{judgeInput=input;return {total:8} as any});
+const client:any={from:(table:string)=>{const q:any={select:()=>q,eq:()=>q,single:async()=>({data:rows[table]})};return q},rpc:async(name:string)=>{if(name==='rebuild_claim_judge')return {data:{status:claimStatus,evaluation:{total:8}}};writes++;return {data:{}}}};
+const judge=createRebuildRunService(async()=>({reader:client,server:client,subject:id,lesson:{}} as any),provider,async(input:any)=>{judgeCalls++;judgeInput=input;return {total:8} as any});
 await judge.evaluateSavedRun('Bearer test',{...input,attemptId:id,learnerPrompt:'FORGED',generatedOutput:'FORGED',lessonRubric:'FORGED'});
 assert.equal(judgeInput.learnerPrompt,'PERSISTED PROMPT');assert.equal(judgeInput.generatedOutput,'PERSISTED OUTPUT');assert.deepEqual(judgeInput.lessonRubric,['SERVER RUBRIC']);assert.equal(writes,1);
+claimStatus='busy';await assert.rejects(()=>judge.evaluateSavedRun('Bearer test',{...input,attemptId:id}),/đang xử lý/);assert.equal(judgeCalls,1);assert.equal(writes,1);
+claimStatus='complete';assert.equal((await judge.evaluateSavedRun('Bearer test',{...input,attemptId:id})).total,8);assert.equal(judgeCalls,1);
 rows.prompt_attempts.learner_id='outsider';await assert.rejects(()=>judge.evaluateSavedRun('Bearer test',{...input,attemptId:id}),/không thuộc/);assert.equal(writes,1);
 console.log('Rebuild run tests passed: canonical context, replay, save failure, input validation, denied scope, persisted Judge data and ownership. No live AI/DB calls.');

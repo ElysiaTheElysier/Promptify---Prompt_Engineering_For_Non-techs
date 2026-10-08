@@ -13,6 +13,7 @@ export interface DbUser {
   auth_provider_id?: string | null;
   created_at?: string;
   updated_at?: string;
+  profile_confirmed_at?: string | null;
 }
 
 export interface DbClient {

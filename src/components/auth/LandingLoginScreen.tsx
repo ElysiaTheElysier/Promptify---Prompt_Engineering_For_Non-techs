@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { EnterpriseSignIn } from './EnterpriseSignIn';
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -22,9 +23,11 @@ import { PromptCompareVisual, PromptDirectionVisual } from '../landing/LandingKe
 export const LandingLoginScreen: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const handleRealGoogleLogin = () => { setLoginError(null); setShowSignIn(true); };
 
   // Luồng Google OAuth thực tế - Giữ nguyên 100% logic
-  const handleRealGoogleLogin = async () => {
+  const handleGoogleSSO = async () => {
     setLoginError(null);
     setIsLoggingIn(true);
 
@@ -60,6 +63,7 @@ export const LandingLoginScreen: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-500 selection:text-white flex flex-col overflow-x-hidden">
+      {showSignIn && <EnterpriseSignIn onClose={() => setShowSignIn(false)} onGoogle={handleGoogleSSO} busy={isLoggingIn} error={loginError} />}
       {/* Dynamic Background Watermark Logo & Ambient Bloom */}
       <AnimatedBrandWatermark />
 
