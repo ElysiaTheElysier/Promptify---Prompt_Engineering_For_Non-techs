@@ -1,3 +1,4 @@
+import { generateSavedRun } from '../src/services/rebuildRunService.js';
 import { AiServerError, handleGenerateRequest } from '../src/services/apiServerService.js';
 import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthorizationService.js';
 
@@ -22,7 +23,7 @@ export default async function handler(req: any, res: any) {
       classId: body?.classId,
       lessonId: body?.lessonId,
     });
-    const result = await handleGenerateRequest(body || {});
+    const result = await generateSavedRun(req.headers?.authorization || '', body || {});
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error in /api/generate:', error);

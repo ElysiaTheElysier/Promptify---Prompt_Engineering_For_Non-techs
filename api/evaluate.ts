@@ -1,3 +1,4 @@
+import { evaluateSavedRun } from '../src/services/rebuildRunService.js';
 import { AiServerError, handleEvaluateRequest } from '../src/services/apiServerService.js';
 import { ApiAccessError, assertAiLessonAccess } from '../src/services/apiAuthorizationService.js';
 
@@ -22,7 +23,7 @@ export default async function handler(req: any, res: any) {
       classId: body?.classId,
       lessonId: body?.lessonId,
     });
-    const result = await handleEvaluateRequest(body || {});
+    const result = await evaluateSavedRun(req.headers?.authorization || '', body || {});
     return res.status(200).json(result);
   } catch (error: any) {
     console.error('Error in /api/evaluate:', error);

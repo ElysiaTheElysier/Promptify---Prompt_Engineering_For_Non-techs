@@ -1,3 +1,4 @@
+import { generateSavedRun, evaluateSavedRun } from './src/services/rebuildRunService';
 import { defineConfig, loadEnv, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { AiServerError, handleGenerateRequest, handleEvaluateRequest } from './src/services/apiServerService';
@@ -19,7 +20,7 @@ function apiDevServerPlugin(): Plugin {
                 classId: parsed.classId,
                 lessonId: parsed.lessonId,
               });
-              const result = await handleGenerateRequest(parsed);
+              const result = await generateSavedRun(req.headers.authorization || '', parsed);
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 200;
               res.end(JSON.stringify(result));
@@ -43,7 +44,7 @@ function apiDevServerPlugin(): Plugin {
                 classId: parsed.classId,
                 lessonId: parsed.lessonId,
               });
-              const result = await handleEvaluateRequest(parsed);
+              const result = await evaluateSavedRun(req.headers.authorization || '', parsed);
               res.setHeader('Content-Type', 'application/json');
               res.statusCode = 200;
               res.end(JSON.stringify(result));

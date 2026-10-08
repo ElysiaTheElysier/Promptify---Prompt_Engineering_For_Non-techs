@@ -162,7 +162,7 @@ export async function executeSimulatedPromptStream(
   lab: LabStep,
   onChunk: (chunk: string) => void,
   startTime: number = performance.now()
-): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'simulated'; model: string }> {
+): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'simulated'; model: string; saved?: any }> {
   const text = promptText.toLowerCase();
   const isImproved = 
     promptText.length > 200 ||
@@ -215,7 +215,7 @@ export async function executePromptStream(
   apiConfig: ApiConfig,
   onChunk: (chunk: string) => void,
   classId?: string,
-): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'gemini' | 'simulated' | 'openai'; model: string }> {
+): Promise<{ output: string; tokenCount: number; latencyMs: number; mode: 'gemini' | 'simulated' | 'openai'; model: string; saved?: any }> {
   const startTime = performance.now();
 
   // 1. Chế độ Mô phỏng (Simulated Engine) - Chỉ chạy khi người dùng chủ động chọn chế độ simulated
@@ -229,6 +229,7 @@ export async function executePromptStream(
     method: 'POST',
     headers,
     body: JSON.stringify({
+      requestId: crypto.randomUUID(),
       lessonId: lab.id,
       classId,
       prompt: promptText,
@@ -272,7 +273,8 @@ export async function executePromptStream(
     tokenCount,
     latencyMs,
     mode: model.toLowerCase().includes('gpt') ? 'openai' : 'gemini',
-    model
+    model,
+    saved: data.saved
   };
 }
 
@@ -280,6 +282,7 @@ export async function executePromptStream(
  * Chấm điểm câu lệnh và kết quả thông qua endpoint POST /api/evaluate
  */
 export async function evaluatePromptLive(params: {
+  attemptId?: string;
   lessonId: string;
   classId?: string;
   scenario: string;

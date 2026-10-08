@@ -1,3 +1,4 @@
+import {TrainerHintInbox} from './TrainerHintInbox';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Play,
@@ -561,7 +562,7 @@ export const HybridView: React.FC<Props> = ({
 
       // Hiển thị ngay kết quả AI để học viên đọc được lập tức
       setOutput(result.output);
-      setIsRunning(false);
+      if (result.saved?.attempt?.id) setCurrentAttemptId(result.saved.attempt.id);
       setMetrics({
         tokens: result.tokenCount,
         latency: result.latencyMs,
@@ -583,6 +584,7 @@ export const HybridView: React.FC<Props> = ({
       let evalResult: AiEvaluationResult | null = null;
       try {
         evalResult = await evaluatePromptLive({
+          attemptId: result.saved?.attempt?.id,
           lessonId: currentLab.id,
           classId: currentClassId,
           scenario: currentLab.scenario,
@@ -621,7 +623,7 @@ export const HybridView: React.FC<Props> = ({
 
       // 3. PERSIST ATTEMPT + PROGRESS ATOMIC. Chỉ confirm completion sau RPC thành công.
       const labVers = versionsByLab[currentLab.id] || [];
-      const newVerNum = labVers.length + 1;
+      const newVerNum = result.saved?.attempt?.attempt_number || labVers.length + 1;
       let persistedAttemptId: string | null = null;
 
       if (!currentLearnerId || !currentClassId) {
@@ -630,7 +632,7 @@ export const HybridView: React.FC<Props> = ({
       }
 
       try {
-        const saved = await dbService.recordPromptAttemptAndProgress({
+        const saved = result.saved || await dbService.recordPromptAttemptAndProgress({
           learner_id: currentLearnerId,
           class_id: currentClassId,
           lesson_id: currentLab.id,
@@ -726,6 +728,7 @@ export const HybridView: React.FC<Props> = ({
 
     try {
       const evalResult = await evaluatePromptLive({
+        attemptId: targetAttemptId || undefined,
         lessonId: currentLab.id,
         classId: currentClassId,
         scenario: currentLab.scenario,
@@ -759,7 +762,7 @@ export const HybridView: React.FC<Props> = ({
       });
 
       // Cập nhật database cho đúng attempt ID đã lưu
-      if (targetAttemptId) {
+      if (targetAttemptId && apiConfig.mode === 'simulated') {
         try {
           await dbService.updatePromptAttemptEvaluation(targetAttemptId, evalResult);
         } catch (dbErr) {
@@ -853,6 +856,7 @@ export const HybridView: React.FC<Props> = ({
 
   return (
     <div className="max-w-[1560px] mx-auto px-4 sm:px-6 xl:px-8 py-5 space-y-5">
+      <TrainerHintInbox classId={currentClassId} learnerId={currentLearnerId}/>
       {/* 1. THANH TIẾN ĐỘ MẢNH & ĐIỀU HƯỚNG TỐI GIẢN */}
       <div className="space-y-3">
         {/* Progress bar mảnh ở đầu lesson */}
