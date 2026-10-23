@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promptify — Workspace (Google AI Studio Spatial Model)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ==============================================================================
+       1. LEFT SIDEBAR (Exact Google AI Studio Architecture)
+       ============================================================================== -->
+  <aside class="app-sidebar">
+    <div class="sidebar-header">
+      <a href="#before_run" class="brand-wrapper" title="Promptify Home">
+        <div class="brand-icon-box">P</div>
+        <span>Promptify</span>
+      </a>
+      <button class="btn-sidebar-collapse" title="Thu gọn sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sidebar-nav-scroll">
+      <!-- Section: HỌC TẬP & LAB -->
+      <div class="nav-section-title">Học tập & Lab</div>
+      
+      <button class="nav-item-btn active" id="nav-lab-item" onclick="switchAttempt('v2')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>Lab 06: Bảng tổng hợp</span>
+      </button>
+
+      <button class="nav-item-btn" onclick="openCompareModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>Lịch sử & So sánh</span>
+      </button>
+
+      <button class="nav-item-btn" onclick="loadStarterTemplate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>Khuôn mẫu prompt</span>
+      </button>
+
+      <!-- Section: TRỢ GIÚP CHUYÊN SÂU (Drawer Triggers) -->
+      <div class="nav-section-title" style="margin-top: 10px;">Trợ giúp học tập</div>
+
+      <button class="nav-item-btn" id="btn-theory-nav" onclick="toggleDrawer('theory')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Lý thuyết cốt lõi</span>
+      </button>
+
+      <button class="nav-item-btn" id="btn-hint-nav" onclick="toggleDrawer('hint')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18h6"></path>
+          <path d="M10 22h4"></path>
+          <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+        </svg>
+        <span>Gợi ý từng bước</span>
+      </button>
+
+      <button class="nav-item-btn" id="btn-solution-nav" onclick="toggleDrawer('solution')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Đáp án mẫu</span>
+      </button>
+
+      <button class="nav-item-btn" id="btn-coach-nav" onclick="toggleDrawer('coach')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>AI Coach đồng hành</span>
+      </button>
+    </div>
+
+    <!-- Sidebar Bottom Strip (Exact Google AI Studio Profile & Tool Icons) -->
+    <div class="sidebar-bottom">
+      <div class="sidebar-tools-row">
+        <button class="tool-icon-btn" title="Thông báo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
+        <button class="tool-icon-btn" title="Cài đặt">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <button class="tool-icon-btn" title="API Key">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5M19 5l-7 7-4-4-6 6 4 4 6-6 7-7z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="user-profile-strip">
+        <div class="user-avatar-circle">AG</div>
+        <div class="user-info-text">
+          <span class="user-name">Agribank Digital</span>
+          <span class="user-role-badge">Lớp OJT K04</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- ==============================================================================
+       2. WORKSPACE MAIN (Top Bar + Center Canvas + Right Panel)
+       ============================================================================== -->
+  <div class="workspace-main">
+    
+    <!-- Minimalist Top Bar (Exact Google AI Studio Layout) -->
+    <header class="studio-topbar">
+      <div class="topbar-left">
+        <div class="prompt-title-editable">
+          <span id="prompt-workspace-title">Lab 06: Bảng Tổng Hợp Phản Ánh Khách Hàng (Structured Outputs)</span>
+          <button class="btn-edit-title" title="Đổi tiêu đề">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn-action-icon" title="Chia sẻ bài làm">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+        </button>
+        <button class="btn-action-icon" title="Mở rộng toàn màn hình">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+        <button class="btn-action-icon" title="Tùy chọn khác">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="1"></circle>
+            <circle cx="12" cy="5" r="1"></circle>
+            <circle cx="12" cy="19" r="1"></circle>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Studio Stage Body (Split View) -->
+    <div class="studio-stage-body">
+
+      <!-- ==========================================================================
+           3. CENTER CANVAS (THE HERO — Dominant Spacious Prompt Canvas)
+           ========================================================================== -->
+      <main class="center-canvas">
+        
+        <!-- Minimal Task Strip -->
+        <div class="canvas-task-banner">
+          <div>
+            <span class="task-tag">Nhiệm vụ</span>
+            <span class="task-summary-text">Trích xuất 5 phản ánh khách hàng thành duy nhất 1 Bảng Markdown 6 cột chuẩn Excel (Zero-Chat)</span>
+          </div>
+          <button class="btn-task-toggle" onclick="toggleTaskCard()">
+            <span id="task-toggle-label">Chi tiết dữ liệu thô ▾</span>
+          </button>
+        </div>
+
+        <!-- Expanded Task Details Card (Toggled on-demand) -->
+        <div class="task-expanded-card" id="task-expanded-card">
+          <h4>Bối cảnh nghiệp vụ Agribank</h4>
+          <p>Phòng Vận hành & Dịch vụ Khách hàng cần tổng hợp 5 phản ánh rải rác từ ATM, App Store và Tổng đài. Yêu cầu đầu ra là 1 bảng Markdown duy nhất, không có lời chào đàm thoại, để copy dán trực tiếp vào Excel phục vụ điều phối xử lý theo đúng mức ưu tiên.</p>
+          
+          <h4 style="margin-top: 12px;">Dữ liệu phản ánh thô (5 trường hợp)</h4>
+          <pre>1. Khách hàng Trần Văn Long: Rút tiền ATM số 14 Láng Hạ bị trừ 2.000.000đ nhưng không nhả tiền (cần đóng viện phí gấp).
+2. App Store user MaiPhuong_91: Bản cập nhật 5.2.0 bấm Chuyển tiền quốc tế bị văng app trên iPhone 14 Pro Max iOS 18.
+3. Bà con Lê Thị Tươi: Hỏi gói vay ưu đãi phụ nữ nuôi gà đẻ trứng tại Hải Dương cần giấy tờ gì.
+4. Chủ tạp hóa Nguyễn Hữu Đạt: Mã QR Pay báo lỗi kết nối máy chủ không thanh toán được tại quầy.
+5. Khách hàng Đỗ Minh Đức: Góp ý bổ sung bộ lọc số tiền và người nhận trong lịch sử giao dịch.</pre>
+        </div>
+
+        <!-- Attempt Version Switcher Subbar -->
+        <div class="canvas-subbar">
+          <div class="attempt-pills-group">
+            <button class="attempt-pill-btn" id="pill-v1" onclick="switchAttempt('v1')">v1 (Thô sơ)</button>
+            <button class="attempt-pill-btn active" id="pill-v2" onclick="switchAttempt('v2')">v2 (Có cấu trúc)</button>
+          </div>
+          <button class="btn-compare-light" onclick="openCompareModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>So sánh lần thử</span>
+          </button>
+        </div>
+
+        <!-- ======================================================================
+             PROMPT COMPOSER CARD (Exact Google AI Studio Floating Box)
+             ====================================================================== -->
+        <div class="prompt-composer-card">
+          
+          <!-- AI Studio Style Banner inside Composer -->
+          <div class="composer-hint-banner">
+            <div class="composer-hint-left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span><strong>Mẹo kỹ thuật:</strong> Dùng cặp thẻ XML <code>&lt;danh_sach&gt;</code> để cô lập dữ liệu và thêm quy tắc cấm lời chào để dán thẳng vào Excel.</span>
+            </div>
+            <a href="#theory" onclick="toggleDrawer('theory')" style="color: inherit; font-weight: 600; text-decoration: underline; cursor: pointer;">Xem lý thuyết</a>
+          </div>
+
+          <!-- Prompt Textarea Area -->
+          <div class="prompt-textarea-box">
+            <textarea 
+              class="prompt-editor-input" 
+              id="prompt-editor-input" 
+              placeholder="Soạn câu lệnh của bạn tại đây... Hãy định nghĩa vai trò, cấu trúc bảng Markdown 6 cột và ràng buộc cấm lời chào."
+              spellcheck="false"
+            >Bạn là Trợ lý Dữ liệu Vận hành (Data Operations Specialist) tại Agribank.
+
+Nhiệm vụ: Hãy phân tích toàn bộ các phản ánh của khách hàng nằm trong cặp thẻ <danh_sach_khieu_nai> và trích xuất thành 01 BẢNG MARKDOWN DUY NHẤT.
+
+<danh_sach_khieu_nai>
+[Dữ liệu 5 phản ánh của khách hàng được tự động nạp từ bối cảnh bài học]
+</danh_sach_khieu_nai>
+
+YÊU CẦU ĐỊNH DẠNG KHUÔN BẢNG (SCHEMA):
+Bảng Markdown phải có đúng 6 cột với tiêu đề sau:
+| STT | Mã Phản Ánh | Kênh Tiếp Nhận | Phân Loại Sự Cố | Mức Độ Ưu Tiên | Đơn Vị Chủ Trì Xử Lý |
+
+RÀNG BUỘC THÉP (ZERO CHAT CONSTRAINT):
+1. Tuyệt đối KHÔNG có lời chào mở đầu và không có lời chúc kết thúc.
+2. Đầu ra bắt đầu ngay lập tức bằng ký tự "|" của dòng tiêu đề bảng.
+3. Cột "Mức Độ Ưu Tiên" gồm: Khẩn cấp, Cao, Trung bình. Trường hợp nuốt tiền viện phí phải xếp Khẩn cấp.</textarea>
+          </div>
+
+          <!-- Composer Bottom Action Bar -->
+          <div class="composer-toolbar-bottom">
+            <div class="toolbar-left">
+              <span class="comp-badge-pill detected">Vai trò (Role)</span>
+              <span class="comp-badge-pill detected">Nhiệm vụ (Task)</span>
+              <span class="comp-badge-pill detected">Ràng buộc Zero-Chat</span>
+              <span class="comp-badge-pill detected">Khuôn bảng 6 cột</span>
+              <span class="comp-badge-pill detected">Thẻ Delimiters</span>
+            </div>
+
+            <div class="toolbar-right">
+              <span class="char-counter-text" id="char-counter-text">854 ký tự</span>
+              <button class="btn-run-studio" id="btn-run-studio" onclick="runPrompt()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Run Prompt</span>
+                <span class="kbd-badge">Ctrl+Enter</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+
+      <!-- ==========================================================================
+           4. RIGHT PANEL (Exact Google AI Studio Settings-Style Rounded Cards)
+           ========================================================================== -->
+      <aside class="right-panel">
+        
+        <div class="right-panel-header">
+          <div class="right-panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span>Kết quả & Đánh giá</span>
+          </div>
+          <div class="panel-header-btns">
+            <button class="btn-copy-sm" onclick="copyOutputTable()" title="Sao chép bảng kết quả">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copy-label">Sao chép</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="right-panel-scroll">
+
+          <!-- BEFORE RUN STATE: QUIET MINIMAL CARD -->
+          <div class="studio-card" id="card-before-run">
+            <div class="quiet-empty-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+              <h4>Chưa chạy câu lệnh</h4>
+              <p>Soạn câu lệnh ở khung canvas trung tâm và nhấn <strong>Run Prompt</strong> (hoặc Ctrl+Enter) để thực thi và nhận phản hồi chi tiết.</p>
+            </div>
+          </div>
+
+          <!-- AFTER RUN: CARD 1 — AI OUTPUT TABLE -->
+          <div class="studio-card" id="card-output-result" style="display: none;">
+            <div class="card-header-line">
+              <span class="card-title-sm">AI Output · Bảng Markdown</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Thời gian sinh: 1.4s</span>
+            </div>
+
+            <div class="table-container-clean">
+              <table class="clean-output-table">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Mã Phản Ánh</th>
+                    <th>Kênh Tiếp Nhận</th>
+                    <th>Phân Loại Sự Cố</th>
+                    <th>Mức Độ Ưu Tiên</th>
+                    <th>Đơn Vị Chủ Trì Xử Lý</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>FB-2026-001</td>
+                    <td>Cây ATM (Láng Hạ)</td>
+                    <td>Nuốt tiền mặt khi rút thẻ, cần đóng viện phí</td>
+                    <td><span class="tag-badge tag-urgent">Khẩn cấp</span></td>
+                    <td>TT Quản lý & Vận hành ATM</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>FB-2026-002</td>
+                    <td>App Store (v5.2.0)</td>
+                    <td>Văng app khi chuyển tiền QT trên iOS 18</td>
+                    <td><span class="tag-badge tag-high">Cao</span></td>
+                    <td>TT Ngân hàng Số & CNTT</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>FB-2026-003</td>
+                    <td>Tổng đài Chăm sóc</td>
+                    <td>Hỏi thủ tục hồ sơ vay ưu đãi phụ nữ nuôi gà</td>
+                    <td><span class="tag-badge tag-normal">Trung bình</span></td>
+                    <td>Phòng Khách hàng Hộ SX</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>FB-2026-004</td>
+                    <td>Điểm chấp nhận QR</td>
+                    <td>Mã QR Pay lỗi kết nối máy chủ thanh toán</td>
+                    <td><span class="tag-badge tag-high">Cao</span></td>
+                    <td>Trung tâm Thanh toán & Thẻ</td>
+                  </tr>
+                  <tr>
+                    <td>5</td>
+                    <td>FB-2026-005</td>
+                    <td>Góp ý Khách hàng</td>
+                    <td>Đề xuất thêm bộ lọc số tiền trong lịch sử</td>
+                    <td><span class="tag-badge tag-normal">Trung bình</span></td>
+                    <td>Phòng Trải nghiệm Sản phẩm</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AFTER RUN: CARD 2 — EVALUATION & 8.5/10 SCORE -->
+          <div class="studio-card" id="card-eval-rubric" style="display: none;">
+            <div class="card-header-line">
+              <span class="card-title-sm">Chấm điểm & Tiêu chuẩn Rubric</span>
+            </div>
+
+            <!-- Big 8.5/10 Score Banner (As requested: Score dùng x/10) -->
+            <div class="score-hero-row">
+              <div class="score-badge-10">
+                <span class="score-num-big">8.5</span>
+                <span class="score-out-of">/ 10 điểm</span>
+              </div>
+              <span class="score-label-sub">Đạt chuẩn xuất sắc · Sẵn sàng dùng ngay</span>
+            </div>
+
+            <!-- 5 Rubric Criteria Breakdown (out of 2.0) -->
+            <div class="rubric-items-clean">
+              <div class="rubric-line">
+                <span class="rubric-name">1. Cấu trúc khuôn bảng Markdown 6 cột</span>
+                <span class="rubric-val">2.0 / 2.0</span>
+              </div>
+              <div class="rubric-line">
+                <span class="rubric-name">2. Sạch 100% lời chào xã giao (Zero-Chat)</span>
+                <span class="rubric-val">1.8 / 2.0</span>
+              </div>
+              <div class="rubric-line">
+                <span class="rubric-name">3. Phân loại phòng ban & mức ưu tiên</span>
+                <span class="rubric-val">1.6 / 2.0</span>
+              </div>
+              <div class="rubric-line">
+                <span class="rubric-name">4. Ứng dụng thẻ phân tách Delimiters</span>
+                <span class="rubric-val">1.6 / 2.0</span>
+              </div>
+              <div class="rubric-line">
+                <span class="rubric-name">5. Tuân thủ dữ kiện thực tế (Grounding)</span>
+                <span class="rubric-val">1.5 / 2.0</span>
+              </div>
+            </div>
+
+            <!-- Actionable Advice -->
+            <div class="coach-tip-box">
+              <strong>Gợi ý nâng cấp:</strong> Để đạt <strong>10/10</strong>, bạn có thể bổ sung thêm một ràng buộc về thời hạn xử lý SLA (Ví dụ: Sự cố Khẩn cấp phản hồi trong 2 giờ) ở cột thứ 7.
+            </div>
+          </div>
+
+        </div>
+
+      </aside>
+
+    </div>
+  </div>
+
+
+  <!-- ==============================================================================
+       5. CONTEXTUAL SLIDE-OUT DRAWERS (Theory, Hint, Solution, AI Coach)
+       ============================================================================== -->
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeAllDrawers()"></div>
+
+  <!-- THEORY DRAWER -->
+  <aside class="side-drawer" id="drawer-theory">
+    <div class="drawer-top-bar">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Lý thuyết: Structured Outputs</span>
+      </h3>
+      <button class="btn-close-drawer" onclick="closeAllDrawers()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body-scroll">
+      <h4>Bản chất Kỹ thuật Đằng sau LLM</h4>
+      <p>Khi bạn yêu cầu AI tổng hợp ý kiến, mặc định nó sẽ trả lời bằng các đoạn văn xuôi đàm thoại: <em>"Chào bạn! Dưới đây là phân tích..."</em> và kết thúc bằng lời chúc. Bạn không thể copy văn bản đó vào Excel để xử lý tự động.</p>
+      
+      <h4>Structured Outputs là gì?</h4>
+      <p>Là kỹ thuật ép buộc mô hình ngôn ngữ phải tuân thủ một lược đồ (Schema) khắt khe: chỉ xuất ra Bảng Markdown (<code>| Cột 1 | Cột 2 |</code>) hoặc định dạng chuẩn không có từ ngữ thừa.</p>
+
+      <div class="quote-highlight">
+        "Hãy coi Structured Output như một chiếc khay chia 5 ngăn dán nhãn: Bạn đưa ra chiếc khay và ra lệnh chỉ được nhét số liệu vào đúng 5 ngăn, cấm nói thêm một câu nào. Bạn sẽ có ngay dữ liệu ngăn nắp trong 3 giây."
+      </div>
+
+      <h4>Quy tắc "3 Không - 1 Chuẩn"</h4>
+      <p><strong>1. Ràng buộc Tiêu cực:</strong> Tuyệt đối cấm chào hỏi xã giao, không giải thích trước sau.</p>
+      <p><strong>2. Khai báo Schema tường minh:</strong> Vẽ mẫu dòng tiêu đề bảng cụ thể.</p>
+      <p><strong>3. Đóng gói bằng Delimiters:</strong> Dùng thẻ XML <code>&lt;danh_sach&gt;</code> để AI phân biệt rõ dữ liệu với chỉ thị.</p>
+    </div>
+  </aside>
+
+  <!-- HINT DRAWER -->
+  <aside class="side-drawer" id="drawer-hint">
+    <div class="drawer-top-bar">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18h6"></path>
+          <path d="M10 22h4"></path>
+          <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+        </svg>
+        <span>Gợi ý từng bước</span>
+      </h3>
+      <button class="btn-close-drawer" onclick="closeAllDrawers()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body-scroll">
+      <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+        <strong style="color: var(--accent-emerald); font-size: 12px; text-transform: uppercase;">Gợi ý 1 · Phân tách vùng dữ liệu</strong>
+        <p style="margin-top: 4px;">Bao bọc 5 ý kiến phản ánh vào trong một cặp thẻ mở và đóng <code>&lt;danh_sach_khieu_nai&gt; ... &lt;/danh_sach_khieu_nai&gt;</code> để mô hình không nhầm phản ánh khách hàng thành câu lệnh.</p>
+      </div>
+
+      <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+        <strong style="color: var(--accent-emerald); font-size: 12px; text-transform: uppercase;">Gợi ý 2 · Định nghĩa tên 6 cột rõ ràng</strong>
+        <p style="margin-top: 4px;">Vẽ chính xác dòng tiêu đề: <code>| STT | Mã Phản Ánh | Kênh Tiếp Nhận | Phân Loại Sự Cố | Mức Độ Ưu Tiên | Đơn Vị Chủ Trì Xử Lý |</code>.</p>
+      </div>
+
+      <div style="border: 1px solid var(--border-light); border-radius: 8px; padding: 12px;">
+        <strong style="color: var(--accent-emerald); font-size: 12px; text-transform: uppercase;">Gợi ý 3 · Ràng buộc Zero-Chat</strong>
+        <p style="margin-top: 4px;">Bổ sung câu lệnh: "Tuyệt đối không có lời chào mở đầu và không có lời chúc kết thúc. Bắt đầu ngay lập tức bằng ký tự '|' của dòng tiêu đề bảng."</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- SOLUTION DRAWER -->
+  <aside class="side-drawer" id="drawer-solution">
+    <div class="drawer-top-bar">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Đáp án mẫu chuẩn (10/10)</span>
+      </h3>
+      <button class="btn-close-drawer" onclick="closeAllDrawers()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body-scroll">
+      <p>Cấu trúc prompt mẫu mực đạt điểm tối đa:</p>
+      <pre style="background: #0f172a; color: #f8fafc; padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; line-height: 1.5; margin: 10px 0; white-space: pre-wrap;">Bạn là Trợ lý Dữ liệu Vận hành tại Agribank.
+
+Nhiệm vụ: Trích xuất 5 phản ánh trong thẻ &lt;danh_sach_khieu_nai&gt; thành DUY NHẤT 1 BẢNG MARKDOWN 6 CỘT:
+| STT | Mã Phản Ánh | Kênh Tiếp Nhận | Phân Loại Sự Cố | Mức Độ Ưu Tiên | Đơn Vị Chủ Trì Xử Lý |
+
+RÀNG BUỘC THÉP:
+1. CẤM TUYỆT ĐỐI lời chào, lời dẫn và kết luận.
+2. Bắt đầu trực tiếp bằng ký tự "|".
+3. Mức ưu tiên gồm: [Khẩn cấp, Cao, Trung bình]. Sự cố nuốt tiền viện phí phải là [Khẩn cấp].</pre>
+      <button class="btn-run-studio" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="applySolutionToEditor()">Nạp đáp án vào Prompt Canvas</button>
+    </div>
+  </aside>
+
+  <!-- AI COACH DRAWER -->
+  <aside class="side-drawer" id="drawer-coach">
+    <div class="drawer-top-bar">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>AI Coach đồng hành</span>
+      </h3>
+      <button class="btn-close-drawer" onclick="closeAllDrawers()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-body-scroll">
+      <div style="background-color: var(--bg-subtle); padding: 12px 14px; border-radius: 8px; margin-bottom: 12px;">
+        <strong style="color: var(--text-primary); font-size: 13px; display: block; margin-bottom: 4px;">AI Coach:</strong>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Chào bạn! Trong bài này, nếu không có ràng buộc "Zero-Chat", AI sẽ tự động thêm lời chào khiến bảng không copy vào Excel được. Bạn đã thêm lệnh cấm chào hỏi chưa?</p>
+      </div>
+      <div class="quote-highlight" style="margin-top: 8px;">
+        <strong>Mẹo nhanh:</strong> Dùng thẻ XML <code>&lt;danh_sach&gt;</code> giúp mô hình nhận diện chính xác vùng dữ liệu thô!
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==============================================================================
+       6. LIGHTWEIGHT COMPARE ATTEMPTS MODAL
+       ============================================================================== -->
+  <div class="modal-overlay" id="compare-modal">
+    <div class="compare-card-light">
+      <div class="drawer-top-bar">
+        <h3>So sánh Phiên bản: v1 (Thô sơ) vs v2 (Có cấu trúc)</h3>
+        <button class="btn-close-drawer" onclick="closeCompareModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="compare-columns">
+        <!-- Col 1: v1 -->
+        <div class="compare-pane">
+          <h4>
+            <span>Lần 1: Prompt Tự phát (4.5 / 10)</span>
+            <span class="tag-badge tag-urgent">Chưa đạt</span>
+          </h4>
+          <div class="compare-text-snippet"><strong>Prompt v1:</strong>
+"Hãy tổng hợp giúp tôi 5 khiếu nại của khách hàng gửi về ứng dụng Agribank, phân loại xem cái nào gấp nhé."</div>
+          <div class="compare-text-snippet"><strong>Kết quả sinh ra:</strong>
+"Chào bạn! Rất vui được hỗ trợ bạn hôm nay. Dưới đây là phân tích chi tiết của tôi:
+Đầu tiên là khách hàng Trần Văn Long bị nuốt thẻ ATM lúc rút tiền...
+Thứ hai là phản ánh từ app MaiPhuong_91...
+Hy vọng thông tin trên hữu ích! Chúc bạn ngày tốt lành!"</div>
+        </div>
+
+        <!-- Col 2: v2 -->
+        <div class="compare-pane">
+          <h4>
+            <span>Lần 2: Prompt Có Cấu Trúc (8.5 / 10)</span>
+            <span class="tag-badge tag-normal" style="background-color: #e6f4ea; color: #137333;">Đạt xuất sắc</span>
+          </h4>
+          <div class="compare-text-snippet"><strong>Prompt v2:</strong>
+"Vai trò: Chuyên viên Vận hành. Nhiệm vụ: Xuất bản 01 BẢNG MARKDOWN 6 CỘT trong thẻ XML. Ràng buộc thép: Cấm tuyệt đối lời chào hỏi ngoài bảng."</div>
+          <div class="compare-text-snippet"><strong>Kết quả sinh ra:</strong>
+| STT | Mã Phản Ánh | Kênh | Sự Cố | Ưu Tiên | Đơn Vị |
+| 1 | FB-001 | ATM | Nuốt tiền | Khẩn cấp | Vận hành ATM |
+(Bảng Markdown 5 dòng sạch 100%, sẵn sàng dán vào Excel)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="prototype.js"></script>
+</body>
+</html>

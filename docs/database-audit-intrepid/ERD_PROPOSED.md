@@ -1,0 +1,272 @@
+# ERD PROPOSED — Intrepid
+
+Đây là phương án 47 bảng CÓ ĐIỀU KIỆN sau approval/gates, không phải schema đã tồn tại. Phương án migration GCP ban đầu vẫn giữ đủ 50 bảng. Chỉ gộp roster_profiles vào enrollments, retire governance_config/tutorial_progress sau kiểm chứng; giữ rotation/rubric và mọi bảng lịch sử. Không tạo bảng mới. Scope Studio cần được làm rõ trong bảng hiện có; không còn ghi global lesson/rubric khi chỉnh riêng lớp.
+
+Ký hiệu PK/FK/cardinality theo constraints; đường nét là FK vật lý, không phải call graph. Các cột thường được lược bỏ cho dễ đọc.
+
+```mermaid
+erDiagram
+    classes {
+        uuid id PK
+    }
+    clients {
+        uuid id PK
+    }
+    course_instructors {
+        uuid course_id PK
+        uuid user_id PK
+    }
+    course_modules {
+        uuid id PK
+    }
+    courses {
+        uuid id PK
+    }
+    enrollments {
+        uuid id PK
+        text country "proposed imported roster metadata"
+        text imported_department "preserved snapshot"
+    }
+    gcp_identity_bindings {
+        text issuer PK
+        text external_subject PK
+    }
+    learners {
+        uuid id PK
+    }
+    lesson_progress {
+        uuid id PK
+    }
+    lesson_resources {
+        uuid id PK
+    }
+    lesson_rubric_criteria {
+        uuid id PK
+    }
+    lessons {
+        uuid id PK
+    }
+    product_attendance {
+        uuid class_id PK
+        uuid lesson_id PK
+        uuid learner_id PK
+    }
+    product_audit {
+        uuid id PK
+    }
+    product_awards {
+        uuid id PK
+    }
+    product_class_grants {
+        uuid user_id PK
+        uuid class_id PK
+    }
+    product_domains {
+        uuid client_id PK
+        text domain PK
+    }
+    product_enterprise_requests {
+        uuid id PK
+    }
+    product_learner_context {
+        uuid id PK
+    }
+    product_learner_support {
+        uuid learner_id PK
+        uuid class_id PK
+        uuid lesson_id PK
+        text kind PK
+    }
+    product_profile_corrections {
+        uuid id PK
+    }
+    product_prompt_drafts {
+        uuid user_id PK
+        uuid class_id PK
+        uuid lesson_id PK
+    }
+    product_prompt_library {
+        uuid id PK
+    }
+    product_request_budgets {
+        uuid actor_id PK
+        text operation PK
+        timestamptz bucket PK
+    }
+    product_rotation_approvals {
+        uuid request_id PK
+        uuid user_id PK
+    }
+    product_rotation_requests {
+        uuid id PK
+    }
+    product_sandbox_runs {
+        uuid actor_id PK
+        uuid request_id PK
+    }
+    product_session_controls {
+        uuid class_id PK
+    }
+    product_sheet_connections {
+        uuid id PK
+    }
+    product_sop_chunks {
+        uuid version_id PK
+        int4 position PK
+    }
+    product_sop_contributions {
+        uuid id PK
+    }
+    product_studio {
+        uuid class_id PK
+        uuid lesson_id PK
+        jsonb config "class overrides including rubric"
+    }
+    product_sync_logs {
+        uuid id PK
+    }
+    product_worker_invocations {
+        uuid nonce PK
+    }
+    prompt_attempts {
+        uuid id PK
+    }
+    rebuild_judge_claims {
+        uuid attempt_id PK
+    }
+    rebuild_roster_imports {
+        uuid id PK
+    }
+    rebuild_runs {
+        uuid subject PK
+        uuid request_id PK
+    }
+    rebuild_sop_bindings {
+        uuid class_id PK
+        uuid lesson_id PK
+        uuid document_id PK
+    }
+    rebuild_sop_documents {
+        uuid id PK
+    }
+    rebuild_sop_versions {
+        uuid id PK
+    }
+    rebuild_trainer_actions {
+        uuid id PK
+    }
+    trainer_hints {
+        uuid id PK
+    }
+    users {
+        uuid id PK
+    }
+    workshop_message_receipts {
+        uuid message_id PK
+        uuid user_id PK
+    }
+    workshop_messages {
+        uuid id PK
+    }
+    gcp_projection_outbox {
+        bigint id PK
+    }
+    clients ||--o{ classes : "client_id"
+    courses ||--o{ classes : "course_id"
+    courses ||--o{ course_instructors : "course_id"
+    users ||--o{ course_instructors : "user_id"
+    courses ||--o{ course_modules : "course_id"
+    users |o--o{ courses : "created_by"
+    classes ||--o{ enrollments : "class_id"
+    learners ||--o{ enrollments : "learner_id"
+    users ||--o{ gcp_identity_bindings : "user_id"
+    users ||--o| learners : "user_id"
+    classes ||--o{ lesson_progress : "class_id"
+    prompt_attempts |o--o{ lesson_progress : "last_attempt_id"
+    learners ||--o{ lesson_progress : "learner_id"
+    lessons ||--o{ lesson_progress : "lesson_id"
+    lessons ||--o{ lesson_resources : "lesson_id"
+    lessons ||--o{ lesson_rubric_criteria : "lesson_id"
+    course_modules ||--o{ lessons : "module_id"
+    classes ||--o{ product_attendance : "class_id"
+    learners ||--o{ product_attendance : "learner_id"
+    lessons ||--o{ product_attendance : "lesson_id"
+    users ||--o{ product_attendance : "recorded_by"
+    users ||--o{ product_audit : "actor_id"
+    classes |o--o{ product_audit : "class_id"
+    classes ||--o{ product_awards : "class_id"
+    learners ||--o{ product_awards : "learner_id"
+    lessons ||--o{ product_awards : "lesson_id"
+    classes ||--o{ product_class_grants : "class_id"
+    users ||--o{ product_class_grants : "user_id"
+    clients ||--o{ product_domains : "client_id"
+    users ||--o{ product_domains : "updated_by"
+    classes ||--o{ product_learner_context : "class_id"
+    lessons ||--o{ product_learner_context : "lesson_id"
+    users ||--o{ product_learner_context : "owner_id"
+    classes ||--o{ product_learner_support : "class_id"
+    learners ||--o{ product_learner_support : "learner_id"
+    lessons ||--o{ product_learner_support : "lesson_id"
+    users ||--o{ product_profile_corrections : "user_id"
+    classes ||--o{ product_prompt_drafts : "class_id"
+    lessons ||--o{ product_prompt_drafts : "lesson_id"
+    users ||--o{ product_prompt_drafts : "user_id"
+    prompt_attempts |o--o{ product_prompt_library : "attempt_id"
+    classes ||--o{ product_prompt_library : "class_id"
+    lessons ||--o{ product_prompt_library : "lesson_id"
+    users ||--o{ product_prompt_library : "owner_id"
+    users |o--o{ product_prompt_library : "reviewed_by"
+    users ||--o{ product_request_budgets : "actor_id"
+    product_rotation_requests ||--o{ product_rotation_approvals : "request_id"
+    users ||--o{ product_rotation_approvals : "user_id"
+    classes ||--o{ product_rotation_requests : "class_id"
+    users ||--o{ product_rotation_requests : "requested_by"
+    users ||--o{ product_sandbox_runs : "actor_id"
+    classes ||--o{ product_sandbox_runs : "class_id"
+    lessons ||--o{ product_sandbox_runs : "lesson_id"
+    classes ||--o| product_session_controls : "class_id"
+    users ||--o{ product_session_controls : "updated_by"
+    classes ||--o{ product_sheet_connections : "class_id"
+    users ||--o{ product_sheet_connections : "created_by"
+    rebuild_sop_versions ||--o{ product_sop_chunks : "version_id"
+    users ||--o{ product_sop_contributions : "actor_id"
+    classes ||--o{ product_sop_contributions : "class_id"
+    rebuild_sop_documents |o--o{ product_sop_contributions : "document_id"
+    lessons ||--o{ product_sop_contributions : "lesson_id"
+    users |o--o{ product_sop_contributions : "reviewed_by"
+    rebuild_sop_versions |o--o{ product_sop_contributions : "version_id"
+    classes ||--o{ product_studio : "class_id"
+    lessons ||--o{ product_studio : "lesson_id"
+    users ||--o{ product_studio : "updated_by"
+    users ||--o{ product_sync_logs : "actor_id"
+    classes ||--o{ product_sync_logs : "class_id"
+    product_sheet_connections ||--o{ product_sync_logs : "connection_id"
+    classes ||--o{ prompt_attempts : "class_id"
+    learners ||--o{ prompt_attempts : "learner_id"
+    lessons |o--o{ prompt_attempts : "lesson_ref_id"
+    prompt_attempts ||--o| rebuild_judge_claims : "attempt_id"
+    users ||--o{ rebuild_roster_imports : "actor_id"
+    classes ||--o{ rebuild_roster_imports : "class_id"
+    prompt_attempts |o--o{ rebuild_runs : "attempt_id"
+    classes ||--o{ rebuild_runs : "class_id"
+    lessons ||--o{ rebuild_runs : "lesson_id"
+    classes ||--o{ rebuild_sop_bindings : "class_id"
+    rebuild_sop_documents ||--o{ rebuild_sop_bindings : "document_id"
+    lessons ||--o{ rebuild_sop_bindings : "lesson_id"
+    rebuild_sop_versions ||--o{ rebuild_sop_bindings : "version_id"
+    classes ||--o{ rebuild_sop_documents : "class_id"
+    users ||--o{ rebuild_sop_documents : "created_by"
+    users ||--o{ rebuild_sop_versions : "created_by"
+    rebuild_sop_documents ||--o{ rebuild_sop_versions : "document_id"
+    users ||--o{ rebuild_trainer_actions : "actor_id"
+    prompt_attempts ||--o{ rebuild_trainer_actions : "attempt_id"
+    classes ||--o{ trainer_hints : "class_id"
+    learners ||--o{ trainer_hints : "learner_id"
+    users ||--o{ trainer_hints : "trainer_id"
+    workshop_messages ||--o{ workshop_message_receipts : "message_id"
+    users ||--o{ workshop_message_receipts : "user_id"
+    classes ||--o{ workshop_messages : "class_id"
+    users ||--o{ workshop_messages : "trainer_id"
+    classes ||--o{ product_profile_corrections : "source_class_id"
+    classes ||--o{ product_profile_corrections : "target_class_id"
+```

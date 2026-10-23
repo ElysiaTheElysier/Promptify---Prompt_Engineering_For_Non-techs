@@ -1,0 +1,3 @@
+# Overlay on hint2-1023: hint decisions no longer post an inbox message; the note is shown inside the request.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:04daee642d56aee9e07c7fda0fe781184a6e700aa75cc398c9a7df65dc07e6c8
+COPY --chown=node:node src/services/workshopSupportService.ts /app/src/services/

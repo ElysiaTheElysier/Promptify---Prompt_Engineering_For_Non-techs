@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import {productionEvaluate} from '../src/services/productionAiService';
+import {DEFAULT_RUBRIC} from '../src/services/weightedRubricService';
+const saved={fetch:globalThis.fetch,key:process.env.GEMINI_API_KEY,model:process.env.GEMINI_MODEL,fallback:process.env.GEMINI_FALLBACK_MODEL};
+process.env.GEMINI_API_KEY='offline-only';process.env.GEMINI_MODEL='gemini-3-flash-preview';delete process.env.GEMINI_FALLBACK_MODEL;
+let invalid=false;
+globalThis.fetch=async(_url:any,options:any)=>{const request=JSON.parse(options.body),schema=request.generationConfig.responseSchema.properties.criteria;assert.equal(schema.type,'OBJECT');assert.deepEqual(schema.required,DEFAULT_RUBRIC.map(c=>c.key));for(const c of DEFAULT_RUBRIC)assert.equal(schema.properties[c.key].properties.score.maximum,c.weight/10);const raw={taskAttempt:true,criteria:Object.fromEntries(DEFAULT_RUBRIC.map(c=>[c.key,{score:invalid?100:c.weight/10,reasonEn:'Supported',reasonVi:'Có căn cứ'}])),strengthsEn:['Clear'],strengthsVi:['Rõ'],improvementsEn:[],improvementsVi:[],nextHintEn:'Add citations.',nextHintVi:'Thêm trích dẫn.'};return new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(raw)}]}}]}));};
+try{const body:any={learnerPrompt:'Extract the response deadlines and cite their source sections.',generatedOutput:'test',lessonRubric:DEFAULT_RUBRIC,language:'en'};assert.equal((await productionEvaluate(body)).total,10);invalid=true;await assert.rejects(()=>productionEvaluate(body),/invalid rubric/);console.log('Judge schema test passed: unique required criteria, weighted bounds and invalid-score rejection.');}finally{globalThis.fetch=saved.fetch;for(const [k,v]of Object.entries({GEMINI_API_KEY:saved.key,GEMINI_MODEL:saved.model,GEMINI_FALLBACK_MODEL:saved.fallback})){if(v===undefined)delete process.env[k];else process.env[k]=v;}}
+

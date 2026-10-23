@@ -1,0 +1,4 @@
+# Overlay on gaps1-1023: Workshop messaging (learner inbox data, ackMessage action, trainer support queue). No schema change.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:11ecc9f85c6884b84b854ed2f3dacde0fa7cbdac1e36bcfe5bb495bab68cbe7d
+COPY --chown=node:node src/services/productionServerService.ts src/services/workshopSupportService.ts /app/src/services/
+COPY --chown=node:node src/types/production.ts /app/src/types/

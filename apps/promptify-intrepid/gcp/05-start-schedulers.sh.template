@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Default --validate/--dry-run mode stops before any cloud/database call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/gcp/SETUP_GUIDE.md before user execution.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+: "${INTREPID_CUTOVER_CHECKS_PASSED:?Set only after migration/reconciliation/staging approval; these jobs write data and can call paid providers}"
+[[ "$INTREPID_CUTOVER_CHECKS_PASSED" == yes ]] || exit 2
+project='PROJECT_ID' 
+region='REGION'
+# USER EXECUTION ONLY. Start only after data/file import + checks; jobs perform writes/paid queries.
+worker_url=$(gcloud run services describe promptify-intrepid-worker --region="$region" --project="$project" --format='value(status.url)')
+for name in projections roster; do
+ if [[ "$name" == roster ]]; then
+  schedule='*/5 * * * *'
+ else
+  schedule='* * * * *'
+ fi
+ gcloud scheduler jobs create http "intrepid-${name}" --location="$region" --schedule="$schedule" --time-zone=Asia/Ho_Chi_Minh --uri="${worker_url}/internal/${name}" --http-method=POST --oidc-service-account-email="promptify-scheduler@${project}.iam.gserviceaccount.com" --oidc-token-audience="$worker_url" --attempt-deadline=300s --project="$project"
+done
+echo 'Roster Scheduler runs every 5 minutes; SQL claims enforce auto_sync settings and the existing 15-minute due interval.'

@@ -1,0 +1,1 @@
+throw new Error('Repository root is tooling only. Promptify Intrepid (apps/promptify-intrepid) deploys through GCP Cloud Build, Cloud Run and Firebase Hosting, not Vercel. See docs/04_OPERATIONS.md. Do not deploy the repository root or the source archive.');

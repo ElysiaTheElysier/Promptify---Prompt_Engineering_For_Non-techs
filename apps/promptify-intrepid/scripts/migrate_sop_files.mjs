@@ -1,0 +1,26 @@
+import {execFileSync} from 'node:child_process';import {fileURLToPath} from 'node:url';import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import {Storage} from '@google-cloud/storage';
+const input=process.argv.find(x=>x.startsWith('--input='))?.slice(8),mode=process.argv.find(x=>x.startsWith('--mode='))?.slice(7);
+const dryRun=process.argv.includes('--dry-run');
+if(dryRun===process.argv.includes('--execute')||!input||!['download','upload'].includes(mode))throw Error('Choose --dry-run or human --execute with --input=SCOPED_EXPORT_DIR --mode=download|upload');
+execFileSync(process.execPath,[fileURLToPath(new URL('./check_export_bundle.mjs',import.meta.url)),'--input='+input],{stdio:'inherit'});
+if(dryRun){
+ if(mode==='upload'){
+  const m=JSON.parse(fs.readFileSync(path.join(input,'blobs/manifest.json'),'utf8'));
+  if(m.format!==1)throw Error('Invalid blob manifest');
+  for(const o of m.objects){if(!/^[0-9a-f]{64}\.bin$/.test(o.file))throw Error('Invalid blob name');const b=fs.readFileSync(path.join(input,'blobs',o.file));if(b.length!==o.bytes||createHash('sha256').update(b).digest('hex')!==o.sha256)throw Error('Local blob checksum mismatch');}
+  console.log('Offline file-upload validation PASS: '+m.objects.length+' files; no GCP calls.');
+ }else{const raw=fs.readFileSync(path.join(input,'product_sop_contributions.jsonl'),'utf8');const n=(raw.trim()?raw.trim().split('\n').map(JSON.parse):[]).filter(r=>r.metadata?.storageBucket==='product-sop-originals'&&r.metadata?.storagePath).length;console.log('Offline source file inventory: '+n+' references; no source/GCP calls.');}
+ process.exit(0);
+}
+const blobDir=path.join(input,'blobs');fs.mkdirSync(blobDir,{recursive:true});const manifestFile=path.join(blobDir,'manifest.json');
+if(mode==='download'){
+ const origin=process.env.SOURCE_SUPABASE_URL,key=process.env.SOURCE_SUPABASE_SERVICE_ROLE_KEY;if(!origin||!key)throw Error('Source storage credentials required in env, never in chat or repo');const url=new URL(origin);if(url.protocol!=='https:'||!url.hostname.endsWith('.supabase.co')||url.pathname!=='/')throw Error('Expected source Supabase HTTPS project origin');
+ const entries=new Map();const raw=fs.readFileSync(path.join(input,'product_sop_contributions.jsonl'),'utf8');for(const line of raw.trim()?raw.trim().split('\n'):[]){const row=JSON.parse(line),m=row.metadata;if(m?.storageBucket==='product-sop-originals'&&m.storagePath){const p=m.storagePath;if(p.startsWith('/')||p.split('/').some(x=>/^\.\.$/.test(x)||!x))throw Error('Invalid source object path');entries.set(p,m);}}
+ const result=[];for(const [p,m] of entries){const response=await fetch(origin.replace(/\/$/,'')+'/storage/v1/object/authenticated/product-sop-originals/'+p.split('/').map(encodeURIComponent).join('/'),{headers:{Authorization:'Bearer '+key,apikey:key},signal:AbortSignal.timeout(60000)});if(!response.ok)throw Error('Source file unavailable; stop migration rather than omit file');if(Number(response.headers.get('content-length')||0)>25*1024*1024)throw Error('File too large');const chunks=[];let size=0;for await(const chunk of response.body){size+=chunk.length;if(size>25*1024*1024)throw Error('File too large');chunks.push(chunk);}const bytes=Buffer.concat(chunks),sha=createHash('sha256').update(bytes).digest('hex');if(m.sha256&&m.sha256!==sha)throw Error('Source checksum mismatch');if(m.bytes&&Number(m.bytes)!==bytes.length)throw Error('Source byte-count mismatch');const file=sha+'.bin';fs.writeFileSync(path.join(blobDir,file),bytes);result.push({path:p,file,sha256:sha,bytes:bytes.length,contentType:m.mimeType||response.headers.get('content-type')||'application/octet-stream',originalMetadata:m});}
+ fs.writeFileSync(manifestFile,JSON.stringify({format:1,logicalBucket:'product-sop-originals',objects:result},null,2));console.log('Scoped originals downloaded and checked: '+result.length);
+}else{
+ const bucket=process.env.GCP_SOP_BUCKET;if(!bucket)throw Error('GCP_SOP_BUCKET required');const manifest=JSON.parse(fs.readFileSync(manifestFile,'utf8'));if(manifest.format!==1)throw Error('Invalid blob manifest');const storage=new Storage();
+ for(const obj of manifest.objects){if(!/^[0-9a-f]{64}\.bin$/.test(obj.file)||typeof obj.path!=='string'||obj.path.startsWith('/')||obj.path.split('/').some(x=>/^\.\.$/.test(x)||!x))throw Error('Invalid blob entry');const bytes=fs.readFileSync(path.join(blobDir,obj.file));if(bytes.length!==obj.bytes||createHash('sha256').update(bytes).digest('hex')!==obj.sha256)throw Error('Local blob integrity failed');
+  const file=storage.bucket(bucket).file(obj.path);const [exists]=await file.exists();if(exists){const [old]=await file.download({validation:'crc32c'});if(createHash('sha256').update(old).digest('hex')!==obj.sha256)throw Error('Existing target object differs; stop without overwriting');continue;}await file.save(bytes,{resumable:false,validation:'crc32c',preconditionOpts:{ifGenerationMatch:0},metadata:{contentType:obj.contentType||'application/octet-stream',metadata:{sourceSha256:obj.sha256}}});const [saved]=await file.download({validation:'crc32c'});if(createHash('sha256').update(saved).digest('hex')!==obj.sha256)throw Error('Target blob integrity failed');}
+ console.log('Private target originals uploaded and SHA-256 verified: '+manifest.objects.length);
+}

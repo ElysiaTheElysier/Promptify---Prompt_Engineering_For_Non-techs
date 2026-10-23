@@ -1,0 +1,28 @@
+.source-scope-nav .workspace-menu-toggle{display:none}
+.workspace-nav-menu{display:contents}
+@media(max-width:760px){
+ .source-ui.source-scope-nav{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 14px}
+ .source-scope-nav .workspace-brand{min-width:0;margin:0}
+ .source-scope-nav .workspace-menu-toggle{display:block;min-height:44px;border:1px solid #a7cebc;padding:8px 14px}
+ .source-scope-nav>select{grid-column:1/-1;min-width:0;width:100%;max-width:100%;min-height:44px;font-size:14px}
+ .source-scope-nav .workspace-nav-menu{display:none}
+ .source-scope-nav .workspace-nav-menu.is-open{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-top:4px}
+ .workspace-nav-menu button{min-height:44px;margin:0;white-space:normal;text-align:left;overflow-wrap:anywhere}
+ .workspace-context{padding:8px 14px;gap:4px 10px;line-height:1.5;overflow-wrap:anywhere}
+ .workspace-context strong{max-width:100%}
+}
+/* Navigation adapts to available width; cohort context is already in its selector. */
+.workspace-shell{min-width:0;width:100%;max-width:100%}
+.source-ui.source-scope-nav .workspace-stage-badge{font-size:11px;line-height:1.4;color:#48645a;border:1px solid #b9dbce;padding:4px 7px;border-radius:6px}
+.source-ui.source-scope-nav>select{min-width:0;max-width:clamp(200px,25vw,400px);text-overflow:ellipsis}
+@media(max-width:1100px){
+ .source-ui.source-scope-nav{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;padding:10px 16px}
+ .source-scope-nav .workspace-brand{min-width:0;margin:0}
+ .source-scope-nav .workspace-menu-toggle{display:block;min-height:44px;border:1px solid #a7cebc;padding:8px 14px}
+ .source-ui.source-scope-nav>select{grid-column:1/-1;width:100%;max-width:100%;min-height:44px;margin:0;font-size:14px}
+ .source-scope-nav .workspace-nav-menu{display:none}
+ .source-scope-nav .workspace-nav-menu.is-open{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-top:4px}
+ .workspace-nav-menu button{min-height:44px;margin:0;white-space:normal;text-align:left;overflow-wrap:anywhere}
+}
+@media(min-width:1101px){.source-ui.source-scope-nav{padding:10px clamp(16px,2vw,32px);gap:8px}.source-ui.source-scope-nav button{min-height:44px}}
+@media(max-width:1100px){.source-ui.source-scope-nav>select{order:0}.source-scope-nav .workspace-nav-menu{order:1}}

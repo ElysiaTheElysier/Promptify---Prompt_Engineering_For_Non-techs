@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promptify Intrepid — Version 2: Guided Executive Enterprise</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="setVersion('v2'); setMode('workspace'); setRole('learner');">
+
+  <header class="demo-controller-bar">
+    <div class="controller-brand">
+      <span class="brand-badge" style="background: var(--blue-600);">Version 2 Standalone</span>
+      <span>Guided Executive Enterprise</span>
+    </div>
+    <div class="controller-group">
+      <a href="index.html" class="ctrl-btn ctrl-btn-outline" style="text-decoration: none;">← Master Deck</a>
+      <a href="version-1-workbench.html" class="ctrl-btn ctrl-btn-outline" style="text-decoration: none;">← View Version 1 (Spatial)</a>
+      <button class="ctrl-btn" onclick="openCompareModal()">⚖️ Compare Attempts</button>
+    </div>
+  </header>
+
+  <nav class="app-navbar">
+    <div class="nav-left">
+      <a href="#" class="promptify-logo">
+        <div class="logo-icon">P</div>
+        <span>Promptify</span>
+      </a>
+      <div class="tenant-badge">
+        <div class="tenant-dot"></div>
+        <span>Intrepid Group · Commercial Ops (Guided Flow)</span>
+      </div>
+    </div>
+    <div class="nav-center">
+      <div class="gcp-credential-chip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>GCP AI Gateway: Active (Vertex / Gemini 1.5 Pro)</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="user-chip">
+        <div class="user-avatar">ND</div>
+        <span>Nguyen Hai Dang</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-view-container">
+    <section class="view-section active" id="view-learner-v2">
+      <div class="guided-layout-v2">
+        
+        <!-- Workflow Stepper Bar -->
+        <div class="workflow-stepper-bar">
+          <div class="wf-step">
+            <div class="wf-step-num">✓</div>
+            <span>1. SOP Reference (SOP-MKT-042)</span>
+          </div>
+          <div class="wf-step">
+            <div class="wf-step-num">✓</div>
+            <span>2. Sample Business Metrics</span>
+          </div>
+          <div class="wf-step active">
+            <div class="wf-step-num">3</div>
+            <span>3. Compose Grounded Prompt</span>
+          </div>
+          <div class="wf-step">
+            <div class="wf-step-num">4</div>
+            <span>4. Execute & Rubric Evaluate</span>
+          </div>
+          <div class="wf-step">
+            <div class="wf-step-num">5</div>
+            <span>5. Compare Attempts & Progress</span>
+          </div>
+        </div>
+
+        <!-- 2-Column Guided Grid -->
+        <div class="guided-grid">
+          
+          <!-- Left Column: Business Brief & Prompt Composer -->
+          <div class="guided-card">
+            <div class="guided-card-header">
+              <div class="guided-card-title">
+                <span class="brand-badge">Step 3</span>
+                <span>Prompt Formulation & Constraints</span>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <button class="ctrl-btn attempt-switch-btn" data-attempt="1" onclick="switchAttempt(1)">Att 1 (7.2)</button>
+                <button class="ctrl-btn attempt-switch-btn active" data-attempt="2" onclick="switchAttempt(2)">Att 2 (8.8)</button>
+              </div>
+            </div>
+
+            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 12px; font-size: 13px; line-height: 1.5;">
+              <strong>Business Scenario:</strong> You are preparing the weekly e-commerce performance report. Apply <strong>SOP-MKT-042</strong> rules to flag ad sets that deviated by more than 25% from benchmark.
+            </div>
+
+            <textarea class="prompt-textarea" style="min-height: 280px;" placeholder="Compose your executive prompt..."></textarea>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+              <span style="font-size: 12px; color: var(--slate-500);">Tokens: ~348 | GCP Secure Runtime</span>
+              <button class="btn-run-ai" onclick="runAiSimulation()">
+                Run Live AI Analysis →
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Executive Evaluation & Output -->
+          <div class="guided-card">
+            <div class="guided-card-header">
+              <div class="guided-card-title">
+                <span class="brand-badge" style="background: var(--blue-600);">Step 4</span>
+                <span>Executive Output & Rubric Assessment</span>
+              </div>
+              <div class="score-big score-big-val" style="font-size: 22px;">8.8 / 10</div>
+            </div>
+
+            <div class="ai-output-content diff-content-box" style="max-height: 400px; overflow-y: auto;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-100); padding-top: 12px;">
+              <span style="font-size: 12px; color: var(--slate-600);">Run Persisted to Intrepid DB (No Data Loss on Refresh)</span>
+              <button class="ctrl-btn ctrl-btn-outline" onclick="openCompareModal()">
+                Open Side-by-Side Comparison
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="compare-attempts-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">⚖️ Compare Attempts · Lesson 02 (SOP-MKT-042 CAC Anomaly)</div>
+        <button class="modal-close-btn" onclick="closeCompareModal()">✕</button>
+      </div>
+      <div class="compare-diff-grid">
+        <div class="diff-column">
+          <div class="diff-pill-header pill-att1"><span>Attempt 1 (Baseline)</span><span>7.2 / 10</span></div>
+          <div class="diff-content-box" style="font-family: var(--font-mono); font-size: 12px;">Please summarize the campaign performance from the provided Lazada sales numbers and tell me if CAC is too high.</div>
+          <div class="diff-content-box">The campaign generated 1,450 orders with a total ad spend of SGD 28,400. Overall CAC stands at SGD 19.58, which is moderately high compared to previous quarters.</div>
+        </div>
+        <div class="diff-column">
+          <div class="diff-pill-header pill-att2"><span>Attempt 2 (SOP-Grounded)</span><span>8.8 / 10 (+1.6)</span></div>
+          <div class="diff-content-box" style="font-family: var(--font-mono); font-size: 12px; background: #f0fdf4;">Role: Senior Commercial & Media Analyst at Intrepid. Context: Apply guidelines from SOP-MKT-042 (CAC anomaly flag threshold: >25% WoW)...</div>
+          <div class="diff-content-box" style="background: #f0fdf4;">Executive Summary: Anomaly Triggered per SOP-MKT-042: Campaign B experienced a +32.4% CAC spike (SGD 26.50 vs target SGD 20.00)...</div>
+        </div>
+      </div>
+      <div style="padding: 14px 24px; background: var(--slate-50); display: flex; justify-content: flex-end;">
+        <button class="btn-run-ai" onclick="closeCompareModal()">Close Comparison</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="prototype.js"></script>
+</body>
+</html>
+

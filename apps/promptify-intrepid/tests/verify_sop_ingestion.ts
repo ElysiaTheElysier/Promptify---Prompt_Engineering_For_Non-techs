@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import JSZip from 'jszip';
+import {extractSop,chunkSop} from '../src/services/sopIngestionService';
+const source='Approved service window: 15 minutes.\nEvidence: contract A.';
+const text=await extractSop(Buffer.from(source),'source.md');
+assert.equal(text.content,source);assert.equal(text.chunks.length,1);assert.equal(text.metadata.type,'MD');assert.equal(text.metadata.sha256.length,64);
+assert.equal(chunkSop([{page:4,text:'A'.repeat(4000)}])[0].page,4);
+assert.throws(()=>chunkSop([{page:null,text:''}]));
+await assert.rejects(()=>extractSop(Buffer.from('<script>bad</script>'),'source.html'));
+await assert.rejects(()=>extractSop(Buffer.from('invalid'),'source.pdf'));
+const ExcelJS=await import('exceljs');const workbook=new ExcelJS.default.Workbook();workbook.addWorksheet('SLA').addRow(['Priority','15 minutes']);
+const xlsx=await extractSop(Buffer.from(await workbook.xlsx.writeBuffer()),'source.xlsx');assert.match(xlsx.content,/15 minutes/);assert.match(xlsx.content,/Sheet: SLA/);
+const docxZip=new JSZip();
+docxZip.file('[Content_Types].xml','<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+docxZip.file('_rels/.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+docxZip.file('word/document.xml','<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Approved response: 15 minutes. %.999999999f</w:t></w:r></w:p></w:body></w:document>');
+const docx=await extractSop(await docxZip.generateAsync({type:'nodebuffer'}),'source.docx');
+assert.equal(docx.content,'Approved response: 15 minutes. %.999999999f');
+assert.equal(docx.metadata.type,'DOCX');assert.equal(docx.chunks.length,1);
+// Mammoth's vulnerable sprintf-js chain is used by its CLI, not library extraction.
+const require=createRequire(import.meta.url);
+assert.deepEqual(Object.keys(require.cache).filter(path=>/[\\/]node_modules[\\/](?:argparse|sprintf-js)[\\/]/.test(path)),[]);
+await assert.rejects(()=>extractSop(Buffer.from('invalid'),'source.docx'));
+console.log('SOP extraction passed: source preservation, page-aware chunks, invalid/empty input rejection, XLSX and DOCX extraction; DOCX does not load CLI dependencies. No live provider calls.');

@@ -1,0 +1,103 @@
+// SOURCE-DERIVED GCP TARGET. This model does not claim a deployed inventory.
+specification {
+ element actor
+ element system
+ element service
+ element component
+ element database
+}
+model {
+ learner = actor 'Học viên'
+ trainer = actor 'Trainer / Head / Admin'
+ firebase = system 'Firebase Auth' 'Identity provider; business scope remains in SQL'
+ vertex = system 'Vertex AI' 'Gemini Flash Generate/Judge and embedding endpoint'
+ workspace = system 'Google Sheets / Drive' 'Approved roster input and document integration'
+ firestore = system 'Firestore' 'Per-user invalidation projection'
+ warehouse = system 'BigQuery' 'Analytics and optional configured vector retrieval'
+ storage = system 'Cloud Storage' 'Private uploaded objects and metadata checksums'
+ scheduler = system 'Cloud Scheduler' 'OIDC private worker invocation'
+ secrets = system 'Secret Manager / IAM' 'Runtime identities and least-privilege credentials'
+ promptify = system 'Promptify Intrepid' {
+  web = service 'Firebase Hosting + React UI00–15'
+  api = service 'Cloud Run API' {
+   http = component 'HTTP /api/product'
+   identity = component 'Verified identity + scope'
+   business = component 'Production business dispatcher'
+   runs = component 'Saved Generate / Judge'
+   sop = component 'SOP ingestion + retrieval'
+   adapter = component 'PostgreSQL adapter / transaction roles'
+  }
+  worker = service 'Cloud Run worker' 'Private roster and projection handlers'
+  sql = database 'Cloud SQL PostgreSQL' {
+   identity = component 'Identity & Access'
+   curriculum = component 'Curriculum & Studio'
+   runs = component 'AI Runs & Evaluation'
+   progress = component 'Progress & Certification'
+   roster = component 'Roster & Membership'
+   sop = component 'SOP & Semantic Retrieval'
+   messaging = component 'Workshop & Messaging'
+   governance = component 'Administration & Audit'
+   outbox = component 'Cloud Integration & Projections'
+  }
+ }
+ learner -> promptify.web 'Thực hành và xem tiến độ'
+ trainer -> promptify.web 'Quản lý scope được phân công'
+ promptify.web -> firebase 'Google login'
+ promptify.web -> promptify.api.http 'Bearer token + named action'
+ promptify.api.http -> promptify.api.identity 'Verify before business operation'
+ promptify.api.identity -> firebase 'Verify token / revocation'
+ promptify.api.identity -> promptify.sql.identity 'Firebase UID → business UUID'
+ promptify.api.identity -> promptify.api.business 'Verified actor'
+ promptify.api.business -> promptify.api.runs 'Generate / Judge'
+ promptify.api.business -> promptify.api.sop 'Upload / review / publish'
+ promptify.api.business -> promptify.api.adapter 'SQL reads and RPC writes'
+ promptify.api.runs -> promptify.api.adapter 'Run snapshots / claims / results'
+ promptify.api.runs -> vertex 'Generate/Judge on configured model'
+ promptify.api.sop -> storage 'Private objects'
+ promptify.api.sop -> vertex 'Embedding provider when configured'
+ promptify.api.sop -> promptify.api.adapter 'Versions / bindings / vector search'
+ promptify.api.adapter -> promptify.sql 'Parameterized queries + scoped roles'
+ promptify.sql -> vertex 'google_ml_integration native embedding'
+ promptify.api.business -> workspace 'Approved workspace operations'
+ promptify.api.business -> warehouse 'Configured analytics/retrieval'
+ promptify.web -> firestore 'Listen only own invalidations'
+ scheduler -> promptify.worker 'OIDC /internal handlers'
+ promptify.worker -> workspace 'Roster sync input'
+ promptify.worker -> promptify.sql 'Claims/imports/outbox'
+ promptify.worker -> firestore 'Scoped monotonic invalidations'
+ promptify.worker -> warehouse 'Configured projection / vector sync'
+ promptify.api -> secrets 'ADC/IAM + reviewed runtime secrets'
+ promptify.worker -> secrets 'Worker identity'
+ promptify.sql.roster -> promptify.sql.identity 'User + learner FK'
+ promptify.sql.curriculum -> promptify.sql.identity 'Owner/editor FK'
+ promptify.sql.runs -> promptify.sql.roster 'Class / learner FK'
+ promptify.sql.runs -> promptify.sql.curriculum 'Lesson FK + frozen snapshot'
+ promptify.sql.progress -> promptify.sql.runs 'Progress and award evidence'
+ promptify.sql.sop -> promptify.sql.roster 'Class ownership'
+ promptify.sql.sop -> promptify.sql.curriculum 'Lesson binding'
+ promptify.sql.messaging -> promptify.sql.roster 'Class/user scope'
+ promptify.sql.governance -> promptify.sql.identity 'Actor and approval history'
+ promptify.sql.outbox -> promptify.worker 'Trigger events, no business FK required'
+}
+views {
+ view context {
+  title '01 — System context (source-derived target)'
+  include learner, trainer, promptify, firebase, vertex, workspace, firestore, warehouse, storage, scheduler, secrets
+ }
+ view containers {
+  title '02 — Containers / runtime modes'
+  include learner, trainer, promptify.*, firebase, vertex, workspace, firestore, warehouse, storage, scheduler, secrets
+ }
+ view backend {
+  title '03 — Backend components'
+  include promptify.api.*, promptify.sql, firebase, vertex, storage, workspace, warehouse
+ }
+ view database {
+  title '04 — Database domains (FK/evidence relationships)'
+  include promptify.sql.*, promptify.worker
+ }
+ view deployment {
+  title '05 — GCP deployment topology (not a live inventory)'
+  include promptify.web, promptify.api, promptify.worker, promptify.sql, firebase, vertex, storage, firestore, warehouse, workspace, scheduler, secrets
+ }
+}

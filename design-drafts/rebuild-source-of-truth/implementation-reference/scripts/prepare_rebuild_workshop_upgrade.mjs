@@ -1,0 +1,10 @@
+import {readFileSync,readdirSync,mkdirSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+const root=resolve(import.meta.dirname,'..');
+const migrationRoot=resolve(root,'supabase/migrations');
+const files=readdirSync(migrationRoot).filter(name=>/^02[2-5]_.*\.sql$/.test(name)).sort();
+if(files.length!==4)throw new Error('Expected migrations 022–025');
+const output=resolve(root,'outputs/rebuild-setup');mkdirSync(output,{recursive:true});
+const sql='-- STAGING Promptify-Rebuild only: aixhryqzgpptuhstiflx.\n-- Requires 019-021. Review before applying. Do not rerun after successful installation.\nBEGIN;\n'+files.map(file=>'-- SOURCE: '+file+'\n'+readFileSync(resolve(migrationRoot,file),'utf8').replace(/^\s*(BEGIN|COMMIT)\s*;\s*$/gm,'')).join('\n')+'\nCOMMIT;\n';
+writeFileSync(resolve(output,'05_upgrade_workshop_roster_sops.sql'),sql);
+console.log('Prepared migrations 022–025. No database connections or credential reads.');

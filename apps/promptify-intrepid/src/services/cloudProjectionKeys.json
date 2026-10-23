@@ -1,0 +1,81 @@
+{
+  "classes": [
+    "id"
+  ],
+  "courses": [
+    "id"
+  ],
+  "course_modules": [
+    "id"
+  ],
+  "lessons": [
+    "id"
+  ],
+  "enrollments": [
+    "id"
+  ],
+  "course_instructors": [
+    "course_id",
+    "user_id"
+  ],
+  "product_class_grants": [
+    "user_id",
+    "class_id"
+  ],
+  "product_domains": [
+    "client_id",
+    "domain"
+  ],
+  "gcp_identity_bindings": [
+    "issuer",
+    "external_subject"
+  ],
+  "prompt_attempts": [
+    "id"
+  ],
+  "lesson_progress": [
+    "id"
+  ],
+  "product_attendance": [
+    "class_id",
+    "lesson_id",
+    "learner_id"
+  ],
+  "product_awards": [
+    "id"
+  ],
+  "workshop_messages": [
+    "id"
+  ],
+  "trainer_hints": [
+    "id"
+  ],
+  "product_session_controls": [
+    "class_id"
+  ],
+  "product_sync_logs": [
+    "id"
+  ],
+  "product_sop_contributions": [
+    "id"
+  ],
+  "product_sop_chunks": [
+    "version_id",
+    "position"
+  ],
+  "rebuild_sop_versions": [
+    "id"
+  ],
+  "rebuild_sop_bindings": [
+    "class_id",
+    "lesson_id",
+    "document_id"
+  ],
+  "product_studio": [
+    "class_id",
+    "lesson_id"
+  ],
+  "users": [
+    "id"
+  ]
+}

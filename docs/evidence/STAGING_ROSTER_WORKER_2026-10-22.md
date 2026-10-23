@@ -1,0 +1,7 @@
+# Staging roster scheduler scope (2026-10-22)
+
+The API-only staging worker route is a temporary QA path for exactly the Northstar and Juniper synthetic class/Sheet pairs pinned in Intrepid's `stagingRosterClaimService.ts`. It cannot accept scope from request bodies, headers, or query parameters. The route is enabled only with the staging feature flag, the expected staging project and API Cloud Run service, the configured HTTPS Cloud Run audience, and a verified OIDC token for the existing staging Scheduler service account.
+
+The staging Scheduler should tick every minute. The scoped claim service then enforces a five-minute due interval and claims at most the two pinned synthetic sources per request. For these fixtures only, that QA interval deliberately overrides the workbook's `product_roster_workbooks.next_sync_at` cadence so scheduled add/omit behavior can be observed promptly. It does not change the normal worker or migration: the existing global worker remains limited to its 15-minute due interval, and no general production sync policy is shortened.
+
+The two-claim PGlite contract test serializes its synthetic database transactions and proves scope, due, and stale-log behavior; it is not proof of PostgreSQL row-lock concurrency. Real Cloud Scheduler and Cloud SQL acceptance must confirm scheduled add and omission on both synthetic Sheets before treating the staging worker as validated.

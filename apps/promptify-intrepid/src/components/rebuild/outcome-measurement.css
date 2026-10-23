@@ -1,0 +1,7 @@
+.learner-v7 .lv-outcome{width:calc(100% - 48px);margin:8px 24px 28px;padding:0;overflow:hidden;max-width:1872px}
+.learner-v7 .lv-outcome>summary{padding:16px 20px;min-height:56px;line-height:1.5;cursor:pointer;list-style-position:inside;overflow-wrap:anywhere}
+.learner-v7 .lv-outcome>summary:focus-visible{outline:2px solid var(--lv-green);outline-offset:-4px;border-radius:18px}
+.learner-v7 .lv-outcome[open]>summary{border-bottom:1px solid var(--lv-line)}
+.learner-v7 .lv-outcome>form{padding:20px;margin:0}
+@media(min-width:1920px){.learner-v7 .lv-outcome{margin-inline:auto}}
+@media(max-width:760px){.learner-v7 .lv-outcome{width:calc(100% - 32px);margin:8px 16px 24px}.learner-v7 .lv-outcome>summary{padding:16px}.learner-v7 .lv-outcome>form{padding:16px}}

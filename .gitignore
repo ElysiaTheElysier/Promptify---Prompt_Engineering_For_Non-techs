@@ -36,3 +36,14 @@ pnpm-debug.log*
 skills-lock.json
 logo.png
 
+# Local artifact previews and scratch work (keep source documents in docs/)
+/outputs/
+/tmp/
+__pycache__/
+*.py[cod]
+
+# Per-app generated outputs
+/apps/*/outputs/
+.env.*
+!.env.example
+!.env.production-setup.example

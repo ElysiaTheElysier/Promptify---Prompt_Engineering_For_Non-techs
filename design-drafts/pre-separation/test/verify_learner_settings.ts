@@ -1,0 +1,7 @@
+import assert from 'node:assert/strict';
+import {validateLearnerSettings,DEFAULT_LEARNER_SETTINGS} from '../src/services/learnerSettingsService';
+assert.deepEqual(validateLearnerSettings(undefined),DEFAULT_LEARNER_SETTINGS);
+assert.equal(validateLearnerSettings({temperature:2,topP:1,maxOutputTokens:256,searchGrounding:true,stopSequences:['END']}).searchGrounding,true);
+for(const invalid of [{temperature:NaN},{temperature:-1},{temperature:2.1},{topP:0},{topP:1.1},{maxOutputTokens:255},{maxOutputTokens:4097},{maxOutputTokens:300.5},{stopSequences:['']},{stopSequences:Array(6).fill('STOP')},{stopSequences:['x'.repeat(81)]},{searchGrounding:'true'},{model:'https://untrusted.example'},{personalInstruction:'x'.repeat(2001)},{personalInstruction:123}])assert.throws(()=>validateLearnerSettings(invalid));
+assert.equal(validateLearnerSettings({model:'gemini-2.5-flash'}).model,'gemini-2.5-flash');
+console.log('Learner settings: defaults, valid boundary values, web toggle and invalid parameter/model rejection passed. No provider calls.');

@@ -1,0 +1,7 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args: ['build', '-f', 'gcp/Dockerfile.judge-bounded', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:judge-bounded-20261019', '.']
+images:
+ - asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:judge-bounded-20261019
+options:
+ logging: CLOUD_LOGGING_ONLY

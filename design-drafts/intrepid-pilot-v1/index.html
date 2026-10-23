@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promptify Intrepid — Enterprise AI Learning Workbench Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ==============================================================================
+       MASTER CONTROLLER DOCK (Persistent for Stakeholders, Mentors & Demos)
+       ============================================================================== -->
+  <header class="demo-controller-bar">
+    <div class="controller-brand">
+      <span class="brand-badge">Intrepid Pilot</span>
+      <span>Promptify Prototype Suite</span>
+      <span style="color: var(--slate-400); font-size: 11px; font-weight: normal;">| Target: 23 Oct 2026</span>
+    </div>
+
+    <!-- Switcher Group: Roles -->
+    <div class="controller-group">
+      <span class="controller-label">Role:</span>
+      <button class="ctrl-btn active" data-role="learner" onclick="setRole('learner')" title="Intrepid Employee (Learner)">
+        🎓 Learner (Commercial)
+      </button>
+      <button class="ctrl-btn" data-role="trainer" onclick="setRole('trainer')" title="Vo Tu Duc (Lead Trainer)">
+        👨‍🏫 Trainer (Vo Tu Duc)
+      </button>
+      <button class="ctrl-btn" data-role="head" onclick="setRole('head')" title="Sarah Tan (Head of Commercial)">
+        👔 Head / PIC (Commercial)
+      </button>
+    </div>
+
+    <!-- Switcher Group: Mode -->
+    <div class="controller-group">
+      <span class="controller-label">Flow:</span>
+      <button class="ctrl-btn active" data-mode="workspace" onclick="setMode('workspace')">
+        ⚡ Workspace
+      </button>
+      <button class="ctrl-btn" data-mode="onboarding" onclick="setMode('onboarding')">
+        🟢 Onboarding Flow
+      </button>
+    </div>
+
+    <!-- Switcher Group: UI Version -->
+    <div class="controller-group">
+      <span class="controller-label">Style:</span>
+      <button class="ctrl-btn active" data-version="v1" onclick="setVersion('v1')" title="Version 1: AI Studio Spatial Workbench">
+        ✦ V1: Spatial Workbench
+      </button>
+      <button class="ctrl-btn" data-version="v2" onclick="setVersion('v2')" title="Version 2: Guided Executive Enterprise">
+        ◫ V2: Guided Executive
+      </button>
+    </div>
+
+    <!-- Switcher Group: Language & Links -->
+    <div class="controller-group">
+      <button class="ctrl-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="ctrl-btn" data-lang="vi" onclick="setLang('vi')">VI</button>
+      <button class="ctrl-btn ctrl-btn-outline" onclick="openCompareModal()" title="View side-by-side prompt diff">
+        ⚖️ Compare
+      </button>
+    </div>
+  </header>
+
+  <!-- ==============================================================================
+       TOP APPLICATION NAVBAR (Branded for Promptify + Intrepid)
+       ============================================================================== -->
+  <nav class="app-navbar">
+    <div class="nav-left">
+      <a href="#" class="promptify-logo">
+        <div class="logo-icon">P</div>
+        <span>Promptify</span>
+      </a>
+      <div class="tenant-badge">
+        <div class="tenant-dot"></div>
+        <span>Intrepid Group · Commercial Ops Zone</span>
+      </div>
+    </div>
+
+    <div class="nav-center">
+      <div class="gcp-credential-chip" title="GCP Service Account managed by Intrepid IT Infrastructure">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>GCP AI Gateway: Active (Vertex / Gemini 1.5 Pro)</span>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <div class="user-chip" id="navbar-user-chip">
+        <div class="user-avatar" id="navbar-user-avatar">ND</div>
+        <span id="navbar-user-name">Nguyen Hai Dang</span>
+        <span style="color: var(--slate-400); font-size: 11px;">(dang.nguyen@intrepid.asia)</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==============================================================================
+       MAIN VIEW CONTAINER
+       ============================================================================== -->
+  <main class="main-view-container">
+
+    <!-- ==========================================================================
+         VIEW A: ONBOARDING FLOW — LEARNER (Nguyen Hai Dang)
+         ========================================================================== -->
+    <section class="view-section" id="view-onboarding-learner">
+      <div class="onboarding-screen">
+        <div class="onboarding-card">
+          <!-- Stepper -->
+          <div class="onboarding-stepper">
+            <div class="step-item completed">
+              <div class="step-circle">✓</div>
+              <span class="step-title">1. Corporate SSO</span>
+            </div>
+            <div class="step-item active">
+              <div class="step-circle">2</div>
+              <span class="step-title">2. Roster Match</span>
+            </div>
+            <div class="step-item">
+              <div class="step-circle">3</div>
+              <span class="step-title">3. Department Zone</span>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--slate-900);">Confirm Your Corporate Identity</h2>
+            <p style="font-size: 13px; color: var(--slate-500); margin-top: 4px;">
+              Your account was matched against the Intrepid Pre-Enrollment Roster (Google Sheets Synced).
+            </p>
+          </div>
+
+          <!-- Matched Roster Info -->
+          <table class="roster-preview-table">
+            <tr>
+              <th style="width: 38%;">Full Name</th>
+              <td><strong>Nguyen Hai Dang</strong></td>
+            </tr>
+            <tr>
+              <th>Corporate Email</th>
+              <td><code>dang.nguyen@intrepid.asia</code> <span style="color: #10b981; font-weight: 600; font-size: 11px;">✓ Verified SSO</span></td>
+            </tr>
+            <tr>
+              <th>Business Function</th>
+              <td><span style="background: var(--blue-50); color: var(--blue-600); padding: 2px 8px; border-radius: 4px; font-weight: 600;">Commercial Operations</span></td>
+            </tr>
+            <tr>
+              <th>Assigned Country</th>
+              <td>Singapore (SG)</td>
+            </tr>
+            <tr>
+              <th>Learning Cohort</th>
+              <td>Q4 AI Enablement Cohort #02 (Trainer: Vo Tu Duc)</td>
+            </tr>
+          </table>
+
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 12px; font-size: 12px; color: var(--slate-600); margin-bottom: 24px;">
+            🔒 <strong>Access Scope Notice:</strong> You are granted access exclusively to Commercial Operations curriculum and resources. Prompt history is stored securely under Intrepid GCP compliance.
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-run-ai" style="flex: 1; justify-content: center; padding: 12px;" onclick="confirmLearnerProfile()">
+              Confirm & Enter Learning Zone →
+            </button>
+            <button class="ctrl-btn" style="padding: 12px 16px;" onclick="reportRosterDiscrepancy()">
+              Report Error
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW B: ONBOARDING FLOW — TRAINER (Vo Tu Duc)
+         ========================================================================== -->
+    <section class="view-section" id="view-onboarding-trainer">
+      <div class="onboarding-screen">
+        <div class="onboarding-card" style="max-width: 680px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <div>
+              <span class="brand-badge" style="background: var(--slate-800);">Trainer Administrative Portal</span>
+              <h2 style="font-size: 20px; font-weight: 700; color: var(--slate-900); margin-top: 6px;">Welcome, Trainer Vo Tu Duc</h2>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--amber-600); background: var(--amber-50); border: 1px solid var(--amber-200); padding: 4px 8px; border-radius: 4px;">
+                Pilot Target: 23 Oct 2026
+              </span>
+            </div>
+          </div>
+
+          <p style="font-size: 13px; color: var(--slate-600); margin-bottom: 20px;">
+            As the single Lead Trainer for Intrepid, this setup walkthrough connects your Google Sheet roster, validates learner departments, and activates the live pilot curriculum.
+          </p>
+
+          <!-- 3 Onboarding Steps for Trainer -->
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+            <div style="padding: 14px; border: 1px solid var(--primary-border); background: var(--primary-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--slate-900);">1. Connect Google Sheet Roster</div>
+                <div style="font-size: 12px; color: var(--slate-600);">Sheet ID configured · 4 required fields: Email, Name, Department, Country</div>
+              </div>
+              <span style="color: var(--primary); font-weight: 700; font-size: 12px;">Connected ✓</span>
+            </div>
+
+            <div style="padding: 14px; border: 1px solid var(--slate-200); background: #ffffff; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--slate-900);">2. Attach SOPs & Sample Datasets</div>
+                <div style="font-size: 12px; color: var(--slate-600);">SOP-MKT-042 and Q4 Lazada raw figures linked to Lesson 02</div>
+              </div>
+              <span style="color: var(--primary); font-weight: 700; font-size: 12px;">Ready ✓</span>
+            </div>
+
+            <div style="padding: 14px; border: 1px solid var(--slate-200); background: #ffffff; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--slate-900);">3. Pre-Enroll Pilot Cohort</div>
+                <div style="font-size: 12px; color: var(--slate-600);">25 active learners ready across Commercial & Ops</div>
+              </div>
+              <span style="color: var(--slate-500); font-weight: 600; font-size: 12px;">Pending Final Sync</span>
+            </div>
+          </div>
+
+          <button class="btn-run-ai" style="width: 100%; justify-content: center; padding: 12px;" onclick="setMode('workspace'); setRole('trainer');">
+            Open Trainer Operations Hub →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW C: ONBOARDING FLOW — HEAD OF DEPARTMENT (Sarah Tan)
+         ========================================================================== -->
+    <section class="view-section" id="view-onboarding-head">
+      <div class="onboarding-screen">
+        <div class="onboarding-card">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px;">
+              🔒 Scoped Access: Commercial Operations
+            </div>
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--slate-900);">Welcome, Sarah Tan (Head of Commercial)</h2>
+            <p style="font-size: 13px; color: var(--slate-500); margin-top: 4px;">
+              Intrepid Business Function Executive & Quality Assurance Hub
+            </p>
+          </div>
+
+          <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--slate-700);">
+            <p><strong>Your Two Primary Roles in Phase 1 Pilot:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+              <li><strong>Track Team Progress:</strong> Monitor the prompt proficiency, attempt counts, and rubric scores of your 14 team members.</li>
+              <li><strong>Provide Business SOP Grounding:</strong> Review SOP accuracy and submit real, sanitized business datasets directly to Lead Trainer Vo Tu Duc.</li>
+            </ul>
+          </div>
+
+          <button class="btn-run-ai" style="width: 100%; justify-content: center; padding: 12px;" onclick="setMode('workspace'); setRole('head');">
+            Enter Commercial Operations Dashboard →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW 1: LEARNER PRACTICE WORKBENCH (VERSION 1: AI STUDIO SPATIAL WORKBENCH)
+         ========================================================================== -->
+    <section class="view-section active" id="view-learner-v1">
+      <div class="workbench-layout-v1">
+        
+        <!-- Left Sidebar: Lesson Meta & SOP Documents -->
+        <aside class="sidebar-v1">
+          <div class="sidebar-section">
+            <div class="sidebar-heading">Assigned Curriculum</div>
+            <div class="lesson-meta-card">
+              <div class="lesson-number">Lesson 02 · Module 1</div>
+              <div class="lesson-title-text">SOP-MKT-042: CAC Anomaly Synthesis & Reporting</div>
+              <div style="margin-top: 8px; font-size: 11px; color: var(--slate-500);">
+                Objective: Ground AI analysis strictly on Intrepid SOP thresholds.
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-heading">Grounding SOP Document</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <a href="#sop" class="sop-badge-link" onclick="showToast('SOP-MKT-042 v3.1 opened in preview.'); return false;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>SOP-MKT-042 (CAC Threshold: >25% WoW)</span>
+              </a>
+              <div style="font-size: 11px; color: var(--slate-600); line-height: 1.4; background: var(--slate-50); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--slate-200);">
+                <strong>Key Guideline §3.2:</strong> An ad campaign is flagged as anomalous if Customer Acquisition Cost exceeds the previous 7-day benchmark by more than 25%.
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-heading">Sample Business Data</div>
+            <div style="font-size: 11px; font-family: var(--font-mono); background: var(--slate-900); color: #e2e8f0; padding: 10px; border-radius: var(--radius-sm); overflow-x: auto;">
+              CampA: $8.5k | ROAS 4.2x | CAC $16.20<br>
+              CampB: $12.4k | ROAS 2.6x | CAC $26.50 (+32.4%)<br>
+              CampC: $4.3k | ROAS 3.9x | CAC $17.80<br>
+              CampD: $3.2k | ROAS 4.5x | CAC $14.10
+            </div>
+          </div>
+
+          <div class="sidebar-section" style="margin-top: auto;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--slate-500);">Progress Status</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">
+                2 Attempts · Completed Run
+              </span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Center Canvas: Prompt Composer -->
+        <div class="composer-canvas-v1">
+          
+          <!-- Context Strip -->
+          <div class="context-strip">
+            <div class="context-strip-header">
+              <div class="context-strip-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Task Specification (Output là đích, Prompt là phương tiện)</span>
+              </div>
+              <span style="font-size: 11px; color: var(--slate-500);">Commercial Ops · Cohort Q4</span>
+            </div>
+            <p class="context-body-text">
+              Write an executive prompt instructing the AI to analyze the Q4 campaign metrics against <strong>SOP-MKT-042</strong>. Ensure the output isolates anomalous spend, provides a clear markdown table, and proposes 3 immediate remediation steps.
+            </p>
+          </div>
+
+          <!-- Prompt Editor Card -->
+          <div class="prompt-editor-card">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; font-weight: 700; color: var(--slate-900);">Prompt Editor</span>
+                <!-- Attempt switcher pills -->
+                <div style="display: flex; gap: 4px;">
+                  <button class="ctrl-btn attempt-switch-btn" data-attempt="1" onclick="switchAttempt(1)">
+                    Attempt 1 (7.2)
+                  </button>
+                  <button class="ctrl-btn attempt-switch-btn active" data-attempt="2" onclick="switchAttempt(2)">
+                    Attempt 2 (8.8)
+                  </button>
+                </div>
+              </div>
+
+              <div class="prompt-tags-row">
+                <span class="prompt-tag selected">+ Role</span>
+                <span class="prompt-tag selected">+ SOP Context</span>
+                <span class="prompt-tag selected">+ Constraints</span>
+                <span class="prompt-tag selected">+ Format</span>
+              </div>
+            </div>
+
+            <textarea class="prompt-textarea" id="prompt-input-v1" placeholder="Enter your prompt instructions here..."></textarea>
+
+            <div class="composer-bottom-bar">
+              <div class="token-stats">
+                <span>Tokens: ~348 / 4,000</span>
+                <span>•</span>
+                <span>Model: Gemini 1.5 Pro (GCP Backend)</span>
+                <span>•</span>
+                <span style="color: #10b981; font-weight: 600;">✓ Grounded in SOP</span>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="ctrl-btn ctrl-btn-outline" onclick="openCompareModal()">
+                  ⚖️ Compare with Attempt 1
+                </button>
+                <button class="btn-run-ai" id="btn-run-ai-action" onclick="runAiSimulation()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <span>Run Live AI (Cmd+Enter)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Live AI Output & Rubric Evaluation -->
+        <aside class="output-judge-panel-v1">
+          <div class="panel-tabs-header">
+            <button class="panel-tab-btn active" id="tab-output-btn">
+              AI Output
+            </button>
+            <button class="panel-tab-btn" id="tab-rubric-btn">
+              Rubric & Evaluation
+            </button>
+          </div>
+
+          <div class="output-body">
+            
+            <!-- Rubric Score Overview -->
+            <div class="rubric-scorecard" style="margin-bottom: 18px;">
+              <div class="score-overview-header">
+                <div>
+                  <div style="font-size: 11px; font-weight: 700; color: var(--slate-600); text-transform: uppercase;">
+                    Evaluation Score (AI Judge)
+                  </div>
+                  <div class="score-big score-big-val">8.8 / 10</div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">
+                    Completed Run
+                  </span>
+                  <div style="font-size: 11px; color: var(--slate-500); margin-top: 4px;">Persisted to Intrepid DB</div>
+                </div>
+              </div>
+
+              <!-- Rubric Breakdown -->
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Role & Goal Clarity</span>
+                  <span>9 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 90%;"></div></div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Business Context & SOP Grounding</span>
+                  <span>9 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 90%;"></div></div>
+                <div class="criterion-note">Explicitly checks SOP-MKT-042 CAC thresholds (>25%).</div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Constraint Adherence</span>
+                  <span>8 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 80%;"></div></div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Output Structure & Format</span>
+                  <span>9 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 90%;"></div></div>
+              </div>
+
+              <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 12px; margin-top: 6px;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--slate-700); margin-bottom: 4px;">AI Coach Advice:</div>
+                <p class="judge-feedback-note" style="font-size: 12px; color: var(--slate-600); line-height: 1.4;">
+                  Strong grounding in SOP-MKT-042. Role and business constraints were strictly applied. The output table clearly flags Campaign B as anomalous (+32.4% CAC) with actionable next steps.
+                </p>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--slate-200); padding-top: 16px;">
+              <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--slate-400); margin-bottom: 8px;">
+                Live Model Response
+              </h4>
+              <div class="ai-output-content diff-content-box"></div>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW 2: LEARNER PRACTICE (VERSION 2: GUIDED EXECUTIVE ENTERPRISE)
+         ========================================================================== -->
+    <section class="view-section" id="view-learner-v2">
+      <div class="guided-layout-v2">
+        
+        <!-- Workflow Stepper Bar -->
+        <div class="workflow-stepper-bar">
+          <div class="wf-step">
+            <div class="wf-step-num">✓</div>
+            <span>1. Review SOP Document</span>
+          </div>
+          <div class="wf-step">
+            <div class="wf-step-num">✓</div>
+            <span>2. Inspect Sample Data</span>
+          </div>
+          <div class="wf-step active">
+            <div class="wf-step-num">3</div>
+            <span>3. Compose & Refine Prompt</span>
+          </div>
+          <div class="wf-step">
+            <div class="wf-step-num">4</div>
+            <span>4. Execute & Evaluate</span>
+          </div>
+          <div class="wf-step">
+            <div class="wf-step-num">5</div>
+            <span>5. Compare Attempts</span>
+          </div>
+        </div>
+
+        <!-- 2-Column Guided Grid -->
+        <div class="guided-grid">
+          
+          <!-- Left Column: Business Brief & Prompt Composer -->
+          <div class="guided-card">
+            <div class="guided-card-header">
+              <div class="guided-card-title">
+                <span class="brand-badge">Step 3</span>
+                <span>Prompt Formulation & Constraints</span>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <button class="ctrl-btn attempt-switch-btn" data-attempt="1" onclick="switchAttempt(1)">Att 1</button>
+                <button class="ctrl-btn attempt-switch-btn active" data-attempt="2" onclick="switchAttempt(2)">Att 2</button>
+              </div>
+            </div>
+
+            <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 12px; font-size: 13px;">
+              <strong>Business Scenario:</strong> You are preparing the weekly e-commerce performance report. Apply <strong>SOP-MKT-042</strong> rules to flag ad sets that deviated by more than 25% from benchmark.
+            </div>
+
+            <textarea class="prompt-textarea" style="min-height: 260px;" placeholder="Compose your executive prompt..."></textarea>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+              <span style="font-size: 12px; color: var(--slate-500);">Tokens: ~348 | GCP Secure Runtime</span>
+              <button class="btn-run-ai" onclick="runAiSimulation()">
+                Run Live AI Analysis →
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Executive Evaluation & Output -->
+          <div class="guided-card">
+            <div class="guided-card-header">
+              <div class="guided-card-title">
+                <span class="brand-badge" style="background: var(--blue-600);">Step 4</span>
+                <span>Executive Output & Rubric Assessment</span>
+              </div>
+              <div class="score-big score-big-val" style="font-size: 20px;">8.8 / 10</div>
+            </div>
+
+            <div class="ai-output-content diff-content-box" style="max-height: 380px; overflow-y: auto;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--slate-100); padding-top: 12px;">
+              <span style="font-size: 12px; color: var(--slate-600);">Run Persisted to Intrepid DB (No Data Loss on Refresh)</span>
+              <button class="ctrl-btn ctrl-btn-outline" onclick="openCompareModal()">
+                Open Side-by-Side Comparison
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW D: TRAINER OPERATIONS HUB (Vo Tu Duc - Lead Trainer)
+         ========================================================================== -->
+    <section class="view-section" id="view-trainer">
+      <div class="trainer-dashboard-view">
+        
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <h1 style="font-size: 22px; font-weight: 800; color: var(--slate-900);">Lead Trainer Hub · Vo Tu Duc</h1>
+            <p style="font-size: 13px; color: var(--slate-500);">Single Lead Trainer Operations & Cohort Administration (Target: 23 Oct 2026)</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-sync-now" id="btn-sync-roster" onclick="triggerRosterSync()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Sync Google Sheet Roster</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5-Milestone Implementation Plan Tracker (From Excel Plan) -->
+        <div class="pilot-milestone-tracker">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--slate-900);">Implementation Plan Tracker (54 Tasks · 06–23 Oct)</h3>
+              <p style="font-size: 12px; color: var(--slate-500);">Confirmed in 02_IMPLEMENTATION_PLAN.md & Progress Excel</p>
+            </div>
+            <span style="font-size: 12px; font-weight: 700; color: #166534; background: #dcfce7; padding: 4px 10px; border-radius: 9999px;">
+              Status: On Schedule (0 Blockers)
+            </span>
+          </div>
+
+          <div class="milestone-timeline-grid">
+            <div class="milestone-cell">
+              <span class="milestone-date">06–08 Oct</span>
+              <span class="milestone-title">M1: Identity Foundation</span>
+              <span class="milestone-status-badge status-done">✓ Verified</span>
+            </div>
+            <div class="milestone-cell active">
+              <span class="milestone-date">09–12 Oct</span>
+              <span class="milestone-title">M2: Sheet Roster & Profile</span>
+              <span class="milestone-status-badge status-active">In Progress</span>
+            </div>
+            <div class="milestone-cell">
+              <span class="milestone-date">13–16 Oct</span>
+              <span class="milestone-title">M3: Learning Vertical Slice</span>
+              <span class="milestone-status-badge status-planned">Planned</span>
+            </div>
+            <div class="milestone-cell">
+              <span class="milestone-date">17–20 Oct</span>
+              <span class="milestone-title">M4: Trainer & Head Roles</span>
+              <span class="milestone-status-badge status-planned">Planned</span>
+            </div>
+            <div class="milestone-cell">
+              <span class="milestone-date">21–23 Oct</span>
+              <span class="milestone-title">M5: Rehearsal & Pilot Final</span>
+              <span class="milestone-status-badge status-planned">Deadline 23/10</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google Sheet Roster Connector Card -->
+        <div class="roster-sync-card">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--slate-900);">Google Sheet Roster Connector (M2 Requirement)</h3>
+              <p style="font-size: 12px; color: var(--slate-500);">Pre-enrolls learners across 27 functions without open registration</p>
+            </div>
+            <span class="tenant-badge">
+              <span class="tenant-dot"></span>
+              Private Server-Side Connector
+            </span>
+          </div>
+
+          <div class="sync-status-row">
+            <div class="sync-metric-pill">
+              <span style="color: var(--slate-400);">Source Sheet:</span>
+              <code>docs.google.com/spreadsheets/d/1BxiM.../edit#gid=0</code>
+            </div>
+            <div class="sync-metric-pill">
+              <span style="color: var(--slate-400);">Tab:</span>
+              <code>Pilot_Learners_Oct26</code>
+            </div>
+            <div class="sync-metric-pill">
+              <span style="color: var(--slate-400);">Last Sync:</span>
+              <span id="last-sync-time" style="color: var(--primary);">Today at 09:42 AM (Batch #20261006-02)</span>
+            </div>
+          </div>
+
+          <!-- Roster Diagnostics Table -->
+          <table class="roster-preview-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Row</th>
+                <th>Full Name</th>
+                <th>Corporate Email</th>
+                <th>Business Function</th>
+                <th>Country</th>
+                <th>Note / Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span style="color: #15803d; font-weight: 700;">✓ Valid</span></td>
+                <td>2</td>
+                <td>Nguyen Hai Dang</td>
+                <td>dang.nguyen@intrepid.asia</td>
+                <td>Commercial Operations</td>
+                <td>SG</td>
+                <td>Pre-onboarded · Confirmed</td>
+              </tr>
+              <tr>
+                <td><span style="color: #15803d; font-weight: 700;">✓ Valid</span></td>
+                <td>3</td>
+                <td>Tran Thi Bich Tram</td>
+                <td>tram.tran@intrepid.asia</td>
+                <td>Brand Management</td>
+                <td>VN</td>
+                <td>Pre-onboarded</td>
+              </tr>
+              <tr style="background: #fff1f2;">
+                <td><span style="color: #be123c; font-weight: 700;">⚠️ Error</span></td>
+                <td>14</td>
+                <td>Ahmad Faris</td>
+                <td>ahmad.faris@gmail.com</td>
+                <td>Operations</td>
+                <td>MY</td>
+                <td><strong style="color: #be123c;">Rejected:</strong> Must use @intrepid.asia corporate domain</td>
+              </tr>
+              <tr style="background: #fff1f2;">
+                <td><span style="color: #be123c; font-weight: 700;">⚠️ Error</span></td>
+                <td>22</td>
+                <td>Siriporn Somchai</td>
+                <td>siriporn.s@intrepid.asia</td>
+                <td><em>(Empty)</em></td>
+                <td>TH</td>
+                <td><strong style="color: #be123c;">Rejected:</strong> Missing required Business Function</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Curriculum & SOP Management -->
+        <div class="roster-sync-card">
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--slate-900); margin-bottom: 6px;">Curriculum & SOP Assignment</h3>
+          <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 16px;">Attach authorized SOP documentation and sanitized business datasets to lessons.</p>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Course Title</label>
+              <input type="text" class="form-input" value="Applied AI for Commercial Operations" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target Cohort</label>
+              <input type="text" class="form-input" value="Commercial Operations (SG & VN) - Q4" readonly>
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Attached SOP Reference URL</label>
+              <input type="text" class="form-input" value="https://intrepid.box.com/s/sop-mkt-042-cac-thresholds-v3.1.pdf">
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Sample Data Snippet (CSV / Obfuscated Business Data)</label>
+              <textarea class="form-textarea" rows="3">Campaign,Spend_SGD,ROAS,CAC_SGD,WoW_Change
+Campaign A (Beauty Mega),8500,4.2,16.20,+4.1%
+Campaign B (Tech Super Day),12400,2.6,26.50,+32.4%
+Campaign C (Home & Living),4300,3.9,17.80,-2.3%
+Campaign D (Flash Voucher),3200,4.5,14.10,-6.5%</textarea>
+            </div>
+          </div>
+          
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+            <button class="ctrl-btn" onclick="showToast('SOP draft updated.')">Save Draft</button>
+            <button class="btn-run-ai" onclick="showToast('Lesson 02 updated & published to Commercial Cohort.')">Publish & Assign to Cohort</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         VIEW E: HEAD OF DEPARTMENT DASHBOARD (Sarah Tan - Head of Commercial)
+         ========================================================================== -->
+    <section class="view-section" id="view-head">
+      <div class="head-dashboard-view">
+        
+        <!-- Strict Isolation Banner -->
+        <div class="isolation-banner">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="isolation-badge">Isolated View</span>
+            <span><strong>Department Scope: Commercial Operations</strong> (14 Enrolled Learners · SG & VN)</span>
+          </div>
+          <span style="font-size: 12px; color: #1e40af;">Role: Read-Only Progress & SOP Contributor</span>
+        </div>
+
+        <!-- KPI Metrics Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-title">Enrolled Learners</span>
+            <span class="kpi-value">14</span>
+            <span class="kpi-subtext">100% Pre-onboarded from Roster</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Completed Runs</span>
+            <span class="kpi-value">12 / 14</span>
+            <span class="kpi-subtext">85.7% Finished at least 1 attempt</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Mastery Rate (>8.5)</span>
+            <span class="kpi-value">9 / 14</span>
+            <span class="kpi-subtext">64.3% Exceeded rubric benchmark</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Average Score</span>
+            <span class="kpi-value">8.4 / 10</span>
+            <span class="kpi-subtext">+1.2 pts improvement on rerun</span>
+          </div>
+        </div>
+
+        <!-- Team Progress Table -->
+        <div class="roster-sync-card">
+          <h3 style="font-size: 15px; font-weight: 700; color: var(--slate-900); margin-bottom: 4px;">Commercial Operations · Learner Roster & Progress</h3>
+          <p style="font-size: 12px; color: var(--slate-500); margin-bottom: 16px;">Real-time execution stats for Lesson 02 (SOP-MKT-042 CAC Anomaly)</p>
+
+          <table class="roster-preview-table">
+            <thead>
+              <tr>
+                <th>Learner Name</th>
+                <th>Email</th>
+                <th>Country</th>
+                <th>Attempts</th>
+                <th>Best Score</th>
+                <th>Status</th>
+                <th>Last Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Nguyen Hai Dang</strong></td>
+                <td>dang.nguyen@intrepid.asia</td>
+                <td>SG</td>
+                <td>2 Attempts</td>
+                <td><strong style="color: var(--primary);">8.8 / 10</strong></td>
+                <td><span style="background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Completed Run</span></td>
+                <td>10 mins ago</td>
+              </tr>
+              <tr>
+                <td><strong>Cheryl Koh</strong></td>
+                <td>cheryl.koh@intrepid.asia</td>
+                <td>SG</td>
+                <td>3 Attempts</td>
+                <td><strong style="color: var(--primary);">9.1 / 10</strong></td>
+                <td><span style="background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Mastery Verified</span></td>
+                <td>1 hour ago</td>
+              </tr>
+              <tr>
+                <td><strong>Le Hoang Long</strong></td>
+                <td>long.le@intrepid.asia</td>
+                <td>VN</td>
+                <td>1 Attempt</td>
+                <td><strong style="color: var(--slate-700);">7.4 / 10</strong></td>
+                <td><span style="background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">In Progress</span></td>
+                <td>3 hours ago</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SOP & Sample Data Feedback Form (D04 Requirement) -->
+        <div class="sop-feedback-card">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--slate-900);">Submit SOP Update & Real Sample Data</h3>
+              <p style="font-size: 12px; color: var(--slate-500);">Per D04 in 03_DECISION_LOG.md: Heads provide authentic operational data to Trainer Vo Tu Duc.</p>
+            </div>
+            <span class="tenant-badge">Direct Channel to Trainer Duc</span>
+          </div>
+
+          <form id="sop-feedback-form" onsubmit="submitSopFeedback(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Select Business SOP</label>
+                <select class="form-select">
+                  <option>SOP-MKT-042: CAC Anomaly & Spend Deviation</option>
+                  <option>SOP-COMM-015: Flash Sale Margin Calculator</option>
+                  <option>+ Propose New Department SOP</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">SOP Verification Status</label>
+                <select class="form-select">
+                  <option>Confirmed Accurate for Q4 2026</option>
+                  <option>Needs Formula Revision</option>
+                  <option>Deprecated - Replace with New Version</option>
+                </select>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Updated SOP Documentation Link (Intrepid Box / Google Drive)</label>
+                <input type="text" class="form-input" placeholder="https://intrepid.box.com/s/..." required>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Real Sample Dataset (Anonymized / Obfuscated Data)</label>
+                <textarea class="form-textarea" rows="3" placeholder="Paste sample CSV rows or describe dataset structure..." required></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label">Context Notes for Trainer Duc</label>
+                <textarea class="form-textarea" rows="2" placeholder="e.g. In 11.11, Lazada changed the commission tier structure so CAC calculations must reflect..."></textarea>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button type="submit" class="btn-run-ai">
+                Submit SOP & Data to Trainer Duc Vo →
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==============================================================================
+       COMPARE ATTEMPTS MODAL (M3 Requirement: Side-by-Side Diff)
+       ============================================================================== -->
+  <div class="modal-backdrop" id="compare-attempts-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          ⚖️ Compare Attempts · Lesson 02 (SOP-MKT-042 CAC Anomaly)
+        </div>
+        <button class="modal-close-btn" onclick="closeCompareModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="compare-diff-grid">
+        
+        <!-- Column 1: Attempt 1 -->
+        <div class="diff-column">
+          <div class="diff-pill-header pill-att1">
+            <span>Attempt 1 (Baseline Run)</span>
+            <span>Score: 7.2 / 10</span>
+          </div>
+
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--slate-500); margin-bottom: 4px;">Prompt Submitted:</div>
+            <div class="diff-content-box" style="font-family: var(--font-mono); font-size: 12px;">
+              Please summarize the campaign performance from the provided Lazada sales numbers and tell me if CAC is too high.
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--slate-500); margin-bottom: 4px;">AI Output Generated:</div>
+            <div class="diff-content-box">
+              <strong>Campaign Performance Summary</strong><br>
+              The campaign generated 1,450 orders with a total ad spend of SGD 28,400. Overall CAC stands at SGD 19.58, which is moderately high compared to previous quarters.
+            </div>
+          </div>
+
+          <div style="font-size: 11px; color: var(--slate-600); background: var(--slate-100); padding: 8px; border-radius: 4px;">
+            ⚠️ Missing role specification, missing citation of SOP-MKT-042, output format is unstructured.
+          </div>
+        </div>
+
+        <!-- Column 2: Attempt 2 -->
+        <div class="diff-column">
+          <div class="diff-pill-header pill-att2">
+            <span>Attempt 2 (SOP-Grounded Run)</span>
+            <span>Score: 8.8 / 10 (+1.6 pts)</span>
+          </div>
+
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--slate-500); margin-bottom: 4px;">Prompt Submitted:</div>
+            <div class="diff-content-box" style="font-family: var(--font-mono); font-size: 12px; background: #f0fdf4;">
+              Role: Senior Commercial & Media Analyst at Intrepid.<br>
+              Context: Apply guidelines from SOP-MKT-042 (CAC anomaly flag threshold: >25% WoW).<br>
+              Task: Analyze the attached Q4 Lazada Mega-Campaign metrics.<br>
+              Constraints: 1. Identify any campaigns where CAC exceeded target by >25%...
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--slate-500); margin-bottom: 4px;">AI Output Generated:</div>
+            <div class="diff-content-box" style="background: #f0fdf4;">
+              <strong>Executive Summary</strong><br>
+              • Anomaly Triggered per SOP-MKT-042: <strong>Campaign B</strong> experienced a +32.4% CAC spike (SGD 26.50 vs target SGD 20.00), breaching threshold.<br>
+              • Formatted markdown table generated with 3 immediate action items.
+            </div>
+          </div>
+
+          <div style="font-size: 11px; color: #15803d; background: #dcfce7; padding: 8px; border-radius: 4px;">
+            ✓ Strict role framing, SOP thresholds applied, structured markdown table generated.
+          </div>
+        </div>
+
+      </div>
+
+      <div style="padding: 14px 24px; background: var(--slate-50); display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 12px; color: var(--slate-600);">
+          Demonstrates core product principle: <em>"Output là đích, kỹ thuật prompt là phương tiện."</em>
+        </span>
+        <button class="btn-run-ai" onclick="closeCompareModal()">
+          Close Comparison
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================================================
+       ROSTER DISCREPANCY REPORT MODAL
+       ============================================================================== -->
+  <div class="modal-backdrop" id="roster-report-modal">
+    <div class="modal-dialog" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-title">Report Roster Discrepancy</div>
+        <button class="modal-close-btn" onclick="closeRosterReportModal()">✕</button>
+      </div>
+      <form onsubmit="submitRosterDiscrepancyReport(event)" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+        <p style="font-size: 13px; color: var(--slate-600);">
+          If your Department, Name, or Country is incorrect, submit a correction to Lead Trainer Vo Tu Duc. Your permissions will remain safe until approved.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Correct Department / Business Function</label>
+          <select class="form-select">
+            <option>Commercial Operations</option>
+            <option>Brand Management</option>
+            <option>Customer Care</option>
+            <option>Warehouse & Logistics</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reason / Notes</label>
+          <textarea class="form-textarea" rows="3" placeholder="Explain the discrepancy..." required></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" class="ctrl-btn" onclick="closeRosterReportModal()">Cancel</button>
+          <button type="submit" class="btn-run-ai">Submit to Trainer Duc</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="prototype.js"></script>
+</body>
+</html>
+

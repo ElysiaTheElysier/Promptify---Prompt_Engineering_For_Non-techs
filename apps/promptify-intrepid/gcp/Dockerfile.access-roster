@@ -1,0 +1,2 @@
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:da9761144deae2a541cf1adb22dadddcb0cd5b0bfd1ab77ceb36001e706ae77b
+COPY --chown=node:node src/services/productionServerService.ts src/services/rosterWorkbookService.ts src/services/rosterTableService.ts src/services/workspaceInspectionService.ts src/services/googleRosterService.ts src/services/workspaceSourcePolicyService.ts src/services/rosterWorkerService.ts /app/src/services/

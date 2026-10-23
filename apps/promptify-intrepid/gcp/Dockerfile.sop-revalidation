@@ -1,0 +1,2 @@
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:77fa1dd043279d6d57a77b84da375fc574465e9cd75878ac9cfa814568684a72
+COPY --chown=node:node src/services/productionServerService.ts /app/src/services/

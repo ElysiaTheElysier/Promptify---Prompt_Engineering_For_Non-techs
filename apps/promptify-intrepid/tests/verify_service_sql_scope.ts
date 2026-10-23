@@ -1,0 +1,24 @@
+import assert from 'node:assert/strict';
+import {configureSqlPoolForTests,sqlTransaction,withServiceScope} from '../src/services/cloudPostgresService';
+process.env.NODE_ENV='test';
+const connections:Array<{queries:string[];released:boolean}>=[];
+configureSqlPoolForTests({supportsServiceScope:true,async connect(){const state={queries:[] as string[],released:false};connections.push(state);let active=false;return {async query(sql:string){assert.equal(active,false,'shared connection queries must be serialized');active=true;await Promise.resolve();state.queries.push(sql);active=false;return {rows:[]};},release(){state.released=true;}};}});
+await withServiceScope(async()=>{
+ await Promise.all([1,2,3].map(n=>sqlTransaction(undefined,db=>db.query('SELECT '+n))));
+ await withServiceScope(()=>sqlTransaction(undefined,db=>db.query('SELECT nested')));
+ await sqlTransaction({subject:'actor',email:'test@example.test'},db=>db.query('SELECT private'));
+});
+assert.equal(connections.length,2,'service reads share one transaction; actor gets a separate connection');
+assert.equal(connections[0].queries.filter(q=>q==='BEGIN').length,1);
+assert.ok(connections[0].queries.includes('SET LOCAL ROLE service_role'));
+assert.ok(!connections[0].queries.includes('SELECT private'));
+assert.ok(connections[1].queries.includes('SET LOCAL ROLE authenticated'));
+assert.ok(connections.every(c=>c.released&&c.queries.at(-1)==='COMMIT'));
+await assert.rejects(()=>withServiceScope(async()=>{throw Error('stop');}),/stop/);
+assert.equal(connections.at(-1)?.queries.at(-1),'ROLLBACK');
+assert.equal(connections.at(-1)?.released,true);
+const before=connections.length;
+await Promise.all([1,2].map(n=>withServiceScope(()=>sqlTransaction(undefined,db=>db.query('SELECT request_'+n)))));
+assert.equal(connections.length,before+2,'concurrent requests never share their service connection');
+assert.ok(connections.slice(before).every(c=>c.queries.filter(q=>q.startsWith('SELECT request_')).length===1));
+console.log('SQL service scope PASS: fewer transactions, actor isolation, rollback/release and request isolation.');

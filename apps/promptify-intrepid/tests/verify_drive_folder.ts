@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {driveFolderId,supportedDriveSource} from '../src/services/driveFolderService.js';
+assert.equal(driveFolderId('https://drive.google.com/drive/folders/abc-123?usp=sharing'),'abc-123');
+assert.equal(driveFolderId('https://drive.google.com/drive/u/0/folders/xyz'),'xyz');
+for(const url of ['https://attacker.example/drive/folders/xyz','https://drive.google.com/file/d/xyz/view'])assert.throws(()=>driveFolderId(url));
+assert.equal(supportedDriveSource({name:'SOP.docx',mimeType:'application/octet-stream'}),true);
+assert.equal(supportedDriveSource({name:'SOP',mimeType:'application/vnd.google-apps.document'}),true);
+assert.equal(supportedDriveSource({name:'SOP.docx',mimeType:'application/octet-stream',size:String(26*1024*1024)}),false);
+assert.equal(supportedDriveSource({name:'run.exe',mimeType:'application/octet-stream'}),false);
+console.log('Drive folder URL validation, supported formats and file-size limits passed. No live calls.');

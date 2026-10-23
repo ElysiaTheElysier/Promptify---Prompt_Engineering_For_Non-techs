@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';import vm from 'node:vm';import ts from 'typescript';
+const code=ts.transpileModule(fs.readFileSync('src/components/rebuild/ProductionStudioSource.tsx','utf8'),{compilerOptions:{jsx:ts.JsxEmit.React,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+let states=[],refs=[],cursor=0,rc=0,calls=[];
+const React={createElement:(type,props,...children)=>({type,props:{...props,children}}),useState(initial){const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;return [states[i],v=>states[i]=typeof v==='function'?v(states[i]):v];},useRef(v){return refs[rc++]??={current:v};},useEffect(){}};
+const module={exports:{}};const rubric=[{key:'accuracy',weight:100,active:true}];
+const require=name=>name==='react'?{...React,default:React}:name.includes('weightedRubric')?{DEFAULT_RUBRIC:rubric,rebalanceRubric:x=>x}:name.includes('productI18n')?{useProductLanguage:()=> 'en'}:name.includes('sourceUiText')?{sourceUiText:x=>x}:new Proxy({},{get:(_,key)=>String(key)});
+vm.runInNewContext(code,{module,exports:module.exports,require,structuredClone,Date,crypto:{randomUUID:()=> 'id'}});
+const lesson={id:'lab',lesson_key:'L1',title:'Lesson',scenario:'brief',task_goal:'goal',system_instruction:'old',starter_prompt:'prompt',studio:{revision:1,scaffold:[],variables:[],materials:[],rubric,awards:{}}};
+const props={snapshot:{selectedClass:{id:'class',client_id:'client',client_name:'Client',class_code:'C',department:'Tech'},classes:[],lessons:[lesson],attempts:[],sops:[]},busy:false,onAction:async(name,payload,after)=>{calls.push({name,payload});after?.(name==='saveStudio'?{revision:2}:{output:'result'});},navigate(){}};
+const render=()=>{cursor=0;rc=0;return module.exports.default(props);};
+const nodes=x=>!x||typeof x!=='object'?[]:[x,...[x.props?.children].flat(Infinity).flatMap(nodes)];
+const text=x=>typeof x==='string'?x:x&&typeof x==='object'?[x.props?.children].flat(Infinity).map(text).join(''):'';
+render();states[0]={...states[0],viewMode:'studio',activeTab:'scope',selectedLab:{...states[0].selectedLab,id:'lab',code:'L1',title:'Lesson'},sandboxPrompt:'prompt'};
+let tree=render();nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='').props.onChange({target:{value:'updated'}});
+states[0]={...states[0],activeTab:'rubric'};tree=render();const run=nodes(tree).find(n=>n.type==='button'&&text(n).includes('Run Test in Sandbox'));assert.equal(run.props.disabled,true);run.props.onClick();assert.equal(calls.length,0);
+nodes(tree).find(n=>n.type==='button'&&text(n)==='Save configuration').props.onClick();assert.equal(calls[0].name,'saveStudio');
+tree=render();nodes(tree).find(n=>n.type==='button'&&text(n).includes('Run Test in Sandbox')).props.onClick();assert.equal(calls[1].name,'sandboxGenerate');
+console.log('Mentor Studio PASS: unsaved edits block sandbox until explicit save.');
+
+// A snapshot refresh must not silently advance the revision of an editor opened earlier.
+states=[];refs=[];calls=[];lesson.studio.revision=1;
+tree=render();nodes(tree).find(n=>n.type==='button'&&text(n).includes('Chỉnh sửa / Cấu hình')).props.onClick();
+tree=render();nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='brief').props.onChange({target:{value:'my local revision'}});
+lesson.studio.revision=77;tree=render();
+nodes(tree).find(n=>n.type==='a'&&text(n).includes('Control Center')).props.onClick({preventDefault(){}});
+tree=render();assert.ok(text(tree).includes('Leave without saving?'),'SPA navigation must warn before discarding dirty edits');
+nodes(tree).find(n=>n.type==='button'&&text(n)==='Stay in Studio').props.onClick();tree=render();
+assert.equal(nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='my local revision').props.value,'my local revision');
+nodes(tree).find(n=>n.type==='button'&&text(n)==='Save configuration').props.onClick();
+assert.equal(calls[0].payload.expectedRevision,1,'save uses opened revision, letting server reject conflicting edits');
+assert.equal(calls[0].payload.config.revision,1);
+tree=render();nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='my local revision').props.onChange({target:{value:'next edit'}});
+tree=render();nodes(tree).find(n=>n.type==='button'&&text(n)==='Save configuration').props.onClick();
+assert.equal(calls[1].payload.expectedRevision,2,'successful save advances the loaded revision');
+console.log('Studio conflict/navigation PASS: pinned revision, saved revision update, dirty navigation warning and retained edits.');

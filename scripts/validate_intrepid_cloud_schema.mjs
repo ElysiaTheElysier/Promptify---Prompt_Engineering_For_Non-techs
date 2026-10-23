@@ -1,0 +1,61 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+const modulePath=process.argv[2]||'../tmp/intrepid-schema-postgres/node_modules/@electric-sql/pglite/dist/index.js';
+const {PGlite}=await import(pathToFileURL(path.resolve(modulePath)).href);
+const db=new PGlite();const folder=path.resolve('docs/intrepid-google-cloud');
+const sql=fs.readFileSync(path.join(folder,'cloud-sql-schema.candidate.sql'),'utf8');
+try { await db.exec(sql); } catch(e){console.error('DDL FAILED:',e.message,'position',e.position);if(e.position)console.error(sql.slice(Math.max(0,Number(e.position)-180),Number(e.position)+180));await db.close();process.exit(1);}
+const tables=(await db.query(`SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename`)).rows;
+const columns=(await db.query(`SELECT table_name,column_name,ordinal_position,data_type,udt_name,is_nullable,column_default,character_maximum_length,numeric_precision,numeric_scale FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,ordinal_position`)).rows;
+const constraints=(await db.query(`SELECT c.relname AS table_name,k.conname AS name,k.contype AS type,pg_get_constraintdef(k.oid) AS definition FROM pg_constraint k JOIN pg_class c ON c.oid=k.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' ORDER BY c.relname,k.conname`)).rows;
+const indexes=(await db.query(`SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' ORDER BY tablename,indexname`)).rows;
+const functions=(await db.query(`SELECT p.proname AS name,pg_get_function_identity_arguments(p.oid) AS arguments,pg_get_function_result(p.oid) AS result,p.prosecdef AS security_definer,pg_get_functiondef(p.oid) AS definition FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' ORDER BY p.proname,arguments`)).rows;
+const policies=(await db.query(`SELECT * FROM pg_policies WHERE schemaname='public' ORDER BY tablename,policyname`)).rows;
+const triggers=(await db.query(`SELECT c.relname AS table_name,t.tgname AS name,pg_get_triggerdef(t.oid) AS definition FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND NOT t.tgisinternal ORDER BY c.relname,t.tgname`)).rows;
+const sequences=(await db.query(`SELECT * FROM information_schema.sequences WHERE sequence_schema='public'`)).rows;
+const grants=(await db.query(`SELECT grantee,table_name,privilege_type FROM information_schema.table_privileges WHERE table_schema='public' AND grantee IN ('anon','authenticated','service_role') ORDER BY table_name,grantee,privilege_type`)).rows;
+const catalog={status:'Fresh candidate instantiated in PGlite PostgreSQL; not a dump of live Supabase or Cloud SQL',tables,columns,constraints,indexes,functions,policies,triggers,sequences,grants};
+fs.writeFileSync(path.join(folder,'catalog.validated.json'),JSON.stringify(catalog,null,2));
+const runtime=JSON.parse(fs.readFileSync(path.join(folder,'runtime-contracts.json')));
+const missingTables=Object.keys(runtime.tables).filter(t=>!tables.some(row=>row.tablename===t));const missingRpcs=Object.keys(runtime.rpcs).filter(f=>!functions.some(row=>row.name===f));
+const result={engine:(await db.query('SELECT version()')).rows[0],tables:tables.length,columns:columns.length,constraints:constraints.length,indexes:indexes.length,functions:functions.length,policies:policies.length,triggers:triggers.length,sequences:sequences.length,missingTables,missingRpcs};
+fs.writeFileSync(path.join(folder,'validation-results.json'),JSON.stringify(result,null,2));
+// All fixtures exist only in this in-memory database. No production data read/write.
+const user='10000000-0000-4000-8000-000000000001',subject='20000000-0000-4000-8000-000000000001';
+await db.exec(`INSERT INTO users(id,email,full_name,role,auth_provider_id) VALUES('${user}','learner@example.test','Schema Test Learner','learner','${subject}');
+INSERT INTO learners(id,user_id) VALUES('30000000-0000-4000-8000-000000000001','${user}');
+INSERT INTO clients(id,name,industry) VALUES('40000000-0000-4000-8000-000000000001','Schema Test Client','Testing');
+INSERT INTO courses(id,title,publication_status) VALUES('50000000-0000-4000-8000-000000000001','Schema Test Course','published');
+INSERT INTO classes(id,class_code,course_id,client_id,department,start_date,end_date) VALUES('60000000-0000-4000-8000-000000000001','SCHEMA-TEST','50000000-0000-4000-8000-000000000001','40000000-0000-4000-8000-000000000001','Testing',now(),now()+interval '1 day');
+INSERT INTO enrollments(learner_id,class_id) VALUES('30000000-0000-4000-8000-000000000001','60000000-0000-4000-8000-000000000001');`);
+await db.exec(`BEGIN; SET LOCAL ROLE authenticated; SELECT set_config('request.jwt.claim.sub','${subject}',true),set_config('request.jwt.claims','{"sub":"${subject}","email":"learner@example.test","role":"authenticated"}',true);`);
+const actor=(await db.query('SELECT public.current_user_id() AS id')).rows[0].id;
+if(actor!==user)throw Error('Identity mapping mismatch');
+const allowed=(await db.query(`SELECT public.product_can_read_class('60000000-0000-4000-8000-000000000001') AS allowed`)).rows[0].allowed;
+if(!allowed)throw Error('Enrolled learner access failed');
+const denied=(await db.query(`SELECT public.product_can_read_class('60000000-0000-4000-8000-000000000099') AS allowed`)).rows[0].allowed;
+if(denied)throw Error('Cross-class access leak');
+await db.exec('COMMIT;');
+const cleared=(await db.query('SELECT auth.uid() AS id')).rows[0].id;if(cleared!==null)throw Error('Pooled identity was not cleared');
+await db.exec('BEGIN; SET LOCAL ROLE service_role;');await db.query('SELECT * FROM users');await db.query('SELECT * FROM product_awards');await db.exec('COMMIT;');
+
+// Exercise migrated award logic using deliberately synthetic imported-history fixtures.
+await db.exec(`INSERT INTO course_modules(id,course_id,title,status) VALUES('70000000-0000-4000-8000-000000000001','50000000-0000-4000-8000-000000000001','Schema Test Module','published');
+INSERT INTO lessons(id,module_id,lesson_key,title,status) VALUES('80000000-0000-4000-8000-000000000001','70000000-0000-4000-8000-000000000001','SCHEMA-TEST','Schema Test Lesson','published');
+INSERT INTO product_studio(class_id,lesson_id,updated_by,config) VALUES('60000000-0000-4000-8000-000000000001','80000000-0000-4000-8000-000000000001','${user}',
+'{"pillar":"Testing","branch":"Testing","competencies":"Testing","startTime":"","endTime":"","departments":["Testing"],"objectives":[],"variables":[],"scaffold":[],"materials":[],"state":"ACTIVE","awards":{"issuance":{"certificateOnCompletion":true,"badgeOnPass":false,"minimumAverageScore":8,"requireAttendance":true},"certificate":{"title":"Schema Test Completion","issuer":"Schema Test Academy"}}}');
+ALTER TABLE prompt_attempts DISABLE TRIGGER USER;`);
+const evaluation={contract:'weighted-v1',total:9,criteria:['groundedness','persona','format','oneshot','actionability'].map(key=>({key,score:1.8,max:2}))};
+await db.query(`INSERT INTO prompt_attempts(learner_id,class_id,lesson_id,lesson_ref_id,prompt_text,ai_output,evaluation_json,production_pass_threshold) VALUES($1,$2,$3::text,$3::text::uuid,'Synthetic prompt','Synthetic output',$4,8)`,['30000000-0000-4000-8000-000000000001','60000000-0000-4000-8000-000000000001','80000000-0000-4000-8000-000000000001',evaluation]);
+await db.exec('ALTER TABLE prompt_attempts ENABLE TRIGGER USER;');
+await db.query('SELECT product_refresh_awards($1,$2)',['60000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001']);
+if((await db.query('SELECT count(*)::int AS n FROM product_awards')).rows[0].n!==0)throw Error('Certificate issued without required attendance');
+await db.exec(`INSERT INTO product_attendance(class_id,lesson_id,learner_id,present,recorded_by,reason) VALUES('60000000-0000-4000-8000-000000000001','80000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001',true,'${user}','Synthetic schema test');`);
+await db.query('SELECT product_refresh_awards($1,$2)',['60000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001']);
+const award=(await db.query('SELECT id,evidence FROM product_awards')).rows[0];if(!award||award.evidence.rule!=='completed_published_course')throw Error('Certificate evidence mapping failed');
+await db.query('SELECT product_refresh_awards($1,$2)',['60000000-0000-4000-8000-000000000001','30000000-0000-4000-8000-000000000001']);
+const replay=(await db.query('SELECT id FROM product_awards')).rows;if(replay.length!==1||replay[0].id!==award.id)throw Error('Duplicate certificate issuance');
+result.behaviorTests=['certificate requires configured attendance','completed course produces real award evidence','repeated refresh preserves award ID', 'identity mapping','enrolled class allowed','unassigned class denied','transaction claims cleared','trusted backend base/private table grants'];
+if(missingTables.length||missingRpcs.length)throw Error('Runtime contracts missing');
+fs.writeFileSync(path.join(folder,'validation-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));await db.close();

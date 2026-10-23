@@ -1,0 +1,12 @@
+import data from './mockup-data.json';
+import {mapAiEvaluationToRubricAudit as mapActual, evaluatePromptRubric as rubricActual} from './production-baseline/src/services/llmService.ts';
+const d:any=data;
+export const LABS_DATA=d['UI-04'].labs.map((l:any)=>({...l,badge:'Codelab '+l.number,focusSkill:l.subtitle}));
+export const mapAiEvaluationToRubricAudit=mapActual;
+export const evaluatePromptRubric=rubricActual;
+const emit=(detail:any)=>window.dispatchEvent(new CustomEvent('guardrail-run',{detail}));
+export async function executePromptStream(_p:any,_s:any,lab:any,_cfg:any,onChunk:any){const output=lab.simulatedImprovedOutput;emit({phase:'execute',progress:0});await new Promise<void>(resolve=>{let progress=0;const timer=setInterval(()=>{progress+=25;onChunk(output.slice(0,Math.ceil(output.length*progress/100)));emit({phase:'execute',progress});if(progress===100){clearInterval(timer);resolve()}},200)});return {output,tokenCount:342,latencyMs:820,mode:'live',model:'LOCAL FIXTURE — no network'};}
+export async function evaluatePromptLive(params:any){emit({phase:'evaluate',progress:100});await new Promise(resolve=>setTimeout(resolve,450));const total=Number(sessionStorage.getItem('gr-score')||9.2),version=Number(sessionStorage.getItem('gr-version')||0)+1;sessionStorage.setItem('gr-version',String(version));if(total<5)sessionStorage.setItem('gr-failed',String(Number(sessionStorage.getItem('gr-failed')||0)+1));emit({phase:'done',progress:100,score:total,prompt:params?.learnerPrompt,version});return {scores:{taskCompletion:2*total/9.2,groundedness:2*total/9.2,formatAdherence:2*total/9.2,constraintCompliance:1.6*total/9.2,businessUsability:1.6*total/9.2},total,strengths:d['UI-07'].strengths,improvements:['Add an explicit on-duty manager assignment tag.','Refine the action phrasing before forwarding to the responsible PIC.'],nextHint:'Include the on-duty manager assignment tag in the Required Action column.'};}
+export const dbService={getPromptAttempts:async()=>[],recordPromptAttemptAndProgress:async()=>({attempt:{id:'LOCAL-ATTEMPT'}}),updatePromptAttemptEvaluation:async()=>({})};
+export const supabase={auth:{signInWithOAuth:async()=>({data:{url:(window as any).COMBINED_FILES[1]},error:null}),getSession:async()=>({data:{session:null}})},functions:{invoke:async()=>({data:null,error:null})}};
+export const supabaseUrl='';export const supabaseAnonKey='';export const isSupabaseConfigured=false;

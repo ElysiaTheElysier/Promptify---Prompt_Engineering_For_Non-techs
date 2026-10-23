@@ -1,0 +1,394 @@
+Oct 5, 2026 
+
+Attendees:Vo Tu Duc
+
+Following up after meeting on Oct 5, 2026 
+
+Đức’s thoughts
+
+Về nguồn lực nhân sự: Ít, multiple tasks, cần tìm cách cân bằng vision product hiện tại (1 platform) thành 1 sản phẩm nhỏ hơn, build nhanh hơn, cụ thể như dưới đây.
+Bối cảnh: Đức hiện tại đang cần tạo Promptify và cũng đang có nhiệm vụ phải làm đào tạo dạy prompt cho người trong công ty Intrepid, một công ty về Ecommerce Enbaler.
+Thu hẹp phạm vi sản phẩm
+Tạo ra 1 version Promptify, bản tiếng Anh, dành riêng cho Intrepid, với bối cảnh của Intrepid cụ thể như sau: 
+Đức là trainer duy nhất, do đó, nhanh chóng hiểu cấu hình nên như thế nào ở phía giáo viên; hoặc cấu hình riêng cho phía các phòng ban.
+Intrepid có 27 phòng ban (aka Business functions), 6 nước khác nhau.
+550 SOPs documents/videos có sẵn, có thể tiếp cận trực tiếp các video/documents này, sẵn sàng cho phân tích sâu để lấy ngữ cảnh để tạo bài giảng. Ngoài ra, có thể yêu cầu các trưởng bộ phận input thêm thông tin về bản cập nhật SOPs và/hoặc thêm data. Nếu áp dụng phân theo Department or Business Functions, nên tạo form để leader/head or PIC tải data lên thông qua form của Promptify để từ đó lấy được data thực tế, song song với SOPs hiện tại.
+Build riêng cho nhân viên của Intrepid thực hành. Theo đó, thông tin của User để xác định identity gồm: email/business funtions/department/country. Kết hợp với các business metrics khác để tracking user và tracking impact của Prompify.
+Với cách tiếp cận này, số loại user trên hệ thống sẽ thu hẹp lại còn:
+Người học: 
+Học theo group/cohort của từng Business function.
+SSO với domain của Intrepid. Ai có email intrepid thì login vào được. Sau khi login cần yêu cầu điền form để khai báo business function, countries. → từ đây reroute đến material resources tương ứng của phòng ban đó.  Trên thực tế, đã có bản sao danh sách email và họ tên, business function của từng phòng ban → có thể pre-onboarding họ và khi họ login vào, thì chỉ yêu cầu xác nhận là xong, nếu thông tin đúng, nhấn xác nhận, thông tin sai → yêu cầu sửa thông tin sau đó xác nhận. Sau bước này, Users sẽ được redirect đến zone đã tạo sẵn cho từng business functions/department.
+Người dạy:
+Vo Tu Duc
+SSO để xem thông tin các phòng ban + data tương ứng. 
+Quản lý lớp, quản lý cohort, quản lý học liệu, quản lý kiến thức lý thuyết, quản lý course.
+Người hỗ trợ: Head or Admin of Business Funtions
+Login để xem kết quả mọi người trong phòng ban của mình học ntn
+Xem library prompt chung
+Nhập tài liệu mà Vo Tu Duc yêu cầu, gồm các nhóm: 
+(SOP) Xác nhận xem link SOPs document đã chính xác or đủ hay chưa? Cần cập nhật gì ko?
+Cung cấp Real Data as Sample data: Giúp Đức tạo được bài giảng dựa trên khung sườn bài giảng prompt đã tạo ra, tùy biến ngữ cảnh cho riêng phòng ban của họ khi prompt.
+
+
+
+
+
+
+Trong quá trình thu hẹp sản phẩm, vẫn đảm bảo kiến trúc có khả năng mở rộng, cụ thể: 
+Hỗ trợ đa ngôn ngữ, trước mắt làm cho Tiếng việt và tiếng anh. Nhưng sử dụng i18n để đảm bảo có thể mở rộng thêm ngôn ngữ khác bất cứ khi nào.
+Về phần báo cáo thì phải làm sâu hơn như đã đề cập ở lần cập nhật trước đây.
+Phần thanh toán: Tạm thời xem tất cả user đều là paid users
+Phần API key: Sử dụng chung 1 API key của Intrepid thông qua GCP tạo trong môi trường của Intrepid → giảm tải thao tác của user là phải tự cấp key. Tuy nhiên, vẫn tạo ra ô để cho user nhìn thấy API key. Riêng ý này, rất quan trọng là cần phải ràng buộc privacy của Key, chỉ cho phép Key được sử dụng khi user là thuộc intrepid + họ đang prompt trên Promptify thay vì sử dụng Key đó cho nhiều mục tiêu khác nhau.
+Sự thành công của bản làm cho Intrepid, sẽ giúp nhân sự thực hiện dự án có cơ hội cọ xát, để sau đó nâng cấp hệ thống lên ở giai đoạn sau.
+Giai đoạn Mở rộng: Khi làm được cho Intrepid rồi và hoạt động hiệu quả, sẽ tìm cách clone hoặc nhân rộng bản này cho từng doanh nghiệp khác nhau. Khi tạo bản đó, thì có tùy biến về logo, màu sắc..v.v. giống kiểu kiến trúc multiple tenant. Ví dụ, tiếp theo sẽ giảng dạy cho Agribank thì tạo bản clone.
+
+Structured Refinement & Actionable Summary of Đức’s Thoughts
+Based on the analysis of the current constraints, goals, and context surrounding the Promptify initiative for Intrepid, below is the consolidated strategic framework:
+1. Strategic Scope & Resource Balancing
+Core Objective: Pivot from building a full multi-tenant platform immediately to delivering a lightweight, highly targeted MVP specifically for Intrepid (an E-commerce Enabler).
+Resource Optimization: Leverage Vo Tu Duc as the single trainer/admin initially to validate curriculum, workflow setups, and system performance with minimal engineering overhead.
+2. User Roles & Access Hierarchy
+Learners (Intrepid Employees): SSO login via Intrepid corporate domain. Pre-onboarded profile routing users to domain-specific training zones based on their department (27 business functions across 6 countries).
+Trainer / Master Admin (Vo Tu Duc): Full permissions to manage cohorts, curriculum materials, sample datasets, and cross-departmental user progress.
+Department Heads / Admins: Access to department learning analytics, shared prompt libraries, and uploading real operational datasets/SOP updates.
+3. Key Product Features & Technical Constraints
+Context-Aware Training: Integrates Intrepid’s 550 SOPs and department-submitted sample data to generate realistic prompt engineering exercises.
+API Key Governance & Privacy: Central Intrepid GCP API key utilized behind backend guardrails, ensuring keys are securely locked to authorized Promptify user sessions only.
+Internationalization (i18n): Built-in support for English and Vietnamese, architected for effortless localization into other regional languages.
+4. Scaling & Expansion Roadmap
+Phase 1 (Validation): Prove product impact and user engagement internally with Intrepid's 27 business functions.
+Phase 2 (Multi-Tenant Replication): Clone and brand instance environments (custom logo, color palette, domain context) for enterprise clients like Agribank.
+Preparation & Resource Handoff Checklist for Engineering Team
+550 SOP Documents & Training Videos: Compile access links to all existing SOP documentation and video materials across Intrepid's 27 business functions to provide baseline training context.
+Pre-Onboarded Employee Roster Data: Prepare a structured roster (Google Sheet/Excel) containing employee names, business emails (@intrepid.asia), business functions/departments, and operating countries for user pre-onboarding and SSO routing.
+Departmental Sample Datasets: Collect realistic operational sample data from Department Heads (e.g., e-commerce campaign logs, SLA metrics, ticket histories) to customize prompt exercises per department.
+i18n Localization Translation Assets: Provide UI string keys and translation dictionaries for English and Vietnamese, structured for i18n support to allow future language expansion.
+GCP API Key & Privacy Governance Guidelines: Deliver the central Intrepid GCP Service Account API key along with explicit privacy guardrails restricting key usage strictly to verified Promptify sessions.
+
+Customer Journeys & User Stories
+Customer Journeys
+Learner Journey (Intrepid Employees): Authenticates via corporate SSO, confirms/updates pre-onboarded profile details, and routes directly into department-specific training zones. Engages in interactive, hands-on prompt engineering practice tailored to their specific daily workflows, actual operational datasets, and official SOPs.
+Trainer / Enterprise Training Lead Journey (Vo Tu Duc - Solo Execution Guru): Performs end-to-end curriculum design and execution. Deep-dives into and analyzes 550+ SOPs and department sample data across all 27 business functions, converts operational workflows into tailored prompt engineering lessons/exercises, manages learning cohorts, and tracks/measures multi-departmental training impact.
+Department Head / Admin Journey: Accesses learning analytics for their department members, reviews shared prompt libraries, and uploads/updates relevant SOPs and real operational sample datasets to keep exercises aligned with evolving business needs.
+User Stories to Enable
+As an Intrepid employee, I want to log in via corporate SSO so that I can access my department's tailored training zone.
+As an employee, I want to practice prompt engineering hands-on directly with my business unit's real SOPs and operational data so that I can immediately apply AI skills to my daily tasks.
+As an Enterprise Training Lead (Vo Tu Duc), I want to analyze SOPs and sample data across 27 business functions to design tailored prompt engineering curricula and practical exercises.
+As an Enterprise Training Lead (Vo Tu Duc), I want to manage cohorts and track overall training performance and impact across all business functions.
+As a Department Head, I want to upload SOP updates and real operational sample data to customize the prompt exercises for my team.
+As a Department Head, I want to view learning analytics for my department members.
+As a System Admin, I want backend privacy guardrails on the central Intrepid GCP API key so it is restricted strictly to authorized Promptify sessions.
+As a Global User, I want i18n support for English and Vietnamese to ensure seamless localization.
+As a System Admin, I want an Admin Theme Customizer so that I can configure dynamic multi-tenant brand theme colors (Background, Primary Accent, Success, Alert) to support white-label customization for future enterprise clients.
+
+
+BUSINESS REQUIREMENTS DOCUMENT (BRD 2.0)
+Project Name: Promptify Initiative for Intrepid
+1. Executive Summary & Strategic Alignment
+Background: Intrepid Asia is a leading Southeast Asian e-commerce enabler operating across 6 countries with 27 distinct business functions (departments) and over 1,150 employees. While over 80% of business users have high demand for AI application, traditional theoretical AI training fails to yield lasting productivity because users lack hands-on practice within their specific work context and operational datasets.
+Core Solution: Pivot Promptify into a tailored, context-aware internal MVP learning platform specifically engineered for Intrepid. The platform enables non-technical employees to learn and practice Prompt Engineering directly against Intrepid's official ~550 SOPs and department-specific sample datasets.
+Strategic Objective: Rapidly validate product impact, elevate organizational AI maturity, reclaim operational capacity across 27 departments, and establish a repeatable enterprise B2B deployment model.
+2. Business Objectives & Key Performance Indicators (KPIs)
+Primary Objective: Build and deploy a lightweight, highly targeted Promptify MVP for Intrepid within a 4-week Sprint framework.
+Quantifiable Success Metrics:
+User Adoption Rate: 100% active onboarding across targeted departmental cohorts within 14 days of launch.
+Skill Mastery Score: ≥80% average score on department-specific prompt practical exercises.
+Operational Capacity Reclaimed: Estimated 30-50% reduction in lead time for standard routine tasks (e.g., campaign brief generation, customer service response, catalog auditing).
+API Cost Efficiency & Governance: 0% unauthorized API usage outside Promptify sessions via automated backend rate limiting and token caps.
+3. Stakeholder Matrix & Target User Profiles
+Role / Persona
+Target Audience
+Primary Responsibilities & Needs
+Learner (Intrepid Employee)
+Non-tech business users across 27 departments & 6 countries
+Log in via corporate SSO, access department training zones, practice prompt engineering hands-on using real SOPs & sample data.
+Enterprise Training Lead (Vo Tu Duc)
+Solo Execution Guru / Trainer / Master Admin
+End-to-end curriculum design, analysis of 550+ SOPs and operational data, cohort management, exercise configuration, and cross-departmental impact tracking.
+Department Head / Admin
+Department Leaders & Operations PICs
+Upload/update department SOPs and operational sample datasets, view team learning analytics, and review department prompt libraries.
+System Admin / Governance
+IT & Tech Leadership
+Manage central GCP API key guardrails, monitor system rate limits, enforce RLS security policies, and maintain SSO integrity.
+
+4. Scope Definition (In-Scope vs. Out-of-Scope)
+In-Scope (Phase 1 - Intrepid Internal MVP)
+Authentication & SSO: One-touch Google SSO restricted strictly to @intrepid.asia email domain with pre-onboarded profile confirmation (Email, Full Name, Department, Country).
+Context-Aware Dual-Pane Playground: Real-time streaming playground (SSE) featuring scenario context, official SOP reference, sample data, prompt workspace, and telemetry badges (token count, latency ms).
+Curriculum & Exercise Engine: Department-tailored prompt engineering lessons (Basic to Advanced) designed and configured by Vo Tu Duc based on 550+ SOPs and department sample data.
+Centralized API Key Governance: Single Intrepid GCP Service Account API key managed backend-side with strict session binding, rate limiting (20 req/min), and token budgets (50k tokens/user/session).
+i18n Multilingual Support: Built-in localization support for English and Vietnamese, architected for multi-country expansion.
+Department Analytics & Prompt Library: Shared team prompt libraries and department-level mastery dashboards.
+Out-of-Scope (Non-Goals for Phase 1)
+Public user registration or external non-Intrepid email access.
+B2B multi-tenant custom white-labeling (reserved for Phase 2 scaling).
+Direct integration into third-party ERPs (e.g., NetSuite writeback) during initial learning phase.
+End-user personal API key management (handled centrally via Intrepid GCP).
+5. Detailed Operational Workflows & Business Rules
+Workflow 1: Learner Onboarding & Routing:
+1. User authenticates via Google SSO (@intrepid.asia).
+2. System checks user against pre-onboarded Roster database.
+3. User confirms or updates Business Function and Country location.
+4. System automatically redirects user to their dedicated Department Zone containing department-specific SOPs and sample exercises.
+Workflow 2: Hands-On Practice & Exercise Evaluation:
+1. Learner opens an assigned prompt exercise (e.g., E-commerce Campaign Brief Generation for Marketing).
+2. System injects relevant SOP context and sample dataset into the prompt playground.
+3. Learner drafts and iterates prompts in real time with streaming responses.
+4. System evaluates prompt against structured evaluation criteria (RCTCF framework: Role, Context, Task, Constraint, Format).
+Workflow 3: Central API Key Privacy & Rate Limiting:
+1. All LLM API calls are routed through backend interceptors utilizing Intrepid's GCP Service Account Key.
+2. Backend validates active @intrepid.asia user session token.
+3. Requests exceeding 20 req/min or 50,000 tokens per session are gracefully throttled with 429 / 403 status messages.
+6. Downstream Agent Handover Schema (<prd_handover>)
+<prd_handover version="2.0">
+  <project_metadata>
+    <project_name>Promptify Initiative for Intrepid</project_name>
+    <target_organization>Intrepid Asia</target_organization>
+    <lead_trainer>Vo Tu Duc (duc.vo@intrepid.asia)</lead_trainer>
+    <target_departments_count>27</target_departments_count>
+    <operating_countries_count>6</operating_countries_count>
+    <sop_documents_count>550</sop_documents_count>
+  </project_metadata>
+
+  <core_technical_requirements>
+    <auth_provider>Google OAuth 2.0 (Intrepid Domain Whitelist)</auth_provider>
+    <api_key_governance>Central GCP Service Account API Key with session-bound backend interceptor</api_key_governance>
+    <rate_limiting>Sliding-Window 20 requests/minute per user; max 50,000 tokens/session</rate_limiting>
+    <localization>i18n engine supporting EN and VN</localization>
+    <playground_architecture>Dual-pane streaming output via SSE on HTTP/2</playground_architecture>
+    <database_schema>Supabase PostgreSQL with Row Level Security (RLS) enabled across USERS, CLASSES, ENROLLMENTS, LESSONS, PROMPT_ATTEMPTS</database_schema>
+  </core_technical_requirements>
+
+  <data_assets_required>
+    <asset id="1">550 SOP Documents &amp; Video access links across 27 departments</asset>
+    <asset id="2">Employee Roster Google Sheet (Email, Full Name, Department, Country)</asset>
+    <asset id="3">Departmental Operational Sample Datasets (Campaign logs, CS tickets, Catalog listings)</asset>
+    <asset id="4">UI String Translation Dictionaries for i18n (EN, VN)</asset>
+  </data_assets_required>
+</prd_handover>
+7. Risk Management & Mitigation Matrix
+Risk Factor
+Impact
+Likelihood
+Mitigation Strategy
+API Key Leakage / Abuse
+High
+Low
+Lock GCP API key inside GCP Secret Manager; strictly enforce backend session authentication for every LLM request.
+Google Sheets Sync Quota Limit (429)
+Medium
+Medium
+Implement Redis caching layer with 5-minute TTL and exponential backoff retry strategy for roster sync.
+Department Context Mismatch
+Medium
+Low
+Engage Department Heads to review and validate SOP links and sample datasets prior to cohort deployment.
+Language / Localization Gaps
+Low
+Low
+Enforce strict i18n translation keys across UI and lesson templates.
+
+
+
+PRODUCT REQUIREMENTS DOCUMENT (PRD 1.0)
+Project Name: Promptify Initiative for Intrepid
+1. Executive Summary & Press Release
+Executive Summary: The Promptify Initiative for Intrepid transforms standard AI education into an internal, context-aware learning platform designed specifically for Intrepid Asia. Operating across 6 countries and 27 business functions, Intrepid's 1,150+ workforce requires a hands-on learning environment grounded in their actual daily work. Promptify provides direct access to ~550 SOPs and operational sample datasets, allowing non-technical employees to master prompt engineering within real work contexts.
+Press Release (Internal Annoucement): "SINGAPORE / HO CHI MINH CITY — Intrepid Asia launches Promptify, a tailored AI-Native Prompt Engineering Learning Platform across its 27 business functions. Powered by real-time LLM feedback and pre-loaded with over 550 official Standard Operating Procedures (SOPs), Promptify enables employees to transition from passive AI users to active prompt engineers, boosting operational efficiency across 6 regional markets."
+2. Business Objectives & Success Metrics
+Primary Objective: Deliver an internal MVP learning environment that drives immediate productivity gains and establishes measurable prompt engineering competency across all 27 business units.
+Key Performance Indicators (KPIs):
+Active Engagement: 100% active onboarding and exercise completion across targeted departmental cohorts within 14 days of cohort release.
+Prompt Mastery Rate: ≥85% score on RCTCF-evaluated (Role, Context, Task, Constraint, Format) prompt practical exercises.
+Operational Efficiency Gain: 30-50% reduction in lead time for standard tasks (e.g., campaign brief generation, customer service response routing, catalog formatting).
+Zero Security Breaches: 100% backend isolation of central Intrepid GCP API keys with zero external token leakage.
+3. User Personas & Critical User Journeys (CUJs)
+User Persona 1 — Learner (Intrepid Employee): Non-technical operational staff in one of 27 business functions across 6 countries. Needs straightforward, hands-on prompt practice directly integrated with daily SOPs and real operational data.
+User Persona 2 — Enterprise Training Lead (Vo Tu Duc): Solo training & execution lead responsible for end-to-end curriculum design, analyzing 550+ SOPs and operational datasets across 27 departments, managing learning cohorts, and evaluating prompt attempt analytics.
+User Persona 3 — Department Head / Admin: Department leads who oversee team progress, review shared prompt libraries, and upload/update operational datasets and SOP links.
+CUJ 1 (Learner Hands-On Practice): Authenticates via @intrepid.asia SSO → Confirms department & country → Redirected to Department Zone → Selects assigned module → Views SOP reference & sample data panel → Drafts prompt in dual-pane playground → Receives streaming output & RCTCF score breakdown → Saves optimized prompt to Department Prompt Library.
+CUJ 2 (Training Lead Content Execution - Vo Tu Duc): Logs in via Master SSO → Accesses Curriculum Management Studio → Reviews department SOPs/datasets → Configures RCTCF evaluation criteria for new module → Publishes module to target cohort → Tracks completion rates and token telemetry on global dashboard.
+4. Functional Requirements & Feature Prioritization
+Module / Feature
+Functional Requirement
+Target Persona
+Priority
+Authentication & Roster Sync
+Google OAuth 2.0 restricted to @intrepid.asia. Auto-matching against pre-onboarded Google Sheet roster for department and country assignment.
+Learner / Admin
+P0
+Dual-Pane Playground
+Split-screen editor with left panel displaying live SOP links & sample data, right panel housing prompt editor and streaming SSE response window.
+Learner
+P0
+RCTCF Evaluation Engine
+Automated evaluation scoring user prompts across Role, Context, Task, Constraint, and Format dimensions with actionable improvement feedback.
+Learner / Vo Tu Duc
+P0
+Curriculum Studio
+Content management console allowing Vo Tu Duc to bind SOPs/datasets, create exercises, and assign modules to cohorts across 27 departments.
+Vo Tu Duc
+P0
+API Proxy & Rate Limiter
+Backend gateway intercepting LLM requests using central GCP key. Implements 20 req/min rate limiting and 50k token cap per session.
+System Admin
+P0
+i18n Engine (EN/VN)
+UI translation string support for English and Vietnamese with dynamic language switcher.
+All Users
+P1
+Department Prompt Library
+Repository for high-scoring prompts curated and shared within specific business functions.
+Learner / Dept Head
+P1
+
+5. System Architecture & Technical Specifications
+Frontend Stack: Next.js 14 (App Router), React, TailwindCSS, Shadcn UI, i18next engine.
+Backend Stack: Node.js (Fastify/Express), Supabase PostgreSQL with Row Level Security (RLS), Redis for sliding-window rate limiting.
+LLM & Streaming Integration: Server-Sent Events (SSE) streaming via Google Vertex AI / GCP Service Account Key, wrapped inside a backend security proxy.
+Database Schema Architecture:
+USERS: id, email, full_name, department_id, country_code, role (learner, trainer, admin), created_at.
+DEPARTMENTS: id, name (27 business functions), sop_folder_link, admin_user_id.
+LESSONS & EXERCISES: id, department_id, title, difficulty, sop_context_text, sample_dataset_json, rctcf_rubric_json.
+PROMPT_ATTEMPTS: id, user_id, exercise_id, prompt_text, response_text, rctcf_score, tokens_used, latency_ms, created_at.
+6. UX/UI & Interface Design Guidelines
+Layout Architecture: Clean, dual-pane workstation interface. Left panel (35% width) presents the active SOP document, task context, and real sample datasets. Right panel (65% width) contains the rich prompt editor, execute button, live streaming output window, and real-time RCTCF badge feedback.
+Visual Styling & Dynamic Theme Engine: Professional enterprise layout powered by a Dynamic Multi-Tenant White-Label Theme Engine. System Admins can configure master color hex codes (Background, Primary Accent, Success, Alert) via an Admin Theme Customizer, which dynamically injects CSS variables into the WebApp to support future client scaling (e.g., Agribank).
+Accessibility & Responsiveness: Desktop-first optimization designed for 1920x1080 and 1440x900 resolutions; compliant with WCAG 2.1 AA standards.
+7. Security, Risk Management & Mitigation
+Security Risk
+Impact
+Likelihood
+Mitigation Mechanism
+GCP API Key Exposure
+Critical
+Low
+Store API key strictly in GCP Secret Manager. Route all frontend requests through backend proxy with JWT session verification.
+Cross-Department Data Leak
+High
+Low
+Enforce Supabase Row Level Security (RLS) policies isolating department sample data and attempt logs strictly to authorized users.
+Prompt Injection & Abuse
+Medium
+Medium
+Implement input sanitization middleware and sliding-window Redis rate limiters (20 req/min, 50k tokens/session).
+
+
+
+Comparison between current course in old/active version with Duc’s designed course for Intrepid.
+Copy of 05_codelab_guide - Advance Prompt Engineering.md ← for Intrepid.
+Prompt Eng for AI Engineer vs Business Users <> Linh Phạm + Khang + Dương ← for what’ve delivered on current webapp (old version).
+
+
+Based on my analysis of your two primary data sources—Source 1: The active document content (Promptify v1 / general framework) and Source 2: Your newly designed Intrepid Codelab Guide (Copy of 05_codelab_guide - Advance Prompt Engineering.md)—here is a comprehensive summary and comparison.📊 Summary of Data SourcesSource 1: Promptify v1 (Active Document / General Framework)
+Focus: Core theoretical concepts and structured lesson design for non-technical business users.
+Key Topics: System Instructions & Persona Engineering, Few-Shot Prompting & Structured Outputs, Multimodal Context & Document Analysis, and Chain-of-Thought (CoT) reasoning.
+Structure: Divided into foundational theory, platform comparison (Google AI Studio vs. Gemini Web App), a 4-step lesson plan (sample generation, zero-shot, few-shot, observability), and implementation recommendations.
+Source 2: Intrepid Codelab Guide (Module 1.5 Masterclass)
+Focus: A high-intensity, 100-minute hands-on enterprise masterclass tailored for a Regional Operations Specialist at Intrepid managing 6 Southeast Asian markets.
+Key Scenarios: Practical operational workflows (store offboarding, multi-lingual customer feedback classification in English, Vietnamese, Thai, Bahasa Indonesia, and HR Time-to-Fill SLAs).
+Hands-On Tasks:
+Task 1: Zero-Hallucination SOP Audit with exact page citations and negative constraints.
+Task 2: Few-Shot Brand Voice Classifier using multi-lingual qualitative feedback.
+Task 3: Locked System Instructions and Dynamic Variables ({{variable}}).
+Task 4: Prompt Observability & A/B Testing in Google Sheets using a 4-metric scoring rubric.
+Task 5 & 6: Enterprise asset packaging (Custom Gems, AI Studio Templates, Workspace Studio Flows, and Apps Script Webhook Function Calling).
+⚖️ Comparison: Promptify v1 vs. Intrepid Codelab Masterclass
+Comparison Dimension
+Source 1: Promptify v1 (Active Doc)
+Source 2: Intrepid Codelab Masterclass
+Target Audience
+General business / non-tech users.
+Specific regional operations & cross-functional enterprise teams at Intrepid.
+Context & Domain
+Generic business scenarios (fictional software "TaskMaster Pro").
+Real enterprise workflows (Intrepid regional retail operations, HR SLAs, WMS/PowerSell/NetSuite).
+Depth of Execution
+Conceptual explanation with basic task outlines.
+Fully fleshed-out step-by-step lab instructions, exact prompts, multi-lingual datasets, and technical automations.
+Technical Integration
+High-level mention of platform comparisons and A/B testing.
+Deep practical implementation including Apps Script Webhooks (doPost), JSON schema function declarations, and Workspace Studio Flows.
+
+🚀 What's Next?
+
+
+we can merge them into the final standard version of the Advanced Prompt Engineering course for Promptify v1.
+
+
+OR  to integrate this unified course curriculum directly into the BRD/PRD or draft the finalized curriculum structure for the webapp? 
+Proposed Merger Options: Final Standard Version of Advanced Prompt Engineering Course for Promptify v1
+← NEED TO REVIEW AND DECIDE WHAT OPTIONS.
+← tạm chọn Options 2 dưới đây để nhanh chóng tạo MVP.
+
+To create a unified, scalable course curriculum for Promptify v1 while preserving the practical depth of the Intrepid Codelab Guide, the following merger options align both resources around the three core foundational pillars: LLM Foundations for Business Users, A-to-Z Enterprise Prompting, and Business AI Workflows & Automation.
+
+Option 1: Modular Track Architecture (Standard vs. Enterprise Case Study Split)
+Core Concept: Structure the course into a universal core curriculum (Promptify v1 framework) supplemented by industry- or enterprise-specific practical codelab modules (Intrepid Masterclass).
+Pillar Mapping:
+Pillar 1: LLM Foundations: Cover foundational LLM mechanics, tokenization, temperature/Top P settings, and hallucination risks using generic concepts.
+Pillar 2: A-to-Z Prompting: Teach RTC-O, Few-Shotting, and System Instructions using standard templates, followed by Task 1 & Task 2 hands-on labs from the Codelab Guide.
+Pillar 3: Business AI Workflows: Incorporate Task 3, Task 4 (Google Sheets A/B testing), and Task 5 (Custom Gems & Workspace Studio Flows) as plug-and-play practical labs.
+Pros/Cons: Highly scalable across multiple client tenants (e.g., Intrepid, Agribank); allows easy swap of dataset modules without rewriting core theoretical lessons.
+
+Option 2: Integrated 100-Minute Masterclass Model
+Core Concept: Fully adopt the Intrepid 100-minute timed agenda structure directly into the standard Promptify v1 course offering as the primary flagship syllabus.
+Pillar Mapping:
+Pillar 1: LLM Foundations: Delivered via the 15-minute A-to-Z Theory Masterclass & Slido Poll.
+Pillar 2: A-to-Z Prompting: Delivered via Task 1 (Grounded SOP Auditing) and Task 2 (Few-Shot Brand Voice Classifier).
+Pillar 3: Business AI Workflows: Delivered via Task 3 (System Instructions & Parametric Variables), Task 4 (Prompt Observability Scorecard), and Task 5 (Asset Packaging & Workspace Studio Flows).
+Pros/Cons: Provides an immediate, field-tested, end-to-end curriculum ready for deployment; requires domain data generalization for non-Intrepid users.
+
+Option 3: Two-Tier Course Progression (Basic / Free vs. Advanced / Paid)
+Core Concept: Divide the unified content into a 2-stage learning funnel matching Promptify's commercial model.
+Tier Structure:
+Level 1 (Basic / Free): Focuses on LLM Foundations, basic RTC-O prompting, and Gemini Web App document grounding (Task 1).
+Level 2 (Advanced / Paid Masterclass): Unlocks Google AI Studio structured prompts, Few-Shotting (Task 2), System Instructions & Dynamic Variables (Task 3), Google Sheets A/B Observability (Task 4), and Custom Gems / Workspace Studio Automation Flows (Task 5).
+Pros/Cons: Directly supports lead generation and user conversion while offering a complete enterprise upskilling path.
+
+Finalized Curriculum: Integrated 100-Minute Masterclass Model (Flagship Syllabus)
+
+This finalized curriculum integrates universal core LLM foundations with the field-tested 100-minute timed agenda, serving as Promptify v1's primary flagship syllabus for enterprise business users.
+
+Time Block
+Pillar & Module
+Primary Tool & Focus
+Target Output & Deliverable
+00:00 - 00:15
+Pillar 1: LLM Foundations
+A-to-Z Theory & Baseline Check
+Slido Polls & Direct Instruction
+(Tokenization, Temperature, Hallucination Risks)
+Baseline confidence score & mental model alignment for non-tech users
+00:15 - 00:30
+Pillar 2: A-to-Z Enterprise Prompting
+Task 1: Grounded SOP Auditing
+Google Gemini Web App
+(RTC-O, PDF Grounding, Negative Constraints)
+Zero-hallucination SOP audit table with exact page citations
+00:30 - 00:45
+Pillar 2: A-to-Z Enterprise Prompting
+Task 2: Few-Shot Feedback Classifier
+Google AI Studio
+(Structured Prompts, Few-Shot Demonstrations)
+Multi-lingual feedback classification with 100% pattern/table consistency
+00:45 - 01:05
+Pillar 3: Business Workflows
+Task 3: System Instructions & Parametric Templates
+Google AI Studio
+(Locked System Personas, Dynamic {{variable}} Placeholders)
+Dynamic parameterized prompt template removing all conversational fluff
+01:05 - 01:30
+Pillar 3: Business Workflows
+Task 4: Prompt Observability & A/B Testing
+Google Sheets & AI Studio Compare Mode
+(4-Metric Scoring Rubric: Adherence, Hallucination, Noise, Quality)
+Completed A/B testing scorecard comparing baseline vs. optimized prompt quality
+01:30 - 01:40
+Enterprise Asset Deployment
+Task 5: Packaging & Live Q&A
+AI Studio Templates, Custom Gems & Workspace Studio Flows
+Deployed reusable AI Studio template, 1-click Custom Gem, and governance flow link
+
+

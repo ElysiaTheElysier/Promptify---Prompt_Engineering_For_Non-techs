@@ -1,0 +1,202 @@
+{
+  "apply_approved_rotation.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/apply_approved_rotation.ts",
+    "original": "scripts/historical/pre-separation/apply_approved_rotation.ts"
+  },
+  "apply_combined_brand.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/apply_combined_brand.mjs",
+    "original": "scripts/historical/pre-separation/apply_combined_brand.mjs"
+  },
+  "audit_source_i18n.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/audit_source_i18n.ts",
+    "original": "scripts/historical/pre-separation/audit_source_i18n.ts"
+  },
+  "build_combined_ui.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/build_combined_ui.cjs",
+    "original": "scripts/historical/pre-separation/build_combined_ui.cjs"
+  },
+  "build_mockup_aligned_ui.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/build_mockup_aligned_ui.cjs",
+    "original": "scripts/historical/pre-separation/build_mockup_aligned_ui.cjs"
+  },
+  "build_prd_gap_report.py": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/build_prd_gap_report.py",
+    "original": "scripts/historical/pre-separation/build_prd_gap_report.py"
+  },
+  "build_promptify_pm_docs.py": {
+    "app": "promptify-mvp",
+    "path": "apps/promptify-mvp/scripts/build_promptify_pm_docs.py",
+    "original": "scripts/historical/pre-separation/build_promptify_pm_docs.py"
+  },
+  "build_prompt_assist_capture.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/build_prompt_assist_capture.cjs",
+    "original": "scripts/historical/pre-separation/build_prompt_assist_capture.cjs"
+  },
+  "build_review_templates.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/build_review_templates.cjs",
+    "original": "scripts/historical/pre-separation/build_review_templates.cjs"
+  },
+  "build_ui_comment_revision.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/build_ui_comment_revision.cjs",
+    "original": "scripts/historical/pre-separation/build_ui_comment_revision.cjs"
+  },
+  "compile_production_analytics.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_analytics.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_analytics.mjs"
+  },
+  "compile_production_compare.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_compare.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_compare.mjs"
+  },
+  "compile_production_entry.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_entry.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_entry.mjs"
+  },
+  "compile_production_governance.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_governance.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_governance.mjs"
+  },
+  "compile_production_hub.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_hub.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_hub.mjs"
+  },
+  "compile_production_judge.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_judge.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_judge.mjs"
+  },
+  "compile_production_landing.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_landing.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_landing.mjs"
+  },
+  "compile_production_learner_inspector.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_learner_inspector.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_learner_inspector.mjs"
+  },
+  "compile_production_roster.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_roster.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_roster.mjs"
+  },
+  "compile_production_sop.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_sop.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_sop.mjs"
+  },
+  "compile_production_sop_inspector.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_sop_inspector.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_sop_inspector.mjs"
+  },
+  "compile_production_studio.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_studio.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_studio.mjs"
+  },
+  "compile_production_workshop.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_workshop.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_workshop.mjs"
+  },
+  "compile_production_workspace_source.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/compile_production_workspace_source.mjs",
+    "original": "scripts/historical/pre-separation/compile_production_workspace_source.mjs"
+  },
+  "diagnose_sop_publish.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/diagnose_sop_publish.ts",
+    "original": "scripts/historical/pre-separation/diagnose_sop_publish.ts"
+  },
+  "generate-curriculum-seed.mjs": {
+    "app": "promptify-mvp",
+    "path": "apps/promptify-mvp/scripts/generate-curriculum-seed.mjs",
+    "original": "scripts/historical/pre-separation/generate-curriculum-seed.mjs"
+  },
+  "generate_public_basic.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/generate_public_basic.mjs",
+    "original": "scripts/historical/pre-separation/generate_public_basic.mjs"
+  },
+  "prepare_production_deploy.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/prepare_production_deploy.mjs",
+    "original": "scripts/historical/pre-separation/prepare_production_deploy.mjs"
+  },
+  "prepare_rebuild_staging.mjs": {
+    "app": "promptify-mvp",
+    "path": "apps/promptify-mvp/scripts/prepare_rebuild_staging.mjs",
+    "original": "scripts/historical/pre-separation/prepare_rebuild_staging.mjs"
+  },
+  "prepare_rebuild_workshop_upgrade.mjs": {
+    "app": "promptify-mvp",
+    "path": "apps/promptify-mvp/scripts/prepare_rebuild_workshop_upgrade.mjs",
+    "original": "scripts/historical/pre-separation/prepare_rebuild_workshop_upgrade.mjs"
+  },
+  "prepare_review_runtime.py": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/prepare_review_runtime.py",
+    "original": "scripts/historical/pre-separation/prepare_review_runtime.py"
+  },
+  "production_source_compiler.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/production_source_compiler.mjs",
+    "original": "scripts/historical/pre-separation/production_source_compiler.mjs"
+  },
+  "prove_combined_baseline.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/prove_combined_baseline.cjs",
+    "original": "scripts/historical/pre-separation/prove_combined_baseline.cjs"
+  },
+  "setup_roster_trial.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/setup_roster_trial.ts",
+    "original": "scripts/historical/pre-separation/setup_roster_trial.ts"
+  },
+  "setup_roster_worker.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/setup_roster_worker.mjs",
+    "original": "scripts/historical/pre-separation/setup_roster_worker.mjs"
+  },
+  "verify_governance_telemetry_live.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/verify_governance_telemetry_live.ts",
+    "original": "scripts/historical/pre-separation/verify_governance_telemetry_live.ts"
+  },
+  "verify_learner_upgrade_live.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/verify_learner_upgrade_live.ts",
+    "original": "scripts/historical/pre-separation/verify_learner_upgrade_live.ts"
+  },
+  "verify_product_live.ts": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/verify_product_live.ts",
+    "original": "scripts/historical/pre-separation/verify_product_live.ts"
+  },
+  "verify_review_rebuild.cjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/verify_review_rebuild.cjs",
+    "original": "scripts/historical/pre-separation/verify_review_rebuild.cjs"
+  },
+  "wire_production_workspace.mjs": {
+    "app": "promptify-intrepid",
+    "path": "apps/promptify-intrepid/scripts/wire_production_workspace.mjs",
+    "original": "scripts/historical/pre-separation/wire_production_workspace.mjs"
+  }
+}

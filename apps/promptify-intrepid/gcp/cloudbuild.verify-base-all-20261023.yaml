@@ -1,0 +1,7 @@
+# Read-only: hashes every source file of the active base image.
+steps:
+ - name: asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app@sha256:19ec87d6eb389a6748fbaa21b5c9bb18551ff2fe33de13f0b32648151d00dddc
+   entrypoint: sh
+   args: ['-c', 'cd /app && find src api -type f | sort | xargs sha256sum']
+options:
+ logging: CLOUD_LOGGING_ONLY

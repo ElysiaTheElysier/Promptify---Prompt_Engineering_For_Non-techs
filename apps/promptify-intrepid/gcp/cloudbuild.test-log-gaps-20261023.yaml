@@ -1,0 +1,15 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args: ['build', '-f', 'gcp/Dockerfile.test-log-gaps-20261023', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:test-log-gaps-20261023', '.']
+ # Read-only check inside the built image: overlay hashes, and the server module graph loads.
+ - name: asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:test-log-gaps-20261023
+   entrypoint: sh
+   args:
+    - -c
+    - >-
+      cd /app && find api src/services src/types -type f | sort | xargs sha256sum &&
+      node --import tsx -e "import('./src/services/cloudRunServer.ts').then(m => console.log('server import ok', typeof m.cloudHandler))"
+images:
+ - asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:test-log-gaps-20261023
+options:
+ logging: CLOUD_LOGGING_ONLY

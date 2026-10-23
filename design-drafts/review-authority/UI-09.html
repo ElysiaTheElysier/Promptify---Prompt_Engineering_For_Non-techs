@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ 
+    // State Navigation Filters
+    activePhase: 'all', // 'all', 'pulse', 'live', 'studio'
+    activeSession: true,
+    
+    // Quick Broadcast Bar State (Phase 3)
+    broadcastMessage: '💡 Tip for LAB-BS-03: Remember to cite Page 4 from SOP-Campaign-Ops-v4.pdf for P1 SLA double deductions!',
+    broadcastToast: false,
+    
+    // UI-10 Prompt Inspector Drawer State
+    inspectorDrawerOpen: false,
+    selectedLearner: null,
+    
+    // Live Cohort Telemetry Data (Intrepid Cohort 04)
+    learners: [
+        { id: 'L-101', name: 'Alex Tan', dept: 'Brand Ops', attempts: 6, score: 5.2, status: 'stuck', technique: 'One-Shot', pii: false, promptV5: '[Role]: Help customer with refund.\n[Task]: Classify ticket #842.\n[Format]: Output table.', feedback: 'Missing explicit SOP citation and role persona depth.' },
+        { id: 'L-102', name: 'Minh Dao', dept: 'Campaign Lead', attempts: 4, score: 4.0, status: 'pii_breach', technique: 'Structured', pii: true, promptV5: 'Customer CCCD 034091002847 and phone 0912345678 experienced double charge on order #842.', feedback: 'CRITICAL SECURITY BREACH: Unscrubbed CCCD and Phone number detected in prompt body.' },
+        { id: 'L-103', name: 'Priya Sharma', dept: 'Brand Ops', attempts: 2, score: 9.2, status: 'completed', technique: 'Grounding', pii: false, promptV5: '[Role]: Senior Campaign Ops Lead.\n[Context]: Intrepid SLA SOP v4.\n[Task]: Classify #842.\n[Format]: Markdown Table with SOP-Campaign-Ops-v4.pdf Page 4 citation.', feedback: 'Perfect score. Accurately identified P1 SLA 15-minute response window.' },
+        { id: 'L-104', name: 'Le Hoang', dept: 'E-commerce', attempts: 3, score: 8.5, status: 'completed', technique: 'Grounding', pii: false, promptV5: '[Role]: Senior Ops Lead.\n[Task]: Classify ticket #842 with SOP citations.', feedback: 'Strong performance. Minor formatting suggestion for table headers.' },
+        { id: 'L-105', name: 'Sarah Jenkins', dept: 'Client Success', attempts: 1, score: 7.8, status: 'in_progress', technique: 'Few-Shot', pii: false, promptV5: '[Role]: Campaign Ops Lead.\n[Context]: Review ticket #842.', feedback: 'In progress. Needs One-Shot example component.' }
+    ],
+
+    // Codelabs Governance Directory (Phase 2)
+    codelabs: [
+        { id: 'LAB-BS-03', title: 'One-shot Brand Voice & SLA Ticket Classification', status: 'ACTIVE', cohort: 'Intrepid Cohort 04', tier: 'ADVANCE Paid', start: '10:00 AM', end: '11:40 AM' },
+        { id: 'LAB-BS-04', title: 'Multi-turn Negotiation & Escalation SOP', status: 'PUBLISHED', cohort: 'Intrepid Cohort 04', tier: 'ADVANCE Paid', start: '2026-10-10 14:00', end: '2026-10-10 15:40' },
+        { id: 'LAB-BS-01', title: 'LLM Foundations & Prompt Structure Basics', status: 'ARCHIVED', cohort: 'All Enterprise Cohorts', tier: 'BASIC Free', start: '2026-09-15 09:00', end: '2026-09-15 10:40' }
+    ],
+
+    // Actions
+    sendBroadcast() {
+        if (!this.broadcastMessage.trim()) return;
+        this.broadcastToast = true;
+        setTimeout(() => { this.broadcastToast = false; }, 3000);
+    },
+
+    openInspector(learner) {
+        this.selectedLearner = learner;
+        this.inspectorDrawerOpen = true;
+    },
+
+    updateLabStatus(lab, newStatus) {
+        lab.status = newStatus;
+    }
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify Intrepid - Facilitator Control Center (UI-09)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1'
+                        },
+                        brand: {
+                            emerald: '#059669',
+                            amber: '#D97706',
+                            rose: '#BA1A1A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 18px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+    <!-- ================================================================= -->
+    <!-- GLOBAL FACILITATOR HEADER NAVIGATION                              -->
+    <!-- ================================================================= -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-2.5">
+        <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Brand & Workspace Role Identifier -->
+            <div class="flex items-center gap-3">
+                <a href="/trainer/dashboard" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-2xl bg-m3-primary text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                        P
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-extrabold text-xs tracking-tight text-m3-on-surface">Promptify Control Center</span>
+                        <span class="text-[10px] font-mono text-m3-primary font-bold">Facilitator / Trainer Portal</span>
+                    </div>
+                </a>
+
+                <div class="h-5 w-px bg-m3-outline-variant/80"></div>
+
+                <!-- Active Cohort Switcher -->
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-m3-on-surface-variant font-semibold">Cohort:</span>
+                    <select class="bg-m3-surface-container-low border border-m3-outline-variant text-xs font-bold text-m3-on-surface rounded-xl px-2.5 py-1 focus:outline-none focus:border-m3-primary">
+                        <option>Intrepid Cohort 04 (Active Masterclass)</option>
+                        <option>Agribank Batch 01 (Scheduled)</option>
+                        <option>All Enterprise Cohorts</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions & Profile -->
+            <div class="flex items-center gap-2.5">
+                
+                <!-- Quick Phase View Filter Tabs -->
+                <div class="hidden md:flex items-center gap-1 bg-m3-surface-container-low p-1 rounded-full border border-m3-outline-variant text-xs font-bold">
+                    <button @click="activePhase = 'all'" :class="activePhase === 'all' ? 'bg-white text-m3-primary shadow-xs' : 'text-m3-on-surface-variant'" class="px-3 py-1 rounded-full transition-all">All Hubs</button>
+                    <button @click="activePhase = 'pulse'" :class="activePhase === 'pulse' ? 'bg-white text-m3-primary shadow-xs' : 'text-m3-on-surface-variant'" class="px-3 py-1 rounded-full transition-all">1. Pulse</button>
+                    <button @click="activePhase = 'live'" :class="activePhase === 'live' ? 'bg-white text-brand-emerald shadow-xs' : 'text-m3-on-surface-variant'" class="px-3 py-1 rounded-full transition-all">2. Live War Room</button>
+                    <button @click="activePhase = 'studio'" :class="activePhase === 'studio' ? 'bg-white text-purple-700 shadow-xs' : 'text-m3-on-surface-variant'" class="px-3 py-1 rounded-full transition-all">3. Studio</button>
+                </div>
+
+                <!-- Launch UI-11 Studio Button -->
+                <a href="/trainer/curriculum" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-m3-surface-container-low border border-m3-outline-variant text-xs font-bold text-m3-on-surface hover:bg-m3-surface-container-high transition-all">
+                    <span class="material-symbols-outlined text-sm text-m3-primary">edit_note</span>
+                    <span class="hidden sm:inline">Curriculum Studio (UI-11)</span>
+                </a>
+
+                <!-- Facilitator Profile Avatar -->
+                <div class="w-8 h-8 rounded-full bg-m3-primary-container text-m3-on-primary-container font-extrabold text-xs flex items-center justify-center border border-m3-primary/30">
+                    LP
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- MAIN CONTROL CENTER BODY                                          -->
+    <!-- ================================================================= -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-5 space-y-6">
+
+        <!-- ============================================================= -->
+        <!-- PHASE 1: SITUATIONAL AWARENESS HUB ("THE PULSE")              -->
+        <!-- ============================================================= -->
+        <section x-show="activePhase === 'all' || activePhase === 'pulse'" class="space-y-4">
+            
+            <!-- Top System Telemetry Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- KPI 1: Active Cohorts -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-4 shadow-xs flex items-center justify-between">
+                    <div class="space-y-0.5">
+                        <span class="text-xs text-m3-on-surface-variant font-semibold">Active Cohorts</span>
+                        <div class="text-2xl font-extrabold text-m3-on-surface">4 Batches</div>
+                        <span class="text-[10px] text-brand-emerald font-bold flex items-center gap-0.5">
+                            <span class="material-symbols-outlined text-xs">trending_up</span>
+                            <span>42 learners online now</span>
+                        </span>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-m3-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">groups</span>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Average Rubric Score -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-4 shadow-xs flex items-center justify-between">
+                    <div class="space-y-0.5">
+                        <span class="text-xs text-m3-on-surface-variant font-semibold">Cohort Avg Score</span>
+                        <div class="text-2xl font-extrabold text-brand-emerald">8.4 / 10</div>
+                        <span class="text-[10px] text-m3-outline font-mono">Benchmark: ≥ 8.0/10</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-brand-emerald flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">verified</span>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Stuck Learner / PII Breach Alerts -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-4 shadow-xs flex items-center justify-between">
+                    <div class="space-y-0.5">
+                        <span class="text-xs text-m3-on-surface-variant font-semibold">Stuck / Security Alerts</span>
+                        <div class="text-2xl font-extrabold text-brand-rose">2 Flagged</div>
+                        <span class="text-[10px] text-brand-rose font-bold">1 PII Breach • 1 Stuck (>5 runs)</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-rose-50 text-brand-rose flex items-center justify-center animate-pulse">
+                        <span class="material-symbols-outlined text-xl">warning</span>
+                    </div>
+                </div>
+
+                <!-- KPI 4: AI Model Gateway Status -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-4 shadow-xs flex items-center justify-between">
+                    <div class="space-y-0.5">
+                        <span class="text-xs text-m3-on-surface-variant font-semibold">AI Gateway Telemetry</span>
+                        <div class="text-2xl font-extrabold text-m3-on-surface">Gemini 3.8</div>
+                        <span class="text-[10px] text-brand-emerald font-mono flex items-center gap-0.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-brand-emerald"></span>
+                            <span>Latency: 0.74s • Operational</span>
+                        </span>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">bolt</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- HERO LIVE SESSION BANNER (Promoted when session active) -->
+            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-m3-on-primary-container text-white rounded-3xl p-6 shadow-md border border-slate-700 relative overflow-hidden">
+                <div class="flex flex-wrap items-center justify-between gap-4 relative z-10">
+                    
+                    <div class="space-y-2 max-w-2xl">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-red-500 text-white animate-pulse flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-white"></span>
+                                <span>LIVE MASTERCLASS SESSION</span>
+                            </span>
+                            <span class="text-xs font-mono text-slate-300">Started 15m ago • Scheduled End: 11:40 AM</span>
+                        </div>
+
+                        <h1 class="text-xl lg:text-2xl font-extrabold tracking-tight">
+                            LAB-BS-03: One-shot Brand Voice & SLA Ticket Classification
+                        </h1>
+
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Cohort: <strong class="text-white">Intrepid Cohort 04</strong> • Eligible: Brand Solutions & Campaign Ops • Active Learners: <strong class="text-emerald-400">38 / 42 Online</strong>
+                        </p>
+                    </div>
+
+                    <!-- Direct War Room Jump CTA -->
+                    <div class="flex items-center gap-3">
+                        <button @click="activePhase = 'live'" class="px-6 py-3 rounded-full bg-brand-emerald text-white font-extrabold text-xs shadow-lg hover:bg-emerald-700 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">sensors</span>
+                            <span>Enter Live War Room (Phase 3)</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- PHASE 3: LIVE WORKSHOP EXECUTION HUB ("IN-GAME WAR ROOM")     -->
+        <!-- ============================================================= -->
+        <section x-show="activePhase === 'all' || activePhase === 'live'" class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-5 shadow-xs">
+            
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-m3-outline-variant/60 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-brand-emerald animate-ping"></div>
+                    <h2 class="font-extrabold text-base text-m3-on-surface">Phase 3: Live Masterclass Command Center & Heatmap</h2>
+                </div>
+
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="text-m3-on-surface-variant font-semibold">Live Controls:</span>
+                    <button @click="alert('Session paused for all student screens')" class="px-3 py-1.5 rounded-full border border-amber-300 bg-amber-50 text-amber-900 font-bold hover:bg-amber-100 transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm text-amber-700">pause_circle</span>
+                        <span>Freeze Session</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUICK BROADCAST BAR (INLINE INTERVENTION) -->
+            <div class="p-4 bg-m3-surface-container-low rounded-2xl border border-m3-outline-variant/80 space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold text-m3-on-surface">
+                    <span class="flex items-center gap-1 text-m3-primary">
+                        <span class="material-symbols-outlined text-sm">campaign</span>
+                        <span>Quick Broadcast SLA Hint to All Student Workspaces (UI-05):</span>
+                    </span>
+                    <span class="text-[10px] text-m3-outline">Instantly blasts pop-up notification</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" x-model="broadcastMessage" class="flex-1 px-3 py-2 rounded-xl border border-m3-outline-variant text-xs font-mono focus:outline-none focus:border-m3-primary bg-white">
+                    <button @click="sendBroadcast()" class="px-5 py-2 rounded-xl bg-m3-primary text-white text-xs font-bold shadow-xs hover:bg-m3-primary/90 transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">send</span>
+                        <span>Broadcast Hint</span>
+                    </button>
+                </div>
+
+                <!-- Toast Confirmation -->
+                <div x-show="broadcastToast" x-transition.opacity class="p-2 bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold flex items-center gap-1" style="display: none;">
+                    <span class="material-symbols-outlined text-sm text-brand-emerald">check_circle</span>
+                    <span>Broadcast hint delivered to 38 active student workspaces!</span>
+                </div>
+            </div>
+
+            <!-- 5-TECHNIQUE LIVE HEATMAP MATRIX TABLE -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between text-xs font-bold text-m3-on-surface">
+                    <span>5-TECHNIQUE COHORT PROGRESS HEATMAP MATRIX:</span>
+                    <div class="flex items-center gap-3 text-[10px] font-mono">
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Completed (≥8.0)</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> In Progress</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Stuck (>5 fails)</span>
+                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span> PII Breach</span>
+                    </div>
+                </div>
+
+                <!-- Heatmap Table -->
+                <div class="overflow-x-auto border border-m3-outline-variant rounded-2xl">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-m3-surface-container-low text-m3-on-surface-variant font-bold border-b border-m3-outline-variant/80 text-[11px]">
+                            <tr>
+                                <th class="p-3">Learner Name</th>
+                                <th class="p-3">Department</th>
+                                <th class="p-3">Attempts</th>
+                                <th class="p-3">Score</th>
+                                <th class="p-3">Current Technique</th>
+                                <th class="p-3 text-right">Quick Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-m3-outline-variant/60 font-sans">
+                            <template x-for="learner in learners" :key="learner.id">
+                                <tr class="hover:bg-m3-surface-container-low/50 transition-colors"
+                                    :class="{
+                                        'bg-red-50/60': learner.status === 'stuck',
+                                        'bg-purple-50/60': learner.status === 'pii_breach'
+                                    }">
+                                    
+                                    <td class="p-3 font-bold text-m3-on-surface flex items-center gap-2">
+                                        <span x-text="learner.name"></span>
+                                        <template x-if="learner.status === 'stuck'">
+                                            <span class="px-2 py-0.2 rounded text-[9px] font-extrabold bg-red-100 text-red-900 border border-red-300">STUCK (>5 Fails)</span>
+                                        </template>
+                                        <template x-if="learner.status === 'pii_breach'">
+                                            <span class="px-2 py-0.2 rounded text-[9px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300">PII BREACH</span>
+                                        </template>
+                                    </td>
+
+                                    <td class="p-3 text-m3-on-surface-variant" x-text="learner.dept"></td>
+                                    
+                                    <td class="p-3 font-mono font-bold" x-text="`${learner.attempts} runs`"></td>
+
+                                    <td class="p-3 font-mono font-extrabold"
+                                        :class="learner.score >= 8.0 ? 'text-brand-emerald' : 'text-brand-rose'"
+                                        x-text="`${learner.score}/10`"></td>
+
+                                    <td class="p-3 font-mono text-[11px]" x-text="learner.technique"></td>
+
+                                    <td class="p-3 text-right">
+                                        <button @click="openInspector(learner)" class="px-3 py-1 rounded-xl border border-m3-outline-variant bg-white text-m3-primary text-xs font-bold hover:bg-m3-primary hover:text-white transition-all">
+                                            Inspect Prompts (UI-10)
+                                        </button>
+                                    </td>
+
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- PHASE 2: PRE-GAME / STUDIO HUB ("CODELABS GOVERNANCE")       -->
+        <!-- ============================================================= -->
+        <section x-show="activePhase === 'all' || activePhase === 'studio'" class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-4 shadow-xs">
+            
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-m3-outline-variant/60 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-m3-primary">edit_note</span>
+                    <h2 class="font-extrabold text-base text-m3-on-surface">Phase 2: Pre-Game Codelabs Governance & Studio Access</h2>
+                </div>
+
+                <a href="/trainer/curriculum" class="px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-bold shadow-xs hover:bg-m3-primary/90 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    <span>+ Create New Lab in UI-11</span>
+                </a>
+            </div>
+
+            <!-- Codelabs Directory Cards with Inline Status Controls -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <template x-for="lab in codelabs" :key="lab.id">
+                    <div class="p-4 bg-m3-surface rounded-2xl border border-m3-outline-variant space-y-3 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-blue-100 text-m3-primary" x-text="lab.id"></span>
+                                
+                                <!-- Inline Status Dropdown (Quick Governance) -->
+                                <select :value="lab.status" @change="updateLabStatus(lab, $event.target.value)" 
+                                        class="text-[10px] font-extrabold rounded-lg px-2 py-0.5 border focus:outline-none"
+                                        :class="{
+                                            'bg-emerald-100 text-emerald-900 border-emerald-300': lab.status === 'ACTIVE',
+                                            'bg-blue-100 text-blue-900 border-blue-300': lab.status === 'PUBLISHED',
+                                            'bg-slate-100 text-slate-700 border-slate-300': lab.status === 'ARCHIVED'
+                                        }">
+                                    <option value="DRAFT">DRAFT</option>
+                                    <option value="PUBLISHED">PUBLISHED</option>
+                                    <option value="ACTIVE">ACTIVE</option>
+                                    <option value="ARCHIVED">ARCHIVED</option>
+                                </select>
+                            </div>
+
+                            <h3 class="font-bold text-xs text-m3-on-surface leading-snug" x-text="lab.title"></h3>
+                            <p class="text-[11px] text-m3-on-surface-variant" x-text="`Cohort: ${lab.cohort} • Tier: ${lab.tier}`"></p>
+                        </div>
+
+                        <div class="pt-2 border-t border-m3-outline-variant/60 flex items-center justify-between">
+                            <span class="text-[10px] text-m3-outline font-mono" x-text="`${lab.start} - ${lab.end}`"></span>
+                            <a href="/trainer/curriculum" class="text-xs font-bold text-m3-primary hover:underline flex items-center gap-0.5">
+                                <span>Edit in UI-11</span>
+                                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE-OVER DRAWER: PROMPT INSPECTOR & COACHING (UI-10 INTEGRATION)-->
+    <!-- ================================================================= -->
+    <div x-show="inspectorDrawerOpen" 
+         x-transition.opacity
+         class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex justify-end" 
+         style="display: none;">
+        
+        <div @click.away="inspectorDrawerOpen = false" 
+             class="bg-white w-full max-w-xl h-full shadow-2xl border-l border-m3-outline-variant p-6 space-y-4 flex flex-col justify-between overflow-y-auto">
+            
+            <template x-if="selectedLearner">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant pb-3">
+                        <div>
+                            <h3 class="font-extrabold text-base text-m3-on-surface" x-text="`Prompt Inspector (UI-10): ${selectedLearner.name}`"></h3>
+                            <p class="text-xs text-m3-on-surface-variant" x-text="`Department: ${selectedLearner.dept} • Total Runs: ${selectedLearner.attempts}`"></p>
+                        </div>
+                        <button @click="inspectorDrawerOpen = false" class="text-m3-outline hover:text-m3-on-surface">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Diagnostic Alert -->
+                    <div class="p-3.5 rounded-2xl border text-xs space-y-1"
+                         :class="selectedLearner.score >= 8.0 ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : 'bg-red-50 border-red-200 text-red-950'">
+                        <span class="font-bold block" x-text="`Diagnostic Score: ${selectedLearner.score}/10`"></span>
+                        <p class="text-[11px]" x-text="selectedLearner.feedback"></p>
+                    </div>
+
+                    <!-- Verbatim Prompt Syntax Code Box -->
+                    <div class="space-y-1.5">
+                        <span class="font-bold text-xs text-m3-on-surface">Verbatim Prompt Syntax (Attempt V5):</span>
+                        <pre class="p-3 bg-slate-950 text-slate-100 rounded-2xl font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed" x-text="selectedLearner.promptV5"></pre>
+                    </div>
+
+                    <!-- Private 1-on-1 Hint Action -->
+                    <div class="p-3 bg-m3-surface-container-low rounded-2xl border border-m3-outline-variant space-y-2">
+                        <span class="font-bold text-xs text-m3-on-surface block">Send Private Hint to Student Workspace:</span>
+                        <textarea rows="2" placeholder="Type custom coaching tip for this student..." class="w-full p-2.5 rounded-xl border border-m3-outline-variant text-xs focus:outline-none focus:border-m3-primary"></textarea>
+                        <button @click="alert('Private hint sent to student!'); inspectorDrawerOpen = false;" class="w-full py-2 rounded-xl bg-m3-primary text-white text-xs font-bold shadow-xs">
+                            Send Private Coaching Tip
+                        </button>
+                    </div>
+                </div>
+            </template>
+
+            <button @click="inspectorDrawerOpen = false" class="w-full py-2.5 rounded-full border border-m3-outline-variant text-xs font-semibold">Close Inspector</button>
+
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- FOOTER                                                            -->
+    <!-- ================================================================= -->
+    <footer class="py-3 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-8">
+        <p>© 2026 Promptify x Intrepid Asia. Refactored Facilitator Control Center Active.</p>
+    </footer>
+
+</body>
+</html>

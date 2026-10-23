@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {createHmac} from 'node:crypto';
+import {validWorkerSignature} from '../src/services/rosterWorkerService.js';
+const secret='a'.repeat(48);
+const now=Date.now(),timestamp=String(Math.floor(now/1000)),nonce='11111111-1111-4111-8111-111111111111';
+const headers={'x-promptify-timestamp':timestamp,'x-promptify-nonce':nonce,'x-promptify-signature':createHmac('sha256',secret).update(timestamp+'.'+nonce).digest('hex')};
+assert.equal(validWorkerSignature(headers,secret,now),true);
+assert.equal(validWorkerSignature(headers,secret,now+121000),false);
+assert.equal(validWorkerSignature({...headers,'x-promptify-nonce':'different'},secret,now),false);
+assert.equal(validWorkerSignature({...headers,'x-promptify-signature':'0'.repeat(64)},secret,now),false);
+assert.equal(validWorkerSignature({},secret,now),false);
+assert.equal(validWorkerSignature(headers,'short',now),false);
+console.log('Worker rejects unsigned, expired, altered, malformed and weak authentication. No live calls.');

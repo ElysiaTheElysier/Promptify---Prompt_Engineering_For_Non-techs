@@ -1,0 +1,11 @@
+{
+  "id": "telemetry-edges",
+  "objective": "Add meaningful offline edge tests for governance telemetry, without changing implementation.",
+  "read": ["src/services/governanceTelemetryService.ts", "test/verify_governance_telemetry.ts"],
+  "write": "test/verify_governance_telemetry_edges.ts",
+  "tests": ["test/verify_governance_telemetry.ts", "test/verify_governance_telemetry_edges.ts"],
+  "acceptance": ["UTC+7 month/year boundaries", "Valid zero differs from missing measurement", "Incomplete attempts do not contribute measurements", "NaN, Infinity and negatives are excluded", "Input arrays/objects are not mutated"],
+  "risk": "low: new offline test only",
+  "maxAttempts": 2,
+  "timeoutSeconds": 300
+}

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Default --validate/--dry-run mode stops before any cloud/database call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/gcp/SETUP_GUIDE.md before user execution.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='PROJECT_ID'
+# USER EXECUTION ONLY. Enables APIs; does not migrate data or change source services.
+gcloud services enable compute.googleapis.com run.googleapis.com sqladmin.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com secretmanager.googleapis.com firestore.googleapis.com firebase.googleapis.com identitytoolkit.googleapis.com aiplatform.googleapis.com bigquery.googleapis.com cloudscheduler.googleapis.com iamcredentials.googleapis.com storage.googleapis.com sheets.googleapis.com drive.googleapis.com --project="$project"
+echo 'Next: attach Firebase to the existing project in Firebase Console and configure Google sign-in.'

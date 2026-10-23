@@ -1,0 +1,40 @@
+{
+  "scope": "Only the eight fictional, unlinked example.test enrollment rows from the two existing synthetic staging classes. This manifest grants no permission by itself.",
+  "runtimeFixture": "outputs/staging-release-2026-10-20-synthetic-workspace/runtime-fixture.json",
+  "sourceBindingManifest": "outputs/staging-release-2026-10-20-synthetic-workspace/source-bindings.json",
+  "sourceRosterManifest": "outputs/staging-synthetic-workspace-2026-10-20/manifest.json",
+  "sourceImportEvidence": "outputs/staging-release-2026-10-20-synthetic-workspace/admin-initial-sop-workflow.json",
+  "sourceMutationEvidence": "outputs/staging-release-2026-10-20-synthetic-workspace/admin-roster-mutations.json",
+  "qaLearnersMustRemainManual": [
+    { "email": "demo.biz@intrepid.asia", "classCode": "STAGING-SYNTHETIC-20261020-NORTHSTAR" },
+    { "email": "manhmanh100127@gmail.com", "classCode": "STAGING-SYNTHETIC-20261020-JUNIPER" }
+  ],
+  "companies": [
+    {
+      "company": "Northstar Paperworks (fictional)",
+      "classId": "9c32e26b-bcda-4549-bca8-dd4f350c2aaa",
+      "classCode": "STAGING-SYNTHETIC-20261020-NORTHSTAR",
+      "sheetId": "192FSgBS3yLEDrEaWIpv_sQJ40d2nnuDWGFEbDT7UhRM",
+      "connectionId": "86898e57-8562-4de6-852a-d2cb38af60ac",
+      "rosterEmails": [
+        "learner01@northstar.example.test",
+        "learner02@northstar.example.test",
+        "learner03@northstar.example.test",
+        "learner04@northstar.example.test"
+      ]
+    },
+    {
+      "company": "Juniper Kiteworks (fictional)",
+      "classId": "f6a40278-c5ab-42f2-9948-abb2fd1431bb",
+      "classCode": "STAGING-SYNTHETIC-20261020-JUNIPER",
+      "sheetId": "19PpiiiA4goQyKqck2Xb-vvFDJZ-MM0dxG1m7B2nJVvw",
+      "connectionId": "dc4ef4ab-d13c-4226-92b0-36172399cc3e",
+      "rosterEmails": [
+        "learner01@juniper.example.test",
+        "learner02@juniper.example.test",
+        "learner03@juniper.example.test",
+        "learner04@juniper.example.test"
+      ]
+    }
+  ]
+}

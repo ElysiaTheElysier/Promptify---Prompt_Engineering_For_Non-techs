@@ -1,0 +1,339 @@
+{
+  "tables": {
+    "lessons": [
+      "apps/promptify-intrepid/src/services/apiAuthorizationService.ts",
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "classes": [
+      "apps/promptify-intrepid/src/services/apiAuthorizationService.ts",
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_runs": [
+      "apps/promptify-intrepid/src/services/governanceTelemetryService.ts",
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "course_modules": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_learner_context": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "product_sync_logs": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_class_grants": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_sheet_connections": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_trainer_actions": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "trainer_hints": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_sop_versions": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "users": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "course_instructors": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_sop_contributions": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_sandbox_runs": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_attendance": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_studio": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "rebuild_sop_documents": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "prompt_attempts": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "product_awards": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_prompt_library": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_audit": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_learner_support": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "enrollments": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_prompt_drafts": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "lesson_progress": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_rotation_requests": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "learners": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "product_domains": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_session_controls": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_sop_bindings": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_sop_chunks": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_judge_claims": [
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ]
+  },
+  "rpcs": {
+    "product_create_cohort": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_unlock_support_reflected": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_request_correction": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_set_sheet_auto_sync": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_broadcast": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_save_studio": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_save_sheet": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_save_draft": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_import_roster": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_create_lesson": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_take_budget": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_set_class_access": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_analytics": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_confirm_profile": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_save_class": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_publish_sop": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_publish_contribution": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_save_domain": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_record_attendance": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_enroll_basic": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_session_control": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_approve_rotation": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_request_rotation": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_can_manage_class": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_refresh_awards": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "product_submit_enterprise_request": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_record_trainer_action": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_class_sops": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts",
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "rebuild_workshop_inbox": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "rebuild_begin_run": [
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "rebuild_finish_run": [
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "rebuild_claim_judge": [
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "rebuild_finish_judge": [
+      "apps/promptify-intrepid/src/services/rebuildRunService.ts"
+    ],
+    "product_claim_roster_sync": [
+      "apps/promptify-intrepid/src/services/rosterWorkerService.ts"
+    ],
+    "product_accept_worker_invocation": [
+      "apps/promptify-intrepid/src/services/rosterWorkerService.ts"
+    ],
+    "product_finish_roster_sync": [
+      "apps/promptify-intrepid/src/services/rosterWorkerService.ts"
+    ]
+  },
+  "actions": {
+    "reviewSop": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "requestRotation": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "sessionControl": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "setSheetAutoSync": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "downloadAward": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "searchSop": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "approveRotation": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "judge": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "createLesson": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "sourceDownload": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "trainerAction": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "broadcast": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "publishSop": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "syncSheet": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "submitSop": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "sandboxJudge": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "savePromptLibrary": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "saveSheet": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "setAccess": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "uploadLearnerContext": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "listDriveFolder": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "generate": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "saveStudio": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "createCohort": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "prepareSopUpload": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "recordAttendance": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "saveDomain": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "privateHint": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "sandboxGenerate": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "requestSopSync": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "saveClass": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "reviewPromptLibrary": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "saveDraft": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "reviewSopPreview": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "unlockSupport": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ],
+    "governance": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ]
+  },
+  "storage_buckets": {
+    "product-sop-originals": [
+      "apps/promptify-intrepid/src/services/productionServerService.ts"
+    ]
+  }
+}

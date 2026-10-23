@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Native Scheduler uses OIDC. This secret is only for retained legacy HMAC caller compatibility.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Optional legacy roster compatibility secret binding.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+: "${LEGACY_ROSTER_SECRET_VERSION:?Numeric version of separately provisioned intrepid-roster-worker-secret required}"
+[[ "$LEGACY_ROSTER_SECRET_VERSION" =~ ^[1-9][0-9]*$ ]] || exit 2
+gcloud secrets add-iam-policy-binding intrepid-roster-worker-secret --member='serviceAccount:promptify-api@PROJECT_ID.iam.gserviceaccount.com' --role=roles/secretmanager.secretAccessor --project='PROJECT_ID'
+gcloud run services update promptify-intrepid-api --region='REGION' --project='PROJECT_ID' --update-secrets="ROSTER_WORKER_SECRET=intrepid-roster-worker-secret:${LEGACY_ROSTER_SECRET_VERSION}"
+printf '%s\n' 'Verify legacy HMAC+nonce rejection/acceptance without logging the secret. Native worker OIDC remains unchanged.'

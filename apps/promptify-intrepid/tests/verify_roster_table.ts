@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {parseTableRoster} from '../src/services/rosterTableService';
+const headers=['#','Code','Name','Note','','','#','Department_Name','Decs','Note','Head','','','ID','Email','Country','Department','','','Asset ID','Department','Asset Category','Asset Title','Access Status','File Owner','Last Modified Date','Tabs / Slide Count / Sub-Info','Google File ID','Direct URL','Source Wiki Container Page','SOP Operational Status','Notes / Action Needed'];
+function row(fields:Record<number,string>){return Object.assign(Array(32).fill(''),fields);}
+const values=[headers,row({1:'VN',2:'Vietnam',7:'Tech',13:'1',14:'one@example.test',15:'Vietnam',16:'Tech',19:'SOP-1',20:'Tech',22:'Fictional procedure',23:'Access Granted',27:'fictional_file_00001'}),row({1:'SG',2:'Singapore',7:'People',13:'2',14:'two@example.test',15:'Singapore',16:'People',19:'SOP-2',20:'People',22:'Other department',23:'Access Granted',27:'fictional_file_00002'}),row({19:'SOP-3',20:'Tech',22:'External reference',23:'External / Web Link',28:'https://example.test/reference'})];
+const result=parseTableRoster(values,'Tech',0);
+assert.equal(result.rows.length,1);assert.equal(result.rows[0].fullName,'','ID/email never substitute for a missing full name');assert.equal(result.rows[0].employeeId,'','sequential ID is not assumed to be an employee ID');
+assert.equal(result.sops.length,1);assert.equal(result.sops[0].assetId,'SOP-1');assert.equal(result.excludedAssets,1);assert.equal(result.nextSync,'1970-01-01T00:15:00.000Z');
+assert.equal(result.contacts.length,0,'Head cells never automatically grant application roles');
+const duplicate=structuredClone(values);duplicate.push(row({14:'ONE@example.test',15:'Vietnam',16:'Tech'}));assert.throws(()=>parseTableRoster(duplicate,'Tech'),/duplicate emails/);
+const badCountry=structuredClone(values);badCountry[1][15]='Unknown';assert.throws(()=>parseTableRoster(badCountry,'Tech'),/country/);
+const badDepartment=structuredClone(values);badDepartment[1][16]='Finance';assert.throws(()=>parseTableRoster(badDepartment,'Tech'),/department/);
+const denied=structuredClone(values);denied[1][23]='Access denied';assert.equal(parseTableRoster(denied,'Tech').sops.length,0);
+const uppercase=structuredClone(values);uppercase[1][20]='TECH';assert.equal(parseTableRoster(uppercase,'Tech').sops.length,1,'Sheet dropdown casing resolves to reference department');
+const unmapped=structuredClone(values);unmapped[1][20]='UNKNOWN';assert.equal(parseTableRoster(unmapped,'Tech').sops.length,0);assert.equal(parseTableRoster(unmapped,'Tech').unmappedAssets,1,'Unmapped asset department is excluded, never guessed or granted');
+const unsafe=structuredClone(values);unsafe[1][27]='';unsafe[1][28]='https://evil.example/drive.google.com';assert.equal(parseTableRoster(unsafe,'Tech').sops.length,0);
+const duplicateHeader=structuredClone(values);duplicateHeader[0][0]='Email';assert.throws(()=>parseTableRoster(duplicateHeader,'Tech'),/one email/);
+assert.throws(()=>parseTableRoster(Array(2002).fill(headers),'Tech'),/bounds/);
+const empty=structuredClone(values);empty[1][13]='';empty[1][14]='';empty[1][15]='';empty[1][16]='';
+assert.equal(parseTableRoster(empty,'Tech').rows.length,0,'validated references permit last-person removal, even when other departments still have users');
+assert.throws(()=>parseTableRoster([headers],'Tech'),/selected department/,'header-only incomplete reference tables must never revoke access');
+console.log('Table roster PASS: real header geometry, department/country isolation, no name/employee/role inference, duplicate rejection, access status and URL restrictions. Synthetic data only.');

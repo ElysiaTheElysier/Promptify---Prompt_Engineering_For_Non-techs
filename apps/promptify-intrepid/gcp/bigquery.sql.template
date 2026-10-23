@@ -1,0 +1,40 @@
+-- Replace PROJECT_ID and REGION via scripts/render_gcp_config.mjs before execution.
+CREATE SCHEMA IF NOT EXISTS `PROJECT_ID.intrepid_raw` OPTIONS(location='REGION');
+CREATE SCHEMA IF NOT EXISTS `PROJECT_ID.intrepid_analytics` OPTIONS(location='REGION');
+CREATE SCHEMA IF NOT EXISTS `PROJECT_ID.intrepid_knowledge` OPTIONS(location='REGION');
+CREATE TABLE IF NOT EXISTS `PROJECT_ID.intrepid_raw.operational_entities` (
+ source_table STRING NOT NULL, entity_id STRING NOT NULL, entity_json STRING,
+ source_version INT64 NOT NULL, is_deleted BOOL NOT NULL, loaded_at TIMESTAMP NOT NULL
+) CLUSTER BY source_table,entity_id;
+CREATE TABLE IF NOT EXISTS `PROJECT_ID.intrepid_knowledge.version_state` (
+ version_id STRING NOT NULL, source_version INT64 NOT NULL
+) CLUSTER BY version_id;
+CREATE TABLE IF NOT EXISTS `PROJECT_ID.intrepid_knowledge.sop_chunks` (
+ version_id STRING NOT NULL, chunk_position INT64 NOT NULL, page INT64,
+ content STRING NOT NULL, embedding ARRAY<FLOAT64>, class_id STRING NOT NULL,
+ document_id STRING NOT NULL, document_version INT64 NOT NULL,title STRING,
+ model_id STRING NOT NULL,embedding_dimensions INT64 NOT NULL,indexed_at TIMESTAMP NOT NULL
+) CLUSTER BY class_id,version_id;
+CREATE VECTOR INDEX IF NOT EXISTS sop_chunks_cosine
+ON `PROJECT_ID.intrepid_knowledge.sop_chunks`(embedding)
+STORING(class_id,version_id,model_id,embedding_dimensions)
+OPTIONS(index_type='IVF',distance_type='COSINE');
+CREATE OR REPLACE VIEW `PROJECT_ID.intrepid_analytics.fact_attempt` AS
+SELECT JSON_VALUE(entity_json,'$.id') attempt_id,JSON_VALUE(entity_json,'$.class_id') class_id,
+ JSON_VALUE(entity_json,'$.learner_id') learner_id,JSON_VALUE(entity_json,'$.lesson_ref_id') lesson_id,
+ TIMESTAMP(JSON_VALUE(entity_json,'$.created_at')) created_at,
+ SAFE_CAST(JSON_VALUE(entity_json,'$.evaluation_json.total') AS FLOAT64) score,
+ JSON_VALUE(entity_json,'$.model') model,SAFE_CAST(JSON_VALUE(entity_json,'$.latency_ms') AS INT64) latency_ms,
+ source_version,loaded_at
+FROM `PROJECT_ID.intrepid_raw.operational_entities` WHERE source_table='prompt_attempts' AND NOT is_deleted;
+CREATE OR REPLACE VIEW `PROJECT_ID.intrepid_analytics.dim_class` AS
+SELECT JSON_VALUE(entity_json,'$.id') class_id,JSON_VALUE(entity_json,'$.client_id') client_id,
+ JSON_VALUE(entity_json,'$.course_id') course_id,JSON_VALUE(entity_json,'$.department') department,
+ JSON_VALUE(entity_json,'$.class_code') class_code,JSON_VALUE(entity_json,'$.status') status
+FROM `PROJECT_ID.intrepid_raw.operational_entities` WHERE source_table='classes' AND NOT is_deleted;
+CREATE OR REPLACE VIEW `PROJECT_ID.intrepid_analytics.fact_progress` AS
+SELECT JSON_VALUE(entity_json,'$.class_id') class_id,JSON_VALUE(entity_json,'$.learner_id') learner_id,
+ JSON_VALUE(entity_json,'$.lesson_id') lesson_id,JSON_VALUE(entity_json,'$.status') status,
+ SAFE_CAST(JSON_VALUE(entity_json,'$.best_score') AS FLOAT64) best_score,
+ SAFE_CAST(JSON_VALUE(entity_json,'$.attempts_count') AS INT64) attempts_count,loaded_at
+FROM `PROJECT_ID.intrepid_raw.operational_entities` WHERE source_table='lesson_progress' AND NOT is_deleted;

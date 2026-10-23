@@ -1,0 +1,4 @@
+# Overlay on msg1-1023: facilitator-approved hint requests (requestHint, reviewHintRequest, learner unlockSupport refused).
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:f15b3728578a0d7f2dd4b23cce0c4716afddbfa02c5c77bdd582640a72a2c649
+COPY --chown=node:node src/services/productionServerService.ts src/services/workshopSupportService.ts /app/src/services/
+COPY --chown=node:node src/types/production.ts /app/src/types/

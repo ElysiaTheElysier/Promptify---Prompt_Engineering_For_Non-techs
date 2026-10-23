@@ -1,0 +1,991 @@
+{
+  "UI-00": {
+    "lang": "en",
+    "authModalOpen": false,
+    "b2bModalOpen": false,
+    "demoTab": "grounded",
+    "emailInput": "",
+    "domainError": false
+  },
+  "UI-01": {
+    "lang": "en",
+    "reason": "session_expired",
+    "emailInput": "staff@intrepid.asia",
+    "isAuthenticating": false,
+    "returnTo": "/learner/playground/lab-1"
+  },
+  "UI-02": {
+    "lang": "en",
+    "hasMismatch": false,
+    "isSubmitting": false,
+    "isConfirmed": false,
+    "selectedDept": "Brand Solutions & Campaign Ops",
+    "correctionNote": "",
+    "departments": [
+      "Brand Solutions & Campaign Ops",
+      "E-commerce Store Operations",
+      "Customer Support & SLA Desk",
+      "Commercial & Business Development",
+      "Supply Chain & Fulfillment",
+      "Finance, Tax & Billing",
+      "Digital Marketing & Media Performance",
+      "Data Analytics & BI"
+    ]
+  },
+  "UI-03": {
+    "lang": "en",
+    "denialReason": "domain_not_allowed",
+    "attemptedEmail": "external.user@gmail.com",
+    "copiedContact": false
+  },
+  "UI-04": {
+    "lang": "en",
+    "userDept": "Brand Solutions & Campaign Ops",
+    "userName": "Linh Pham",
+    "userEmail": "linh.pham@intrepid.asia",
+    "totalAttempts": 14,
+    "avgScore": "8.7",
+    "sopDrawerOpen": false,
+    "selectedSop": null,
+    "labs": [
+      {
+        "id": "lab-1",
+        "number": 1,
+        "title": "Zero-shot Prompting & SOP Audit",
+        "subtitle": "Extract exact SLAs and page citations from department SOPs",
+        "status": "completed",
+        "score": 10,
+        "attempts": 3,
+        "timeSpent": "15 mins",
+        "icon": "verified_user",
+        "badgeColor": "bg-emerald-100 text-emerald-800 border-emerald-300"
+      },
+      {
+        "id": "lab-2",
+        "number": 2,
+        "title": "Structured Output & Markdown Tables",
+        "subtitle": "Enforce JSON schemas, clean tables, and zero digital clutter",
+        "status": "completed",
+        "score": 9,
+        "attempts": 4,
+        "timeSpent": "18 mins",
+        "icon": "table_chart",
+        "badgeColor": "bg-emerald-100 text-emerald-800 border-emerald-300"
+      },
+      {
+        "id": "lab-3",
+        "number": 3,
+        "title": "One-shot Brand Voice & Classification",
+        "subtitle": "Classify support tickets & campaign feedback using single-example prompts",
+        "status": "in_progress",
+        "score": 7,
+        "attempts": 5,
+        "timeSpent": "22 mins",
+        "icon": "auto_awesome",
+        "badgeColor": "bg-amber-100 text-amber-900 border-amber-300"
+      },
+      {
+        "id": "lab-4",
+        "number": 4,
+        "title": "Few-shot System Instructions & {{variables}}",
+        "subtitle": "Build dynamic prompt templates with variable interpolation and system constraints",
+        "status": "not_started",
+        "score": null,
+        "attempts": 2,
+        "timeSpent": "0 mins",
+        "icon": "tune",
+        "badgeColor": "bg-slate-100 text-slate-700 border-slate-300"
+      },
+      {
+        "id": "lab-5",
+        "number": 5,
+        "title": "Grounding & Anti-Hallucination Guardrails",
+        "subtitle": "Prevent hallucinated policies and cross-reference enterprise context logs",
+        "status": "not_started",
+        "score": null,
+        "attempts": 0,
+        "timeSpent": "0 mins",
+        "icon": "shield",
+        "badgeColor": "bg-slate-100 text-slate-700 border-slate-300"
+      }
+    ],
+    "sops": [
+      {
+        "name": "SOP-Campaign-Ops-v4.pdf",
+        "pages": 12,
+        "size": "2.4 MB",
+        "updated": "2 days ago",
+        "dept": "Brand Solutions"
+      },
+      {
+        "name": "Intrepid-Brand-Voice-Guide-2026.md",
+        "pages": 5,
+        "size": "480 KB",
+        "updated": "1 week ago",
+        "dept": "Brand Solutions"
+      },
+      {
+        "name": "Ticket-Escalation-SLA-Matrix.xlsx",
+        "pages": 3,
+        "size": "1.1 MB",
+        "updated": "Yesterday",
+        "dept": "Customer Support"
+      }
+    ]
+  },
+  "UI-05": {
+    "lang": "en",
+    "userDept": "Brand Solutions & Campaign Ops",
+    "labTitle": "Codelab 03: One-shot Brand Voice & Classification",
+    "activeTab": "composer",
+    "promptVersion": 3,
+    "promptText": "[Role]: Act as Senior Campaign Ops Lead for Intrepid Asia.\n\n[Context]: Review customer feedback tickets from the latest 11.11 Mega Sale Campaign using Intrepid SLA SOP v4.\n\n[Task]: Classify the support ticket below into Priority SLA Level (P1 - Critical, P2 - High, P3 - Normal).\n\n[One-Shot Example]:\nTicket: 'Payment deducted twice but order status shows cancelled.'\nClassification: P1 - Critical SLA (Max response time: 15 mins).\n\n[Input Ticket]:\n{{ticket_text}}\n\n[Format]: Return a clean Markdown Table with 3 columns: Ticket ID, Priority Level, Required Action.\n[Constraint]: Strictly cite page numbers from SOP-Campaign-Ops-v4.pdf.",
+    "isExecuting": false,
+    "hasExecuted": true,
+    "executionTime": "0.82s",
+    "tokenCount": "342 tokens",
+    "aiJudgeScore": 8,
+    "runHistory": [
+      {
+        "version": 1,
+        "score": 4,
+        "timestamp": "10:14 AM",
+        "note": "Vague prompt, missing SLA constraints"
+      },
+      {
+        "version": 2,
+        "score": 6,
+        "timestamp": "10:18 AM",
+        "note": "Added One-shot example, formatting missing"
+      },
+      {
+        "version": 3,
+        "score": 8,
+        "timestamp": "10:22 AM",
+        "note": "Added Markdown Table format + SOP citations"
+      }
+    ],
+    "sopDrawerOpen": false
+  },
+  "UI-06": {
+    "lang": "en",
+    "userDept": "Brand Solutions & Campaign Ops",
+    "labTitle": "Codelab 03: One-shot Brand Voice & Classification",
+    "versionA": 2,
+    "versionB": 3,
+    "diffMode": "split",
+    "viewTab": "prompt",
+    "versions": [
+      {
+        "version": 1,
+        "score": 4,
+        "timestamp": "10:14 AM",
+        "latency": "0.64s",
+        "tokens": "120 tokens"
+      },
+      {
+        "version": 2,
+        "score": 6,
+        "timestamp": "10:18 AM",
+        "latency": "0.72s",
+        "tokens": "210 tokens"
+      },
+      {
+        "version": 3,
+        "score": 8,
+        "timestamp": "10:22 AM",
+        "latency": "0.82s",
+        "tokens": "342 tokens"
+      }
+    ],
+    "promptV2": "[Role]: Act as Senior Campaign Ops Lead.\n\n[Context]: Review customer feedback tickets from 11.11 Campaign.\n\n[Task]: Classify support ticket into SLA Level (P1, P2, P3).\n\n[One-Shot Example]:\nTicket: 'Payment deducted twice but order status cancelled.'\nClassification: P1 - Critical.\n\n[Input Ticket]:\n{{ticket_text}}",
+    "promptV3": "[Role]: Act as Senior Campaign Ops Lead for Intrepid Asia.\n\n[Context]: Review customer feedback tickets from the latest 11.11 Mega Sale Campaign using Intrepid SLA SOP v4.\n\n[Task]: Classify the support ticket below into Priority SLA Level (P1 - Critical, P2 - High, P3 - Normal).\n\n[One-Shot Example]:\nTicket: 'Payment deducted twice but order status shows cancelled.'\nClassification: P1 - Critical SLA (Max response time: 15 mins).\n\n[Input Ticket]:\n{{ticket_text}}\n\n[Format]: Return a clean Markdown Table with 3 columns: Ticket ID, Priority Level, Required Action.\n[Constraint]: Strictly cite page numbers from SOP-Campaign-Ops-v4.pdf.",
+    "outputV2": "Ticket INT-1111-9082 is classified as P1 Critical because payment was charged twice. Escalate immediately.",
+    "outputV3": "| Ticket ID | Priority Level | Required Action | SOP Citation |\n| :--- | :--- | :--- | :--- |\n| INT-1111-9082 | **P1 - Critical** | Escalate to Billing Lead & Refund within 15 mins. | SOP v4 Page 4 (Section 4.2) |"
+  },
+  "UI-07": {
+    "lang": "en",
+    "evalState": "success",
+    "drawerOpen": true,
+    "totalScore": 8,
+    "isRetrying": false,
+    "criteria": [
+      {
+        "name": "1. Task Completion",
+        "score": 2,
+        "max": 2,
+        "desc": "Fully executes core scenario objectives and SLA escalation rules.",
+        "status": "pass"
+      },
+      {
+        "name": "2. Groundedness",
+        "score": 2,
+        "max": 2,
+        "desc": "Accurately cites SOP-Campaign-Ops-v4.pdf Page 4 with zero hallucinated policies.",
+        "status": "pass"
+      },
+      {
+        "name": "3. Format Adherence",
+        "score": 2,
+        "max": 2,
+        "desc": "Strict compliance with requested 4-column Markdown table layout.",
+        "status": "pass"
+      },
+      {
+        "name": "4. Constraint Compliance",
+        "score": 1,
+        "max": 2,
+        "desc": "Minor gap: Did not explicitly state the max response time limit in column 3.",
+        "status": "warn"
+      },
+      {
+        "name": "5. Business Usability",
+        "score": 1,
+        "max": 2,
+        "desc": "Output is actionable but requires minor formatting adjustment before sending to PIC.",
+        "status": "warn"
+      }
+    ],
+    "strengths": [
+      "Correctly identified payment discrepancy as P1 Critical SLA.",
+      "Properly grounded in SOP v4 Page 4 with exact section reference.",
+      "Clean Markdown table structure with correct column headers."
+    ],
+    "improvements": [
+      "Include exact maximum response window (15 mins) directly inside the Action column.",
+      "Add explicit duty manager assignment tag."
+    ],
+    "nextHint": "Add an explicit constraint to your prompt: \"Include max response time in mins in Column 3\"."
+  },
+  "UI-08": {
+    "lang": "en",
+    "drawerOpen": true,
+    "searchQuery": "",
+    "selectedPage": 4,
+    "copiedCitation": false,
+    "activeDoc": {
+      "title": "SOP-Campaign-Ops-v4.pdf",
+      "version": "v4.2",
+      "dept": "Brand Solutions & Campaign Ops",
+      "totalPages": 12,
+      "syncStatus": "Verified via Drive Service Account",
+      "lastSynced": "2 hours ago",
+      "driveId": "drive-sops-1092834"
+    },
+    "pages": [
+      {
+        "number": 1,
+        "title": "Page 1 - Executive Summary & Scope",
+        "matches": false
+      },
+      {
+        "number": 4,
+        "title": "Page 4 - SLA Priority Escalation Matrix",
+        "matches": true
+      },
+      {
+        "number": 5,
+        "title": "Page 5 - Shipping & Voucher Delay Rules",
+        "matches": true
+      },
+      {
+        "number": 8,
+        "title": "Page 8 - Brand Voice & Tone Guidelines",
+        "matches": false
+      },
+      {
+        "number": 12,
+        "title": "Page 12 - Emergency Contact & Duty Officers",
+        "matches": false
+      }
+    ],
+    "pageContent": [
+      {
+        "section": "Section 4.1 - Overview of Customer SLA Categories",
+        "text": "All customer feedback tickets generated during regional Flash Sale campaigns (including 11.11, 12.12, and Payday Sales) must be categorized into one of three strict SLA tiers before routing to department leads."
+      },
+      {
+        "section": "Section 4.2 - P1 Critical SLA Escalation (Ground Truth Rule)",
+        "ruleId": "Rule 4.2.1",
+        "highlighted": true,
+        "text": "Financial discrepancies resulting from duplicate payment deductions or failed checkout charges MUST be classified as P1 Critical SLA. Resolution time limit: Maximum 15 minutes. Required Action: Escalate immediately to Duty Billing Lead & initiate verification refund.",
+        "citationTag": "[Citation: SOP-Campaign-Ops-v4.pdf, Page 4, Section 4.2]"
+      },
+      {
+        "section": "Section 4.3 - Authorization Limits for Refunds",
+        "ruleId": "Rule 4.3.2",
+        "text": "Campaign Ops Specialists hold instant refund pre-authorization limits up to $500 per incident without requiring VP approval. All refunds exceeding $500 require dual sign-off from Finance."
+      }
+    ]
+  },
+  "UI-09": {
+    "lang": "en",
+    "activeCohort": "Cohort #04 - Brand Solutions (48 Learners)",
+    "autoRefresh": true,
+    "nudgeSent": false,
+    "selectedLearner": null,
+    "inspectModalOpen": false,
+    "cohorts": [
+      "Cohort #04 - Brand Solutions (48 Learners)",
+      "Cohort #03 - E-Commerce Ops (52 Learners)",
+      "Cohort #02 - Customer SLA Desk (35 Learners)",
+      "Cohort #01 - Management & Execs (20 Learners)"
+    ],
+    "stuckLearners": [
+      {
+        "id": "L-842",
+        "name": "Linh Pham",
+        "dept": "Brand Solutions",
+        "lab": "Lab 3: One-Shot Voice",
+        "attempts": 5,
+        "score": 4,
+        "issue": "Failed SOP Citation",
+        "timeStuck": "8 mins"
+      },
+      {
+        "id": "L-911",
+        "name": "Khang Nguyen",
+        "dept": "Brand Solutions",
+        "lab": "Lab 3: One-Shot Voice",
+        "attempts": 6,
+        "score": 5,
+        "issue": "Missing Markdown Table",
+        "timeStuck": "12 mins"
+      },
+      {
+        "id": "L-204",
+        "name": "Duong Tran",
+        "dept": "Campaign Ops",
+        "lab": "Lab 2: Structured Output",
+        "attempts": 4,
+        "score": 3,
+        "issue": "JSON Schema Syntax Error",
+        "timeStuck": "5 mins"
+      }
+    ],
+    "telemetryStream": [
+      {
+        "id": "RUN-9081",
+        "time": "10:44:12 AM",
+        "learner": "Linh Pham",
+        "lab": "Lab 3",
+        "attempt": "V5",
+        "score": 4,
+        "model": "Gemini 3.8 Flash",
+        "status": "fail"
+      },
+      {
+        "id": "RUN-9080",
+        "time": "10:44:05 AM",
+        "learner": "An Vo",
+        "lab": "Lab 2",
+        "attempt": "V3",
+        "score": 9,
+        "model": "Gemini 3.8 Flash",
+        "status": "pass"
+      },
+      {
+        "id": "RUN-9079",
+        "time": "10:43:52 AM",
+        "learner": "Minh Le",
+        "lab": "Lab 1",
+        "attempt": "V2",
+        "score": 10,
+        "model": "Gemini 3.8 Flash",
+        "status": "pass"
+      },
+      {
+        "id": "RUN-9078",
+        "time": "10:43:30 AM",
+        "learner": "Khang Nguyen",
+        "lab": "Lab 3",
+        "attempt": "V6",
+        "score": 5,
+        "model": "Gemini 3.8 Flash",
+        "status": "warn"
+      }
+    ]
+  },
+  "UI-10": {
+    "lang": "en",
+    "modalOpen": true,
+    "selectedAttempt": 5,
+    "hintSent": false,
+    "manualCleared": false,
+    "trainerNote": "",
+    "noteSaved": false,
+    "learner": {
+      "id": "INT-L-842",
+      "name": "Linh Pham",
+      "email": "linh.pham@intrepid.asia",
+      "dept": "Brand Solutions & Campaign Ops",
+      "currentLab": "Lab 03: One-shot Brand Voice & Classification",
+      "status": "stuck",
+      "totalRuns": 5,
+      "timeInLab": "24 mins",
+      "assignedSupervisor": "Vo Tu Duc (Enterprise Training Lead)"
+    },
+    "attempts": [
+      {
+        "version": 1,
+        "score": 3,
+        "timestamp": "10:14 AM",
+        "latency": "0.62s",
+        "issue": "Vague prompt, missing role & context",
+        "prompt": "Write a summary of customer feedback tickets for 11.11 sale and classify them."
+      },
+      {
+        "version": 2,
+        "score": 4,
+        "timestamp": "10:18 AM",
+        "latency": "0.71s",
+        "issue": "Missing One-shot example & SOP rules",
+        "prompt": "[Role]: Act as Campaign Ops Lead.\n[Task]: Classify ticket into SLA P1, P2, P3.\nTicket: Double payment deducted."
+      },
+      {
+        "version": 3,
+        "score": 4,
+        "timestamp": "10:22 AM",
+        "latency": "0.78s",
+        "issue": "Missing SOP page citation",
+        "prompt": "[Role]: Act as Senior Campaign Ops Lead.\n[Context]: Review tickets using Intrepid SLA SOP v4.\n[Task]: Classify ticket into P1, P2, P3.\n[One-Shot Example]:\nTicket: 'Payment deducted twice' -> P1 Critical.\nInput: {{ticket_text}}"
+      },
+      {
+        "version": 4,
+        "score": 5,
+        "timestamp": "10:28 AM",
+        "latency": "0.81s",
+        "issue": "Missing Markdown table format",
+        "prompt": "[Role]: Act as Senior Campaign Ops Lead for Intrepid.\n[Context]: Review tickets using Intrepid SLA SOP v4.\n[Task]: Classify ticket into P1, P2, P3.\n[One-Shot Example]: Ticket: 'Payment deducted twice' -> P1 Critical.\n[Input]: {{ticket_text}}\n[Constraint]: Cite page number from SOP."
+      },
+      {
+        "version": 5,
+        "score": 4,
+        "timestamp": "10:35 AM",
+        "latency": "0.85s",
+        "issue": "Hallucinated SLA response window (30 mins instead of 15 mins)",
+        "prompt": "[Role]: Act as Senior Campaign Ops Lead for Intrepid Asia.\n[Context]: Review customer tickets from 11.11 Mega Sale using Intrepid SLA SOP v4.\n[Task]: Classify support ticket below into Priority SLA Level (P1, P2, P3).\n[One-Shot Example]:\nTicket: 'Payment deducted twice' -> P1 Critical (Max response: 30 mins).\n[Input Ticket]: {{ticket_text}}\n[Format]: Return Markdown Table with Ticket ID, Priority, Action."
+      }
+    ]
+  },
+  "UI-11": {
+    "lang": "en",
+    "userDept": "Brand Solutions & Campaign Ops",
+    "userName": "Linh Pham",
+    "activeTab": "enterprise",
+    "searchQuery": "",
+    "selectedDeptFilter": "All Departments",
+    "selectedTechFilter": "All Techniques",
+    "selectedPrompt": null,
+    "detailModalOpen": false,
+    "copiedPrompt": false,
+    "submitModalOpen": false,
+    "departments": [
+      "All Departments",
+      "Brand Solutions & Campaign Ops",
+      "E-commerce Store Operations",
+      "Customer Support & SLA Desk",
+      "Commercial & Business Development",
+      "Supply Chain & Fulfillment",
+      "Finance, Tax & Billing"
+    ],
+    "techniques": [
+      "All Techniques",
+      "Zero-shot & Audit",
+      "Structured Output (Markdown/JSON)",
+      "One-shot Classification",
+      "Few-shot System Instructions",
+      "Grounding & Guardrails"
+    ],
+    "prompts": [
+      {
+        "id": "SOP-PRM-101",
+        "title": "11.11 Flash Sale SLA Ticket Classifier & Citation Table",
+        "dept": "Brand Solutions & Campaign Ops",
+        "author": "Vo Tu Duc (Training Lead)",
+        "technique": "One-shot Classification",
+        "score": 9.4,
+        "usageCount": 142,
+        "isApproved": true,
+        "updated": "2 days ago",
+        "groundingDoc": "SOP-Campaign-Ops-v4.pdf (Page 4)",
+        "variables": [
+          "{{ticket_text}}",
+          "{{sop_context}}"
+        ],
+        "description": "Classifies customer support tickets into P1, P2, P3 SLA escalation tiers with exact page citations from SOP v4.",
+        "templateText": "[Role]: Act as Senior Campaign Ops Lead for Intrepid Asia.\n\n[Context]: Review customer feedback tickets from the latest 11.11 Mega Sale Campaign using Intrepid SLA SOP v4.\n\n[Task]: Classify the support ticket below into Priority SLA Level (P1 - Critical, P2 - High, P3 - Normal).\n\n[One-Shot Example]:\nTicket: 'Payment deducted twice but order status shows cancelled.'\nClassification: P1 - Critical SLA (Max response time: 15 mins).\n\n[Input Ticket]:\n{{ticket_text}}\n\n[Format]: Return a clean Markdown Table with 4 columns: Ticket ID, Priority Level, Required Action, SOP Citation.\n[Constraint]: Strictly cite page numbers from SOP-Campaign-Ops-v4.pdf."
+      },
+      {
+        "id": "SOP-PRM-102",
+        "title": "E-commerce Flash Deal Voucher Discrepancy Auditor",
+        "dept": "E-commerce Store Operations",
+        "author": "Khang Nguyen (Store Ops)",
+        "technique": "Structured Output (Markdown/JSON)",
+        "score": 8.9,
+        "usageCount": 88,
+        "isApproved": true,
+        "updated": "3 days ago",
+        "groundingDoc": "Voucher-Reconciliation-Guide.xlsx",
+        "variables": [
+          "{{order_id}}",
+          "{{voucher_code}}"
+        ],
+        "description": "Enforces strict JSON schema output for marketplace voucher audit logs across Shopee and Lazada stores.",
+        "templateText": "[Role]: Act as E-Commerce Store Operations Auditor.\n[Task]: Audit order {{order_id}} against voucher code {{voucher_code}}.\n[Constraint]: Output must strictly follow valid JSON format with keys: order_id, status, error_margin, escalation_required."
+      },
+      {
+        "id": "SOP-PRM-103",
+        "title": "Customer Ticket Empathy & Brand Voice Response Generator",
+        "dept": "Customer Support & SLA Desk",
+        "author": "Duong Tran (SLA Desk Lead)",
+        "technique": "Few-shot System Instructions",
+        "score": 9.1,
+        "usageCount": 204,
+        "isApproved": true,
+        "updated": "1 week ago",
+        "groundingDoc": "Intrepid-Brand-Voice-Guide-2026.md",
+        "variables": [
+          "{{customer_name}}",
+          "{{issue_description}}"
+        ],
+        "description": "Generates professional, empathetic customer response emails adhering to Intrepid Asia 2026 Brand Tone.",
+        "templateText": "[Role]: Act as Senior Customer Care Specialist for Intrepid Asia.\n[Tone]: Professional, empathetic, solution-oriented.\n[Task]: Write a response to {{customer_name}} regarding {{issue_description}}.\n[Rule]: Never promise unverified refund dates."
+      },
+      {
+        "id": "SOP-PRM-104",
+        "title": "Supply Chain Shipping Delay & Warehouse SLA Escalator",
+        "dept": "Supply Chain & Fulfillment",
+        "author": "An Vo (Logistics PIC)",
+        "technique": "Grounding & Guardrails",
+        "score": 8.7,
+        "usageCount": 64,
+        "isApproved": true,
+        "updated": "5 days ago",
+        "groundingDoc": "Warehouse-3PL-SLA-Matrix.pdf",
+        "variables": [
+          "{{tracking_no}}",
+          "{{delay_hours}}"
+        ],
+        "description": "Cross-references 3PL delivery delays against contractual penalty rules and outputs an escalation memo.",
+        "templateText": "[Role]: Act as Logistics Compliance Lead.\n[Task]: Evaluate tracking # {{tracking_no}} delayed by {{delay_hours}} hours.\n[Constraint]: Cite exact 3PL penalty clauses from Warehouse-3PL-SLA-Matrix.pdf."
+      }
+    ]
+  },
+  "UI-12": {
+    "lang": "en",
+    "clientName": "Intrepid Asia",
+    "dateRange": "Q4 2026 (Oct 06 - Oct 23)",
+    "exportingReport": false,
+    "selectedDept": "All Departments",
+    "departments": [
+      "All Departments (27 Functions)",
+      "Brand Solutions & Campaign Ops",
+      "E-commerce Store Operations",
+      "Customer Support & SLA Desk",
+      "Commercial & Business Development",
+      "Supply Chain & Fulfillment",
+      "Finance, Tax & Billing"
+    ],
+    "kpis": {
+      "totalEnrolled": 1150,
+      "completedLearners": 1017,
+      "completionRate": 88.4,
+      "preScoreAvg": 4.2,
+      "postScoreAvg": 8.6,
+      "scoreDelta": "+104.7%",
+      "totalPromptsCreated": 3420,
+      "estHoursSavedPerWeek": 2.4,
+      "annualRoiEst": "$184,200"
+    },
+    "techniqueBreakdown": [
+      {
+        "name": "1. Zero-shot Prompting & SOP Audit",
+        "pre": 3.8,
+        "post": 9.2,
+        "gain": "+142%"
+      },
+      {
+        "name": "2. Structured Output (Markdown/JSON)",
+        "pre": 4.5,
+        "post": 8.9,
+        "gain": "+97%"
+      },
+      {
+        "name": "3. One-shot Brand Voice & Classification",
+        "pre": 4.1,
+        "post": 8.4,
+        "gain": "+105%"
+      },
+      {
+        "name": "4. Few-shot System Instructions & Variables",
+        "pre": 4,
+        "post": 8.2,
+        "gain": "+105%"
+      },
+      {
+        "name": "5. Grounding & Anti-Hallucination Guardrails",
+        "pre": 4.6,
+        "post": 8.7,
+        "gain": "+89%"
+      }
+    ],
+    "deptLeaderboard": [
+      {
+        "dept": "Brand Solutions & Campaign Ops",
+        "enrolled": 240,
+        "completed": 228,
+        "rate": "95.0%",
+        "avgScore": 8.8,
+        "sopsCreated": 840,
+        "hoursSaved": "2.8h/wk"
+      },
+      {
+        "dept": "Customer Support & SLA Desk",
+        "enrolled": 310,
+        "completed": 285,
+        "rate": "91.9%",
+        "avgScore": 8.7,
+        "sopsCreated": 1120,
+        "hoursSaved": "3.1h/wk"
+      },
+      {
+        "dept": "E-commerce Store Operations",
+        "enrolled": 220,
+        "completed": 198,
+        "rate": "90.0%",
+        "avgScore": 8.5,
+        "sopsCreated": 680,
+        "hoursSaved": "2.2h/wk"
+      },
+      {
+        "dept": "Finance, Tax & Billing",
+        "enrolled": 180,
+        "completed": 151,
+        "rate": "83.8%",
+        "avgScore": 8.3,
+        "sopsCreated": 420,
+        "hoursSaved": "1.9h/wk"
+      },
+      {
+        "dept": "Supply Chain & Fulfillment",
+        "enrolled": 200,
+        "completed": 155,
+        "rate": "77.5%",
+        "avgScore": 8.2,
+        "sopsCreated": 360,
+        "hoursSaved": "1.8h/wk"
+      }
+    ]
+  },
+  "UI-13": {
+    "lang": "vi",
+    "modalOpen": true,
+    "activeTab": "upload_file",
+    "selectedDept": "Brand Solutions & Campaign Ops",
+    "sopTitle": "",
+    "versionTag": "v4.2",
+    "driveUrl": "",
+    "isUploading": false,
+    "uploadProgress": 0,
+    "uploadSuccess": false,
+    "dragOver": false,
+    "departments": [
+      "Brand Solutions & Campaign Ops",
+      "E-commerce Store Operations",
+      "Customer Support & SLA Desk",
+      "Commercial & Business Development",
+      "Supply Chain & Fulfillment",
+      "Finance, Tax & Billing"
+    ],
+    "ingestedSops": [
+      {
+        "id": "SOP-01",
+        "title": "SOP-Campaign-Ops-v4.pdf",
+        "type": "PDF",
+        "pages": 12,
+        "size": "2.4 MB",
+        "dept": "Brand Solutions & Campaign Ops",
+        "status": "synced",
+        "lastSync": "2 giờ trước",
+        "driveSynced": true
+      },
+      {
+        "id": "SOP-02",
+        "title": "Intrepid-Brand-Voice-Guide-2026.md",
+        "type": "Markdown",
+        "pages": 5,
+        "size": "480 KB",
+        "dept": "Brand Solutions & Campaign Ops",
+        "status": "synced",
+        "lastSync": "1 tuần trước",
+        "driveSynced": true
+      },
+      {
+        "id": "SOP-03",
+        "title": "Ticket-Escalation-SLA-Matrix.xlsx",
+        "type": "Excel",
+        "pages": 3,
+        "size": "1.1 MB",
+        "dept": "Customer Support & SLA Desk",
+        "status": "synced",
+        "lastSync": "Hôm qua",
+        "driveSynced": true
+      }
+    ]
+  },
+  "UI-14": {
+    "lang": "en",
+    "showKeySecret": false,
+    "selectedKey": null,
+    "rotationModalOpen": false,
+    "rotatingKey": false,
+    "domainModalOpen": false,
+    "newDomain": "",
+    "activeTab": "vault",
+    "newDomainAdded": false,
+    "domains": [
+      {
+        "domain": "@intrepid.asia",
+        "client": "Intrepid Asia",
+        "status": "active",
+        "usersCount": 1150,
+        "created": "2026-10-01"
+      },
+      {
+        "domain": "@agribank.com.vn",
+        "client": "Agribank B2B Enterprise",
+        "status": "active",
+        "usersCount": 2400,
+        "created": "2026-10-03"
+      }
+    ],
+    "apiKeys": [
+      {
+        "id": "KEY-GEM-01",
+        "provider": "Google AI Studio / Vertex AI",
+        "name": "Gemini 3.8 Flash - Primary Playground Exec",
+        "envVar": "GEMINI_FLASH_API_KEY",
+        "status": "healthy",
+        "usageToday": "142,890 tokens",
+        "costEst": "$0.14",
+        "limitRate": "1,000 RPM",
+        "lastRotated": "5 days ago"
+      },
+      {
+        "id": "KEY-GEM-02",
+        "provider": "Google AI Studio / Vertex AI",
+        "name": "Gemini 3.8 Pro - AI Judge Evaluator Engine",
+        "envVar": "GEMINI_PRO_API_KEY",
+        "status": "healthy",
+        "usageToday": "38,410 tokens",
+        "costEst": "$0.38",
+        "limitRate": "300 RPM",
+        "lastRotated": "12 days ago"
+      },
+      {
+        "id": "KEY-SVC-03",
+        "provider": "Google Cloud Service Account",
+        "name": "Drive & Sheets Sync Worker API",
+        "envVar": "GOOGLE_SA_CREDENTIALS",
+        "status": "healthy",
+        "usageToday": "1,240 API calls",
+        "costEst": "Free Tier",
+        "limitRate": "100 QPS",
+        "lastRotated": "20 days ago"
+      },
+      {
+        "id": "KEY-SUPA-04",
+        "provider": "Supabase PostgreSQL",
+        "name": "Supabase Service Role (RLS Bypass)",
+        "envVar": "SUPABASE_SERVICE_ROLE_KEY",
+        "status": "healthy",
+        "usageToday": "18,920 queries",
+        "costEst": "Enterprise",
+        "limitRate": "Unlimited",
+        "lastRotated": "30 days ago"
+      }
+    ],
+    "gatewayRules": [
+      {
+        "route": "Codelab Prompt Execution (UI-05)",
+        "targetModel": "Gemini 3.8 Flash",
+        "fallbackModel": "Gemini 3.8 Flash (Secondary)",
+        "avgLatency": "0.74s",
+        "errorRate": "0.02%",
+        "status": "active"
+      },
+      {
+        "route": "AI Judge Rubric Scorecard (UI-07)",
+        "targetModel": "Gemini 3.8 Pro",
+        "fallbackModel": "Gemini 3.8 Flash",
+        "avgLatency": "1.42s",
+        "errorRate": "0.05%",
+        "status": "active"
+      },
+      {
+        "route": "SOP Document Ingestion & RAG Indexing (UI-13)",
+        "targetModel": "Gemini 3.8 Pro (Embedding-004)",
+        "fallbackModel": "Gemini 3.8 Flash",
+        "avgLatency": "2.10s",
+        "errorRate": "0.00%",
+        "status": "active"
+      }
+    ],
+    "auditLogs": [
+      {
+        "id": "AUD-9012",
+        "time": "10:58:12 AM",
+        "event": "API Key Access",
+        "actor": "System Worker",
+        "resource": "GEMINI_FLASH_API_KEY",
+        "ip": "34.120.89.12 (Cloud Run)",
+        "status": "success"
+      },
+      {
+        "id": "AUD-9011",
+        "time": "10:55:04 AM",
+        "event": "Domain Guard Check",
+        "actor": "linh.pham@intrepid.asia",
+        "resource": "Google SSO Login",
+        "ip": "118.69.182.10",
+        "status": "success"
+      },
+      {
+        "id": "AUD-9010",
+        "time": "10:48:30 AM",
+        "event": "Blocked Login Attempt",
+        "actor": "hacker@unknown.com",
+        "resource": "Domain Whitelist Policy",
+        "ip": "192.168.1.100",
+        "status": "blocked"
+      },
+      {
+        "id": "AUD-9009",
+        "time": "10:42:15 AM",
+        "event": "RLS Context Query",
+        "actor": "Supabase RLS Worker",
+        "resource": "public.prompt_library",
+        "ip": "Internal DB",
+        "status": "success"
+      }
+    ]
+  },
+  "UI-15": {
+    "lang": "vi",
+    "activeTab": "connections",
+    "isSyncing": false,
+    "syncProgress": 0,
+    "syncSuccess": false,
+    "addModalOpen": false,
+    "errorModalOpen": false,
+    "selectedErrorLog": null,
+    "newSheetUrl": "",
+    "newClient": "Intrepid Asia",
+    "selectedDept": "Brand Solutions & Campaign Ops",
+    "clients": [
+      "Intrepid Asia",
+      "Agribank B2B Enterprise",
+      "Vietnam Airlines L&D"
+    ],
+    "sheetConnections": [
+      {
+        "id": "RST-SYNC-01",
+        "title": "[Master] Intrepid Cohort 04 - Roster Sync 2026",
+        "client": "Intrepid Asia",
+        "sheetId": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+        "saAccount": "sa-promptify-sync@intrepid-prod.iam.gserviceaccount.com",
+        "interval": "Mỗi 15 phút",
+        "lastSync": "5 phút trước",
+        "totalRows": 1150,
+        "status": "active",
+        "mappedCols": 5
+      },
+      {
+        "id": "RST-SYNC-02",
+        "title": "Agribank B2B Masterclass Batch 1 Roster",
+        "client": "Agribank B2B Enterprise",
+        "sheetId": "1A9834720981230498123049812304981230498123",
+        "saAccount": "sa-promptify-sync@intrepid-prod.iam.gserviceaccount.com",
+        "interval": "Mỗi 1 giờ",
+        "lastSync": "12 phút trước",
+        "totalRows": 2400,
+        "status": "active",
+        "mappedCols": 5
+      }
+    ],
+    "columnMappings": [
+      {
+        "sheetCol": "Họ và tên học viên",
+        "dbField": "full_name",
+        "required": true,
+        "mapped": true,
+        "sample": "Linh Phạm"
+      },
+      {
+        "sheetCol": "Email công ty (@intrepid.asia)",
+        "dbField": "email",
+        "required": true,
+        "mapped": true,
+        "sample": "linh.pham@intrepid.asia"
+      },
+      {
+        "sheetCol": "Mã phòng ban / Khoa",
+        "dbField": "department_id",
+        "required": true,
+        "mapped": true,
+        "sample": "DEPT-BRAND-01"
+      },
+      {
+        "sheetCol": "Mã số nhân viên (Employee ID)",
+        "dbField": "employee_id",
+        "required": false,
+        "mapped": true,
+        "sample": "INT-842"
+      },
+      {
+        "sheetCol": "Chức danh / Role",
+        "dbField": "job_title",
+        "required": false,
+        "mapped": true,
+        "sample": "Campaign Ops Specialist"
+      }
+    ],
+    "syncLogs": [
+      {
+        "id": "LOG-9082",
+        "time": "10:55:04 AM",
+        "sheetName": "Intrepid Cohort 04",
+        "processed": 1150,
+        "added": 12,
+        "updated": 1138,
+        "errors": 0,
+        "status": "success"
+      },
+      {
+        "id": "LOG-9081",
+        "time": "10:40:02 AM",
+        "sheetName": "Intrepid Cohort 04",
+        "processed": 1138,
+        "added": 0,
+        "updated": 1138,
+        "errors": 2,
+        "status": "warning",
+        "errorDetails": [
+          "Dòng 42: Email trùng lặp (duoc.vo@intrepid.asia)",
+          "Dòng 105: Sai định dạng domain email (@gmail.com)"
+        ]
+      },
+      {
+        "id": "LOG-9080",
+        "time": "09:55:00 AM",
+        "sheetName": "Agribank Batch 1",
+        "processed": 2400,
+        "added": 50,
+        "updated": 2350,
+        "errors": 0,
+        "status": "success"
+      }
+    ]
+  }
+}

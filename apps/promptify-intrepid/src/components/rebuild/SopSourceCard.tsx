@@ -1,0 +1,9 @@
+import React,{useState} from 'react';
+import {useProductLanguage} from '../../services/productI18nService';
+export default function SopSourceCard({source,onNotice,onInspect}:{source:any;onNotice:(text:string)=>void;onInspect?:()=>void}){
+ const vi=useProductLanguage()==='vi',p=(en:string,vn:string)=>vi?vn:en;
+ const pages=[...new Set<number>((source.chunks||[]).map((c:any)=>Number(c.page)).filter((n:number)=>Number.isInteger(n)&&n>0))].sort((a,b)=>a-b),[page,setPage]=useState(pages[0]||0);
+ const indexed=(source.chunks||[]).map((c:any)=>c.indexed_at).filter(Boolean).sort().at(-1),status=source.chunks?.length?p('Indexed','Đã lập chỉ mục'):source.metadata?.indexingStatus==='processing'?p('Syncing','Đang đồng bộ'):p('Pending indexing','Chờ lập chỉ mục');
+ const citation=source.citation+(page?' [Page '+page+']':'');
+ return <article className="lv-resource"><strong>{source.title}</strong><span className="lv-badge">{status}</span><p>{source.metadata?.filename||source.metadata?.type||'SOP'} · {source.metadata?.pages??(pages.length||'—')} {p('pages','trang')} · {source.chunks?.length??0} {p('chunks','đoạn')}</p><small>{p('Last indexed','Lập chỉ mục gần nhất')}: {indexed?new Date(indexed).toLocaleString(vi?'vi-VN':'en-US'):p('Not indexed yet','Chưa lập chỉ mục')}</small>{!!pages.length&&<label>{p('Citation page','Trang trích dẫn')}<select value={page} onChange={e=>setPage(Number(e.target.value))}>{pages.map(n=><option key={n} value={n}>{n}</option>)}</select></label>}<p><code>{citation}</code></p><button className="lv-secondary" onClick={()=>void navigator.clipboard.writeText(citation).then(()=>onNotice(p('Citation copied.','Đã sao chép trích dẫn.'))).catch(()=>onNotice(p('Copy failed.','Sao chép thất bại.')))}>{p('Copy citation path','Sao chép trích dẫn')}</button>{onInspect&&<button className="lv-secondary" onClick={onInspect}>{p('Inspect source','Xem nguồn')}</button>}</article>;
+}

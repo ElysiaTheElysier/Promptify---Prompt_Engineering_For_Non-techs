@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+// Static contracts for the async AI Judge wiring. JUDGE_MODE=sync stays the default behavior. Offline only.
+const read=file=>fs.readFileSync(new URL('../'+file,import.meta.url),'utf8');
+const server=read('src/services/cloudRunServer.ts');
+assert.match(server,/\(process\.env\.RUNTIME_MODE==='ai-worker'\|\|process\.env\.RUNTIME_MODE==='api'&&process\.env\.AI_WORKER_ISOLATED!=='true'\)&&url\.pathname==='\/internal\/judge'&&judgeAsyncEnabled\(\)/,'AI worker remains enabled while isolated API rejects AI work');
+assert.match(server,/req\.headers\['x-promptify-judge-token'\]/,'worker authenticates with the per-job token');
+assert.match(server,/bytes>4096/,'worker body is bounded');
+const product=read('src/services/productionServerService.ts');
+assert.match(product,/judgeAsyncEnabled\(\) \? enqueueJudge\(authorization, judgeBody\) : evaluateSavedRun\(authorization, judgeBody\)/,'sync Judge remains the default path');
+assert.match(product,/case 'judgeStatus': return judgeStatus\(/,'status polling action exists');
+assert.match(product,/if\(judgeAsyncEnabled\(\)\)\{\s*const ungraded/,'snapshot reads job state only in async mode (migration 012 may be absent in sync)');
+const client=read('src/services/productionClientService.ts');
+assert.match(client,/if \(!result\?\.async\) return result;/,'synchronous Judge response is returned unchanged');
+assert.match(client,/Date\.now\(\) - started < 30000 \? 3000 : 10000/,'poll every 3s for 30s, then 10s');
+assert.match(client,/started < 10000 \? 1000/,'fast Judge polls each second for the first 10s');
+assert.match(client,/document\.hidden\) continue/,'polling pauses in hidden tabs');
+const app=read('src/components/rebuild/ProductionApp.tsx');
+assert.match(app,/judge:async attemptId=>\{try\{await gradeAttempt\(/,'Run waits for the async grade');
+assert.match(app,/name==='judge'\?await gradeAttempt\(/,'Retry AI Judge waits for the async grade');
+assert.match(app,/flushSync\(\(\)=>setSnapshot[\s\S]*?evaluation_json:grade/,'authoritative grade renders before full snapshot refresh');
+assert.match(app,/waitForJudge\(\{classId,lessonId:lesson\.id,attemptId:attempt\.id\},setJudgeProgress,controller\.signal\)/,'reload resumes waiting');
+const v7=read('src/components/rebuild/ProductionWorkspaceV7.tsx');
+assert.match(v7,/!attempt\.evaluation_json&&!busy&&!props\.judgeProgress&&<button/,'no duplicate retry while a job is active');
+assert.match(v7,/AI Judge đang xếp hàng/,'queued state is visible');
+const sql=read('gcp/sql/012_judge_jobs.sql');
+assert.match(sql,/CREATE POLICY service_only ON public\.product_judge_jobs TO service_role/,'service_role can read jobs under RLS');
+assert.match(sql,/REVOKE ALL PRIVILEGES ON TABLE public\.product_judge_jobs FROM PUBLIC, anon, authenticated/,'browsers cannot read jobs or token hashes');
+console.log('Async Judge contracts PASS: async-only worker route with job token, sync default, owner polling, UI states and resume, service-only RLS. Static only.');

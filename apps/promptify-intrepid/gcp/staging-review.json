@@ -1,0 +1,20 @@
+{
+  "format": 1,
+  "status": "REVIEW_ONLY_NOT_APPROVED",
+  "project": "ai-transformation-510302",
+  "region": "asia-southeast1",
+  "instance": "promptify-staging",
+  "database": "promptify_db",
+  "apiService": "promptify-intrepid-api",
+  "firebaseAppId": "1:390575746801:web:af750eeab9c2bcf097c350",
+  "hostingOrigin": "https://ai-transformation-510302-intrepid-staging.web.app",
+  "localOrigins": ["http://localhost:5195", "http://127.0.0.1:5195"],
+  "generationModel": null,
+  "generationLocation": null,
+  "aiBudgetApproved": false,
+  "rosterSheetId": null,
+  "syntheticWritesApproved": false,
+  "confirmedMissingMigrations": ["006_mentor_feedback.sql", "010_structured_badge_rules.sql"],
+  "catalogReviewRequired": ["006_studio_class_scope.sql", "007_sop_binding_integrity.sql", "008_scoped_progress_rls.sql", "009_projection_and_indexing_recovery.sql"],
+  "deferred": ["worker deployment", "scheduler activation", "BigQuery warehouse", "IAM changes"]
+}

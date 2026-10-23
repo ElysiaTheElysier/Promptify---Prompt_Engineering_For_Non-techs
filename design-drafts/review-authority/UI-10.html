@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ 
+    // Active Learner Selector
+    activeLearnerId: 'L-101',
+    selectedVersion: 'V5',
+    
+    // Toast Confirmations
+    coachingMessage: '',
+    coachingToast: false,
+    noteToast: false,
+
+    // Session-Wide Learner Roster & Telemetry Data (Intrepid Cohort 04)
+    learners: {
+        'L-101': {
+            id: 'L-101',
+            name: 'Alex Tan',
+            dept: 'Brand Solutions & Ops',
+            cohort: 'Intrepid Cohort 04',
+            labId: 'LAB-BS-03',
+            labTitle: 'One-shot Brand Voice & SLA Ticket Classification',
+            status: 'stuck', // 'stuck', 'pii_breach', 'passed', 'in_progress'
+            
+            // Session Attendance & Engagement Telemetry
+            loginCount: 4,
+            firstJoined: '10:02 AM',
+            totalActiveTime: '34 mins',
+            lastActive: '2 mins ago',
+            
+            // Facilitator Internal Note
+            facilitatorNote: 'Alex skips SOP citations when trying to fix table formatting. Needs guidance on keeping [Context] intact.',
+            
+            // Historical Draft Versions (V1..V5)
+            versions: {
+                'V1': {
+                    timestamp: '10:14:02 AM',
+                    tokens: 84,
+                    latency: '0.42s',
+                    hasPii: false,
+                    score: 3.0,
+                    prompt: 'Please help me classify customer ticket 842 about payment issues.',
+                    aiOutput: 'Ticket #842 is classified as a payment dispute.',
+                    feedback: 'Zero-shot prompt lacking persona, format specification, and SOP citations.',
+                    scores: { groundedness: 0.0, persona: 0.0, format: 1.0, oneshot: 0.0, actionability: 2.0 }
+                },
+                'V2': {
+                    timestamp: '10:18:15 AM',
+                    tokens: 122,
+                    latency: '0.51s',
+                    hasPii: false,
+                    score: 4.5,
+                    prompt: '[Role]: Customer Service Agent.\n[Task]: Classify ticket #842: Payment deducted twice but order cancelled.',
+                    aiOutput: '| Ticket | Category |\n| #842 | Billing Error |',
+                    feedback: 'Added basic persona and table format, but lacks SOP citation and P1 SLA escalation logic.',
+                    scores: { groundedness: 0.0, persona: 1.0, format: 1.5, oneshot: 0.0, actionability: 2.0 }
+                },
+                'V3': {
+                    timestamp: '10:22:40 AM',
+                    tokens: 168,
+                    latency: '0.64s',
+                    hasPii: false,
+                    score: 5.2,
+                    prompt: '[Role]: Senior Campaign Ops Lead.\n[Context]: Review ticket #842.\n[Task]: Output table with Priority and Action.',
+                    aiOutput: '| Ticket ID | Priority | Action |\n| #842 | High | Refund customer |',
+                    feedback: 'Missing explicit SOP-Campaign-Ops-v4.pdf citation and One-Shot example component.',
+                    scores: { groundedness: 0.0, persona: 2.0, format: 2.0, oneshot: 0.0, actionability: 1.2 }
+                },
+                'V4': {
+                    timestamp: '10:27:11 AM',
+                    tokens: 195,
+                    latency: '0.68s',
+                    hasPii: false,
+                    score: 5.8,
+                    prompt: '[Role]: Senior Campaign Ops Lead.\n[Context]: 11.11 Mega Sale Ticket #842.\n[Task]: Classify using Intrepid SOP.\n[Format]: 4-column Markdown table.',
+                    aiOutput: '| Ticket ID | Priority Level | Required Action | SOP Citation |\n| #842 | P1 | Escalate | Intrepid SOP |',
+                    feedback: 'Citation is vague. Must explicitly cite page number (Page 4) from SOP-Campaign-Ops-v4.pdf.',
+                    scores: { groundedness: 1.0, persona: 2.0, format: 2.0, oneshot: 0.0, actionability: 0.8 }
+                },
+                'V5': {
+                    timestamp: '10:31:50 AM',
+                    tokens: 218,
+                    latency: '0.72s',
+                    hasPii: false,
+                    score: 5.2,
+                    prompt: '[Role]: Senior Campaign Ops Lead.\n[Task]: Classify ticket #842.\n[One-Shot]: Ticket: Double charge -> P1 SLA.\n[Format]: Output table.',
+                    aiOutput: '| Ticket ID | Priority | Action | SOP Citation |\n| #842 | P1 | Escalate in 15m | Missing Page Citation |',
+                    feedback: 'STUCK (>5 Fails): Learner removed SOP context while adding One-Shot block. Groundedness dropped to 0/3.0.',
+                    scores: { groundedness: 0.0, persona: 2.0, format: 2.0, oneshot: 1.5, actionability: 0.0 }
+                }
+            }
+        },
+        'L-102': {
+            id: 'L-102',
+            name: 'Minh Dao',
+            dept: 'Campaign Management',
+            cohort: 'Intrepid Cohort 04',
+            labId: 'LAB-BS-03',
+            labTitle: 'One-shot Brand Voice & SLA Ticket Classification',
+            status: 'pii_breach',
+            loginCount: 2,
+            firstJoined: '10:10 AM',
+            totalActiveTime: '21 mins',
+            lastActive: '5 mins ago',
+            facilitatorNote: 'Breached PII in V4 by pasting raw CCCD. Sent warning to scrub data.',
+            versions: {
+                'V4': {
+                    timestamp: '10:29:12 AM',
+                    tokens: 174,
+                    latency: '0.58s',
+                    hasPii: true,
+                    score: 4.0,
+                    prompt: 'Customer Nguyen Van A (CCCD 034091002847, SĐT 0912.345.678) paid twice for order #842.',
+                    aiOutput: 'P1 SLA escalation required for Nguyen Van A.',
+                    feedback: 'CRITICAL SECURITY BREACH: Unscrubbed CCCD and Phone number detected in prompt body.',
+                    scores: { groundedness: 2.0, persona: 0.0, format: 1.0, oneshot: 0.0, actionability: 1.0 }
+                }
+            }
+        },
+        'L-103': {
+            id: 'L-103',
+            name: 'Priya Sharma',
+            dept: 'Brand Operations',
+            cohort: 'Intrepid Cohort 04',
+            labId: 'LAB-BS-03',
+            labTitle: 'One-shot Brand Voice & SLA Ticket Classification',
+            status: 'passed',
+            loginCount: 1,
+            firstJoined: '10:00 AM',
+            totalActiveTime: '18 mins',
+            lastActive: '12 mins ago',
+            facilitatorNote: 'Excellent execution. First attempt passed with 9.2/10.',
+            versions: {
+                'V2': {
+                    timestamp: '10:18:00 AM',
+                    tokens: 242,
+                    latency: '0.71s',
+                    hasPii: false,
+                    score: 9.2,
+                    prompt: '[Role]: Senior Campaign Ops Lead.\n[Context]: Review ticket #842.\n[One-Shot]: Ticket: Double charge -> P1 SLA.\n[Format]: Markdown table citing SOP-Campaign-Ops-v4.pdf Page 4.',
+                    aiOutput: '| Ticket ID | Priority | Action | SOP Citation |\n| #842 | P1 Critical | Escalate in 15m | SOP-Campaign-Ops-v4.pdf Page 4 |',
+                    feedback: 'Passed benchmark! Complete role, formatting, and grounding citations.',
+                    scores: { groundedness: 3.0, persona: 2.0, format: 2.0, oneshot: 1.5, actionability: 0.7 }
+                }
+            }
+        },
+        'L-104': {
+            id: 'L-104',
+            name: 'Le Hoang',
+            dept: 'E-commerce Ops',
+            cohort: 'Intrepid Cohort 04',
+            labId: 'LAB-BS-03',
+            labTitle: 'One-shot Brand Voice & SLA Ticket Classification',
+            status: 'in_progress',
+            loginCount: 3,
+            firstJoined: '10:05 AM',
+            totalActiveTime: '28 mins',
+            lastActive: '1 min ago',
+            facilitatorNote: 'Iterating on One-Shot syntax block.',
+            versions: {
+                'V3': {
+                    timestamp: '10:30:15 AM',
+                    tokens: 188,
+                    latency: '0.62s',
+                    hasPii: false,
+                    score: 7.5,
+                    prompt: '[Role]: Ops Lead.\n[Task]: Classify #842.\n[Format]: Markdown Table.',
+                    aiOutput: '| Ticket | Priority |\n| #842 | P1 |',
+                    feedback: 'In Progress. Close to benchmark (7.5/10). Needs One-Shot example.',
+                    scores: { groundedness: 2.0, persona: 1.8, format: 2.0, oneshot: 0.5, actionability: 1.2 }
+                }
+            }
+        }
+    },
+
+    // Actions
+    switchLearner(id) {
+        this.activeLearnerId = id;
+        const availableVersions = Object.keys(this.learners[id].versions);
+        this.selectedVersion = availableVersions[availableVersions.length - 1]; // Pick latest version
+    },
+
+    sendPrivateCoaching() {
+        if (!this.coachingMessage.trim()) return;
+        this.coachingToast = true;
+        setTimeout(() => { this.coachingToast = false; this.coachingMessage = ''; }, 3000);
+    },
+
+    saveNote() {
+        this.noteToast = true;
+        setTimeout(() => { this.noteToast = false; }, 2500);
+    }
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify Intrepid - Refined Prompt Inspector (UI-10)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1'
+                        },
+                        brand: {
+                            emerald: '#059669',
+                            amber: '#D97706',
+                            rose: '#BA1A1A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 18px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+    <!-- ================================================================= -->
+    <!-- HEADER & TRIAD NAVIGATION LINKS                                   -->
+    <!-- ================================================================= -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-2.5">
+        <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Context Title -->
+            <div class="flex items-center gap-3">
+                <a href="/trainer/dashboard" class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-2xl bg-brand-emerald text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                        P
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-extrabold text-xs tracking-tight text-m3-on-surface">UI-10: Prompt Inspector & 1-on-1 Coaching Workspace</span>
+                        <span class="text-[10px] font-mono text-brand-emerald font-bold" x-text="`${learners[activeLearnerId].labId} • ${learners[activeLearnerId].labTitle}`"></span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- TRIAD CROSS-NAVIGATION BUTTONS -->
+            <div class="flex items-center gap-2">
+                <!-- Link to UI-09 Control Center -->
+                <a href="/trainer/dashboard" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-m3-surface-container-low border border-m3-outline-variant text-xs font-bold text-m3-on-surface hover:bg-m3-surface-container-high transition-all">
+                    <span class="material-symbols-outlined text-sm text-m3-primary">arrow_back</span>
+                    <span>Back to Live War Room (UI-09)</span>
+                </a>
+
+                <!-- Link to UI-11 Curriculum Studio -->
+                <a href="/trainer/curriculum" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 text-purple-900 border border-purple-300 text-xs font-bold hover:bg-purple-100 transition-all">
+                    <span class="material-symbols-outlined text-sm text-purple-700">edit_note</span>
+                    <span>Edit Master Template (UI-11)</span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- NEW FEATURE 1: QUICK LEARNER SWITCHER CAROUSEL BAR               -->
+    <!-- ================================================================= -->
+    <div class="bg-m3-surface-container-low border-b border-m3-outline-variant px-4 lg:px-8 py-2.5">
+        <div class="max-w-[1600px] mx-auto flex items-center gap-3 overflow-x-auto">
+            <span class="text-xs font-bold text-m3-on-surface-variant whitespace-nowrap flex items-center gap-1">
+                <span class="material-symbols-outlined text-m3-primary text-sm">groups</span>
+                <span>Session Learner Roster:</span>
+            </span>
+
+            <div class="flex items-center gap-2">
+                <template x-for="(learnerObj, lId) in learners" :key="lId">
+                    <button @click="switchLearner(lId)" 
+                            :class="activeLearnerId === lId ? 'bg-m3-primary text-white shadow-md border-m3-primary' : 'bg-white text-m3-on-surface hover:bg-m3-surface-container-high border-m3-outline-variant'"
+                            class="px-3 py-1.5 rounded-2xl border text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap">
+                        <span x-text="learnerObj.name"></span>
+                        
+                        <!-- Mini Status Badges -->
+                        <template x-if="learnerObj.status === 'stuck'">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                        </template>
+                        <template x-if="learnerObj.status === 'pii_breach'">
+                            <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+                        </template>
+                        <template x-if="learnerObj.status === 'passed'">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        </template>
+                        <template x-if="learnerObj.status === 'in_progress'">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        </template>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MAIN INSPECTOR CONTENT BODY                                       -->
+    <!-- ================================================================= -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-5 space-y-6">
+
+        <!-- ACTIVE LEARNER HEADER CARD + NEW FEATURE 2: ATTENDANCE TELEMETRY -->
+        <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 shadow-xs space-y-3">
+            
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-lg font-extrabold text-m3-on-surface" x-text="learners[activeLearnerId].name"></h1>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-300" x-text="learners[activeLearnerId].dept"></span>
+                        
+                        <!-- Status Flag -->
+                        <template x-if="learners[activeLearnerId].status === 'stuck'">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-900 border border-red-300 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-red-700">warning</span>
+                                <span>STUCK (>5 Failed Attempts)</span>
+                            </span>
+                        </template>
+                        <template x-if="learners[activeLearnerId].status === 'pii_breach'">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-purple-700">lock_open</span>
+                                <span>PII BREACH DETECTED</span>
+                            </span>
+                        </template>
+                    </div>
+
+                    <p class="text-xs text-m3-on-surface-variant">
+                        Cohort: <strong class="text-m3-on-surface" x-text="learners[activeLearnerId].cohort"></strong> • Active Exercise: <strong class="text-m3-primary" x-text="learners[activeLearnerId].labId"></strong>
+                    </p>
+                </div>
+
+                <!-- Version Switcher Pills (V1..V5 History) -->
+                <div class="flex items-center gap-2 bg-m3-surface-container-low p-1.5 rounded-2xl border border-m3-outline-variant">
+                    <span class="text-xs text-m3-on-surface-variant font-bold px-2">Draft History:</span>
+                    <template x-for="(versionData, verKey) in learners[activeLearnerId].versions" :key="verKey">
+                        <button @click="selectedVersion = verKey" 
+                                :class="selectedVersion === verKey ? 'bg-m3-primary text-white shadow-xs' : 'bg-white text-m3-on-surface hover:bg-m3-surface-container-high'"
+                                class="px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all">
+                            <span x-text="verKey"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- NEW FEATURE 2: ATTENDANCE & SESSION METRICS BAR -->
+            <div class="pt-3 border-t border-m3-outline-variant/60 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
+                <div class="p-2 bg-m3-surface rounded-xl border border-m3-outline-variant/60">
+                    <span class="text-[10px] text-m3-outline block font-sans">Session Logins:</span>
+                    <strong class="text-m3-on-surface" x-text="`${learners[activeLearnerId].loginCount} times`"></strong>
+                </div>
+
+                <div class="p-2 bg-m3-surface rounded-xl border border-m3-outline-variant/60">
+                    <span class="text-[10px] text-m3-outline block font-sans">First Joined:</span>
+                    <strong class="text-m3-on-surface" x-text="learners[activeLearnerId].firstJoined"></strong>
+                </div>
+
+                <div class="p-2 bg-m3-surface rounded-xl border border-m3-outline-variant/60">
+                    <span class="text-[10px] text-m3-outline block font-sans">Total Active Time:</span>
+                    <strong class="text-m3-primary" x-text="learners[activeLearnerId].totalActiveTime"></strong>
+                </div>
+
+                <div class="p-2 bg-m3-surface rounded-xl border border-m3-outline-variant/60">
+                    <span class="text-[10px] text-m3-outline block font-sans">Last Active:</span>
+                    <strong class="text-brand-emerald" x-text="learners[activeLearnerId].lastActive"></strong>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2-COLUMN INSPECTION GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- COLUMN 1: VERBATIM SYNTAX & 1-ON-1 COACHING (7 cols) -->
+            <div class="lg:col-span-7 space-y-4">
+                
+                <!-- Verbatim Prompt Syntax Box -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-3 shadow-xs">
+                    
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-2.5 text-xs">
+                        <div class="flex items-center gap-2 font-bold text-m3-on-surface">
+                            <span class="material-symbols-outlined text-m3-primary">terminal</span>
+                            <span x-text="`Verbatim Prompt Syntax (${selectedVersion})`"></span>
+                        </div>
+
+                        <div class="flex items-center gap-2 font-mono text-[10px] text-m3-outline">
+                            <span x-text="learners[activeLearnerId].versions[selectedVersion].timestamp"></span>
+                            <span>•</span>
+                            <span x-text="`${learners[activeLearnerId].versions[selectedVersion].tokens} tokens`"></span>
+                            <span>•</span>
+                            <span x-text="learners[activeLearnerId].versions[selectedVersion].latency"></span>
+                        </div>
+                    </div>
+
+                    <!-- Monospaced Code Viewer -->
+                    <pre class="p-4 bg-slate-950 text-slate-100 rounded-2xl font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed select-all border border-slate-800" x-text="learners[activeLearnerId].versions[selectedVersion].prompt"></pre>
+                </div>
+
+                <!-- Executed AI Response Card -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-3 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-2.5 text-xs">
+                        <div class="flex items-center gap-2 font-bold text-m3-on-surface">
+                            <span class="material-symbols-outlined text-brand-emerald">smart_toy</span>
+                            <span>Gemini 3.8 Flash Output</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded font-mono text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">Executed Successfully</span>
+                    </div>
+
+                    <pre class="p-4 bg-m3-surface rounded-2xl font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed border border-m3-outline-variant/80 text-m3-on-surface" x-text="learners[activeLearnerId].versions[selectedVersion].aiOutput"></pre>
+                </div>
+
+                <!-- WORKING FEATURE: PRIVATE 1-ON-1 COACHING INTERVENTION BAR -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-3 shadow-xs">
+                    <div class="flex items-center justify-between text-xs font-bold text-m3-on-surface">
+                        <span class="flex items-center gap-1.5 text-m3-primary">
+                            <span class="material-symbols-outlined text-sm">support_agent</span>
+                            <span>Send Private 1-on-1 Coaching Tip to Learner Workspace (UI-05):</span>
+                        </span>
+                        <span class="text-[10px] text-m3-outline font-mono" x-text="`Target: ${learners[activeLearnerId].name}`"></span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <textarea x-model="coachingMessage" 
+                                  rows="2" 
+                                  placeholder="Type custom coaching tip (e.g. 'Remember to cite Page 4 from SOP-Campaign-Ops-v4.pdf inside your [Context] block!')..." 
+                                  class="w-full p-3 rounded-2xl border border-m3-outline-variant bg-m3-surface-container-low text-xs font-sans focus:outline-none focus:border-m3-primary"></textarea>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-m3-on-surface-variant font-mono">Direct delivery to active editor</span>
+                            <button @click="sendPrivateCoaching()" class="px-5 py-2 rounded-xl bg-m3-primary text-white text-xs font-bold shadow-xs hover:bg-m3-primary/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">send</span>
+                                <span>Send Private Tip</span>
+                            </button>
+                        </div>
+
+                        <!-- Confirmation Toast -->
+                        <div x-show="coachingToast" x-transition.opacity class="p-2.5 bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold flex items-center gap-1.5" style="display: none;">
+                            <span class="material-symbols-outlined text-sm text-brand-emerald">check_circle</span>
+                            <span x-text="`Coaching tip delivered directly to ${learners[activeLearnerId].name}'s workspace (UI-05)!`"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COLUMN 2: 5-CRITERIA SCORECARD & NEW FEATURE 3: FACILITATOR NOTES (5 cols) -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <!-- NEW FEATURE 3: FACILITATOR INTERNAL NOTES WIDGET -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-3 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-2.5 text-xs">
+                        <span class="font-bold text-m3-on-surface flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-amber-600">sticky_note_2</span>
+                            <span>Facilitator Private Notes for Learner:</span>
+                        </span>
+                        <span class="text-[10px] text-m3-outline font-mono">Internal / Not visible to learner</span>
+                    </div>
+
+                    <textarea x-model="learners[activeLearnerId].facilitatorNote" 
+                              rows="3" 
+                              class="w-full p-3 rounded-2xl border border-amber-200 bg-amber-50/50 text-xs font-sans text-amber-950 focus:outline-none focus:border-amber-500 leading-relaxed"></textarea>
+
+                    <div class="flex items-center justify-between">
+                        <span x-show="noteToast" x-transition.opacity class="text-[10px] text-emerald-700 font-bold flex items-center gap-0.5">
+                            <span class="material-symbols-outlined text-xs">check</span> Note saved to database!
+                        </span>
+                        <button @click="saveNote()" class="px-4 py-1.5 rounded-xl border border-m3-outline-variant bg-white text-xs font-bold text-m3-on-surface hover:bg-m3-surface-container-low transition-all">
+                            Save Internal Note
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5-CRITERIA AI JUDGE SCORECARD BREAKDOWN -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-4 shadow-xs">
+                    
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <span class="font-extrabold text-sm text-m3-on-surface flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-brand-emerald">gavel</span>
+                            <span>AI Judge Evaluation Scorecard</span>
+                        </span>
+
+                        <span class="px-3 py-1 rounded-full font-mono font-extrabold text-sm border"
+                              :class="learners[activeLearnerId].versions[selectedVersion].score >= 8.0 ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-red-100 text-red-900 border-red-300'"
+                              x-text="`${learners[activeLearnerId].versions[selectedVersion].score} / 10`">
+                        </span>
+                    </div>
+
+                    <!-- 5 Criteria Score Breakdown Matching UI-11 Weights -->
+                    <div class="space-y-3 font-mono text-xs">
+                        
+                        <!-- Criteria 1: Groundedness (30%) -->
+                        <div class="p-2.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-1">
+                            <div class="flex justify-between items-center font-bold">
+                                <span class="text-m3-on-surface font-sans">1. Groundedness & SOP Citation (30%):</span>
+                                <strong :class="learners[activeLearnerId].versions[selectedVersion].scores.groundedness >= 2.4 ? 'text-brand-emerald' : 'text-brand-rose'"
+                                        x-text="`${learners[activeLearnerId].versions[selectedVersion].scores.groundedness} / 3.0`"></strong>
+                            </div>
+                            <p class="text-[10px] text-m3-on-surface-variant font-sans">Requires explicit citation of SOP-Campaign-Ops-v4.pdf Page 4.</p>
+                        </div>
+
+                        <!-- Criteria 2: Task & Role Persona (20%) -->
+                        <div class="p-2.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-1">
+                            <div class="flex justify-between items-center font-bold">
+                                <span class="text-m3-on-surface font-sans">2. Task & Role Persona Completion (20%):</span>
+                                <strong class="text-brand-emerald" x-text="`${learners[activeLearnerId].versions[selectedVersion].scores.persona} / 2.0`"></strong>
+                            </div>
+                            <p class="text-[10px] text-m3-on-surface-variant font-sans">Adopts Senior Campaign Ops Lead persona.</p>
+                        </div>
+
+                        <!-- Criteria 3: Format Adherence (20%) -->
+                        <div class="p-2.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-1">
+                            <div class="flex justify-between items-center font-bold">
+                                <span class="text-m3-on-surface font-sans">3. Format Adherence - Markdown (20%):</span>
+                                <strong class="text-brand-emerald" x-text="`${learners[activeLearnerId].versions[selectedVersion].scores.format} / 2.0`"></strong>
+                            </div>
+                            <p class="text-[10px] text-m3-on-surface-variant font-sans">Renders clean 4-column table layout.</p>
+                        </div>
+
+                        <!-- Criteria 4: One-Shot Pattern (15%) -->
+                        <div class="p-2.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-1">
+                            <div class="flex justify-between items-center font-bold">
+                                <span class="text-m3-on-surface font-sans">4. One-Shot Pattern Compliance (15%):</span>
+                                <strong :class="learners[activeLearnerId].versions[selectedVersion].scores.oneshot >= 1.2 ? 'text-brand-emerald' : 'text-brand-rose'"
+                                        x-text="`${learners[activeLearnerId].versions[selectedVersion].scores.oneshot} / 1.5`"></strong>
+                            </div>
+                            <p class="text-[10px] text-m3-on-surface-variant font-sans">Provides 1 explicit example in prompt body.</p>
+                        </div>
+
+                        <!-- Criteria 5: Actionability & SLA (15%) -->
+                        <div class="p-2.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-1">
+                            <div class="flex justify-between items-center font-bold">
+                                <span class="text-m3-on-surface font-sans">5. Business Actionability & SLA (15%):</span>
+                                <strong :class="learners[activeLearnerId].versions[selectedVersion].scores.actionability >= 1.2 ? 'text-brand-emerald' : 'text-brand-rose'"
+                                        x-text="`${learners[activeLearnerId].versions[selectedVersion].scores.actionability} / 1.5`"></strong>
+                            </div>
+                            <p class="text-[10px] text-m3-on-surface-variant font-sans">Identifies P1 15-minute response window.</p>
+                        </div>
+
+                    </div>
+
+                    <!-- Qualitative Diagnostic Summary -->
+                    <div class="pt-3 border-t border-m3-outline-variant/60 space-y-2 text-xs font-sans">
+                        <strong class="text-m3-on-surface font-bold block">Qualitative Feedback:</strong>
+                        <p class="p-3 bg-red-50 text-red-950 border border-red-200 rounded-2xl text-[11px] leading-relaxed font-semibold"
+                           x-text="learners[activeLearnerId].versions[selectedVersion].feedback"></p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- FOOTER                                                            -->
+    <!-- ================================================================= -->
+    <footer class="py-3 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-8">
+        <p>© 2026 Promptify x Intrepid Asia. Refined Prompt Inspector (UI-10) Active.</p>
+    </footer>
+
+</body>
+</html>

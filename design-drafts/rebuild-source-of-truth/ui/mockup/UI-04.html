@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{
+    lang: 'en',
+    userDept: 'Brand Solutions & Campaign Ops',
+    userName: 'Linh Pham',
+    userEmail: 'linh.pham@intrepid.asia',
+    totalAttempts: 14,
+    avgScore: '8.7',
+    sopDrawerOpen: false,
+    selectedSop: null,
+    labs: [
+        {
+            id: 'lab-1',
+            number: 1,
+            title: 'Zero-shot Prompting & SOP Audit',
+            subtitle: 'Extract exact SLAs and page citations from department SOPs',
+            status: 'completed', // 'completed', 'in_progress', 'not_started'
+            score: 10,
+            attempts: 3,
+            timeSpent: '15 mins',
+            icon: 'verified_user',
+            badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+        },
+        {
+            id: 'lab-2',
+            number: 2,
+            title: 'Structured Output & Markdown Tables',
+            subtitle: 'Enforce JSON schemas, clean tables, and zero digital clutter',
+            status: 'completed',
+            score: 9,
+            attempts: 4,
+            timeSpent: '18 mins',
+            icon: 'table_chart',
+            badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300'
+        },
+        {
+            id: 'lab-3',
+            number: 3,
+            title: 'One-shot Brand Voice & Classification',
+            subtitle: 'Classify support tickets & campaign feedback using single-example prompts',
+            status: 'in_progress',
+            score: 7,
+            attempts: 5,
+            timeSpent: '22 mins',
+            icon: 'auto_awesome',
+            badgeColor: 'bg-amber-100 text-amber-900 border-amber-300'
+        },
+        {
+            id: 'lab-4',
+            number: 4,
+            title: 'Few-shot System Instructions & {{variables}}',
+            subtitle: 'Build dynamic prompt templates with variable interpolation and system constraints',
+            status: 'not_started',
+            score: null,
+            attempts: 2,
+            timeSpent: '0 mins',
+            icon: 'tune',
+            badgeColor: 'bg-slate-100 text-slate-700 border-slate-300'
+        },
+        {
+            id: 'lab-5',
+            number: 5,
+            title: 'Grounding & Anti-Hallucination Guardrails',
+            subtitle: 'Prevent hallucinated policies and cross-reference enterprise context logs',
+            status: 'not_started',
+            score: null,
+            attempts: 0,
+            timeSpent: '0 mins',
+            icon: 'shield',
+            badgeColor: 'bg-slate-100 text-slate-700 border-slate-300'
+        }
+    ],
+    sops: [
+        { name: 'SOP-Campaign-Ops-v4.pdf', pages: 12, size: '2.4 MB', updated: '2 days ago', dept: 'Brand Solutions' },
+        { name: 'Intrepid-Brand-Voice-Guide-2026.md', pages: 5, size: '480 KB', updated: '1 week ago', dept: 'Brand Solutions' },
+        { name: 'Ticket-Escalation-SLA-Matrix.xlsx', pages: 3, size: '1.1 MB', updated: 'Yesterday', dept: 'Customer Support' }
+    ]
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify - Learner Department Training Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN for Micro-Interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'on-primary': '#FFFFFF',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1',
+                            error: '#BA1A1A',
+                            'error-container': '#FFDAD6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+<!-- ================================================================= -->
+<!-- TOP NAVIGATION BAR -->
+<!-- ================================================================= -->
+<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-3 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+        <!-- Brand Logo & Department Context -->
+        <div class="flex items-center gap-4">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-2xl bg-m3-primary text-white flex items-center justify-center font-bold text-lg shadow-md shadow-m3-primary/20">
+                    P
+                </div>
+                <span class="font-bold text-lg tracking-tight text-m3-on-surface hidden sm:inline-block">Promptify</span>
+            </a>
+
+            <div class="h-6 w-px bg-m3-outline-variant/80 hidden sm:block"></div>
+
+            <!-- Assigned Department Badge -->
+            <div class="flex items-center gap-2 bg-m3-primary-container/60 text-m3-on-primary-container px-3 py-1 rounded-full text-xs font-semibold">
+                <span class="material-symbols-outlined text-sm text-m3-primary">domain</span>
+                <span x-text="userDept"></span>
+            </div>
+        </div>
+
+        <!-- Right Profile & Quick Tools -->
+        <div class="flex items-center gap-3">
+
+            <!-- SOP Resources Drawer Button -->
+            <button @click="sopDrawerOpen = true"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-m3-outline-variant bg-white text-xs font-semibold text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-all">
+                <span class="material-symbols-outlined text-sm text-m3-primary">folder_open</span>
+                <span class="hidden md:inline-block" x-text="lang === 'en' ? 'Department SOPs' : 'Tài liệu SOP'"></span>
+                <span class="bg-m3-primary text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full" x-text="sops.length"></span>
+            </button>
+
+            <!-- Language Toggle -->
+            <button @click="lang = lang === 'en' ? 'vi' : 'en'"
+                    class="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-m3-outline-variant bg-white text-xs font-medium text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-sm">language</span>
+                <span x-text="lang.toUpperCase()"></span>
+            </button>
+
+            <!-- User Profile Avatar -->
+            <div class="flex items-center gap-2 pl-2 border-l border-m3-outline-variant/60">
+                <div class="w-8 h-8 rounded-full bg-m3-primary text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                    LP
+                </div>
+                <div class="hidden lg:block text-left text-xs">
+                    <p class="font-bold text-m3-on-surface leading-none" x-text="userName"></p>
+                    <p class="text-[10px] text-m3-on-surface-variant leading-tight">Learner</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+<!-- ================================================================= -->
+<!-- MAIN CONTENT CONTAINER -->
+<!-- ================================================================= -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 space-y-8">
+
+    <!-- HERO DEPARTMENT PROGRESS BANNER -->
+    <section class="bg-gradient-to-br from-m3-on-primary-container via-slate-900 to-m3-on-surface text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <!-- Background Decorative Grid -->
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+
+            <!-- Left Details -->
+            <div class="lg:col-span-8 space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-m3-primary-container border border-white/15">
+                    <span class="material-symbols-outlined text-sm text-emerald-400">school</span>
+                    <span>100-Minute Masterclass • Intrepid Enterprise Cohort</span>
+                </div>
+
+                <div class="space-y-1">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        <span x-show="lang === 'en'">Welcome back, Linh!</span>
+                        <span x-show="lang === 'vi'">Chào mừng trở lại, Linh!</span>
+                    </h1>
+                    <p class="text-sm text-slate-300 max-w-2xl leading-relaxed">
+                        <span x-show="lang === 'en'">Master AI prompting across 5 hands-on Codelabs grounded in real <strong>Brand Solutions & Campaign Ops</strong> SOPs.</span>
+                        <span x-show="lang === 'vi'">Thực hành làm chủ kỹ năng Prompting qua 5 bài Codelab gắn liền với tài liệu <strong>Brand Solutions & Campaign Ops</strong> thực tế.</span>
+                    </p>
+                </div>
+
+                <!-- Progress Statistics Bar -->
+                <div class="pt-2 flex flex-wrap items-center gap-6 text-xs text-slate-200">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+                        <span><strong>2 of 5</strong> Labs Completed (40%)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-m3-primary-container text-lg">history_edu</span>
+                        <span><strong>14</strong> Total Attempts Run</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-amber-400 text-lg">star</span>
+                        <span><strong>8.7 / 10</strong> Avg AI Judge Score</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Action / Primary Resume CTA -->
+            <div class="lg:col-span-4 bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 space-y-3">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-m3-primary-container block">Active Learning Focus:</span>
+                <p class="font-bold text-sm leading-snug">Lab 3: One-shot Brand Voice & Classification</p>
+                <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                    <div class="bg-amber-400 h-full w-[40%]"></div>
+                </div>
+                <button @click="alert('Launching Codelab Workspace (UI-05)...')"
+                        class="w-full flex items-center justify-center gap-2 bg-m3-primary hover:bg-m3-primary/90 text-white font-semibold py-2.5 px-4 rounded-full text-xs shadow-md transition-all hover:scale-[1.02]">
+                    <span>Resume Practice Session</span>
+                    <span class="material-symbols-outlined text-sm">play_arrow</span>
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CODELABS LEARNING PATH (5 LAB CARDS) -->
+    <section class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-m3-on-surface" x-text="lang === 'en' ? 'Masterclass Learning Path' : 'Lộ trình Thực hành 5 Codelabs'"></h2>
+                <p class="text-xs text-m3-on-surface-variant" x-text="lang === 'en' ? 'Complete labs in sequence to master prompt engineering' : 'Hoàn thành từng bài lab theo thứ tự để làm chủ kỹ năng'"></p>
+            </div>
+
+            <!-- Prototype Filter Switcher -->
+            <div class="flex items-center gap-1 bg-m3-surface-container-low p-1 rounded-xl text-xs font-semibold">
+                <button class="px-2.5 py-1 rounded-lg bg-white shadow text-m3-primary">All (5)</button>
+                <button class="px-2.5 py-1 rounded-lg text-m3-on-surface-variant hover:text-m3-on-surface">Active</button>
+            </div>
+        </div>
+
+        <!-- Grid of 5 Lab Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <template x-for="lab in labs" :key="lab.id">
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-6 flex flex-col justify-between space-y-5 hover:shadow-lg transition-all relative overflow-hidden group">
+
+                    <!-- Top Card Header -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-m3-primary font-bold text-sm shadow-inner"
+                                 :class="lab.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : (lab.status === 'in_progress' ? 'bg-amber-100 text-amber-900' : 'bg-m3-surface-container-low text-m3-outline')">
+                                <span class="material-symbols-outlined" x-text="lab.icon"></span>
+                            </div>
+
+                            <!-- Status Badge -->
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider"
+                                  :class="lab.badgeColor"
+                                  x-text="lab.status === 'completed' ? 'Completed' : (lab.status === 'in_progress' ? 'In Progress' : 'Not Started')">
+                                </span>
+                        </div>
+
+                        <div class="space-y-1">
+                            <span class="text-[11px] font-mono font-bold text-m3-primary uppercase tracking-wider" x-text="`CODELAB 0${lab.number}`"></span>
+                            <h3 class="font-bold text-base text-m3-on-surface group-hover:text-m3-primary transition-colors" x-text="lab.title"></h3>
+                            <p class="text-xs text-m3-on-surface-variant leading-relaxed line-clamp-2" x-text="lab.subtitle"></p>
+                        </div>
+                    </div>
+
+                    <!-- Card Metadata & Metrics -->
+                    <div class="space-y-4 pt-4 border-t border-m3-outline-variant/50">
+
+                        <!-- Attempt & Score Row -->
+                        <div class="flex items-center justify-between text-xs font-semibold">
+                                <span class="text-m3-on-surface-variant flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">history</span>
+                                    <span x-text="`${lab.attempts} attempts`"></span>
+                                </span>
+
+                            <template x-if="lab.score !== null">
+                                    <span class="flex items-center gap-1 font-bold"
+                                          :class="lab.score >= 8 ? 'text-emerald-700' : 'text-amber-700'">
+                                        <span class="material-symbols-outlined text-sm">star</span>
+                                        <span x-text="`Score: ${lab.score} / 10`"></span>
+                                    </span>
+                            </template>
+                            <template x-if="lab.score === null">
+                                <span class="text-m3-outline text-[11px] italic">Not evaluated</span>
+                            </template>
+                        </div>
+
+                        <!-- Action CTA Button -->
+                        <button @click="alert(`Opening Codelab ${lab.number}: ${lab.title}`)"
+                                class="w-full py-2.5 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
+                                :class="lab.status === 'in_progress' ? 'bg-m3-primary text-white shadow hover:bg-m3-primary/90' : (lab.status === 'completed' ? 'border border-m3-outline-variant text-m3-on-surface hover:bg-m3-surface-container-low' : 'bg-m3-surface-container-low text-m3-on-surface hover:bg-m3-surface-container-high')">
+                            <span x-text="lab.status === 'in_progress' ? 'Resume Lab' : (lab.status === 'completed' ? 'Review Submission' : 'Start Lab')"></span>
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+
+                    </div>
+
+                </div>
+            </template>
+        </div>
+    </section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- SLIDE-OVER DRAWER: DEPARTMENT SOP RESOURCES -->
+<!-- ================================================================= -->
+<div x-show="sopDrawerOpen"
+     x-transition.opacity
+     class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex justify-end"
+     style="display: none;">
+
+    <div @click.away="sopDrawerOpen = false"
+         class="bg-white w-full max-w-md h-full shadow-2xl p-6 space-y-6 flex flex-col justify-between border-l border-m3-outline-variant overflow-y-auto">
+
+        <div class="space-y-6">
+            <!-- Drawer Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-m3-outline-variant">
+                <div class="flex items-center gap-2 text-m3-primary">
+                    <span class="material-symbols-outlined text-2xl">folder_open</span>
+                    <h3 class="font-bold text-lg text-m3-on-surface">Department SOP Library</h3>
+                </div>
+                <button @click="sopDrawerOpen = false" class="text-m3-outline hover:text-m3-on-surface">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <p class="text-xs text-m3-on-surface-variant leading-relaxed">
+                These documents are ingested via the <strong>Google Drive Service Account Worker</strong> and served as ground-truth context in your Codelabs.
+            </p>
+
+            <!-- Ingested SOP List -->
+            <div class="space-y-3">
+                <template x-for="sop in sops" :key="sop.name">
+                    <div class="p-3.5 bg-m3-surface-container-low rounded-2xl border border-m3-outline-variant/60 hover:border-m3-primary transition-all space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-m3-primary text-xl">description</span>
+                                <span class="font-bold text-xs text-m3-on-surface line-clamp-1" x-text="sop.name"></span>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800" x-text="sop.dept"></span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-m3-on-surface-variant pt-1">
+                            <span x-text="`${sop.pages} pages • ${sop.size}`"></span>
+                            <span x-text="`Updated ${sop.updated}`"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Drawer Footer Action -->
+        <div class="pt-4 border-t border-m3-outline-variant">
+            <button @click="alert('Redirecting to Department Head SOP Upload Modal...')"
+                    class="w-full py-2.5 rounded-full border border-m3-outline-variant text-xs font-semibold text-m3-on-surface hover:bg-m3-surface-container-low transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">upload_file</span>
+                <span>Request New SOP Context Sync</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- FOOTER -->
+<!-- ================================================================= -->
+<footer class="py-6 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-12">
+    <p>© 2026 Promptify x Intrepid Asia. Grounded Masterclass Engine Active.</p>
+</footer>
+
+</body>
+</html>

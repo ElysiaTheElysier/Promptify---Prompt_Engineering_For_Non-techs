@@ -1,0 +1,6 @@
+# Overlay on the running ja1-1023 image: server files changed for the test-log gaps release (+ already-tested
+# Codex integration they import). All new behaviour is flag-gated, default OFF. No dependency changes.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:6b26c8fa5abd5dd272ced28bc42645fd21d9d5442cc92f759d3efb49a49d1331
+COPY --chown=node:node api/evaluate.ts api/generate.ts /app/api/
+COPY --chown=node:node src/services/admittedModelService.ts src/services/cloudRunServer.ts src/services/cloudSchema.json src/services/generationQueueService.ts src/services/generationStreamService.ts src/services/judgeFencingService.ts src/services/learnerSafeguardService.ts src/services/parallelJudgeService.ts src/services/productI18nService.ts src/services/productionAiService.ts src/services/productionClientService.ts src/services/productionServerService.ts src/services/promptInjectionService.ts src/services/providerAdmissionService.ts src/services/providerOperationsService.ts src/services/rebuildRunService.ts src/services/releaseUiTranslations.ts src/services/studioValidationService.ts src/services/vertexAiService.ts /app/src/services/
+COPY --chown=node:node src/types/production.ts /app/src/types/

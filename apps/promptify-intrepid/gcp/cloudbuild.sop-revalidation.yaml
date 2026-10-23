@@ -1,0 +1,7 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args: ['build', '-f', 'gcp/Dockerfile.sop-revalidation', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:sop-revalidation-20261020', '.']
+images:
+ - asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:sop-revalidation-20261020
+options:
+ logging: CLOUD_LOGGING_ONLY

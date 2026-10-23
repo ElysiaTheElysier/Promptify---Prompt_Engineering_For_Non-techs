@@ -1,0 +1,12 @@
+import React,{useState} from 'react';
+import type {ProductAttempt} from '../../types/production';
+import {useProductLanguage} from '../../services/productI18nService';
+import {lineDiff} from '../../services/textDiffService';
+export default function ProductionCompare({attempts,restore}:{attempts:ProductAttempt[];restore:(prompt:string)=>void}){
+ const language=useProductLanguage(),p=(en:string,vi:string)=>language==='en'?en:vi;
+ const [left,setLeft]=useState(attempts[1]?.id||attempts[0]?.id||''),[right,setRight]=useState(attempts[0]?.id||''),[content,setContent]=useState('prompt'),[mode,setMode]=useState('split');
+ const a=attempts.find(v=>v.id===left),b=attempts.find(v=>v.id===right),value=(v:ProductAttempt|undefined)=>v?(content==='prompt'?v.prompt_text:v.ai_output):'';
+ if(!attempts.length)return <p>{p('Run and save a prompt to compare versions.','Chạy và lưu prompt để so sánh phiên bản.')}</p>;
+ const diff=lineDiff(value(a),value(b));
+ return <section className="prod-card"><div className="prod-grid">{[[left,setLeft,'A'],[right,setRight,'B']].map(([id,set,label])=><label key={label as string}>{p('Version','Phiên bản')} {label as string}<select value={id as string} onChange={e=>(set as (v:string)=>void)(e.target.value)}>{attempts.map(v=><option key={v.id} value={v.id}>V{v.attempt_number} · {new Date(v.created_at).toLocaleString(language==='en'?'en-US':'vi-VN')}</option>)}</select></label>)}</div><nav className="prod-tabs">{[['prompt',p('Prompt','Prompt')],['output',p('AI output','Kết quả AI')]].map(([id,label])=><button key={id} aria-pressed={content===id} onClick={()=>setContent(id)}>{label}</button>)}{[['split',p('Side by side','Hai cột')],['unified',p('Unified diff','Khác biệt hợp nhất')]].map(([id,label])=><button key={id} aria-pressed={mode===id} onClick={()=>setMode(id)}>{label}</button>)}</nav>{mode==='split'?<div className="prod-grid">{[a,b].map((v,i)=><article key={i}><h3>{i?'B':'A'} · V{v?.attempt_number}</h3><pre>{value(v)}</pre><button disabled={!v} onClick={()=>v&&restore(v.prompt_text)}>{p('Restore this prompt','Khôi phục prompt này')}</button></article>)}</div>:<pre className="prod-diff">{diff.lines.map((line,i)=><span key={i} className={'prod-diff-'+line.kind}>{line.kind==='added'?'+':line.kind==='removed'?'-':' '} {line.text}{'\n'}</span>)}</pre>}{diff.coarse&&mode==='unified'&&<p>{p('Large texts use a whole-document comparison.','Nội dung dài được so sánh ở mức toàn tài liệu.')}</p>}</section>;
+}

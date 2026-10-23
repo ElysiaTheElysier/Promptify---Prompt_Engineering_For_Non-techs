@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promptify AI Playground v2 • Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Dev Toolbar for Quick State Switching & Screenshot Capture -->
+  <div class="dev-banner" id="devToolbar">
+    <div>
+      <strong>PROMPTIFY PROTOTYPE</strong> &nbsp;|&nbsp; <span>Google AI Studio Interaction Model</span>
+    </div>
+    <div class="dev-controls">
+      <span style="color:#94a3b8; font-size:10px;">PRESET STATES:</span>
+      <button class="dev-btn" onclick="setState('before_run')">1. Before Run</button>
+      <button class="dev-btn active" onclick="setState('after_run_guided')">2. After Run (Guided)</button>
+      <button class="dev-btn" onclick="setState('after_run_compact')">3. Compact Mode</button>
+      <button class="dev-btn" onclick="openDrawer('theory')">4. Theory</button>
+      <button class="dev-btn" onclick="openModal('solution')">5. Solution</button>
+      <button class="dev-btn" onclick="openModal('compare')">6. Compare</button>
+      <button class="dev-btn" onclick="openDrawer('coach')">7. AI Coach</button>
+      <button class="dev-btn" onclick="setMobileView('prompt')">📱 Mobile: Prompt</button>
+      <button class="dev-btn" onclick="setMobileView('output')">📱 Mobile: Output</button>
+    </div>
+  </div>
+
+  <div class="app-container" id="appRoot">
+
+    <!-- Top App Navigation Bar -->
+    <header class="top-navbar">
+      <div class="nav-brand">
+        <div class="nav-logo-mark">P</div>
+        <span>Promptify</span>
+        <span class="brand-tag">AI Workbench</span>
+      </div>
+
+      <div class="nav-center">
+        <div class="cohort-pill">
+          <span class="dot"></span>
+          <span>Executive AI Prompting • Class EN-REVIEW</span>
+        </div>
+
+        <!-- Mode Toggle: Guided vs Compact -->
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="btnModeGuided" onclick="setMode('guided')">Guided Mode</button>
+          <button class="mode-btn" id="btnModeCompact" onclick="setMode('compact')">Compact Mode</button>
+        </div>
+      </div>
+
+      <div class="nav-user">
+        <div class="cohort-pill" style="border:none; background:transparent;">
+          <span style="font-size:11.5px; color:#64748b;">Engine:</span>
+          <span style="color:#047857; font-weight:700;">Live Claude / Gemini</span>
+        </div>
+        <div class="user-avatar" title="Lam Hai Duong (Reviewer)">LP</div>
+      </div>
+    </header>
+
+    <!-- Main Full-Height Workspace -->
+    <div class="workbench-body">
+
+      <!-- COLUMN 1: LEFT NAVIGATION (In-place Lesson Switcher) -->
+      <aside class="sidebar-nav" id="sidebarNav">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Playground</div>
+          <a class="nav-item active" href="#">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Active Workbench</span>
+          </a>
+          <a class="nav-item" href="#">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            <span>Learning Path</span>
+          </a>
+          <a class="nav-item" href="#" onclick="openModal('library'); return false;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <span>Prompt Library (SOP)</span>
+          </a>
+          <a class="nav-item" href="#">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Practice History</span>
+          </a>
+        </div>
+
+        <div class="sidebar-section" style="border-top: 1px solid var(--border-subtle); flex: 1;">
+          <div class="sidebar-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Lessons (6)</span>
+            <span style="color:#047857; font-weight:700;">1/6 Done</span>
+          </div>
+
+          <div class="lesson-list" id="lessonList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- COLUMN 2: CENTER PROMPT WORKSPACE -->
+      <main class="workspace-center" id="workspaceCenter">
+
+        <!-- Lesson Header & Secondary Tool Tabs -->
+        <div class="workspace-header">
+          <div class="header-left">
+            <h1 id="lessonTitleDisplay">Lesson 2: Q3 Executive Status Memo</h1>
+            <div class="meta-strip">
+              <span class="skill-tag" id="lessonSkillDisplay">Grounded Business Communication</span>
+              <span>•</span>
+              <span style="color:#64748b;">Target: Executive Vice President</span>
+            </div>
+          </div>
+
+          <div class="tool-tabs">
+            <button class="tab-btn active" id="tabTaskBtn" onclick="toggleTaskData()">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span>Task Context</span>
+            </button>
+            <button class="tab-btn" onclick="openDrawer('theory')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+              <span>Theory</span>
+            </button>
+            <button class="tab-btn" onclick="openDrawer('hint')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span>Hint</span>
+            </button>
+            <button class="tab-btn" onclick="openModal('solution')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Solution</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="workspace-content">
+
+          <!-- 1. Task Context & Authentic Grounded Data Box -->
+          <div class="task-card" id="taskContextCard">
+            <div class="task-card-header" onclick="toggleTaskData()">
+              <div class="label">
+                <svg width="14" height="14" fill="none" stroke="#047857" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>Scenario & Grounded Internal Memo</span>
+              </div>
+              <span style="font-size:11px; color:#047857; font-weight:600;" id="taskToggleHint">Collapse ▲</span>
+            </div>
+            <div class="grounded-data-box" id="groundedDataBox"></div>
+          </div>
+
+          <!-- 2. Prompt Structure Helper Chips -->
+          <div class="structure-bar" id="structureBar">
+            <span class="title">Structure Chips:</span>
+            <button class="chip-btn" onclick="insertChip('[Role: Senior Operations Manager]')">+ Role</button>
+            <button class="chip-btn" onclick="insertChip('Context: Briefing Executive Vice President.')">+ Context</button>
+            <button class="chip-btn" onclick="insertChip('Task: Draft concise 3-bullet status memo.')">+ Task</button>
+            <button class="chip-btn" onclick="insertChip('Constraints: State exact $12,500 budget and Oct 28 date. Zero speculation.')">+ Constraints</button>
+            <button class="chip-btn" onclick="insertChip('Format: Markdown bullet list with subject.')">+ Format</button>
+          </div>
+
+          <!-- 3. Prompt Editor Card with Attempt Version Tabs -->
+          <div class="prompt-editor-card">
+            <div class="editor-toolbar">
+              <div class="attempt-tabs" id="attemptTabsContainer">
+                <!-- Rendered by JS -->
+              </div>
+              <button class="dev-btn" onclick="openModal('compare')" style="background:#fff; color:#334155;">⚖️ Compare Attempts</button>
+            </div>
+
+            <textarea 
+              id="promptTextarea" 
+              class="prompt-textarea" 
+              placeholder="Write your prompt here... (e.g., You are the Senior Operations Manager...)"
+              onkeydown="handleKeydown(event)"
+            ></textarea>
+
+            <div class="editor-bottom-bar">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-primary-run" id="btnRunAi" onclick="simulateRun()">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <span>Run AI</span>
+                </button>
+                <button class="btn-secondary" onclick="resetPrompt()">Reset</button>
+                <span style="font-size:11px; color:#94a3b8; margin-left:6px;" id="shortcutHint">Ctrl+Enter to Run</span>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button class="btn-secondary" onclick="openModal('solution')">View Solution</button>
+                <button class="btn-secondary" onclick="saveToLibrary()">Save SOP</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- COLUMN 3: RIGHT OUTPUT & EVALUATION PANEL (Beside Prompt) -->
+      <aside class="output-panel" id="outputPanel">
+        <div class="output-header">
+          <h2>AI Output & Rubric Audit</h2>
+          <span style="font-size:11px; font-weight:700; color:#047857;" id="outputStatusLabel">Attempt 3 Result</span>
+        </div>
+
+        <div class="output-content" id="outputContainer">
+
+          <!-- BEFORE RUN STATE (Empty State) -->
+          <div class="empty-output-state" id="emptyOutputState" style="display:none;">
+            <div class="icon-circle">⚡</div>
+            <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:4px;">No Output Generated Yet</h3>
+            <p style="font-size:12px; color:#64748b; max-width:280px; line-height:1.5;">
+              Compose or edit your prompt on the left, then click <strong>Run AI</strong> to execute live enterprise models and receive instant rubric scoring.
+            </p>
+          </div>
+
+          <!-- AFTER RUN STATE (Active Output + Rubric) -->
+          <div id="activeOutputState">
+            <!-- 1. AI Output Box -->
+            <div class="ai-output-box">
+              <div class="output-meta-bar">
+                <span>Model: Claude 3.5 Sonnet (Live Managed)</span>
+                <span>142 tokens • 0.8s latency</span>
+              </div>
+              <div id="aiOutputText">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- 2. Rubric Scorecard -->
+            <div class="rubric-scorecard" style="margin-top:14px;">
+              <div class="scorecard-top">
+                <div>
+                  <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:#64748b; letter-spacing:0.4px;">Promptify Rubric Score</span>
+                  <div class="score-badge-large">
+                    <span class="score-number" id="rubricScoreDisplay">9.4</span>
+                    <span class="score-max">/ 10</span>
+                  </div>
+                </div>
+                <span class="score-status-pill" id="rubricStatusPill">Executive Ready</span>
+              </div>
+
+              <!-- 5 Rubric Criteria Bars -->
+              <div class="criteria-list">
+                <div class="criterion-row">
+                  <div class="criterion-header">
+                    <span>1. Task Completion</span>
+                    <span id="scoreC1">2.0 / 2.0</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="fillC1" style="width:100%;"></div></div>
+                </div>
+
+                <div class="criterion-row">
+                  <div class="criterion-header">
+                    <span>2. Source Groundedness</span>
+                    <span id="scoreC2">2.0 / 2.0</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="fillC2" style="width:100%;"></div></div>
+                </div>
+
+                <div class="criterion-row">
+                  <div class="criterion-header">
+                    <span>3. Format Adherence</span>
+                    <span id="scoreC3">2.0 / 2.0</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="fillC3" style="width:100%;"></div></div>
+                </div>
+
+                <div class="criterion-row">
+                  <div class="criterion-header">
+                    <span>4. Constraint Compliance</span>
+                    <span id="scoreC4">1.7 / 2.0</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="fillC4" style="width:85%;"></div></div>
+                </div>
+
+                <div class="criterion-row">
+                  <div class="criterion-header">
+                    <span>5. Business Usability</span>
+                    <span id="scoreC5">1.7 / 2.0</span>
+                  </div>
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" id="fillC5" style="width:85%;"></div></div>
+                </div>
+              </div>
+
+              <!-- Strengths & Actionable Improvements -->
+              <div class="feedback-box">
+                <div class="label" style="color:#047857;">✓ What Worked Well:</div>
+                <div id="strengthsText" style="color:#334155;">Persona established, data anchored 100% to internal memo.</div>
+              </div>
+
+              <div class="feedback-box" style="border-left-color: #d97706; margin-top:8px;">
+                <div class="label" style="color:#b45309;">▲ Actionable Suggestion:</div>
+                <div id="improvementsText" style="color:#334155;">Trim bullet 2 slightly for tighter executive reading.</div>
+              </div>
+
+              <!-- Action Strip -->
+              <div class="output-actions-bar">
+                <button class="btn-primary-run" onclick="simulateRun()" style="flex:1; justify-content:center; padding:7px 10px;">
+                  <span>⚡ Iterate Draft</span>
+                </button>
+                <button class="btn-secondary" onclick="openModal('compare')">
+                  <span>⚖️ Compare</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Floating AI Coach Launcher -->
+    <div class="ai-coach-bubble" id="aiCoachBubble" onclick="openDrawer('coach')">
+      <span class="badge-dot"></span>
+      <span style="font-size:12px; font-weight:700; color:#0f172a;">AI Coach</span>
+      <span style="font-size:11px; color:#047857;">• 1 tip ready</span>
+    </div>
+
+    <!-- Mobile Tabs Bar (Active on Small Screens) -->
+    <div class="mobile-tabs-bar" id="mobileTabsBar">
+      <button class="dev-btn active" style="flex:1; border-radius:0; height:100%; font-size:13px;" onclick="setMobileTab('prompt')">✍️ Prompt Workspace</button>
+      <button class="dev-btn" style="flex:1; border-radius:0; height:100%; font-size:13px;" onclick="setMobileTab('output')">⚡ Output & Score (9.4)</button>
+    </div>
+
+  </div>
+
+  <!-- DRAWER OVERLAY: THEORY / HINT / AI COACH -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer(event)">
+    <div class="drawer-panel" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <h3 id="drawerTitle" style="font-size:14px; font-weight:700;">Theory: The CRISP Principle</h3>
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="drawer-body" id="drawerBody">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL OVERLAY: SOLUTION / COMPARE / LIBRARY -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <h3 id="modalTitle" style="font-size:15px; font-weight:700;">Reference Solution Prompt</h3>
+        <button class="drawer-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modalBody" style="overflow-y:auto; padding:16px;">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Mock Data & Prototype Interactive Controller -->
+  <script src="mock-data.js"></script>
+  <script>
+    let currentLessonIndex = 1; // Lesson 2
+    let currentAttemptIndex = 2; // Attempt 3 (index 2)
+    let currentMode = 'guided'; // 'guided' | 'compact'
+    let isTaskExpanded = true;
+    let isRunExecuted = true;
+
+    function init() {
+      renderLessonList();
+      loadLesson(currentLessonIndex);
+      loadAttempt(currentAttemptIndex);
+      
+      // Check URL parameters or hash
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        if (hash === 'before_run') {
+          setState('before_run');
+        } else if (hash === 'after_run_guided') {
+          setState('after_run_guided');
+        } else if (hash === 'after_run_compact') {
+          setState('after_run_compact');
+        } else if (hash === 'solution') {
+          setState('after_run_guided');
+          openModal('solution');
+        } else if (hash === 'compare') {
+          setState('after_run_guided');
+          openModal('compare');
+        } else if (hash === 'coach') {
+          setState('after_run_guided');
+          openDrawer('coach');
+        } else if (hash === 'theory') {
+          setState('after_run_guided');
+          openDrawer('theory');
+        } else if (hash === 'mobile_prompt') {
+          setState('after_run_guided');
+          setMobileView('prompt');
+        } else if (hash === 'mobile_output') {
+          setState('after_run_guided');
+          setMobileView('output');
+        }
+      }
+    }
+
+    function renderLessonList() {
+      const container = document.getElementById('lessonList');
+      container.innerHTML = PROMPTIFY_MOCK.lessons.map((lesson, idx) => `
+        <div class="lesson-item ${idx === currentLessonIndex ? 'active' : ''} ${lesson.status === 'completed' ? 'completed' : ''}" onclick="selectLesson(${idx})">
+          <div class="lesson-num">${lesson.status === 'completed' ? '✓' : lesson.number}</div>
+          <div class="lesson-info">
+            <div class="title">${lesson.title}</div>
+            <div class="badge">${lesson.badge}</div>
+          </div>
+          ${lesson.score ? `<span style="font-size:11px; font-weight:700; color:#047857;">${lesson.score}</span>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function selectLesson(idx) {
+      currentLessonIndex = idx;
+      renderLessonList();
+      loadLesson(idx);
+    }
+
+    function loadLesson(idx) {
+      const l = PROMPTIFY_MOCK.currentLesson;
+      document.getElementById('lessonTitleDisplay').innerText = `Lesson ${l.number}: ${l.title}`;
+      document.getElementById('lessonSkillDisplay').innerText = l.skill;
+      document.getElementById('groundedDataBox').innerText = l.taskContext.groundedData;
+
+      // Render Attempts tabs
+      const tabsCont = document.getElementById('attemptTabsContainer');
+      tabsCont.innerHTML = l.attempts.map((att, i) => `
+        <button class="attempt-pill ${i === currentAttemptIndex ? 'active' : ''}" onclick="loadAttempt(${i})">
+          ${att.label.split(' ')[0]} ${att.version}
+          <span class="score">${att.score}</span>
+        </button>
+      `).join('') + `<button class="chip-btn" onclick="newAttempt()" style="padding:2px 7px;">+ New</button>`;
+    }
+
+    function loadAttempt(attemptIdx) {
+      currentAttemptIndex = attemptIdx;
+      const att = PROMPTIFY_MOCK.currentLesson.attempts[attemptIdx];
+      
+      // Update Tabs active class
+      const pills = document.querySelectorAll('.attempt-pill');
+      pills.forEach((p, i) => p.classList.toggle('active', i === attemptIdx));
+
+      // Update Editor text
+      document.getElementById('promptTextarea').value = att.promptText;
+
+      // Update Output and Rubric
+      document.getElementById('aiOutputText').innerText = att.output;
+      document.getElementById('rubricScoreDisplay').innerText = att.score;
+      document.getElementById('outputStatusLabel').innerText = `Attempt ${att.version} Evaluation`;
+
+      document.getElementById('rubricStatusPill').innerText = att.score >= 9 ? 'Executive Ready' : att.score >= 8 ? 'Good Quality' : 'Needs Rework';
+      document.getElementById('rubricStatusPill').style.background = att.score >= 9 ? '#dcfce7' : att.score >= 8 ? '#fef3c7' : '#fee2e2';
+      document.getElementById('rubricStatusPill').style.color = att.score >= 9 ? '#15803d' : att.score >= 8 ? '#b45309' : '#b91c1c';
+
+      // Update 5 rubric criteria
+      document.getElementById('scoreC1').innerText = `${att.metrics.taskCompletion} / 2.0`;
+      document.getElementById('fillC1').style.width = `${(att.metrics.taskCompletion / 2) * 100}%`;
+
+      document.getElementById('scoreC2').innerText = `${att.metrics.groundedness} / 2.0`;
+      document.getElementById('fillC2').style.width = `${(att.metrics.groundedness / 2) * 100}%`;
+
+      document.getElementById('scoreC3').innerText = `${att.metrics.formatAdherence} / 2.0`;
+      document.getElementById('fillC3').style.width = `${(att.metrics.formatAdherence / 2) * 100}%`;
+
+      document.getElementById('scoreC4').innerText = `${att.metrics.constraintCompliance} / 2.0`;
+      document.getElementById('fillC4').style.width = `${(att.metrics.constraintCompliance / 2) * 100}%`;
+
+      document.getElementById('scoreC5').innerText = `${att.metrics.businessUsability} / 2.0`;
+      document.getElementById('fillC5').style.width = `${(att.metrics.businessUsability / 2) * 100}%`;
+
+      document.getElementById('strengthsText').innerText = att.strengths;
+      document.getElementById('improvementsText').innerText = att.improvements;
+    }
+
+    function toggleTaskData() {
+      const box = document.getElementById('groundedDataBox');
+      const hint = document.getElementById('taskToggleHint');
+      isTaskExpanded = !isTaskExpanded;
+      box.style.display = isTaskExpanded ? 'block' : 'none';
+      hint.innerText = isTaskExpanded ? 'Collapse ▲' : 'Expand ▼';
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnModeGuided').classList.toggle('active', mode === 'guided');
+      document.getElementById('btnModeCompact').classList.toggle('active', mode === 'compact');
+      document.body.classList.toggle('mode-compact', mode === 'compact');
+
+      // Adjust UI hints based on mode
+      const shortcutHint = document.getElementById('shortcutHint');
+      const structureBar = document.getElementById('structureBar');
+      if (mode === 'compact') {
+        shortcutHint.innerText = 'Ctrl+Enter';
+        if (isTaskExpanded) toggleTaskData();
+      } else {
+        shortcutHint.innerText = 'Ctrl+Enter to Run';
+        if (!isTaskExpanded) toggleTaskData();
+      }
+    }
+
+    function simulateRun() {
+      const btn = document.getElementById('btnRunAi');
+      btn.innerHTML = `<span style="display:inline-block; animation:spin 1s infinite linear;">⚙</span> <span>Generating...</span>`;
+      btn.style.opacity = '0.7';
+
+      setTimeout(() => {
+        btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> <span>Run AI</span>`;
+        btn.style.opacity = '1';
+
+        // Switch to Attempt 3 (mastered output)
+        loadAttempt(2);
+        document.getElementById('emptyOutputState').style.display = 'none';
+        document.getElementById('activeOutputState').style.display = 'block';
+        isRunExecuted = true;
+      }, 450);
+    }
+
+    function insertChip(chipText) {
+      const textarea = document.getElementById('promptTextarea');
+      textarea.value = textarea.value ? `${textarea.value}\n${chipText}` : chipText;
+      textarea.focus();
+    }
+
+    function resetPrompt() {
+      document.getElementById('promptTextarea').value = '';
+      document.getElementById('promptTextarea').focus();
+    }
+
+    function newAttempt() {
+      resetPrompt();
+      document.getElementById('emptyOutputState').style.display = 'flex';
+      document.getElementById('activeOutputState').style.display = 'none';
+      isRunExecuted = false;
+    }
+
+    function handleKeydown(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        simulateRun();
+      }
+    }
+
+    function openDrawer(type) {
+      const overlay = document.getElementById('drawerOverlay');
+      const title = document.getElementById('drawerTitle');
+      const body = document.getElementById('drawerBody');
+
+      if (type === 'theory') {
+        title.innerText = "Theory: The CRISP Principle for Executive Briefings";
+        body.innerHTML = `
+          <div style="font-size:13px; line-height:1.6; color:#334155;">
+            <p style="margin-bottom:12px;">Executives process dozens of updates an hour. High-performing prompts avoid conversational padding and enforce concise, factual deliverables.</p>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:14px;">
+              <strong style="color:#0f172a; display:block; margin-bottom:4px;">C.R.I.S.P. Framework:</strong>
+              <ul style="padding-left:18px; display:flex; flex-direction:column; gap:6px;">
+                <li><strong>Context:</strong> Declare your seniority and audience upfront.</li>
+                <li><strong>Restraint:</strong> Rely 100% on verifiable data without extrapolation.</li>
+                <li><strong>Isolation:</strong> Limit output to a strict bullet count (e.g. max 3 bullets).</li>
+                <li><strong>Structure:</strong> Enforce standard corporate memorandum conventions.</li>
+                <li><strong>Precision:</strong> Ban conversational fluff ("I hope this helps").</li>
+              </ul>
+            </div>
+            <button class="btn-primary-run" style="width:100%; justify-content:center;" onclick="closeDrawer()">Got it, return to Workbench</button>
+          </div>
+        `;
+      } else if (type === 'hint') {
+        title.innerText = "Hint: Overcoming Low Scores in Lesson 2";
+        body.innerHTML = `
+          <div style="font-size:13px; line-height:1.6; color:#334155;">
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:12px; margin-bottom:14px; color:#b45309;">
+              <strong>Key Missing Detail:</strong> Most learners forget to state the exact budget reallocation ($12,500) and the specific Oct 28 date.
+            </div>
+            <p>Try adding this negative constraint to your prompt:</p>
+            <pre style="background:#f1f5f9; padding:10px; border-radius:6px; font-family:var(--font-mono); font-size:11.5px; margin-top:8px;">Constraints:
+- Exactly 3 bullets.
+- Mention $12,500 and Oct 28 date.
+- No pleasantries or conversational intros.</pre>
+          </div>
+        `;
+      } else if (type === 'coach') {
+        title.innerText = "AI Coach: Real-time Draft Guidance";
+        body.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
+            <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:8px; padding:10px; color:#065f46;">
+              <strong>Coach Observation:</strong> Your Attempt 2 achieved 8.4/10! To hit 9.4+ (Executive Ready), enhance the diplomatic tone of bullet 2.
+            </div>
+            <p style="color:#64748b; font-size:12px;">Suggested revision snippet:</p>
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:10px; font-size:12px;">
+              <code>"Maintain a proactive, diplomatic tone framing the security audit as an essential enterprise risk protection measure."</code>
+            </div>
+            <button class="btn-primary-run" style="justify-content:center;" onclick="insertChip('Maintain a proactive, diplomatic tone.'); closeDrawer();">Insert Suggestion</button>
+          </div>
+        `;
+      }
+
+      overlay.classList.add('active');
+    }
+
+    function closeDrawer(e) {
+      if (!e || e.target.id === 'drawerOverlay' || e.target.classList.contains('drawer-close')) {
+        document.getElementById('drawerOverlay').classList.remove('active');
+      }
+    }
+
+    function openModal(type) {
+      const overlay = document.getElementById('modalOverlay');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+
+      if (type === 'solution') {
+        title.innerText = "Reference Solution Prompt • Lesson 2";
+        body.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <p style="font-size:12.5px; color:#64748b;">This master prompt exemplifies all 5 rubric criteria for an Executive Status Briefing:</p>
+            <pre style="background:#f8fafc; border:1px solid #cbd5e1; padding:14px; border-radius:8px; font-size:12.5px; line-height:1.5; white-space:pre-wrap; font-family:var(--font-mono); color:#0f172a;">${PROMPTIFY_MOCK.currentLesson.solutionPrompt}</pre>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+              <button class="btn-secondary" onclick="closeModal()">Close</button>
+              <button class="btn-primary-run" onclick="applySolution(); closeModal();">Apply to Prompt Editor</button>
+            </div>
+          </div>
+        `;
+      } else if (type === 'compare') {
+        title.innerText = "Attempt Comparison: Attempt 1 vs Attempt 3";
+        body.innerHTML = `
+          <div class="compare-grid">
+            <div class="compare-col">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <strong style="color:#64748b; font-size:12px;">Attempt 1 (Initial Draft)</strong>
+                <span style="color:#b91c1c; font-weight:700;">Score: 5.4/10</span>
+              </div>
+              <div style="font-size:11.5px; font-family:var(--font-mono); background:#fff; padding:8px; border-radius:4px; margin-bottom:8px; border:1px solid #e2e8f0;">
+                ${PROMPTIFY_MOCK.currentLesson.attempts[0].promptText}
+              </div>
+              <strong style="font-size:11px; color:#475569;">Generated Output:</strong>
+              <div style="font-size:11.5px; background:#fff; padding:8px; border-radius:4px; margin-top:4px; border:1px solid #e2e8f0; white-space:pre-wrap; color:#64748b;">
+                ${PROMPTIFY_MOCK.currentLesson.attempts[0].output}
+              </div>
+            </div>
+
+            <div class="compare-col highlighted">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <strong style="color:#047857; font-size:12px;">Attempt 3 (Mastered)</strong>
+                <span style="color:#15803d; font-weight:700;">Score: 9.4/10 ✓</span>
+              </div>
+              <div style="font-size:11.5px; font-family:var(--font-mono); background:#fff; padding:8px; border-radius:4px; margin-bottom:8px; border:1px solid #a7f3d0;">
+                ${PROMPTIFY_MOCK.currentLesson.attempts[2].promptText}
+              </div>
+              <strong style="font-size:11px; color:#047857;">Generated Output:</strong>
+              <div style="font-size:11.5px; background:#fff; padding:8px; border-radius:4px; margin-top:4px; border:1px solid #a7f3d0; white-space:pre-wrap; color:#0f172a;">
+                ${PROMPTIFY_MOCK.currentLesson.attempts[2].output}
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === 'library') {
+        title.innerText = "Prompt Library (Saved SOPs)";
+        body.innerHTML = `
+          <div style="font-size:13px; line-height:1.6; color:#334155;">
+            <p style="margin-bottom:12px;">Saved production-ready prompts calibrated for corporate compliance:</p>
+            <div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; background:#f8fafc; margin-bottom:10px;">
+              <strong style="color:#0f172a; font-size:13px;">Q3 Executive Status Briefing (SOP-002)</strong>
+              <p style="font-size:11.5px; color:#64748b; margin-top:2px;">Calibrated for VP & C-Suite Memos • Rubric 9.4/10</p>
+              <button class="btn-secondary" style="margin-top:8px; font-size:11px;" onclick="closeModal()">Insert into Active Editor</button>
+            </div>
+          </div>
+        `;
+      }
+
+      overlay.classList.add('active');
+    }
+
+    function closeModal(e) {
+      if (!e || e.target.id === 'modalOverlay' || e.target.classList.contains('drawer-close') || e.target.innerText === 'Close') {
+        document.getElementById('modalOverlay').classList.remove('active');
+      }
+    }
+
+    function applySolution() {
+      document.getElementById('promptTextarea').value = PROMPTIFY_MOCK.currentLesson.solutionPrompt;
+      loadAttempt(2);
+    }
+
+    function saveToLibrary() {
+      alert("✓ Current Prompt and Output successfully saved to your Enterprise SOP Library!");
+    }
+
+    // Preset State Switcher for Screenshots and Review
+    function setState(state) {
+      document.querySelectorAll('.dev-btn').forEach(b => b.classList.remove('active'));
+
+      if (state === 'before_run') {
+        newAttempt();
+        setMode('guided');
+      } else if (state === 'after_run_guided') {
+        loadAttempt(2);
+        document.getElementById('emptyOutputState').style.display = 'none';
+        document.getElementById('activeOutputState').style.display = 'block';
+        setMode('guided');
+      } else if (state === 'after_run_compact') {
+        loadAttempt(2);
+        document.getElementById('emptyOutputState').style.display = 'none';
+        document.getElementById('activeOutputState').style.display = 'block';
+        setMode('compact');
+      }
+    }
+
+    function setMobileView(tab) {
+      if (tab === 'prompt') {
+        document.getElementById('workspaceCenter').style.display = 'flex';
+        document.getElementById('outputPanel').style.display = 'none';
+        document.getElementById('sidebarNav').style.display = 'none';
+      } else {
+        document.getElementById('workspaceCenter').style.display = 'none';
+        document.getElementById('outputPanel').style.display = 'flex';
+        document.getElementById('sidebarNav').style.display = 'none';
+      }
+    }
+
+    function setMobileTab(tab) {
+      setMobileView(tab);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

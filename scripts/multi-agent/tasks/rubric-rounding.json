@@ -1,0 +1,23 @@
+{
+  "id": "rubric-rounding",
+  "objective": "Add a small offline regression test for score normalization and rejection in weightedRubricService. Do not change implementation.",
+  "read": [
+    "src/services/weightedRubricService.ts",
+    "src/types/production.ts"
+  ],
+  "write": "test/verify_rubric_rounding.ts",
+  "tests": [
+    "test/verify_rubric_rounding.ts"
+  ],
+  "acceptance": [
+    "Valid all-zero criterion evaluation totals zero",
+    "Supplied top-level total of 10 cannot override criterion sum zero",
+    "Negative, NaN and Infinity scores reject",
+    "Missing criterion rejects",
+    "Test passes offline without secrets or API calls"
+  ],
+  "risk": "low: one new offline test only",
+  "maxAttempts": 1,
+  "timeoutSeconds": 120,
+  "delivery": "code"
+}

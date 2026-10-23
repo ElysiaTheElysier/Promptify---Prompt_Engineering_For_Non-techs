@@ -1,0 +1,294 @@
+{
+  "apps": {
+    "promptify-mvp": {
+      "tests": [
+        {
+          "test": "verify_auth_errors.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_backend_failure_recovery.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_codelab_lifecycle.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_judge_provider_schema.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_judge_task_alignment.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_provider_contract.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_settings.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_product_i18n.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_provider_fallback.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_rebuild_runs.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_rubric_rounding.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_text_diff.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_tab_switch.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_ai_evaluation_contract.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_course_curriculum.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_enrollment_access.ts",
+          "exit": 1
+        },
+        {
+          "test": "verify_generation_prompt_isolation.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_highlight.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_identity_cleanup.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_interactive_tutorial.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_home_class_menu.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_lesson_url_navigation.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_logout.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_pedagogical_flow.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_prompt_analyzer.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_real_ai_flow.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_roster_csv.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_server_backed_learning_progress.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_tester_sample_prompts.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_tutorial_tester_course.ts",
+          "exit": 0
+        },
+        {
+          "test": "architecture_guards.mjs",
+          "exit": 0
+        }
+      ],
+      "pass": 30,
+      "total": 31,
+      "failures": [
+        {
+          "test": "verify_enrollment_access.ts",
+          "output": "=== TEST: Enrollment-gated Course Access ===\nnode:internal/modules/run_main:107\r\n    triggerUncaughtException(\r\n    ^\r\n\r\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\r\n\r\ntrue !== false\r\n\r\n    at <anonymous> (C:\\Ki_OJT\\PromptforNontech\\apps\\promptify-mvp\\tests\\verify_enrollment_access.ts:29:8) {\r\n  generatedMessage: true,\r\n  code: 'ERR_ASSERTION',\r\n  actual: true,\r\n  expected: false,\r\n  operator: 'strictEqual',\r\n  diff: 'simple'\r\n}\r\n\r\nNode.js v24.14.0\r\n"
+        }
+      ]
+    },
+    "promptify-intrepid": {
+      "tests": [
+        {
+          "test": "verify_auth_errors.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_backend_failure_recovery.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_codelab_lifecycle.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_judge_provider_schema.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_judge_task_alignment.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_provider_contract.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_settings.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_product_i18n.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_provider_fallback.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_rebuild_runs.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_rubric_rounding.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_text_diff.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_tab_switch.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_app_session_state.mjs",
+          "exit": 0
+        },
+        {
+          "test": "verify_award_pdf.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_class_loading.mjs",
+          "exit": 0
+        },
+        {
+          "test": "verify_drive_folder.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_google_roster.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_governance_telemetry.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_content_language.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_learner_ui_state.mjs",
+          "exit": 0
+        },
+        {
+          "test": "verify_product_http.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_roster_worker.ts",
+          "exit": 0
+        },
+        {
+          "test": "verify_sop_ingestion.ts",
+          "exit": 0
+        },
+        {
+          "test": "architecture_guards.mjs",
+          "exit": 0
+        }
+      ],
+      "pass": 25,
+      "total": 25,
+      "failures": []
+    }
+  },
+  "browser": [
+    {
+      "name": "mvp-landing",
+      "textEqual": true,
+      "pixelsEqual": true,
+      "pageErrors": []
+    },
+    {
+      "name": "intrepid-landing",
+      "textEqual": true,
+      "pixelsEqual": true,
+      "pageErrors": []
+    },
+    {
+      "name": "intrepid-signin",
+      "textEqual": true,
+      "pixelsEqual": true,
+      "pageErrors": []
+    },
+    {
+      "name": "review",
+      "textEqual": true,
+      "pixelsEqual": true,
+      "pageErrors": []
+    }
+  ],
+  "actualRuntimeChanges": [
+    {
+      "file": "apps/promptify-mvp/src/main.tsx",
+      "original": "src/main.tsx"
+    },
+    {
+      "file": "apps/promptify-intrepid/src/main.tsx",
+      "original": "src/main.tsx"
+    },
+    {
+      "file": "apps/promptify-intrepid/src/components/rebuild/ProductionApp.tsx",
+      "original": "src/components/rebuild/ProductionApp.tsx"
+    }
+  ],
+  "databaseHistoryUnchanged": true,
+  "notVerified": [
+    "Authenticated live user flows",
+    "Vercel Preview/Production deployment and alias",
+    "Live DB/RLS/OAuth/roster/provider integrations",
+    "Maintenance generators/live tools (not executed)"
+  ]
+}

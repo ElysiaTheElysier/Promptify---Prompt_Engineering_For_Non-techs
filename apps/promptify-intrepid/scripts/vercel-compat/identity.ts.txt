@@ -1,0 +1,17 @@
+import type { Session, AuthChangeEvent } from '@supabase/supabase-js';
+import {supabase,isSupabaseConfigured} from './supabaseClient';
+export type FirebaseSession = Session;
+export const isFirebaseConfigured = isSupabaseConfigured;
+export const identity={auth:{
+  getSession:()=>supabase.auth.getSession(),
+  onAuthStateChange:(callback:(event:AuthChangeEvent,value:Session|null)=>void)=>supabase.auth.onAuthStateChange(callback),
+  signOut:(options?:{scope?:'global'|'local'|'others'})=>supabase.auth.signOut(options),
+  async signInWithOAuth(options:{provider:string;options?:{redirectTo?:string;queryParams?:Record<string,string>}}){
+    if(options.provider!=='google')return {error:new Error('Only Google sign-in is supported')};
+    return supabase.auth.signInWithOAuth({provider:'google',options:{...options.options,queryParams:{...options.options?.queryParams,prompt:'select_account'}}});
+  }
+},storage:supabase.storage};
+export function subscribeClassUpdates(classId:string,callback:()=>void){
+  const channel=supabase.channel('vercel-class-'+classId).on('postgres_changes',{event:'*',schema:'public',table:'product_session_controls',filter:'class_id=eq.'+classId},callback).subscribe();
+  return ()=>{void supabase.removeChannel(channel);};
+}

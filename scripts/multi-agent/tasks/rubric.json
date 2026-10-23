@@ -1,0 +1,11 @@
+{
+  "id": "rubric-edges",
+  "objective": "Add offline tests for rubric invariants without changing implementation.",
+  "read": ["src/services/weightedRubricService.ts", "src/types/production.ts"],
+  "write": "test/verify_weighted_rubric_edges.ts",
+  "tests": ["test/verify_weighted_rubric_edges.ts"],
+  "acceptance": ["Rebalancing preserves total 100 and does not mutate the original rubric", "Inactive weights remain zero", "Non-finite judge numbers are rejected", "Model supplied total is not authoritative"],
+  "risk": "low: new offline test only",
+  "maxAttempts": 2,
+  "timeoutSeconds": 300
+}

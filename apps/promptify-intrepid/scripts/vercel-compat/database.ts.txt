@@ -1,0 +1,11 @@
+import {createClient,type SupabaseClient} from '@supabase/supabase-js';
+export type CloudDatabaseClient = SupabaseClient;
+export function requireCloudDatabase(){
+  if(!(process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL)||!(process.env.SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_ANON_KEY)||!process.env.SUPABASE_SERVICE_ROLE_KEY)throw Error('Vercel database configuration is missing');
+}
+export function createDatabaseClient(authorization?:string):SupabaseClient {
+  requireCloudDatabase();
+  const url=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL!;
+  const key=authorization?(process.env.SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_ANON_KEY!):process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},...(authorization?{global:{headers:{Authorization:authorization}}}:{})});
+}

@@ -1,0 +1,14 @@
+{
+  "format": 1,
+  "approvalReference": "REPLACE_WITH_REVIEWED_INTPREPID_SCOPE_DECISION",
+  "classIds": [],
+  "clientIds": [],
+  "courseIds": [],
+  "userIds": [],
+  "includeUnscoped": [],
+  "userHistory": {
+    "product_profile_corrections": [],
+    "user_tutorial_progress": [],
+    "product_request_budgets": []
+  }
+}

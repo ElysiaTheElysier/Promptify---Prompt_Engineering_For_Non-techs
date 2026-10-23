@@ -1,0 +1,26 @@
+-- REVIEW ONLY. Target staging ONLY, migration owner, during controlled import.
+-- Do not run against source/live. Re-enable in the SAME controlled import workflow.
+-- No DISABLE TRIGGER ALL; internal FK constraints remain active.
+-- ALTER TABLE public.course_modules DISABLE TRIGGER USER;
+-- ALTER TABLE public.courses DISABLE TRIGGER USER;
+-- ALTER TABLE public.enrollments DISABLE TRIGGER USER;
+-- ALTER TABLE public.lesson_resources DISABLE TRIGGER USER;
+-- ALTER TABLE public.lesson_rubric_criteria DISABLE TRIGGER USER;
+-- ALTER TABLE public.lessons DISABLE TRIGGER USER;
+-- ALTER TABLE public.product_sandbox_runs DISABLE TRIGGER USER;
+-- ALTER TABLE public.product_studio DISABLE TRIGGER USER;
+-- ALTER TABLE public.prompt_attempts DISABLE TRIGGER USER;
+-- ALTER TABLE public.rebuild_runs DISABLE TRIGGER USER;
+-- ALTER TABLE public.users DISABLE TRIGGER USER;
+
+-- ALTER TABLE public.course_modules ENABLE TRIGGER USER;
+-- ALTER TABLE public.courses ENABLE TRIGGER USER;
+-- ALTER TABLE public.enrollments ENABLE TRIGGER USER;
+-- ALTER TABLE public.lesson_resources ENABLE TRIGGER USER;
+-- ALTER TABLE public.lesson_rubric_criteria ENABLE TRIGGER USER;
+-- ALTER TABLE public.lessons ENABLE TRIGGER USER;
+-- ALTER TABLE public.product_sandbox_runs ENABLE TRIGGER USER;
+-- ALTER TABLE public.product_studio ENABLE TRIGGER USER;
+-- ALTER TABLE public.prompt_attempts ENABLE TRIGGER USER;
+-- ALTER TABLE public.rebuild_runs ENABLE TRIGGER USER;
+-- ALTER TABLE public.users ENABLE TRIGGER USER;

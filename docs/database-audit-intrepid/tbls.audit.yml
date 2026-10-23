@@ -1,0 +1,12 @@
+# Proposed read-only catalog audit. Not executed; no credentials in this file.
+# Supply an approved READ-ONLY PostgreSQL DSN through tbls's DSN option/environment.
+# Never use the runtime/migration-owner credentials for this audit.
+docPath: outputs/db-audit-intrepid/tbls
+include:
+  - public.*
+lint:
+  requireForeignKeyIndex:
+    enabled: true
+  duplicateRelations:
+    enabled: true
+# Review lint findings against actual workload; not every FK needs another index.

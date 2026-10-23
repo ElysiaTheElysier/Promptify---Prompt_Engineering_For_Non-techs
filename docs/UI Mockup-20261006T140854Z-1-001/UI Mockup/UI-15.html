@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi" x-data="{
+    lang: 'vi',
+    activeTab: 'connections', // 'connections', 'mapping', 'logs'
+    isSyncing: false,
+    syncProgress: 0,
+    syncSuccess: false,
+    addModalOpen: false,
+    errorModalOpen: false,
+    selectedErrorLog: null,
+    newSheetUrl: '',
+    newClient: 'Intrepid Asia',
+    selectedDept: 'Brand Solutions & Campaign Ops',
+    clients: ['Intrepid Asia', 'Agribank B2B Enterprise', 'Vietnam Airlines L&D'],
+    sheetConnections: [
+        {
+            id: 'RST-SYNC-01',
+            title: '[Master] Intrepid Cohort 04 - Roster Sync 2026',
+            client: 'Intrepid Asia',
+            sheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+            saAccount: 'sa-promptify-sync@intrepid-prod.iam.gserviceaccount.com',
+            interval: 'Mỗi 15 phút',
+            lastSync: '5 phút trước',
+            totalRows: 1150,
+            status: 'active',
+            mappedCols: 5
+        },
+        {
+            id: 'RST-SYNC-02',
+            title: 'Agribank B2B Masterclass Batch 1 Roster',
+            client: 'Agribank B2B Enterprise',
+            sheetId: '1A9834720981230498123049812304981230498123',
+            saAccount: 'sa-promptify-sync@intrepid-prod.iam.gserviceaccount.com',
+            interval: 'Mỗi 1 giờ',
+            lastSync: '12 phút trước',
+            totalRows: 2400,
+            status: 'active',
+            mappedCols: 5
+        }
+    ],
+    columnMappings: [
+        { sheetCol: 'Họ và tên học viên', dbField: 'full_name', required: true, mapped: true, sample: 'Linh Phạm' },
+        { sheetCol: 'Email công ty (@intrepid.asia)', dbField: 'email', required: true, mapped: true, sample: 'linh.pham@intrepid.asia' },
+        { sheetCol: 'Mã phòng ban / Khoa', dbField: 'department_id', required: true, mapped: true, sample: 'DEPT-BRAND-01' },
+        { sheetCol: 'Mã số nhân viên (Employee ID)', dbField: 'employee_id', required: false, mapped: true, sample: 'INT-842' },
+        { sheetCol: 'Chức danh / Role', dbField: 'job_title', required: false, mapped: true, sample: 'Campaign Ops Specialist' }
+    ],
+    syncLogs: [
+        { id: 'LOG-9082', time: '10:55:04 AM', sheetName: 'Intrepid Cohort 04', processed: 1150, added: 12, updated: 1138, errors: 0, status: 'success' },
+        { id: 'LOG-9081', time: '10:40:02 AM', sheetName: 'Intrepid Cohort 04', processed: 1138, added: 0, updated: 1138, errors: 2, status: 'warning', errorDetails: ['Dòng 42: Email trùng lặp (duoc.vo@intrepid.asia)', 'Dòng 105: Sai định dạng domain email (@gmail.com)'] },
+        { id: 'LOG-9080', time: '09:55:00 AM', sheetName: 'Agribank Batch 1', processed: 2400, added: 50, updated: 2350, errors: 0, status: 'success' }
+    ],
+    triggerSyncAll() {
+        this.isSyncing = true;
+        this.syncProgress = 10;
+        let interval = setInterval(() => {
+            if (this.syncProgress < 100) {
+                this.syncProgress += 25;
+            } else {
+                clearInterval(interval);
+                this.isSyncing = false;
+                this.syncSuccess = true;
+
+                // Add new log entry
+                this.syncLogs.unshift({
+                    id: 'LOG-' + Math.floor(1000 + Math.random() * 9000),
+                    time: new Date().toLocaleTimeString(),
+                    sheetName: 'Intrepid Cohort 04',
+                    processed: 1152,
+                    added: 2,
+                    updated: 1150,
+                    errors: 0,
+                    status: 'success'
+                });
+
+                setTimeout(() => this.syncSuccess = false, 3000);
+            }
+        }, 300);
+    }
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify - Google Sheets Roster Sync Management (UI-15)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN for Micro-Interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'on-primary': '#FFFFFF',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1',
+                            error: '#BA1A1A',
+                            'error-container': '#FFDAD6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+<!-- ================================================================= -->
+<!-- TOP NAVIGATION APP BAR -->
+<!-- ================================================================= -->
+<header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-3 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+        <!-- Brand Logo & Context -->
+        <div class="flex items-center gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-2xl bg-m3-primary text-white flex items-center justify-center font-bold text-lg shadow-md shadow-m3-primary/20">
+                    P
+                </div>
+                <span class="font-bold text-lg tracking-tight text-m3-on-surface hidden sm:inline-block">Promptify Admin</span>
+            </a>
+
+            <div class="h-6 w-px bg-m3-outline-variant/80 hidden sm:block"></div>
+
+            <div class="flex items-center gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold">
+                <span class="material-symbols-outlined text-sm text-emerald-600">table_chart</span>
+                <span>GOOGLE SHEETS ROSTER WORKER</span>
+            </div>
+        </div>
+
+        <!-- Right Actions & Language Toggle -->
+        <div class="flex items-center gap-3">
+            <button @click="triggerSyncAll()"
+                    :disabled="isSyncing"
+                    class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-semibold shadow hover:bg-m3-primary/90 transition-all disabled:opacity-50">
+                <span class="material-symbols-outlined text-sm" :class="{ 'animate-spin': isSyncing }">sync</span>
+                <span x-text="isSyncing ? (lang === 'en' ? 'Syncing Rosters...' : 'Đang đồng bộ...') : (lang === 'en' ? 'Sync All Rosters Now' : 'Bắt đầu Sync Tức thì')"></span>
+            </button>
+
+            <!-- Language Toggle -->
+            <button @click="lang = lang === 'en' ? 'vi' : 'en'"
+                    class="px-2.5 py-1 rounded-full border border-m3-outline-variant bg-white text-xs font-medium text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-colors">
+                <span x-text="lang.toUpperCase()"></span>
+            </button>
+        </div>
+
+    </div>
+</header>
+
+<!-- ================================================================= -->
+<!-- MAIN CONTENT BODY -->
+<!-- ================================================================= -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 space-y-8">
+
+    <!-- HERO BANNER -->
+    <section class="bg-gradient-to-br from-m3-on-primary-container via-slate-900 to-m3-on-surface text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-emerald-300 border border-white/15">
+                    <span class="material-symbols-outlined text-sm text-emerald-400">verified</span>
+                    <span>Service Account Auth Active • Background Worker API v2</span>
+                </div>
+
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    <span x-show="lang === 'en'">Google Sheets Learner Roster Auto-Sync</span>
+                    <span x-show="lang === 'vi'">Tự động hóa Đồng bộ Danh sách Học viên từ Google Sheets</span>
+                </h1>
+
+                <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                    Seamlessly read B2B employee rosters directly from Google Sheets, parse department hierarchies, provision cohort access, and sync user profile updates to Supabase PostgreSQL.
+                </p>
+            </div>
+
+            <!-- Live Sync Telemetry Badge -->
+            <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 text-center shrink-0 space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-300 block">Total Synced Learners:</span>
+                <span class="text-3xl font-black text-emerald-400 font-mono">3,550</span>
+                <span class="block text-[11px] text-slate-300">Across 2 Enterprise Clients</span>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- TOP KPI COUNTERS (4 METRIC CARDS) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Active Sheet Syncs</span>
+                <span class="material-symbols-outlined text-m3-primary">grid_on</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-m3-on-surface font-mono" x-text="sheetConnections.length"></span>
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">100% Active</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">Connected via Service Account</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Sync Interval</span>
+                <span class="material-symbols-outlined text-purple-600">schedule</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-m3-on-surface font-mono">15m</span>
+                <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">Cron Job</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">Automated background worker</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Column Mapping Health</span>
+                <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-m3-on-surface font-mono">5 / 5</span>
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Valid</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">All required DB schema fields mapped</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Validation Alerts (24h)</span>
+                <span class="material-symbols-outlined text-amber-500">warning</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-amber-700 font-mono">2</span>
+                <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Warnings</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">Duplicate & Domain Format checks</p>
+        </div>
+
+    </section>
+
+    <!-- PROGRESS BAR WHEN SYNCING -->
+    <template x-if="isSyncing">
+        <div class="bg-m3-primary-container/40 p-4 rounded-2xl border border-m3-primary/30 space-y-2 text-xs">
+            <div class="flex items-center justify-between font-bold text-m3-on-primary-container">
+                    <span class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined animate-spin text-m3-primary text-sm">progress_activity</span>
+                        <span>Google Sheets Service Account Reading Rows & Validating Schema...</span>
+                    </span>
+                <span class="font-mono" x-text="`${syncProgress}%`"></span>
+            </div>
+
+            <div class="w-full bg-white h-2 rounded-full overflow-hidden">
+                <div class="bg-m3-primary h-full transition-all duration-300" :style="`width: ${syncProgress}%`"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- SUCCESS NOTIFICATION -->
+    <template x-if="syncSuccess">
+        <div class="p-4 bg-emerald-50 text-emerald-950 rounded-2xl border border-emerald-300 text-xs font-bold flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-600 text-lg">check_circle</span>
+            <span x-text="lang === 'en' ? 'Google Sheets Roster Sync Executed Successfully! 2 new learners added.' : 'Đã đồng bộ thành công danh sách từ Google Sheets! 2 học viên mới đã được thêm.'"></span>
+        </div>
+    </template>
+
+    <!-- TAB NAVIGATION -->
+    <section class="bg-white p-4 rounded-3xl border border-m3-outline-variant shadow-sm space-y-4">
+
+        <div class="flex items-center gap-2 border-b border-m3-outline-variant/60 pb-3 overflow-x-auto text-xs font-semibold">
+            <button @click="activeTab = 'connections'"
+                    :class="activeTab === 'connections' ? 'bg-m3-primary text-white font-bold shadow' : 'bg-m3-surface-container-low text-m3-on-surface-variant hover:bg-m3-surface-container-high'"
+                    class="px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">link</span>
+                <span>1. Active Google Sheet Connections</span>
+            </button>
+
+            <button @click="activeTab = 'mapping'"
+                    :class="activeTab === 'mapping' ? 'bg-m3-primary text-white font-bold shadow' : 'bg-m3-surface-container-low text-m3-on-surface-variant hover:bg-m3-surface-container-high'"
+                    class="px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">swap_horiz</span>
+                <span>2. Column Mapping Configuration</span>
+            </button>
+
+            <button @click="activeTab = 'logs'"
+                    :class="activeTab === 'logs' ? 'bg-m3-primary text-white font-bold shadow' : 'bg-m3-surface-container-low text-m3-on-surface-variant hover:bg-m3-surface-container-high'"
+                    class="px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">receipt_long</span>
+                <span>3. Real-Time Sync Execution Logs</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: ACTIVE GOOGLE SHEET CONNECTIONS -->
+        <div x-show="activeTab === 'connections'" class="space-y-4 pt-2">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-base text-m3-on-surface">Connected Google Sheets Roster Sources</h3>
+                    <p class="text-xs text-m3-on-surface-variant">The Service Account worker connects via Google Sheets API to read learner rows automatically.</p>
+                </div>
+
+                <button @click="addModalOpen = true"
+                        class="px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-semibold shadow hover:bg-m3-primary/90 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    <span>Connect New Sheet</span>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <template x-for="sheet in sheetConnections" :key="sheet.id">
+                    <div class="p-4 bg-m3-surface rounded-2xl border border-m3-outline-variant/70 flex flex-wrap items-center justify-between gap-4 text-xs">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm text-m3-on-surface" x-text="sheet.title"></span>
+                                <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200" x-text="sheet.client"></span>
+                            </div>
+                            <p class="font-mono text-[11px] text-m3-on-surface-variant" x-text="`Service Account: ${sheet.saAccount}`"></p>
+                            <p class="text-[11px] text-m3-outline" x-text="`Sheet ID: ${sheet.sheetId}`"></p>
+                        </div>
+
+                        <div class="flex items-center gap-4 font-mono text-[11px]">
+                            <div class="bg-white px-3 py-1 rounded-xl border border-m3-outline-variant text-center">
+                                <span class="text-[10px] text-m3-outline block">Total Learner Rows</span>
+                                <span class="font-bold text-m3-primary" x-text="sheet.totalRows"></span>
+                            </div>
+
+                            <div class="bg-white px-3 py-1 rounded-xl border border-m3-outline-variant text-center">
+                                <span class="text-[10px] text-m3-outline block">Last Sync</span>
+                                <span class="font-bold text-emerald-700" x-text="sheet.lastSync"></span>
+                            </div>
+
+                            <button @click="triggerSyncAll()" class="px-3 py-1.5 rounded-full bg-m3-primary text-white font-semibold font-sans shadow hover:bg-m3-primary/90 transition-all">
+                                Sync Now
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 2: COLUMN MAPPING CONFIGURATION -->
+        <div x-show="activeTab === 'mapping'" class="space-y-4 pt-2" style="display: none;">
+            <div>
+                <h3 class="font-bold text-base text-m3-on-surface">Google Sheet Header → Supabase Database Mapping</h3>
+                <p class="text-xs text-m3-on-surface-variant">Maps custom column titles in your Google Sheet to Promptify's target PostgreSQL user schema.</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                    <tr class="bg-m3-surface-container-low font-bold text-m3-on-surface border-b border-m3-outline-variant">
+                        <th class="p-3">Google Sheet Column Header</th>
+                        <th class="p-3">Target DB Field (Supabase)</th>
+                        <th class="p-3">Field Constraint</th>
+                        <th class="p-3">Data Preview Sample</th>
+                        <th class="p-3">Mapping Status</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-m3-outline-variant/60 font-mono text-[11px]">
+                    <template x-for="m in columnMappings" :key="m.dbField">
+                        <tr class="hover:bg-m3-surface transition-colors">
+                            <td class="p-3 font-bold text-m3-on-surface" x-text="m.sheetCol"></td>
+                            <td class="p-3 font-bold text-purple-900 bg-purple-50 px-2 py-0.5 rounded border border-purple-200" x-text="m.dbField"></td>
+                            <td class="p-3 font-sans">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold"
+                                              :class="m.required ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'"
+                                              x-text="m.required ? 'REQUIRED' : 'OPTIONAL'"></span>
+                            </td>
+                            <td class="p-3 text-m3-on-surface-variant" x-text="m.sample"></td>
+                            <td class="p-3 font-sans">
+                                        <span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1 w-max">
+                                            <span class="material-symbols-outlined text-[12px]">check</span>
+                                            <span>Mapped</span>
+                                        </span>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: REAL-TIME SYNC LOGS -->
+        <div x-show="activeTab === 'logs'" class="space-y-4 pt-2" style="display: none;">
+            <div>
+                <h3 class="font-bold text-base text-m3-on-surface">Execution Telemetry & Validation Logs</h3>
+                <p class="text-xs text-m3-on-surface-variant">Real-time records of every automated background sync run.</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                    <tr class="bg-m3-surface-container-low font-bold text-m3-on-surface border-b border-m3-outline-variant">
+                        <th class="p-2.5">Log ID</th>
+                        <th class="p-2.5">Timestamp</th>
+                        <th class="p-2.5">Sheet Source</th>
+                        <th class="p-2.5">Processed</th>
+                        <th class="p-2.5">Added</th>
+                        <th class="p-2.5">Updated</th>
+                        <th class="p-2.5">Errors</th>
+                        <th class="p-2.5">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-m3-outline-variant/60 font-mono text-[11px]">
+                    <template x-for="log in syncLogs" :key="log.id">
+                        <tr class="hover:bg-m3-surface transition-colors cursor-pointer" @click="
+                                    if(log.errors > 0) {
+                                        selectedErrorLog = log;
+                                        errorModalOpen = true;
+                                    }
+                                ">
+                            <td class="p-2.5 font-bold text-m3-primary" x-text="log.id"></td>
+                            <td class="p-2.5 text-m3-on-surface-variant" x-text="log.time"></td>
+                            <td class="p-2.5 font-sans font-bold text-m3-on-surface" x-text="log.sheetName"></td>
+                            <td class="p-2.5" x-text="log.processed"></td>
+                            <td class="p-2.5 font-bold text-emerald-700" x-text="`+${log.added}`"></td>
+                            <td class="p-2.5 text-blue-700" x-text="log.updated"></td>
+                            <td class="p-2.5 font-bold" :class="log.errors > 0 ? 'text-m3-error' : 'text-slate-400'" x-text="log.errors"></td>
+                            <td class="p-2.5 font-sans">
+                                        <span class="px-2 py-0.5 rounded font-bold"
+                                              :class="log.status === 'success' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'"
+                                              x-text="log.status === 'success' ? 'Success' : '2 Warnings'"></span>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- MODAL 1: ADD NEW GOOGLE SHEET CONNECTION -->
+<!-- ================================================================= -->
+<div x-show="addModalOpen"
+     x-transition.opacity
+     class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+     style="display: none;">
+
+    <div @click.away="addModalOpen = false"
+         class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-m3-outline-variant p-6 space-y-4">
+
+        <div class="flex items-center gap-3 text-m3-primary">
+            <span class="material-symbols-outlined text-3xl">add_to_drive</span>
+            <h3 class="font-extrabold text-lg text-m3-on-surface">Connect New Google Sheet Roster</h3>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="font-bold text-m3-on-surface block">Enterprise Client Scope:</label>
+                <select x-model="newClient" class="w-full p-2.5 rounded-xl border border-m3-outline-variant bg-white font-semibold">
+                    <template x-for="c in clients" :key="c">
+                        <option :value="c" x-text="c"></option>
+                    </template>
+                </select>
+            </div>
+
+            <div>
+                <label class="font-bold text-m3-on-surface block">Google Sheet URL (Public or Shared with Service Account):</label>
+                <input type="text" x-model="newSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs..." class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-mono focus:outline-none focus:border-m3-primary">
+            </div>
+
+            <div class="p-3 bg-blue-50 text-blue-900 rounded-xl border border-blue-200 text-[11px] space-y-1">
+                <span class="font-bold block">Service Account Email to Share Access:</span>
+                <p class="font-mono text-[10px] bg-white p-1.5 rounded border border-blue-200 select-all">sa-promptify-sync@intrepid-prod.iam.gserviceaccount.com</p>
+            </div>
+        </div>
+
+        <div class="pt-3 border-t border-m3-outline-variant flex items-center justify-end gap-2 text-xs">
+            <button @click="addModalOpen = false" class="px-4 py-2 rounded-full border border-m3-outline-variant font-semibold text-m3-on-surface">Cancel</button>
+            <button @click="
+                    if(newSheetUrl) {
+                        sheetConnections.push({
+                            id: 'RST-SYNC-03',
+                            title: 'New Connected Roster Sheet',
+                            client: newClient,
+                            sheetId: '1NewSheetIdFromUrl902834',
+                            saAccount: 'sa-promptify-sync@intrepid-prod.iam.gserviceaccount.com',
+                            interval: 'Mỗi 15 phút',
+                            lastSync: 'Vừa xong',
+                            totalRows: 0,
+                            status: 'active',
+                            mappedCols: 5
+                        });
+                        newSheetUrl = '';
+                        addModalOpen = false;
+                    }
+                " class="px-5 py-2 rounded-full bg-m3-primary text-white font-semibold shadow hover:bg-m3-primary/90">Connect & Test Sync</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL 2: VALIDATION WARNING INSPECTOR -->
+<!-- ================================================================= -->
+<div x-show="errorModalOpen"
+     x-transition.opacity
+     class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+     style="display: none;">
+
+    <template x-if="selectedErrorLog">
+        <div @click.away="errorModalOpen = false"
+             class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-m3-outline-variant p-6 space-y-4">
+
+            <div class="flex items-center gap-3 text-amber-600">
+                <span class="material-symbols-outlined text-3xl">warning</span>
+                <div>
+                    <h3 class="font-extrabold text-base text-m3-on-surface" x-text="`Sync Warning Details (${selectedErrorLog.id})`"></h3>
+                    <p class="text-[10px] text-m3-outline font-mono" x-text="selectedErrorLog.time"></p>
+                </div>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <span class="font-bold text-m3-on-surface block">Detected Row Errors:</span>
+                <div class="space-y-1.5 font-mono text-[11px]">
+                    <template x-for="err in selectedErrorLog.errorDetails" :key="err">
+                        <div class="p-2.5 bg-red-50 text-red-900 rounded-xl border border-red-200" x-text="err"></div>
+                    </template>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-m3-outline-variant flex items-center justify-end text-xs">
+                <button @click="errorModalOpen = false" class="px-5 py-2 rounded-full bg-m3-primary text-white font-semibold">Close Details</button>
+            </div>
+
+        </div>
+    </template>
+</div>
+
+<!-- ================================================================= -->
+<!-- FOOTER -->
+<!-- ================================================================= -->
+<footer class="py-6 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-12">
+    <p>© 2026 Promptify x Intrepid Asia. Google Sheets Service Account Roster Worker Active.</p>
+</footer>
+
+</body>
+</html>

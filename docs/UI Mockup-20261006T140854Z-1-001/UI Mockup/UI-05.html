@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="vi" x-data="{
+    lang: 'vi',
+    sidebarCollapsed: false, // Desktop: thu gọn cột trái
+    mobileTab: 'composer', // Mobile: 'task', 'composer', 'output'
+    activeTabLeft: 'task', // 'task', 'theory', 'hints', 'solution'
+    activeTestCase: 'case-1',
+    activePopover: null,
+    systemRoleOpen: false,
+    sopDrawerOpen: false,
+    judgeDrawerOpen: false,
+    isExecuting: false,
+    hasExecuted: true,
+    promptVersion: 2,
+    promptText: `=== SYSTEM CONTEXT & VAI TRÒ ===
+[Role]: Bạn là Chuyên viên Truyền thông & Báo chí của Agribank.
+[Constraint]: Tuân thủ nghiêm ngặt Nghị định 13/2023/NĐ-CP. Tuyệt đối khử định danh 100% dữ liệu PII (Họ tên thật, CCCD, SĐT, Số tài khoản). Sử dụng biến giữ chỗ {{TEN_KH}}, {{CCCD_AN}}, {{STK_AN}}.
+
+=== NGUYÊN LIỆU ĐÃ LÀM SẠCH (SCRUBBED DATA) ===
+- Đối tượng: Hộ nông dân {{TEN_KH}} tại Thôn 3, An Lạc, Trấn Yên.
+- Thiệt hại bão số 3: Trôi 300 con gà giống, sạt lở 2 sào bưởi đặc sản.
+- Chính sách hỗ trợ: Agribank PGD Cổ Phúc khoanh nợ 120 triệu (HĐTD-2024-TY-889) và giải ngân khẩn cấp 50 triệu ưu đãi 0.5%/năm.
+
+=== NHIỆM VỤ & ĐỊNH DẠNG ĐẦU RA ===
+[Task]: Xuất bản phác thảo 03 góc tiếp cận tiêu đề phóng sự ngắn:
+1. Góc 1: Nghị lực kiên cường của người nông dân.
+2. Góc 2: Sự đồng hành kịp thời của Agribank.
+3. Góc 3: Niềm tin hồi sinh trang trại.
+[Format]: Trình bày theo cấu trúc Markdown rõ ràng gồm Tiêu đề, Thông điệp cốt lõi (1-2 câu), và Đoạn mở đầu gợi ý (30-50 từ).`,
+
+    testCases: {
+        'case-1': {
+            name: 'Case 01: Chuẩn PII bão số 3 (Thôn 3, Trấn Yên)',
+            rawSnippet: 'Khách hàng Nguyễn Văn Tèo (CCCD 034091002847, SĐT 0912.345.678) tại Thôn 3, An Lạc, Trấn Yên vay vốn 120 triệu (HĐTD-2024-TY-889) tại Agribank PGD Cổ Phúc...',
+            scrubbedSnippet: 'Khách hàng {{TEN_KH}} (CCCD {{CCCD_AN}}, SĐT {{SDT_AN}}) tại Thôn 3, An Lạc, Trấn Yên được khoanh nợ 120 triệu...'
+        },
+        'case-2': {
+            name: 'Case 02: Bẫy dữ liệu khuyết thiếu & Mất hồ sơ',
+            rawSnippet: 'Ghi chép nhanh: Hộ vay Lê Thị Mận mất giấy chứng nhận QSDĐ số BS 123456 do lũ cuốn, cần giải ngân gấp 30 triệu không có TSBĐ bổ sung...',
+            scrubbedSnippet: 'Ghi chép: Hộ vay {{TEN_KH}} thất lạc GCN QSDĐ {{SO_SERI_AN}} do lũ, đề xuất cơ chế hỗ trợ đặc thù...'
+        }
+    },
+
+    judgeScore: 8,
+    rubricCriteria: [
+        { name: '1. Khử PII & Bảo mật (Nghị định 13)', score: 2, max: 2, status: 'pass' },
+        { name: '2. Nhập vai Chuyên viên Truyền thông', score: 2, max: 2, status: 'pass' },
+        { name: '3. Đủ 03 góc tiếp cận theo yêu cầu', score: 2, max: 2, status: 'pass' },
+        { name: '4. Kiểm soát tính chính xác (Chống bịa đặt)', score: 1, max: 2, status: 'warn' },
+        { name: '5. Tính ứng dụng nghiệp vụ ngân hàng', score: 1, max: 2, status: 'warn' }
+    ],
+
+    // Chèn thông minh tại vị trí con trỏ chuột
+    insertChip(textToInsert) {
+        const textarea = document.getElementById('promptTextarea');
+        if (!textarea) {
+            this.promptText += '\n\n' + textToInsert;
+        } else {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const before = this.promptText.substring(0, start);
+            const after = this.promptText.substring(end);
+            this.promptText = before + (before.endsWith('\n') || before === '' ? '' : '\n\n') + textToInsert + (after.startsWith('\n') ? '' : '\n\n') + after;
+        }
+        this.activePopover = null;
+    },
+
+    runPrompt() {
+        this.isExecuting = true;
+        setTimeout(() => {
+            this.isExecuting = false;
+            this.hasExecuted = true;
+            this.promptVersion = 3;
+            // Trên mobile: tự chuyển sang tab kết quả để học viên quan sát ngay
+            if (window.innerWidth < 1024) {
+                this.mobileTab = 'output';
+            }
+        }, 800);
+    }
+}"
+@keydown.window.ctrl.enter.prevent="runPrompt()"
+@keydown.window.cmd.enter.prevent="runPrompt()"
+@keydown.window.ctrl.backslash.prevent="sopDrawerOpen = !sopDrawerOpen"
+@keydown.window.cmd.backslash.prevent="sopDrawerOpen = !sopDrawerOpen"
+@keydown.window.escape="activePopover = null; sopDrawerOpen = false; judgeDrawerOpen = false">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Promptify - Modern Learner Workspace (UI-05 v1.3 Consolidated Master)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1'
+                        },
+                        brand: {
+                            emerald: '#059669',
+                            amber: '#D97706'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .popover-caret-top::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 20px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-left: 1px solid #CBD5E1;
+            border-top: 1px solid #CBD5E1;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased h-screen flex flex-col overflow-hidden selection:bg-m3-primary-container">
+
+<!-- ================================================================= -->
+<!-- 1. TOP GLOBAL NAVIGATION BAR (RESPONSIVE FOR ALL SCREENS)         -->
+<!-- ================================================================= -->
+<header class="bg-white border-b border-m3-outline-variant/60 px-3 sm:px-4 py-2 flex items-center justify-between shrink-0 z-30 shadow-xs">
+    
+    <!-- Left: Brand Logo & Compact Context -->
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <a href="/" class="flex items-center gap-1.5 shrink-0">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-m3-primary text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs">
+                P
+            </div>
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-m3-on-surface hidden xs:inline-block">Promptify</span>
+        </a>
+
+        <div class="h-4 w-px bg-m3-outline-variant/80 hidden sm:block"></div>
+
+        <!-- Truncated Breadcrumb Pill -->
+        <div class="flex items-center gap-1 bg-m3-primary-container/40 text-m3-primary px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-bold truncate max-w-[180px] sm:max-w-xs md:max-w-md">
+            <span class="material-symbols-outlined text-xs shrink-0">lock</span>
+            <span class="truncate text-[11px] sm:text-xs">Lab 01: Khử PII (Agribank SOP)</span>
+        </div>
+    </div>
+
+    <!-- Center: Desktop Ergonomic Run Meta -->
+    <div class="hidden xl:flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-m3-surface-container-low px-3 py-1 rounded-full border border-m3-outline-variant/60 text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-m3-on-surface-variant">Lần thử:</span>
+            <span class="font-mono font-bold text-m3-primary" x-text="`Run V${promptVersion}`"></span>
+            <span class="text-m3-outline">•</span>
+            <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.2 rounded-full text-[11px]" x-text="`Điểm: ${judgeScore}/10`"></span>
+            <span class="text-m3-outline">•</span>
+            <span class="text-m3-on-surface-variant font-mono text-[11px]">Gemini 1.5 Pro</span>
+        </div>
+
+        <button @click="sidebarCollapsed = !sidebarCollapsed"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-m3-outline-variant text-xs text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-all">
+            <span class="material-symbols-outlined text-sm" x-text="sidebarCollapsed ? 'dock_to_right' : 'dock_to_left'"></span>
+            <span x-text="sidebarCollapsed ? 'Mở đề bài' : 'Thu gọn đề'"></span>
+        </button>
+    </div>
+
+    <!-- Right: Quick Tools (Clean Responsive Grouping) -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- SOP Tra cứu Button -->
+        <button @click="sopDrawerOpen = true"
+                class="flex items-center gap-1 px-2.5 py-1 sm:py-1.5 rounded-full border border-m3-outline-variant bg-white text-xs font-semibold text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-all"
+                title="Ctrl + \">
+            <span class="material-symbols-outlined text-sm text-m3-primary">menu_book</span>
+            <span class="hidden md:inline-block">Tra cứu SOP</span>
+            <span class="bg-blue-100 text-blue-800 text-[10px] font-mono font-bold px-1 py-0.2 rounded hidden sm:inline-block">Ctrl+\</span>
+        </button>
+
+        <!-- Rubric Score Button -->
+        <button @click="judgeDrawerOpen = true"
+                class="flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full border border-m3-outline-variant bg-white text-xs font-semibold text-emerald-800 hover:bg-emerald-50 transition-all">
+            <span class="material-symbols-outlined text-sm text-emerald-600">gavel</span>
+            <span class="font-mono font-bold" x-text="`${judgeScore}/10đ`"></span>
+        </button>
+
+        <!-- Compare Link -->
+        <a href="UI-06.html" target="_blank"
+           class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-m3-primary-container text-m3-on-primary-container text-xs font-bold hover:bg-m3-primary-container/80 transition-all">
+            <span class="material-symbols-outlined text-sm">compare_arrows</span>
+            <span class="hidden lg:inline">So sánh Diff</span>
+        </a>
+
+        <!-- User Profile Avatar -->
+        <div class="w-7 h-7 rounded-full bg-brand-emerald text-white font-bold text-xs flex items-center justify-center shadow-xs ml-1 shrink-0">
+            MA
+        </div>
+    </div>
+</header>
+
+<!-- ================================================================= -->
+<!-- 2. LAB STEP & MOBILE SEGMENTED TABS CONTROLLER                     -->
+<!-- ================================================================= -->
+<!-- Desktop Sub-bar -->
+<div class="hidden lg:flex bg-m3-surface-container-low border-b border-m3-outline-variant/60 px-4 py-2 items-center justify-between text-xs shrink-0">
+    <div class="flex items-center gap-3">
+        <span class="font-bold text-m3-on-surface flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm text-brand-emerald">check_circle</span>
+            <span>Bài 1 / 8: Lab 01 - Khử định danh PII</span>
+        </span>
+        <span class="text-m3-outline">•</span>
+        <span class="text-m3-on-surface-variant font-medium">Bước 1 / 3: Thử nghiệm giải pháp ban đầu</span>
+        <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] border border-emerald-300">✓ Đã vượt benchmark</span>
+    </div>
+
+    <button class="flex items-center gap-1 bg-brand-emerald hover:bg-brand-emerald/90 text-white font-semibold px-3 py-1 rounded-full text-xs shadow-xs transition-all">
+        <span>Tiếp tục Bước 2 (Cải tiến prompt)</span>
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+    </button>
+</div>
+
+<!-- Mobile Segmented Tab Bar (CỨU CÁNH CHO GIAO DIỆN DI ĐỘNG) -->
+<div class="lg:hidden bg-white border-b border-m3-outline-variant/60 px-2 py-1.5 shrink-0 flex items-center justify-between text-xs gap-1">
+    <button @click="mobileTab = 'task'"
+            :class="mobileTab === 'task' ? 'bg-m3-primary text-white font-bold shadow-xs' : 'bg-m3-surface-container-low text-m3-on-surface-variant'"
+            class="flex-1 py-1.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1 truncate">
+        <span class="material-symbols-outlined text-sm">assignment</span>
+        <span>1. Đề bài</span>
+    </button>
+    <button @click="mobileTab = 'composer'"
+            :class="mobileTab === 'composer' ? 'bg-m3-primary text-white font-bold shadow-xs' : 'bg-m3-surface-container-low text-m3-on-surface-variant'"
+            class="flex-1 py-1.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1 truncate">
+        <span class="material-symbols-outlined text-sm">edit_note</span>
+        <span>2. Soạn Prompt</span>
+    </button>
+    <button @click="mobileTab = 'output'"
+            :class="mobileTab === 'output' ? 'bg-m3-primary text-white font-bold shadow-xs' : 'bg-m3-surface-container-low text-m3-on-surface-variant'"
+            class="flex-1 py-1.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1 truncate relative">
+        <span class="material-symbols-outlined text-sm">task_alt</span>
+        <span>3. Kết quả (<span x-text="`${judgeScore}đ`"></span>)</span>
+    </button>
+</div>
+
+<!-- ================================================================= -->
+<!-- 3. MAIN WORKSPACE BODY (DESKTOP: 3 COLS | MOBILE: 1 COL TABBED)   -->
+<!-- ================================================================= -->
+<main class="flex-1 flex overflow-hidden relative">
+
+    <!-- ============================================================= -->
+    <!-- COLUMN 1: FULL PEDAGOGICAL SIDEBAR (4 TABS KHÔNG THIẾU GÌ)     -->
+    <!-- ============================================================= -->
+    <div class="border-r border-m3-outline-variant/60 bg-white flex flex-col transition-all duration-300 overflow-hidden shrink-0"
+         :class="{
+            // Mobile visibility
+            'hidden lg:flex': mobileTab !== 'task',
+            'w-full flex': mobileTab === 'task',
+            // Desktop width
+            'lg:w-10 lg:bg-m3-surface-container-low': sidebarCollapsed,
+            'lg:w-80 xl:w-[360px] 2xl:w-[400px]': !sidebarCollapsed
+         }">
+
+        <!-- Desktop Collapsed Minimal Rail -->
+        <div x-show="sidebarCollapsed" class="hidden lg:flex h-full flex-col items-center py-3 space-y-4">
+            <button @click="sidebarCollapsed = false" class="p-1.5 rounded-lg bg-white border border-m3-outline-variant text-m3-primary hover:bg-m3-primary-container transition-all" title="Mở rộng Đề bài">
+                <span class="material-symbols-outlined text-sm">dock_to_right</span>
+            </button>
+            <div class="[writing-mode:vertical-rl] select-none text-[11px] font-bold uppercase tracking-wider text-slate-500 py-6 tracking-widest">
+                ĐỀ BÀI & DỮ LIỆU
+            </div>
+        </div>
+
+        <!-- Expanded Full Content Body -->
+        <div x-show="!sidebarCollapsed || mobileTab === 'task'" class="h-full flex flex-col overflow-y-auto w-full">
+            
+            <!-- 4 TABS: ĐỀ BÀI, LÝ THUYẾT, GỢI Ý 🔒, LỜI GIẢI 🔒 (ĐÃ PHỤC HỒI ĐẦY ĐỦ) -->
+            <div class="bg-m3-surface-container-low border-b border-m3-outline-variant/60 px-2 sm:px-3 pt-2 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-1 text-xs font-semibold overflow-x-auto no-scrollbar">
+                    <button @click="activeTabLeft = 'task'"
+                            :class="activeTabLeft === 'task' ? 'bg-white text-m3-primary border-t-2 border-m3-primary shadow-xs' : 'text-m3-on-surface-variant'"
+                            class="px-2.5 py-1.5 rounded-t-lg transition-all flex items-center gap-1 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-sm">assignment</span>
+                        <span>Bài tập</span>
+                    </button>
+                    <button @click="activeTabLeft = 'theory'"
+                            :class="activeTabLeft === 'theory' ? 'bg-white text-m3-primary border-t-2 border-m3-primary shadow-xs' : 'text-m3-on-surface-variant'"
+                            class="px-2.5 py-1.5 rounded-t-lg transition-all flex items-center gap-1 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-sm">menu_book</span>
+                        <span>Lý thuyết</span>
+                    </button>
+                    <button @click="activeTabLeft = 'hints'"
+                            :class="activeTabLeft === 'hints' ? 'bg-white text-amber-800 border-t-2 border-amber-500 shadow-xs' : 'text-m3-on-surface-variant'"
+                            class="px-2 py-1.5 rounded-t-lg transition-all flex items-center gap-0.5 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-xs text-amber-600">lock</span>
+                        <span>Gợi ý</span>
+                    </button>
+                    <button @click="activeTabLeft = 'solution'"
+                            :class="activeTabLeft === 'solution' ? 'bg-white text-rose-800 border-t-2 border-rose-500 shadow-xs' : 'text-m3-on-surface-variant'"
+                            class="px-2 py-1.5 rounded-t-lg transition-all flex items-center gap-0.5 whitespace-nowrap">
+                        <span class="material-symbols-outlined text-xs text-rose-600">lock</span>
+                        <span>Lời giải</span>
+                    </button>
+                </div>
+
+                <button @click="sidebarCollapsed = true" class="hidden lg:block text-m3-outline hover:text-m3-on-surface p-1" title="Thu gọn">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: BÀI TẬP VÀ TEST BENCH -->
+            <div x-show="activeTabLeft === 'task'" class="p-3.5 sm:p-4 space-y-4 flex-1 overflow-y-auto text-xs">
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
+                            Nhiệm vụ Bài 1
+                        </span>
+                        <span class="text-[10px] text-m3-outline font-mono">Lab 01 • 30-45 Phút</span>
+                    </div>
+                    <h2 class="text-sm font-extrabold text-m3-on-surface">
+                        Bài 1: BẢO MẬT DỮ LIỆU & BÚT XÓA PII (PII SCRUBBING)
+                    </h2>
+                    <p class="text-[11px] text-m3-on-surface-variant leading-relaxed">
+                        Trọng tâm: Hiểu bản chất token của LLM, cơ chế rò rỉ dữ liệu qua prompt và thuần thục kỹ thuật khử định danh (Sanitization) bằng biến giữ chỗ.
+                    </p>
+                </div>
+
+                <!-- Tình huống thực tế -->
+                <div class="p-3 bg-m3-surface-container-low rounded-xl border border-m3-outline-variant/60 text-[11px] leading-relaxed space-y-1 text-m3-on-surface-variant">
+                    <strong class="text-m3-on-surface flex items-center gap-1 font-bold">
+                        <span class="material-symbols-outlined text-sm text-m3-primary">description</span>
+                        <span>Tình huống thực tế:</span>
+                    </strong>
+                    <p>Phòng Truyền thông nhận được email từ Chi nhánh Agribank Trấn Yên (Yên Bái) đề nghị viết bài phóng sự ngắn về gương mặt hộ nông dân vượt khó sau bão lũ số 3. Tài liệu gửi kèm là trích lục nội bộ của phòng Tín dụng.</p>
+                </div>
+
+                <!-- Multi-Input Test Bench -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between font-bold text-[11px] uppercase tracking-wider text-m3-on-surface">
+                        <span>Bàn thử nghiệm dữ liệu:</span>
+                        <span class="text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded font-mono text-[10px]">2 Test Cases</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5 bg-m3-surface-container-low p-1 rounded-xl text-[11px]">
+                        <button @click="activeTestCase = 'case-1'"
+                                :class="activeTestCase === 'case-1' ? 'bg-white shadow text-m3-primary font-bold' : 'text-m3-on-surface-variant'"
+                                class="py-1 px-2 rounded-lg text-center truncate">Case 01: Chuẩn PII</button>
+                        <button @click="activeTestCase = 'case-2'"
+                                :class="activeTestCase === 'case-2' ? 'bg-white shadow text-purple-700 font-bold' : 'text-m3-on-surface-variant'"
+                                class="py-1 px-2 rounded-lg text-center truncate">Case 02: Bẫy khuyết</button>
+                    </div>
+                    <div class="bg-slate-900 text-slate-300 p-2.5 rounded-xl font-mono text-[10px] leading-relaxed border border-slate-800">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1 mb-1">
+                            <span class="text-emerald-400 font-bold uppercase text-[9px]" x-text="testCases[activeTestCase].name"></span>
+                            <button @click="navigator.clipboard.writeText(testCases[activeTestCase].scrubbedSnippet); alert('Đã sao chép dữ liệu!');" class="text-slate-400 hover:text-white text-[9px] flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[10px]">content_copy</span>
+                                <span>Copy</span>
+                            </button>
+                        </div>
+                        <p class="line-clamp-3 text-slate-400" x-text="testCases[activeTestCase].rawSnippet"></p>
+                    </div>
+                </div>
+
+                <!-- Mục tiêu cần đạt -->
+                <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200 text-[11px] space-y-1.5 text-emerald-950">
+                    <strong class="font-bold block text-emerald-900">Mục tiêu cần đạt:</strong>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li>Khử PII: Thay thế CCCD, SĐT, STK bằng biến giữ chỗ <code class="bg-white px-1 py-0.2 rounded font-mono">{{TEN_KH}}</code>.</li>
+                        <li>Đóng vai: Chuyên viên Truyền thông & Báo chí Agribank.</li>
+                        <li>Định dạng: Phác thảo 03 góc tiếp cận tiêu đề (Nghị lực, Đồng hành, Hồi sinh).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB 2: LÝ THUYẾT NỀN TẢNG (CHI TIẾT VỀ TOKEN & BẢO MẬT) -->
+            <div x-show="activeTabLeft === 'theory'" class="p-3.5 sm:p-4 space-y-3 flex-1 overflow-y-auto text-xs leading-relaxed" style="display: none;">
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-1 text-blue-900">
+                    <strong class="block text-[11px]">1.1 Bản chất Kỹ thuật Đằng sau LLM (Under The Hood)</strong>
+                    <p class="text-[11px]">Cơ chế hoạt động: Mô hình ngôn ngữ lớn (LLM) không "suy nghĩ" như con người. Bản chất là <strong>Mô hình Dự đoán Từ tiếp theo (Next-Token Prediction)</strong> dựa trên xác suất thống kê.</p>
+                </div>
+                <div class="space-y-1.5 text-[11px] text-m3-on-surface-variant">
+                    <strong class="text-m3-on-surface block">Dữ liệu bạn nhập đi về đâu?</strong>
+                    <p>Khi gõ văn bản vào ô chat của các nền tảng AI công cộng, đoạn văn bản đó được gửi về máy chủ đám mây và có thể được dùng để huấn luyện tiếp (RLHF) hoặc lưu trong lịch sử chat.</p>
+                </div>
+                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-[10px] space-y-1 text-slate-800">
+                    <strong class="font-sans font-bold block text-[11px] text-slate-900">Quy tắc Bút xóa PII:</strong>
+                    <p>• Tên khách hàng &rarr; <code>{{HO_TEN_KH}}</code></p>
+                    <p>• Số CCCD / CMND &rarr; <code>{{SO_CCCD_AN}}</code></p>
+                    <p>• Số tài khoản &rarr; <code>{{SO_TK_AN}}</code></p>
+                </div>
+            </div>
+
+            <!-- TAB 3: GỢI Ý TƯ DUY 🔒 (GAMIFIED LOCK PHỤC HỒI HOÀN CHỈNH) -->
+            <div x-show="activeTabLeft === 'hints'" class="p-6 space-y-4 text-center my-auto flex-1 flex flex-col items-center justify-center" style="display: none;">
+                <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shadow-inner">
+                    <span class="material-symbols-outlined text-3xl">lock</span>
+                </div>
+                <div class="space-y-1 max-w-xs">
+                    <h3 class="font-extrabold text-sm text-m3-on-surface">Gợi ý tư duy đang được khóa</h3>
+                    <p class="text-xs text-m3-on-surface-variant leading-relaxed">
+                        Khuyến khích bạn tự phân tích bài toán trước. Việc mở gợi ý sẽ được lưu lại để Giảng viên đánh giá mức độ tự chủ của bạn.
+                    </p>
+                </div>
+                <button @click="alert('Gợi ý: Cấu trúc prompt gồm 4 phần: [Role] + [Context] + [Task] + [Constraint]. Hãy bắt đầu bằng việc yêu cầu AI đóng vai Chuyên viên Truyền thông Agribank.')"
+                        class="px-5 py-2.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shadow-xs transition-all">
+                    Mở khóa Gợi ý bài học
+                </button>
+            </div>
+
+            <!-- TAB 4: LỜI GIẢI MẪU 🔒 (GAMIFIED LOCK PHỤC HỒI HOÀN CHỈNH) -->
+            <div x-show="activeTabLeft === 'solution'" class="p-6 space-y-4 text-center my-auto flex-1 flex flex-col items-center justify-center" style="display: none;">
+                <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center shadow-inner">
+                    <span class="material-symbols-outlined text-3xl">key</span>
+                </div>
+                <div class="space-y-1 max-w-xs">
+                    <h3 class="font-extrabold text-sm text-m3-on-surface">Đáp án mẫu đang được khóa</h3>
+                    <p class="text-xs text-m3-on-surface-variant leading-relaxed">
+                        Hành động này sẽ gắn cờ <strong>"Đã xem đáp án"</strong> vào hồ sơ đánh giá. Bạn nên thử nghiệm chạy prompt ít nhất 1 lần trước khi mở!
+                    </p>
+                </div>
+                <button @click="alert('Đáp án chuẩn đã được nạp vào ô soạn thảo!')"
+                        class="px-5 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs transition-all">
+                    Xác nhận mở khóa Lời giải
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- COLUMN 2: PROMPT COMPOSER WORKSPACE                           -->
+    <!-- ============================================================= -->
+    <div class="flex-1 flex flex-col bg-white overflow-hidden border-r border-m3-outline-variant/60"
+         :class="{
+            'hidden lg:flex': mobileTab !== 'composer',
+            'w-full flex': mobileTab === 'composer'
+         }">
+
+        <!-- Sub-Header: Lịch sử & Nhận diện thẻ -->
+        <div class="p-2.5 bg-white border-b border-m3-outline-variant/60 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-m3-on-surface-variant hidden xs:inline">Lịch sử thử:</span>
+                <select class="bg-m3-surface-container-low border border-m3-outline-variant rounded-lg px-2 py-0.5 text-xs font-mono font-bold text-m3-on-surface focus:outline-none">
+                    <option>Lần thử 2 (Mới nhất) • 8/10đ</option>
+                    <option>Lần thử 1 (Ban đầu) • 4/10đ</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+                <span class="material-symbols-outlined text-xs text-emerald-600">verified</span>
+                <span>Đã nhận diện: <strong>4 / 6 thẻ chuẩn</strong></span>
+            </div>
+        </div>
+
+        <!-- PEDAGOGICAL CHIPS BAR: POPOVER SẼ MỞ XUỐNG DƯỚI (TOP-FULL MT-2) -->
+        <div class="bg-m3-surface-container-low/70 border-b border-m3-outline-variant/60 px-3 sm:px-4 py-2 shrink-0 relative z-20">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-m3-on-surface-variant flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs text-m3-primary">extension</span>
+                    <span>Gợi ý chèn cấu trúc Prompt:</span>
+                </span>
+                <span class="text-[10px] text-m3-outline hidden sm:inline">Click thẻ để học tác động đầu ra</span>
+            </div>
+
+            <!-- Chips Container -->
+            <div class="flex flex-wrap items-center gap-1.5 relative">
+
+                <!-- CHIP 1: VAI TRÒ -->
+                <div class="relative">
+                    <button @click="activePopover = (activePopover === 'role' ? null : 'role')"
+                            class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all flex items-center gap-1 bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-50 shadow-2xs">
+                        <span class="material-symbols-outlined text-xs text-emerald-600">check</span>
+                        <span>+ Vai trò</span>
+                    </button>
+                    <!-- Popover 1: Mở xuống dưới -->
+                    <div x-show="activePopover === 'role'"
+                         @click.away="activePopover = null"
+                         class="absolute top-full mt-2 left-0 z-50 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-m3-outline-variant p-3.5 space-y-2.5 popover-caret-top"
+                         style="display: none;">
+                        <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-1.5">
+                            <span class="font-bold text-xs text-m3-on-surface">Vai trò (Role / Persona)</span>
+                            <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.2 rounded">Trọng tâm</span>
+                        </div>
+                        <p class="text-[11px] text-m3-on-surface-variant leading-relaxed">
+                            <strong>Tác động đầu ra:</strong> Giúp AI chọn đúng góc nhìn chuyên gia và văn phong báo chí chuẩn mực của Agribank.
+                        </p>
+                        <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 font-mono text-[10px] text-slate-800">
+                            "Bạn là Chuyên viên Truyền thông & Báo chí Agribank với 10 năm kinh nghiệm."
+                        </div>
+                        <button @click="insertChip('[Role]: Bạn là Chuyên viên Truyền thông & Báo chí của Agribank.')"
+                                class="w-full py-1.5 rounded-lg bg-m3-primary hover:bg-m3-primary/90 text-white font-semibold text-xs shadow-xs">
+                            + Chèn thẻ này vào bài làm
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CHIP 2: BỐI CẢNH (TRỌNG TÂM) -->
+                <div class="relative">
+                    <button @click="activePopover = (activePopover === 'context' ? null : 'context')"
+                            class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all flex items-center gap-1 bg-white border-amber-300 text-amber-900 hover:bg-amber-50 shadow-2xs">
+                        <span class="material-symbols-outlined text-xs text-amber-600">check</span>
+                        <span>+ Bối cảnh</span>
+                        <span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-1 rounded">TRỌNG TÂM</span>
+                    </button>
+                    <!-- Popover 2 -->
+                    <div x-show="activePopover === 'context'"
+                         @click.away="activePopover = null"
+                         class="absolute top-full mt-2 left-0 z-50 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-m3-outline-variant p-3.5 space-y-2.5 popover-caret-top"
+                         style="display: none;">
+                        <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-1.5">
+                            <span class="font-bold text-xs text-m3-on-surface">Bối cảnh (Context)</span>
+                            <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded">Cốt lõi</span>
+                        </div>
+                        <p class="text-[11px] text-m3-on-surface-variant leading-relaxed">
+                            <strong>Tác động:</strong> Giúp câu trả lời bám đúng tình huống công việc và dữ liệu sau bão số 3 tại Chi nhánh Trấn Yên.
+                        </p>
+                        <button @click="insertChip('[Context]: Khách hàng {{TEN_KH}} chịu thiệt hại bão số 3, được Agribank khoanh nợ 120 triệu.')"
+                                class="w-full py-1.5 rounded-lg bg-m3-primary hover:bg-m3-primary/90 text-white font-semibold text-xs shadow-xs">
+                            + Chèn thẻ này
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CHIP 3: RÀNG BUỘC PII (TRỌNG TÂM) -->
+                <div class="relative">
+                    <button @click="activePopover = (activePopover === 'constraint' ? null : 'constraint')"
+                            class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-all flex items-center gap-1 bg-white border-amber-300 text-amber-900 hover:bg-amber-50 shadow-2xs">
+                        <span class="material-symbols-outlined text-xs text-amber-600">check</span>
+                        <span>+ Ràng buộc PII</span>
+                        <span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-1 rounded">TRỌNG TÂM</span>
+                    </button>
+                    <!-- Popover 3 -->
+                    <div x-show="activePopover === 'constraint'"
+                         @click.away="activePopover = null"
+                         class="absolute top-full mt-2 left-0 z-50 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-m3-outline-variant p-3.5 space-y-2.5 popover-caret-top"
+                         style="display: none;">
+                        <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-1.5">
+                            <span class="font-bold text-xs text-m3-on-surface">Ràng buộc PII (Constraint)</span>
+                            <span class="text-[10px] bg-red-100 text-red-800 font-bold px-1.5 py-0.2 rounded">Bắt buộc</span>
+                        </div>
+                        <p class="text-[11px] text-m3-on-surface-variant leading-relaxed">
+                            <strong>Tác động:</strong> Thiết lập quy tắc cấm LLM rò rỉ số CCCD, SĐT và số hợp đồng tín dụng ra văn bản công cộng.
+                        </p>
+                        <button @click="insertChip('[Constraint]: Tuyệt đối không xuất thông tin PII thật. Dùng biến {{TEN_KH}} và {{CCCD_AN}}.')"
+                                class="w-full py-1.5 rounded-lg bg-m3-primary hover:bg-m3-primary/90 text-white font-semibold text-xs shadow-xs">
+                            + Chèn quy tắc PII
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CHIP 4: ĐỊNH DẠNG -->
+                <button @click="insertChip('[Format]: Xuất bản 3 góc tiếp cận dưới dạng Markdown có tiêu đề và đoạn mở đầu.')"
+                        class="px-2.5 py-1 rounded-lg text-xs font-medium border bg-white border-m3-outline-variant text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-all">
+                    + Định dạng
+                </button>
+
+                <!-- CHIP 5: TRÍCH DẪN SOP -->
+                <button @click="sopDrawerOpen = true"
+                        class="px-2.5 py-1 rounded-lg text-xs font-medium border bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs text-blue-700">format_quote</span>
+                    <span>+ SOP</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TEXTAREA CHÍNH -->
+        <div class="flex-1 p-2.5 sm:p-3 flex flex-col overflow-hidden relative">
+            <textarea id="promptTextarea"
+                      x-model="promptText"
+                      spellcheck="false"
+                      placeholder="Viết prompt của bạn tại đây..."
+                      class="flex-1 w-full bg-white p-3.5 sm:p-4 rounded-2xl border border-m3-outline-variant font-mono text-xs text-m3-on-surface focus:outline-none focus:border-m3-primary focus:ring-2 focus:ring-m3-primary-container leading-relaxed resize-none shadow-inner"></textarea>
+
+            <div class="absolute bottom-4 right-4 flex items-center gap-2 bg-white/95 px-2.5 py-1 rounded-full border border-m3-outline-variant/60 text-[10px] font-mono text-m3-on-surface-variant shadow-xs">
+                <span x-text="`${promptText.length} ký tự`"></span>
+                <span>•</span>
+                <span x-text="`~${Math.round(promptText.length / 4)} tokens`"></span>
+            </div>
+        </div>
+
+        <!-- SYSTEM INSTRUCTION COLLAPSIBLE -->
+        <div class="px-3 sm:px-4 py-1.5 border-t border-m3-outline-variant/60 bg-m3-surface-container-low/40">
+            <button @click="systemRoleOpen = !systemRoleOpen"
+                    class="text-xs font-semibold text-m3-on-surface-variant hover:text-m3-primary flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm" x-text="systemRoleOpen ? 'keyboard_arrow_down' : 'keyboard_arrow_right'"></span>
+                <span class="truncate">Thiết lập nâng cao: Chỉ dẫn hệ thống (System Role)</span>
+            </button>
+            <div x-show="systemRoleOpen" class="mt-1 pb-1">
+                <input type="text"
+                       value="Bạn là trợ lý AI chuyên môn cao của Agribank. Tuân thủ tuyệt đối an toàn thông tin Nghị định 13."
+                       class="w-full p-2 bg-white rounded-xl border border-m3-outline-variant text-[11px] font-mono text-m3-on-surface focus:outline-none">
+            </div>
+        </div>
+
+        <!-- STICKY ACTION BAR -->
+        <div class="p-2.5 sm:p-3 bg-white border-t border-m3-outline-variant/60 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-1 text-[11px] sm:text-xs text-m3-on-surface-variant">
+                <span class="material-symbols-outlined text-brand-emerald text-sm">bolt</span>
+                <span class="hidden xs:inline">Mô hình:</span>
+                <strong>Gemini 1.5 Pro</strong>
+            </div>
+
+            <button @click="runPrompt()"
+                    :disabled="isExecuting"
+                    class="flex items-center gap-1.5 bg-brand-emerald hover:bg-brand-emerald/90 text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50">
+                <template x-if="!isExecuting">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base">play_arrow</span>
+                        <span>Chạy Prompt</span>
+                        <span class="hidden md:inline font-mono text-[11px] font-normal opacity-80">(Ctrl+Enter)</span>
+                    </div>
+                </template>
+                <template x-if="isExecuting">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+                        <span>Đang chạy...</span>
+                    </div>
+                </template>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- COLUMN 3: LIVE OUTPUT & COMPLETE RUBRIC BREAKDOWN             -->
+    <!-- ============================================================= -->
+    <div class="w-full lg:w-80 xl:w-[360px] 2xl:w-[400px] bg-m3-surface flex flex-col overflow-hidden shrink-0 border-l border-m3-outline-variant/40"
+         :class="{
+            'hidden lg:flex': mobileTab !== 'output',
+            'w-full flex': mobileTab === 'output'
+         }">
+
+        <!-- Header: Đã fix nút Lưu SOP không bao giờ bị cắt -->
+        <div class="p-2.5 bg-white border-b border-m3-outline-variant/60 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-m3-on-surface">
+                <span class="material-symbols-outlined text-brand-emerald text-sm">task_alt</span>
+                <span>Kết quả AI (Run V2)</span>
+            </div>
+            <button @click="alert('Đã lưu thành công vào Thư viện SOP!')"
+                    class="px-2.5 py-1 rounded-full border border-m3-outline-variant bg-white hover:bg-m3-surface-container-low font-semibold text-[11px] text-m3-on-surface-variant flex items-center gap-1 shrink-0">
+                <span class="material-symbols-outlined text-xs text-brand-amber">bookmark</span>
+                <span>Lưu SOP</span>
+            </button>
+        </div>
+
+        <!-- Output & Rubric Body -->
+        <div class="flex-1 p-3 overflow-y-auto space-y-3">
+
+            <!-- Card 1: Output Markdown -->
+            <div class="bg-white p-3.5 rounded-2xl border border-m3-outline-variant space-y-2 shadow-2xs">
+                <div class="flex items-center justify-between border-b border-m3-outline-variant/50 pb-1.5">
+                    <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        ✓ 100% Khử PII thành công
+                    </span>
+                    <span class="text-[10px] text-m3-outline font-mono">0.78s • 290 tokens</span>
+                </div>
+
+                <div class="space-y-2 text-xs leading-relaxed text-m3-on-surface">
+                    <div class="p-2 bg-m3-surface-container-low rounded-xl space-y-0.5">
+                        <strong class="text-brand-emerald block text-[11px]">Góc 1: Nghị lực kiên cường</strong>
+                        <p class="font-semibold text-[11px]">Tiêu đề: Vượt qua bão giông: Bàn tay người nông dân Trấn Yên giữ màu xanh cho đồi bưởi</p>
+                        <p class="text-[11px] text-m3-on-surface-variant">Đoạn mở đầu: Giữa những triền đồi Trấn Yên vừa trải qua cơn lũ dữ, hình ảnh hộ nông dân {{TEN_KH}} cần cụi dựng lại từng gốc bưởi...</p>
+                    </div>
+
+                    <div class="p-2 bg-m3-surface-container-low rounded-xl space-y-0.5">
+                        <strong class="text-m3-primary block text-[11px]">Góc 2: Sự đồng hành của Agribank</strong>
+                        <p class="font-semibold text-[11px]">Tiêu đề: Kịp thời tháo gỡ khó khăn, Agribank đồng hành cùng bà con hồi sinh kinh tế sau lũ</p>
+                    </div>
+
+                    <div class="p-2 bg-m3-surface-container-low rounded-xl space-y-0.5">
+                        <strong class="text-purple-700 block text-[11px]">Góc 3: Niềm tin hồi sinh</strong>
+                        <p class="font-semibold text-[11px]">Tiêu đề: Những mầm xanh tái thiết: Khát vọng vươn lên từ dòng vốn chính sách Tam nông</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Rubric Đánh giá (PHỤC HỒI ĐẦY ĐỦ ĐIỂM TỐT & CẦN CẢI THIỆN) -->
+            <div class="bg-white p-3.5 rounded-2xl border border-m3-outline-variant space-y-3 shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-m3-on-surface flex items-center gap-1">
+                        <span class="material-symbols-outlined text-brand-emerald text-sm">gavel</span>
+                        <span>Đánh giá Rubric tự động:</span>
+                    </span>
+                    <span class="text-sm font-black text-brand-emerald bg-emerald-100 px-2 py-0.2 rounded-full shrink-0" x-text="`${judgeScore} / 10đ`"></span>
+                </div>
+
+                <!-- 5 Thanh Rubric Đã fix không bao giờ bị cắt chữ/số điểm -->
+                <div class="space-y-1.5 pt-1 border-t border-m3-outline-variant/60">
+                    <template x-for="crit in rubricCriteria" :key="crit.name">
+                        <div class="space-y-0.5 text-xs">
+                            <div class="flex items-center justify-between text-[11px] gap-2">
+                                <span class="text-m3-on-surface truncate flex-1" x-text="crit.name"></span>
+                                <span class="font-mono font-bold shrink-0"
+                                      :class="crit.score === 2 ? 'text-emerald-700' : 'text-amber-700'"
+                                      x-text="`${crit.score}/${crit.max}đ`"></span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-500"
+                                     :class="crit.score === 2 ? 'bg-brand-emerald' : 'bg-amber-500'"
+                                     :style="`width: ${(crit.score/crit.max)*100}%`"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- PHẦN CHI TIẾT SƯ PHẠM: ĐIỂM TỐT & CẦN CẢI THIỆN -->
+                <div class="space-y-2 pt-1 border-t border-m3-outline-variant/60 text-[11px]">
+                    <div class="space-y-0.5">
+                        <strong class="text-emerald-800 flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-xs text-brand-emerald">check_circle</span>
+                            <span>Điểm làm tốt:</span>
+                        </strong>
+                        <p class="text-m3-on-surface-variant pl-4">• Khử 100% PII nhạy cảm theo đúng Nghị định 13.</p>
+                        <p class="text-m3-on-surface-variant pl-4">• Cấu trúc 03 góc tiếp cận giàu cảm xúc, đúng văn phong Agribank.</p>
+                    </div>
+
+                    <div class="space-y-0.5">
+                        <strong class="text-amber-800 flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-xs text-brand-amber">warning</span>
+                            <span>Cần cải thiện:</span>
+                        </strong>
+                        <p class="text-m3-on-surface-variant pl-4">• Bổ sung điều kiện xử lý trong trường hợp hồ sơ khách hàng bị khuyết thiếu giấy tờ.</p>
+                    </div>
+                </div>
+
+                <!-- Callout Gợi ý -->
+                <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-200 text-xs text-blue-900 flex items-start gap-1.5">
+                    <span class="material-symbols-outlined text-sm text-m3-primary mt-0.5">lightbulb</span>
+                    <div class="text-[11px]">
+                        <span class="font-bold block">Gợi ý cho lần thử tiếp theo:</span>
+                        <span>Nêu rõ cách thức xử lý tình huống mất giấy tờ đất để đạt 10/10 điểm tuyệt đối.</span>
+                    </div>
+                </div>
+
+                <!-- Mở Drawer Chi tiết -->
+                <button @click="judgeDrawerOpen = true"
+                        class="w-full py-1.5 rounded-xl border border-m3-outline-variant hover:bg-m3-surface-container-low text-[11px] font-semibold text-m3-on-surface transition-all flex items-center justify-center gap-1">
+                    <span>Xem báo cáo chẩn đoán chi tiết (UI-07)</span>
+                    <span class="material-symbols-outlined text-xs">open_in_new</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- 4. SLIDE-OVER DRAWERS (SOP UI-08 & JUDGE UI-07)                   -->
+<!-- ================================================================= -->
+<!-- SOP Drawer -->
+<div x-show="sopDrawerOpen" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex justify-end" style="display: none;">
+    <div @click.away="sopDrawerOpen = false" class="bg-white w-full max-w-lg h-full shadow-2xl p-5 sm:p-6 flex flex-col justify-between border-l border-m3-outline-variant">
+        <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-m3-outline-variant">
+                <h3 class="font-bold text-base text-m3-on-surface">Tra cứu SOP Bảo mật (UI-08)</h3>
+                <button @click="sopDrawerOpen = false"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-300 text-xs space-y-2">
+                <span class="font-bold block">[Điều 4.2 - Bắt buộc khử PII]:</span>
+                <p>Mọi bài viết truyền thông đối ngoại phải ẩn CCCD, SĐT, số hợp đồng tín dụng và số tài khoản.</p>
+                <button @click="insertChip('[Constraint]: Tuân thủ nghiêm ngặt Điều 4.2 từ SOP-BaoMat-v2.pdf (Trang 4).'); sopDrawerOpen = false;"
+                        class="px-2.5 py-1 rounded bg-amber-200 hover:bg-amber-300 font-bold text-[10px] text-amber-900">
+                    + Chèn điều khoản vào Prompt
+                </button>
+            </div>
+        </div>
+        <button @click="sopDrawerOpen = false" class="w-full py-2.5 rounded-full border border-m3-outline-variant text-xs font-semibold">Đóng tra cứu</button>
+    </div>
+</div>
+
+<!-- AI Judge Drawer -->
+<div x-show="judgeDrawerOpen" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex justify-end" style="display: none;">
+    <div @click.away="judgeDrawerOpen = false" class="bg-white w-full max-w-md h-full shadow-2xl p-5 sm:p-6 flex flex-col justify-between border-l border-m3-outline-variant">
+        <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-m3-outline-variant">
+                <h3 class="font-bold text-base text-m3-on-surface">Chi tiết Đánh giá Rubric (UI-07)</h3>
+                <button @click="judgeDrawerOpen = false"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-emerald-900 block">Điểm tổng kết</span>
+                    <span class="text-3xl font-black text-emerald-900">8 / 10đ</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-emerald-200 text-emerald-900 flex items-center justify-center font-bold">80%</div>
+            </div>
+        </div>
+        <button @click="judgeDrawerOpen = false" class="w-full py-2.5 rounded-full bg-m3-primary text-white text-xs font-semibold">Đóng bảng</button>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+import pg from 'pg';
+if(!process.argv.includes('--execute')||!process.env.TARGET_DATABASE_URL)throw Error('Target readiness check includes one paid Vertex embedding: requires --execute and TARGET_DATABASE_URL');
+const db=new pg.Client({connectionString:process.env.TARGET_DATABASE_URL});
+try{await db.connect();const extensions=(await db.query("SELECT extname,extversion FROM pg_extension WHERE extname IN ('vector','google_ml_integration')")).rows;if(extensions.length!==2)throw Error('Both extensions required');const ml=extensions.find(e=>e.extname==='google_ml_integration').extversion.split('.').map(Number);if(ml[0]<1||ml[0]===1&&ml[1]<2)throw Error('google_ml_integration >=1.2 required');
+ const index=(await db.query("SELECT indexdef FROM pg_indexes WHERE indexname='product_sop_chunks_embedding_hnsw'")).rows[0];if(!index?.indexdef.includes('hnsw'))throw Error('HNSW index missing');
+ await db.query('BEGIN');await db.query('SET LOCAL ROLE service_role');const test=(await db.query("SELECT cardinality(public.intrepid_embed_text($1)) dimensions",['Kiểm tra kết nối Vertex AI từ Cloud SQL.'])).rows[0];if(test.dimensions!==768)throw Error('Embedding dimension mismatch');await db.query('ROLLBACK');console.log('Cloud SQL readiness PASS: extensions, HNSW and real SQL -> Vertex 768-dimensional embedding.');console.log(extensions);
+}catch(e){await db.query('ROLLBACK').catch(()=>{});console.error('Readiness failed: '+e.message);process.exitCode=1;}finally{await db.end();}

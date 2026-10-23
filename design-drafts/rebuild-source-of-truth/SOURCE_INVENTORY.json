@@ -1,0 +1,3353 @@
+{
+  "files": [
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\changes.md",
+      "file": "ui/latest/changes.md",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 3698,
+      "sha256": "86e7a22f0d910f7720158379f27f62d3af668ae5f937b5b0930411e3efac740d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\compare.html",
+      "file": "ui/latest/compare.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 32240,
+      "sha256": "9dfde091eee8e8a2059d3b9abfae7d77a37a640e74fb15e1872d5a24cb2898aa"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\01_UI-00_Public-Landing.html",
+      "file": "ui/latest/html/01_UI-00_Public-Landing.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4804931,
+      "sha256": "8840cf14ddf0048f09e7e9aef87a83faaac982c7f5576e3e1407abefdefcb7be"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\02_UI-01_Enterprise-Authentication.html",
+      "file": "ui/latest/html/02_UI-01_Enterprise-Authentication.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4804938,
+      "sha256": "aa4444da1ed213e64248180b03bdacc7a4df5a87d3fe954499cb2efe3b220b88"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\03_UI-02_Profile-Confirmation.html",
+      "file": "ui/latest/html/03_UI-02_Profile-Confirmation.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758997,
+      "sha256": "56b750341236efb8c1ec699c63aef71718494512797e43405fcff1a34e2eb980"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\04_UI-03_Access-Denied.html",
+      "file": "ui/latest/html/04_UI-03_Access-Denied.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758990,
+      "sha256": "2ea4edc9c7ed8ebfd51b99730262356b880d96c41ed6d8a4655008a808d600e3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\05_UI-04_Department-Training-Hub.html",
+      "file": "ui/latest/html/05_UI-04_Department-Training-Hub.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4759000,
+      "sha256": "48734aefbd4b61652a93f6b7f509b39ff234a93d1c60d7da524f42673f06a126"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\06_UI-05_Consolidated-Master-Workspace.html",
+      "file": "ui/latest/html/06_UI-05_Consolidated-Master-Workspace.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4804946,
+      "sha256": "595b44f7c588885ac6f38ad094bae1a0e502a9d16521c1231082fb2a493fc092"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\07_UI-06_Prompt-and-Output-Diff.html",
+      "file": "ui/latest/html/07_UI-06_Prompt-and-Output-Diff.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4804939,
+      "sha256": "a779e42f60036ba960da9ead20b40498c687873560a13774d33e7caa646c8e9a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\08_UI-07_AI-Judge-Scorecard.html",
+      "file": "ui/latest/html/08_UI-07_AI-Judge-Scorecard.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758995,
+      "sha256": "6007d796c1e9c81b1665746d03363fcf96250080d0d511faba34c8d91077179f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\09_UI-08_SOP-Context-Inspector.html",
+      "file": "ui/latest/html/09_UI-08_SOP-Context-Inspector.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758998,
+      "sha256": "243a235acb335cc060583aec42670628ec95b1322be95208b011efa81101a07e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\10_UI-09_Workshop-Command-Center-v1-1.html",
+      "file": "ui/latest/html/10_UI-09_Workshop-Command-Center-v1-1.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4804945,
+      "sha256": "af0c9f9c2bb13d4a807300dae874b89931a51d74ba997f636e2d81953f948096"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\11_UI-10_Learner-Detail-Inspector.html",
+      "file": "ui/latest/html/11_UI-10_Learner-Detail-Inspector.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4759001,
+      "sha256": "0352f928e97e2ff2002e221137fbdc4e71f1ae8d451e4d45315dcafbb8c8d21e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\12_UI-11_Curriculum-and-SOP-Mapping-Studio-v1-2.html",
+      "file": "ui/latest/html/12_UI-11_Curriculum-and-SOP-Mapping-Studio-v1-2.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4759015,
+      "sha256": "3a325dd1b8425c687e51cd9b000cf050b819f335d93a44be24d9d0240395803d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\13_UI-12_L-D-Impact-Dashboard.html",
+      "file": "ui/latest/html/13_UI-12_L-D-Impact-Dashboard.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758997,
+      "sha256": "b86e27ef95f02824d83cdbfda94c7aac9b15d066cc210d95a6f755841e51dbe0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\14_UI-13_Department-SOP-Upload.html",
+      "file": "ui/latest/html/14_UI-13_Department-SOP-Upload.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758998,
+      "sha256": "42397723f76ec8a46cfc4ad6c9fd7c755fce2b30c83121e378a45f2f5daac499"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\15_UI-14_System-Governance.html",
+      "file": "ui/latest/html/15_UI-14_System-Governance.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758994,
+      "sha256": "dd2d8c9d4cc8d022b0b36bc4a31a59d68598ef88e2dc3bd4f4c6f20c9d0b53e8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\html\\16_UI-15_Roster-Sync.html",
+      "file": "ui/latest/html/16_UI-15_Roster-Sync.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 4758988,
+      "sha256": "b3d7c09d2a09b20d8496ce1ed326a0bbdb07da0f3d40f996f2039d2788f545d8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\index.html",
+      "file": "ui/latest/index.html",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 6229,
+      "sha256": "01d170964acef2aa89f97b1208e98ede2aff446f57be8e9d889ff9c2eabfb887"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\manifest.json",
+      "file": "ui/latest/manifest.json",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 34311,
+      "sha256": "7e7ace64d411235ab10e5e413963600463436aaa8ae43e1a9b67e92c3947ba1e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\revision-bundle.css",
+      "file": "ui/latest/revision-bundle.css",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 13736,
+      "sha256": "09f3cc260e147ed3bbf59d40b80ecbc0227d9a1c1bdb5da55235e344bca5fd0c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\revision-bundle.js",
+      "file": "ui/latest/revision-bundle.js",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 1977296,
+      "sha256": "e06ea717b1e021489951ece89fdde714b246878238bdca76ddbabb0c8b3ff4b5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-00-mobile.png",
+      "file": "ui/latest/screenshots/UI-00-mobile.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 67193,
+      "sha256": "ea640031568aee185c61011cd1805c1a46e2976a80fcf658657bd314a598c931"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-00.png",
+      "file": "ui/latest/screenshots/UI-00.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 142970,
+      "sha256": "a400654f9f889e5055a0456823ed37defdab3d5fdb8c142bd681a4bc2d4762d8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-01-mobile.png",
+      "file": "ui/latest/screenshots/UI-01-mobile.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 54332,
+      "sha256": "264db741d186733e58ccf9f6f861c6780efe4e27e53437e70beb398b69eb03a2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-01.png",
+      "file": "ui/latest/screenshots/UI-01.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 75526,
+      "sha256": "dddc272418e77e2a5a2db31e0cf048e8730a10d0677fea58ae71e75c7cedfe9b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-02.png",
+      "file": "ui/latest/screenshots/UI-02.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 85855,
+      "sha256": "a7a51a73930fc7b6128322efe1c03833090ba639eca9b14106eb505efa7f3783"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-03.png",
+      "file": "ui/latest/screenshots/UI-03.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 89962,
+      "sha256": "beb657135a508fbd527cf6ccfa50390f1098df75641108b0751fd60c172e2846"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-04.png",
+      "file": "ui/latest/screenshots/UI-04.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 224587,
+      "sha256": "9111ee48e9bb285714dfe9070dda38f6e58281e2e7cca5f873184c47f3a9244d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-05-mobile.png",
+      "file": "ui/latest/screenshots/UI-05-mobile.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 56664,
+      "sha256": "51131f68ce5b60702331ea97149a46abf9437502fd1547d9553c9ba7678b6d74"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-05.png",
+      "file": "ui/latest/screenshots/UI-05.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 214977,
+      "sha256": "3f16631421dbe08058cb788a03b8ab70f25d0ea185cc14f492082f989aa248a6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-06-mobile.png",
+      "file": "ui/latest/screenshots/UI-06-mobile.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 59144,
+      "sha256": "28476c202ffa1b6efd9e74b501aff72215d16b1b61841f6fe1cdc11243b03fbe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-06.png",
+      "file": "ui/latest/screenshots/UI-06.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 118345,
+      "sha256": "3f70a5a325d747647413bc13cc77a5a0c2a4186ddce0d3679ae2b1d048381ac4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-07.png",
+      "file": "ui/latest/screenshots/UI-07.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 165346,
+      "sha256": "4f8bbe03465f689c8b7776505fc87c00905e0c62a0cc7f7b9ddc894d79eb605a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-08.png",
+      "file": "ui/latest/screenshots/UI-08.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 141278,
+      "sha256": "2f7beb4b1d0578419a7728bd3c03e17db3f2d802dfd115163917f8d11c5c60ab"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-09-mobile.png",
+      "file": "ui/latest/screenshots/UI-09-mobile.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 61098,
+      "sha256": "b5aa7753a530241b0c8ff61bf8ecae10180a450323eee3221658f7f650512b3e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-09.png",
+      "file": "ui/latest/screenshots/UI-09.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 139447,
+      "sha256": "b96625f4c0ce74f88082930e2ac7bfb67a912bf2f7216ca9fd1f828669db9505"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-10.png",
+      "file": "ui/latest/screenshots/UI-10.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 199120,
+      "sha256": "9606be2881c4614a63b81868883f930fb17da022e18a5881971463b6cfb24907"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-11.png",
+      "file": "ui/latest/screenshots/UI-11.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 206167,
+      "sha256": "02851e77d33248ab3bbf7b8ec3f29b794c033ce6d8c782cdb1a9844b6ea1f3b5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-12.png",
+      "file": "ui/latest/screenshots/UI-12.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 222581,
+      "sha256": "b17d946807b4f6b56ba488c46dc227a25cd9446ff04de2d9d67af6877aa717e9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-13.png",
+      "file": "ui/latest/screenshots/UI-13.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 112827,
+      "sha256": "85d1b1de177b7ba2f7d5309109cb7b32c816b66aa6b4a68f9369d67aef91a4ba"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-14.png",
+      "file": "ui/latest/screenshots/UI-14.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 259670,
+      "sha256": "9d4110eac18128ec04bf1b0168cc3283d68d1b9483356ab7998dc33f9c558a31"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\screenshots\\UI-15.png",
+      "file": "ui/latest/screenshots/UI-15.png",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 213763,
+      "sha256": "8c338510b3949286b81318618b4b0ecc3de777e954a398f6890df4c68418e42a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\outputs\\ui-comment-revision\\verification.json",
+      "file": "ui/latest/verification.json",
+      "authority": "LATEST_UI_TARGET_PROTOTYPE",
+      "bytes": 1714,
+      "sha256": "659e87abe833ac0681d3d133dfc9a1e2769e639c8e2e258e21ba25b1175ed5b8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-00.html",
+      "file": "ui/mockup/UI-00.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 35650,
+      "sha256": "5d8a8dd026aae50e4ad3052440ca1147cf935073b5341a9ae3ae9196aa089c38"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-01.html",
+      "file": "ui/mockup/UI-01.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 13322,
+      "sha256": "b086b4c294854bb2d0b1a9a26b0cd17ce83e1960649742397c9f70508de204b0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-02.html",
+      "file": "ui/mockup/UI-02.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 13359,
+      "sha256": "372bdbca2b5aca82ab66ebc2b3129846da75060b72f369f0378a95d2fcfa80aa"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-03.html",
+      "file": "ui/mockup/UI-03.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 12248,
+      "sha256": "c724022499f680a9d3f2c5a4f7b837c2bfba6b8ac1fc4fb68439009ccdfead76"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-04.html",
+      "file": "ui/mockup/UI-04.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 21994,
+      "sha256": "1892952c46f9c49a8f1ffe567e45e9759cf52f2eac105400c6d4aeb200928118"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-05.html",
+      "file": "ui/mockup/UI-05.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 55779,
+      "sha256": "3c82e68dd2ed995d5b14eb120dceaa576f2b1820ac8a4ed56bbf7dcd425fc886"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-06.html",
+      "file": "ui/mockup/UI-06.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 19448,
+      "sha256": "c8a009cb3ceafcfb97e8ec203a1280f0025a06ef7ff720f930b2c0e5c70ad933"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-07.html",
+      "file": "ui/mockup/UI-07.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 19732,
+      "sha256": "bd9d3759ab22f46eb6ab4f90213155b47e4ede4b9613f55ca5e1efaf53966265"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-08.html",
+      "file": "ui/mockup/UI-08.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 16277,
+      "sha256": "1bba7ff4e4e6f6efbda2d9e1a6f8ccb26639b8e312f6c311e988a9e357e240ce"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-09.html",
+      "file": "ui/mockup/UI-09.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 29905,
+      "sha256": "dbd06d3e5765c1c58c7a36243c2adf03ab467c6345c831343723da66540beee1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-10.html",
+      "file": "ui/mockup/UI-10.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 22061,
+      "sha256": "7d1f99231c1d8d187cab7e98bc01ab1955b95c2d90fbe643ea9af46eaf4d1364"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-11.html",
+      "file": "ui/mockup/UI-11.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 55062,
+      "sha256": "ada80368beb087fc035ef07748060846b56e62e8c73789a1b7765aaff8ec3085"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-12.html",
+      "file": "ui/mockup/UI-12.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 19751,
+      "sha256": "07dda429539536427669ee71ac86836aef3b7ed2505dd1e7eb928305cc6d6b34"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-13.html",
+      "file": "ui/mockup/UI-13.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 23332,
+      "sha256": "889aa963beee3f58582809a1ebd50c3c2cd1ec0f553f30389b6e3f50f6de2614"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-14.html",
+      "file": "ui/mockup/UI-14.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 31871,
+      "sha256": "dc19e3862939d83c65e1ea9653c25911d2884b47c29bab33fcb70ce62acf2dbb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\UI Mockup-20261006T140854Z-1-001\\UI Mockup\\UI-15.html",
+      "file": "ui/mockup/UI-15.html",
+      "authority": "WORDING_FUNCTION_REFERENCE",
+      "bytes": 31947,
+      "sha256": "891aa58cc160829d7ec5ecd1b581c3e270af80af1c03fe671daaf09cedc664f9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\comment-revision-entry.tsx",
+      "file": "ui/source/comment-revision-entry.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 30100,
+      "sha256": "d6d64ed5ae53b9eefdb03e60dab95ecf512365a0b19c7d4d1bee241d31a237c7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\comment-variants.css",
+      "file": "ui/source/comment-variants.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 11526,
+      "sha256": "9d4064d0d8072c04417648c6a8eef6131bbf68d5bb346b253724432c4afc12e6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\comment-variants.tsx",
+      "file": "ui/source/comment-variants.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 15275,
+      "sha256": "1724b08c240c0fdefc94ce8213083d9dcb2db9ecbd4194a9f97b601ef1677e7b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\compare-shell.html",
+      "file": "ui/source/compare-shell.html",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 9454,
+      "sha256": "6fa8b03ffd702d4854d42af06baaebf50eae1cd30833907a9cea13c0f2aff2e9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\deployed.tsx",
+      "file": "ui/source/deployed.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 23292,
+      "sha256": "dfff5da3bb1e029452af814bf584ebe76cea416cc6121e1fbe16a88dc7ce36fa"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\entry.tsx",
+      "file": "ui/source/entry.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 50984,
+      "sha256": "01cb3c46c138ad7b215e7be013e96012ed75fc0b2dde6447bf69cc188183870f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\fonts.css",
+      "file": "ui/source/fonts.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 2662447,
+      "sha256": "1886874e1ab149c7acd3f03af2cdc983e04dc8690785a1d29d79e45264b9ea11"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\guardrail-compliance.md",
+      "file": "ui/source/guardrail-compliance.md",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 5538,
+      "sha256": "6cb1898589c1762b3445965fc48df1721c150e3503267514c98ad6e11ac57586"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\guardrail-i18n.ts",
+      "file": "ui/source/guardrail-i18n.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 48611,
+      "sha256": "85c05e21f4e12da7b8073c7d8fcf46239a9a2b282188e84c96e4c6784481a7cf"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\guardrails.css",
+      "file": "ui/source/guardrails.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 7356,
+      "sha256": "e530a3602a1b630786615350795b72d8c913b75486584caea1cb9a5d22bf2952"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\guardrails.tsx",
+      "file": "ui/source/guardrails.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 11066,
+      "sha256": "fefdec43b94ecf6f2a1ad294685a56fbba740f43cd2db39d2c08f88bde7ab7f6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\MOCKUP-ALIGNED-README.md",
+      "file": "ui/source/MOCKUP-ALIGNED-README.md",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 5256,
+      "sha256": "0ec51478d55d240213f117b9fd6277968e7b57d43e048b4b51d32f7081ecea04"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\mockup-aligned.css",
+      "file": "ui/source/mockup-aligned.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 6269,
+      "sha256": "c22379759379653878e93bc634fec946ac39254d10fe62ef9f56f60fc5b3bbab"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\mockup-aligned.tsx",
+      "file": "ui/source/mockup-aligned.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 29428,
+      "sha256": "a2c7f0626648b633da9d47bae5c849d9d50a0c45696bca0f72997100b72e0c84"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\mockup-data.json",
+      "file": "ui/source/mockup-data.json",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 32944,
+      "sha256": "b78231dc4d2083155aade2bb1fbaafc10c454863da1da26f63107108368f1fe8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\mockup-templates.json",
+      "file": "ui/source/mockup-templates.json",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 503485,
+      "sha256": "3126d5e8cbc902ba5a8878b64915c66380b40b95aa1e22a02ecc74f2fdd23ea1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\MockupLogo.tsx",
+      "file": "ui/source/MockupLogo.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 88,
+      "sha256": "e23e07889a2bbafc498ebc12d410d2378746216f369b2304dea9c32a8be5b228"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\public\\brand\\promptify-mark.png",
+      "file": "ui/source/production-baseline/public/brand/promptify-mark.png",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 833168,
+      "sha256": "48d5f8a7601597f8522071200d1ae6b0dfd16c90dbbdeadc92bd03ea62c52dd8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\App.tsx",
+      "file": "ui/source/production-baseline/src/App.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 40362,
+      "sha256": "2c60bb1b65d82869db74d37291693af9834afdc718349fcaefe1883d537abe0c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\auth\\LandingLoginScreen.tsx",
+      "file": "ui/source/production-baseline/src/components/auth/LandingLoginScreen.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 32217,
+      "sha256": "132623b3414a272d002b1c234c6eaf7c9b9ca66409b1a66091b243fd6d8dc415"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\classes\\ClassSelectionScreen.tsx",
+      "file": "ui/source/production-baseline/src/components/classes/ClassSelectionScreen.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 8578,
+      "sha256": "40e4a37fa0f1649b71cf5838acc22eaada78a8224b71219b5e6ef7f71c4dd844"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\ABCompareModal.tsx",
+      "file": "ui/source/production-baseline/src/components/common/ABCompareModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 30897,
+      "sha256": "4a622bfdf45999f6f05d7d7c813290900e6dd9c2a3e28cb2f0cf6bed5d929dc9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\AiCoach.tsx",
+      "file": "ui/source/production-baseline/src/components/common/AiCoach.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 36694,
+      "sha256": "d3400ef82252d04c37fc342a1963d22758a6979b27cbb3cf26fe5eae871ad0bb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\ApiKeyModal.tsx",
+      "file": "ui/source/production-baseline/src/components/common/ApiKeyModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 3573,
+      "sha256": "519b3927ec2cef521cdd8b887e7f0f01680a37f87353d1fc43d061854e408ebe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\DiffCompareModal.tsx",
+      "file": "ui/source/production-baseline/src/components/common/DiffCompareModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 1753,
+      "sha256": "885035dbf37e9857cf436c4b6fe8c353a84b51fb54c16a9eb09372a0cf7f3dd0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\ExpirationBanner.tsx",
+      "file": "ui/source/production-baseline/src/components/common/ExpirationBanner.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 2579,
+      "sha256": "8382ca7732abac4afb70fc0ae0533c03eee239f62492b5195d41eba6a60ca576"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\GuidedWalkthrough.tsx",
+      "file": "ui/source/production-baseline/src/components/common/GuidedWalkthrough.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 23554,
+      "sha256": "806b5d96fcb602e90dff7cec89c387739361f48338ce241afb5eabce4d3c81e3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\Header.tsx",
+      "file": "ui/source/production-baseline/src/components/common/Header.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 9249,
+      "sha256": "9ca944bb07362767181d886e3398c2382a54132553cade0595b49e3a58ddc46f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\InlineCompareCard.tsx",
+      "file": "ui/source/production-baseline/src/components/common/InlineCompareCard.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 2604,
+      "sha256": "e41a8d87c55e7f7800a6696bdb01dafb7a9fbbfb8d6aa26d75a6c8e57af004b7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\LearningBadges.tsx",
+      "file": "ui/source/production-baseline/src/components/common/LearningBadges.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 4963,
+      "sha256": "32cfc055772af009723685a3a4cecd6335ab5d5c7a5cff837bb84b3139051459"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\MarkdownView.tsx",
+      "file": "ui/source/production-baseline/src/components/common/MarkdownView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 12756,
+      "sha256": "13f4be2494491539bbd1492a979c977de3373532fa9ac0d2060964263907fb0b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\MiniChallengeCard.tsx",
+      "file": "ui/source/production-baseline/src/components/common/MiniChallengeCard.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 3891,
+      "sha256": "68eb3c4040512dbbe52b59fbeb92b0028c1385c7176a56bb30d8e23fc130a275"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\OnboardingTutorial.tsx",
+      "file": "ui/source/production-baseline/src/components/common/OnboardingTutorial.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 7361,
+      "sha256": "0e70cdd03f9b0a77fa28ad818e808f54e14b38712888266c28947e7ba1816421"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\PromptifyMark.tsx",
+      "file": "ui/source/production-baseline/src/components/common/PromptifyMark.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 321,
+      "sha256": "8d3bcdcdacc294f422e52ab0522214c2bf9d5d577705266f6f2871fb64b6693a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\PromptLibraryModal.tsx",
+      "file": "ui/source/production-baseline/src/components/common/PromptLibraryModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 13891,
+      "sha256": "11eec29fa5c99c9ba4d520e986d238978e350e7a38457a89b6d18f4bc11740a7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\PromptVersionBar.tsx",
+      "file": "ui/source/production-baseline/src/components/common/PromptVersionBar.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 5173,
+      "sha256": "56fa6d5bb6bb96df5fdab5ee02c4a6618486326b68131bdfd176b1a5e6b684b7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\RubricScorecard.tsx",
+      "file": "ui/source/production-baseline/src/components/common/RubricScorecard.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 4828,
+      "sha256": "29a4c2bf0216ad2709e0d8ca9442a7ef69628c80640940a6f7228f770902deb6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\common\\SavePromptModal.tsx",
+      "file": "ui/source/production-baseline/src/components/common/SavePromptModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 7170,
+      "sha256": "08ef4d35291c2e6d46cd3b33ef150fcea19837db96166504a6ad73c8c0dd068f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\dashboard\\LearnerDashboard.tsx",
+      "file": "ui/source/production-baseline/src/components/dashboard/LearnerDashboard.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 13349,
+      "sha256": "45b524493cf2e530a6128240118499dc7f3b14cb231e017bc3875860a596ce98"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\dashboard\\LearnerHome.tsx",
+      "file": "ui/source/production-baseline/src/components/dashboard/LearnerHome.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 6021,
+      "sha256": "5c24ff9381eadb09df0c5b7e9a0636eed48602c074988958811c9a790de8f446"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\history\\PromptHistoryView.tsx",
+      "file": "ui/source/production-baseline/src/components/history/PromptHistoryView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 12356,
+      "sha256": "5dac3056bbeac1faf3aa13825a649fbc4a182ef2c8bb21f410d5f06dfed40a6d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\hybrid\\HybridView.tsx",
+      "file": "ui/source/production-baseline/src/components/hybrid/HybridView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 65989,
+      "sha256": "5eae08788f131c17f3ad8295d7572ff596423a74315e4e215a2f5d6333d36ece"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\ActivityStreamView.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/ActivityStreamView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 6351,
+      "sha256": "25dd7427c236d6ee7e56daad55ee82f131811f0fa849bc8c3403de4f541760c2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\AddLearnerModal.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/AddLearnerModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 7237,
+      "sha256": "37e13a01616befc26ea95309899b2668a9150bd46b4905956877fbd31161d5e5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\ClassDetailView.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/ClassDetailView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 18129,
+      "sha256": "1be99fe6170ead01951a2d28a01c852b2b8953255c8c3699de3730b88451f3d9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\CourseCurriculumEditor.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/CourseCurriculumEditor.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 29355,
+      "sha256": "99b4b689a3e6e0c85ea13d843afedbc99ba16b595c874fa5644dbec01987bd89"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\CourseManagementModal.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/CourseManagementModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 18791,
+      "sha256": "cf98faeb3b8a6d03a205d14f917765ba3391e720384ba7307a611b40ad4879fe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\InstructorDashboard.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/InstructorDashboard.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 16450,
+      "sha256": "c3b8a7fc8f3fdf5c45ceb4470d58aa05f207e679530c2cbb3567481411314a94"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\InstructorNavbar.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/InstructorNavbar.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 8283,
+      "sha256": "96dfd452cc825c26f68b285ade04e64748eb8844840f9f836d163f9fcfe4737c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\InstructorViewShell.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/InstructorViewShell.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 21895,
+      "sha256": "2a8e2e31b148fc1b56668a6351843fb56866ead0a7a6de2bcf5b0c7710d15950"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\InstructorWalkthrough.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/InstructorWalkthrough.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 19946,
+      "sha256": "f98b99c5e990156462186fcf4697e82abb400c079d5303af946e2996e9731ab6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\LearnerDetailModal.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/LearnerDetailModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 12864,
+      "sha256": "a7a3b6fa83a5d6404ea0cba008718f6cbfb1591e6778d15d41dd6a482548abad"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\instructor\\LearnerTableView.tsx",
+      "file": "ui/source/production-baseline/src/components/instructor/LearnerTableView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 24864,
+      "sha256": "fef2a90f77c741617f8b075dec414d969b50ceb3d7297c00933aeb0147008b96"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\landing\\AnimatedBrandWatermark.tsx",
+      "file": "ui/source/production-baseline/src/components/landing/AnimatedBrandWatermark.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 4080,
+      "sha256": "2acb09b26775566cd7e793e0d2b43cc50738144895f275ce3a9f5c8634282ee7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\landing\\LandingKeyVisuals.css",
+      "file": "ui/source/production-baseline/src/components/landing/LandingKeyVisuals.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 16431,
+      "sha256": "820f44acf484f66bd988225170f0f40738abd18b3c0712f9f3e9083b8eec2f97"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\landing\\LandingKeyVisuals.tsx",
+      "file": "ui/source/production-baseline/src/components/landing/LandingKeyVisuals.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 9603,
+      "sha256": "8bc3cc69006a815ca6fdf93b915a7b6fd246167a1a51273d0a9949f6861384c5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\landing\\RevealOnScroll.tsx",
+      "file": "ui/source/production-baseline/src/components/landing/RevealOnScroll.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 2812,
+      "sha256": "81110e5088fd60b825e297829c4a0e41a972f6b7d6b80558167efcdc48ae7bbe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\lesson\\AssistanceConfirmModal.tsx",
+      "file": "ui/source/production-baseline/src/components/lesson/AssistanceConfirmModal.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 6076,
+      "sha256": "510307f44f7f619492352ff378cbedcceb2a9efb6c7318c5185ace70b4e4ae63"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\lesson\\LessonBriefPanel.tsx",
+      "file": "ui/source/production-baseline/src/components/lesson/LessonBriefPanel.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 24589,
+      "sha256": "1d2daab21b12c6c8ceda3e554651ad0ea374cb1055f2f4876a8ea82f6b0a01d0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\lesson\\LessonHeaderBar.tsx",
+      "file": "ui/source/production-baseline/src/components/lesson/LessonHeaderBar.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 4641,
+      "sha256": "ab828caeeac8bc250f0d83206069b91743cf11f8398083d7571dcc92d6517085"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\library\\PromptLibraryView.tsx",
+      "file": "ui/source/production-baseline/src/components/library/PromptLibraryView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 11831,
+      "sha256": "41aa209186ecbd477ad4ba3893af8aa8654ff2eb228cf076e429bbb4539591d8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\navigation\\ProductNavbar.tsx",
+      "file": "ui/source/production-baseline/src/components/navigation/ProductNavbar.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 10440,
+      "sha256": "1c2a951a6f2ace327a03f997be6da31e2c53714a74fda19610b967897f937c47"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\notebook\\NotebookCell.tsx",
+      "file": "ui/source/production-baseline/src/components/notebook/NotebookCell.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 27453,
+      "sha256": "ac40ccfa9da54683a7bbd6cb5108004c43eaf3a1b00aba2f93bf39a85a422e3a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\notebook\\NotebookCoach.tsx",
+      "file": "ui/source/production-baseline/src/components/notebook/NotebookCoach.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 18687,
+      "sha256": "f246e64525e3629cc52c6e8ee0ee79165c5f0a821fefc380a563290093ac1bd7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\notebook\\NotebookView.tsx",
+      "file": "ui/source/production-baseline/src/components/notebook/NotebookView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 9270,
+      "sha256": "444ac18ca79a322857ad9b23018713b74804e13b0eaa48d3160f1f80c39baa1e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\playground\\PlaygroundView.tsx",
+      "file": "ui/source/production-baseline/src/components/playground/PlaygroundView.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 21520,
+      "sha256": "5379ea4c99b5fb9f79a32f74b2befe91a1ba53fb0ad00afb4213b941b4bd45c5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\prompt\\InlineDiffSuggestionCard.tsx",
+      "file": "ui/source/production-baseline/src/components/prompt/InlineDiffSuggestionCard.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 10652,
+      "sha256": "0b7602a5d52c594fe91df2ef571a013ec7af347826ef113ccd18be09dfb869c1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\prompt\\PromptComposer.tsx",
+      "file": "ui/source/production-baseline/src/components/prompt/PromptComposer.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 33155,
+      "sha256": "91b24a039c3d5c05f25009bed87c04e823e45bddf72296a739cc413970eea45a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\prompt\\PromptStructurePanel.tsx",
+      "file": "ui/source/production-baseline/src/components/prompt/PromptStructurePanel.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 16053,
+      "sha256": "80747cc494239177168d534a5adf61a0f57d89b21cb67d95e058df2fdb0df40c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\components\\telemetry\\HistoryDrawer.tsx",
+      "file": "ui/source/production-baseline/src/components/telemetry/HistoryDrawer.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 7585,
+      "sha256": "a8518701b4828b99153d4e2ffc556b938c997e38194759415c60051a9a66dd46"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\data\\curriculumSeed.ts",
+      "file": "ui/source/production-baseline/src/data/curriculumSeed.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 372033,
+      "sha256": "8693fdcda958f86851c40416e273429821b7ca56a4e9e0b0d458ca1022810e52"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\data\\labsData.ts",
+      "file": "ui/source/production-baseline/src/data/labsData.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 1203,
+      "sha256": "d56bc27216556e187b17e903aeafeed34b66467a43fc26e8fc17d1233b31c162"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\index.css",
+      "file": "ui/source/production-baseline/src/index.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 3169,
+      "sha256": "f48731224f2800ceb87a19726f8279329b5aec279954a3a41af02e2a85b908be"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\main.tsx",
+      "file": "ui/source/production-baseline/src/main.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 249,
+      "sha256": "4c36fec1735dae9eb36c8df54227a581c466b938536bf290ae7a590c120db7f6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\aiEvaluationContract.ts",
+      "file": "ui/source/production-baseline/src/services/aiEvaluationContract.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 2717,
+      "sha256": "2227a6b75bcd0225cc9c16cd15eb8206bbd4d8fd3fbaca2fd862650da7b6e09f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\apiAuthorizationService.ts",
+      "file": "ui/source/production-baseline/src/services/apiAuthorizationService.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 3043,
+      "sha256": "2e9329ddc820aa3594ab22c9955cea5d3a7cbb35c7c6bb08cf0d08f3c7d28971"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\apiServerService.ts",
+      "file": "ui/source/production-baseline/src/services/apiServerService.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 17575,
+      "sha256": "b9eab5ba53e9455e3c4bc93d08b553537ae301623a6aa4d8139700b8373731c9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\businessEvaluationService.ts",
+      "file": "ui/source/production-baseline/src/services/businessEvaluationService.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 15124,
+      "sha256": "f602ae579553ec9ea01479be342fada7caf63bc7986a48aadfd98f9fa94d47fa"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\curriculumAdapter.ts",
+      "file": "ui/source/production-baseline/src/services/curriculumAdapter.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 3681,
+      "sha256": "1527496f9c6ea5a4674885ac119e62aa12757f6f1be384ad8aac067e67b59977"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\dbService.ts",
+      "file": "ui/source/production-baseline/src/services/dbService.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 55796,
+      "sha256": "1f56679c03aaa6e594e221f2aecee61309f4039f811f1968f617818f87c65846"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\instructorTutorialConfig.ts",
+      "file": "ui/source/production-baseline/src/services/instructorTutorialConfig.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 11834,
+      "sha256": "ab33851ece17ec2672457ac3ab4872340bfb51a4cff527fdfb988dddf31f02cf"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\labComplianceService.ts",
+      "file": "ui/source/production-baseline/src/services/labComplianceService.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 14756,
+      "sha256": "6d14ca1071380fe1ece23af3d70bad56568fb8669bf0d0a0fa10383018282c55"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\lessonUrlState.ts",
+      "file": "ui/source/production-baseline/src/services/lessonUrlState.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 911,
+      "sha256": "678ca3325103b3d8d316b5e5f21eef23488380867adc4adbfe0e87b9596b1dac"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\llmService.ts",
+      "file": "ui/source/production-baseline/src/services/llmService.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 13482,
+      "sha256": "12d7060efcc95ba020b27612112804fe173fe7bf66b96c11fe674d3f74b78b20"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\promptStructureAnalyzer.ts",
+      "file": "ui/source/production-baseline/src/services/promptStructureAnalyzer.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 13880,
+      "sha256": "801564991714935af80b67f7c0e1453217c3bdee3ad7cbab1cb76b24a684d025"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\supabaseClient.ts",
+      "file": "ui/source/production-baseline/src/services/supabaseClient.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 1986,
+      "sha256": "f148fb47a5589a8147a74703d9450a0b2e387817b90e586f2c24e2603ba25fd0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\services\\tutorialConfig.ts",
+      "file": "ui/source/production-baseline/src/services/tutorialConfig.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 13603,
+      "sha256": "87d00a8c78d47ffcda7416385d221dfc3904feb8c10daaad1fd02fbb936f5fa3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\types\\database.ts",
+      "file": "ui/source/production-baseline/src/types/database.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 5944,
+      "sha256": "9978ca36972f8f93e6ff0597ed54738ac2019fb18569859e4de28bb39e6ebcad"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\types\\index.ts",
+      "file": "ui/source/production-baseline/src/types/index.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 5905,
+      "sha256": "98f02edaa8c09455d73ac03e8f7d5c6d304aeb253c0f2dc3989efce1f3fb8927"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\types\\instructor.ts",
+      "file": "ui/source/production-baseline/src/types/instructor.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 1871,
+      "sha256": "41abcae6006c28bdddc109f6470ae045abb0c63e55b966f1924ffd2df881ad6a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\production-baseline\\src\\vite-env.d.ts",
+      "file": "ui/source/production-baseline/src/vite-env.d.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 41,
+      "sha256": "f143733555ee727c891ccfa675fe94bd1a49c64aff112ec93e0b5121e9bc15e7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\prompt-assist-capture.tsx",
+      "file": "ui/source/prompt-assist-capture.tsx",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 4172,
+      "sha256": "3ced49673acf44b398572792e916aea82cf445e390001f0c2f637f80d4c1149d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\README.md",
+      "file": "ui/source/README.md",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 7028,
+      "sha256": "3699e6fafc2579ac61243c5fbb7cc0a989f0b77e41bfa05a1aa25e9d3e4e6944"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\reference-history\\UI-05_before_2026-10-07.html",
+      "file": "ui/source/reference-history/UI-05_before_2026-10-07.html",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 25796,
+      "sha256": "2383225a7fcbefa5df0e017953c4766a170261cbbe47f0dbf0c624c92b23d055"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\reference-history\\UI-09_before_2026-10-07.html",
+      "file": "ui/source/reference-history/UI-09_before_2026-10-07.html",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 24419,
+      "sha256": "ab32d6768e07068a36561a518b23d3cf872cf9348765f2f0108ed7ef410bfd8f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\reference-history\\UI-11_before_2026-10-07.html",
+      "file": "ui/source/reference-history/UI-11_before_2026-10-07.html",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 23721,
+      "sha256": "8634ce2127e5b2b355eb24ad739fce193b5beffde5b5e22bf09876a782c1a0e6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\runtime-mocks.ts",
+      "file": "ui/source/runtime-mocks.ts",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 2423,
+      "sha256": "59bbc81091db582f03732afc42ac54b11e483f3d6b370cb86b42a169952060c7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\design-drafts\\combined-ui\\theme.css",
+      "file": "ui/source/theme.css",
+      "authority": "PROTOTYPE_SOURCE_AND_BRAND_REFERENCE",
+      "bytes": 14194,
+      "sha256": "b921e613be60f7a019af63d91f497d52f4537ec38a8e27a702e0d4408049b016"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\00_PRODUCT_SOURCE_OF_TRUTH.md",
+      "file": "documents/00_PRODUCT_SOURCE_OF_TRUTH.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 4630,
+      "sha256": "b0ef6ef4bbd8f4aac4e8657ce61ced3bf816b910bd772ecb0cab1a3ea51ce813"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\01_CURRENT_STATE.md",
+      "file": "documents/01_CURRENT_STATE.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 7034,
+      "sha256": "f072658e78ac3d0c8c7be57adc1aec52052adc98680151aa1674e67f5d36e027"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\02_IMPLEMENTATION_PLAN.md",
+      "file": "documents/02_IMPLEMENTATION_PLAN.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 25263,
+      "sha256": "17cd156d8d2a24086aa279751dc8508bcff924b852b031132ffecd379c96554c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\03_DECISION_LOG.md",
+      "file": "documents/03_DECISION_LOG.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 14429,
+      "sha256": "462c6121667568bb8331750ecdfaa615c4e21f26afc58b21c18a1e219be31c18"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\PRODUCTION_BACKEND_ARCHITECTURE_PLAN_2026-10-08.md",
+      "file": "documents/PRODUCTION_BACKEND_ARCHITECTURE_PLAN_2026-10-08.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 37160,
+      "sha256": "5f7db2d832ca8cf16451115a8b34f07e86d18706768c8d0e261c5aff14faf697"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\PRODUCTION_BACKEND_FLOWS_2026-10-08.md",
+      "file": "documents/PRODUCTION_BACKEND_FLOWS_2026-10-08.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 7832,
+      "sha256": "a4d36847d0a37099b5bad81abca987f5ab7fe85d40d696e9107cf24dd6e9b04c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\Promptify_Intrepid_Progress_06-23_Oct_2026.xlsx",
+      "file": "documents/Promptify_Intrepid_Progress_06-23_Oct_2026.xlsx",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 153378,
+      "sha256": "d4e604d228dd53081c77561c1b2383f3eb66d2918bb5f1e209ec4b29b8e0441d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\PROMPTIFY_SEQUENCE_FLOWS.md",
+      "file": "documents/PROMPTIFY_SEQUENCE_FLOWS.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 8467,
+      "sha256": "4171db5b98ca9c70278eb4739820c5456b574cd8bfa2626a4689d14965274cf7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\REBUILD_DELIVERY_STATUS.md",
+      "file": "documents/REBUILD_DELIVERY_STATUS.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 8463,
+      "sha256": "c53c15044d20a61796db252894a9965ec6babdf6437cbf5838cac5e4f0fc60b5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\REBUILD_SLICE_SETUP.md",
+      "file": "documents/REBUILD_SLICE_SETUP.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 6119,
+      "sha256": "5f05a0d06aaa4d567030bc2e2294277cd78a9c2b3f5ee423e95410a4b5628520"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\REPOSITORY_GUIDE.md",
+      "file": "documents/REPOSITORY_GUIDE.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 5998,
+      "sha256": "c5b0010b0db88f94d0a74549a8309cdd8535e3cd24afb24995369fe6fad286c9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\USER_FLOWS_FROM_UI_MOCKUPS.md",
+      "file": "documents/USER_FLOWS_FROM_UI_MOCKUPS.md",
+      "authority": "PLANNING_OR_STATUS_READ_PRECEDENCE",
+      "bytes": 15667,
+      "sha256": "8eb895a7261281b632dbb4492849d0bae3b5c80d0e958eca7260b2ba5c9c1776"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\docs\\archive\\business-drafts\\STAKEHOLDER_NOTES_2026-10-05.txt",
+      "file": "requirements/stakeholder-notes.txt",
+      "authority": "HISTORICAL_PRODUCT_INPUT",
+      "bytes": 33305,
+      "sha256": "297dad155571f2ace1fad719539e22b8811c95e6b096695f65021a87e54b99b4"
+    },
+    {
+      "source": "C:\\Users\\Admin\\.codex\\attachments\\313fe708-0ce1-45a3-90a7-58087029209f\\Pasted text.txt",
+      "file": "requirements/facilitator-latest-flow.txt",
+      "authority": "LATEST_FACILITATOR_FLOW",
+      "bytes": 17085,
+      "sha256": "93c78242385fb251c6e161c947cda799e9b575e1b522fd8c4bb38a136c1213de"
+    },
+    {
+      "source": "C:\\Users\\Admin\\.codex\\attachments\\4340111b-e8ea-441b-9330-2b5545b2bed6\\Pasted text.txt",
+      "file": "requirements/UI-05-teacher-source.txt",
+      "authority": "TEACHER_UI_UPDATE",
+      "bytes": 58604,
+      "sha256": "7ad564bbb3c93fe98f62c64b5322684baa38777cd5a01247b8a373801c24ef8a"
+    },
+    {
+      "source": "C:\\Users\\Admin\\.codex\\attachments\\9641bc9b-ecbc-437e-bf79-dd4a0a3c2d61\\Pasted text.txt",
+      "file": "requirements/UI-09-v1.1-teacher-source.txt",
+      "authority": "TEACHER_UI_UPDATE",
+      "bytes": 31324,
+      "sha256": "840b14312a376852ec7f59991cea845956bb1d0bfeab5c30c213a4c42d96dfe5"
+    },
+    {
+      "source": "C:\\Users\\Admin\\.codex\\attachments\\a4978f3c-113b-4a74-a580-ce32c9672bdb\\Pasted text.txt",
+      "file": "requirements/UI-11-v1.2-teacher-source.txt",
+      "authority": "TEACHER_UI_UPDATE",
+      "bytes": 57173,
+      "sha256": "31a31c88b2eb6ccbce49b8d0257b33162da8d518ef9498b39cc9561b71cf6838"
+    },
+    {
+      "source": "C:\\Users\\Admin\\.codex\\attachments\\948d1ff5-2ba9-408b-8d62-63be2f9c24a9\\Pasted text.txt",
+      "file": "requirements/guardrail-latest.txt",
+      "authority": "GUARDRAIL_WITH_USER_OVERRIDES",
+      "bytes": 13439,
+      "sha256": "d9cfd95d1b1ab84da1bbec318d1ff919877fc7fbb47b79d255e7952c90e63bc7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\design-taste-frontend\\SKILL.md",
+      "file": "guardrails/skills/design-taste-frontend/SKILL.md",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 88459,
+      "sha256": "2e064e92aca020b2e0bad69326fe7ea55d59005ed53d1a8cbce1bd135d44b8b3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\app-interface.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/app-interface.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 11079,
+      "sha256": "f502a372b25ebd186dc850a77462b1a7c0a95c02595122cd6d55a629739073af"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\catalog-summary.json",
+      "file": "guardrails/skills/ui-ux-pro-max/data/catalog-summary.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 2470,
+      "sha256": "804ceaa425ac951a2028fb1030ddd44d44f3c2ecccb1aa924f56b8fa6339e70e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\charts.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/charts.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 23391,
+      "sha256": "1fd649c00516a24b193940902548d2584381f1e3cfa048490c9f88cddcf65bb4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\colors.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/colors.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 38133,
+      "sha256": "1c7527d81842b386fbb066376e1e449b05c4bb5db72e6842b51db752801b6fc0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\data-provenance.json",
+      "file": "guardrails/skills/ui-ux-pro-max/data/data-provenance.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 38034,
+      "sha256": "f171af8a6981559f1feca34e65347515035dc6b983661e0ab1698078e12836d7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\google-font-licenses.json",
+      "file": "guardrails/skills/ui-ux-pro-max/data/google-font-licenses.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 453312,
+      "sha256": "7c35e410dd8b5853ca86c3e0e3d3cfb73db1ffa3d9a2fa688c182bc44cd9a8d7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\google-fonts.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/google-fonts.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 749176,
+      "sha256": "d03194d2c35a2cdc4c6846ddde9beb54fdd1f81a3ddc80fead3c0ba2842b75fb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\icons.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/icons.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 58051,
+      "sha256": "272ccf0eb60e50ba7af55de3ef5c195d92e1862d411b6cb80d81dec4fe56deee"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\landing.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/landing.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 25484,
+      "sha256": "9efd4568de12dc9e9e4c5b7c1743f3643243232d2dbb9257d30d88613d4bb8fc"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\motion.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/motion.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 14697,
+      "sha256": "854b30af6fdd40a735eeed077eabec3a6917923627220bc5062ea8a15165ef6b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\phosphor-icons-upstream.json",
+      "file": "guardrails/skills/ui-ux-pro-max/data/phosphor-icons-upstream.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 856515,
+      "sha256": "81c37fb3583eb43a91e93f1a62c4da3b4ff089624c06bfe53950b8205b54974d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\products.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/products.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 75816,
+      "sha256": "c3ef558cf2987e145e90ab22ff71dbe769d38d2c83999bfd63d7dd58b477f73d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\react-performance.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/react-performance.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 15125,
+      "sha256": "4dc9b897a2150a8f30b4ad18f67ebc62074d1706bde9849c189b7f511fb821d2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\angular.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/angular.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 19914,
+      "sha256": "9fc11f2b1c9efe6aac4e0416f2a022389c1ee005551523fc6a776cd39494eb2c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\astro.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/astro.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 14645,
+      "sha256": "85ddebda566b2814a6088140d06af2b729d582d5df73ba5f954a9009e17b3a5d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\avalonia.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/avalonia.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 27384,
+      "sha256": "a7ea4a448bb26e50b8eb69f8c191ecb374aaa4ddea6b39deadf2ad5d482e71d9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\flutter.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 14245,
+      "sha256": "be5422f81892515ea4646460a7a77c95a4e22db0d112b05d5885757fd5c16016"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\html-tailwind.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 16611,
+      "sha256": "4004df03af7cf4cdd635d7a2127f6da4f94f6718af6556bee6bc2a14e6093cb8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\javafx.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/javafx.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 33653,
+      "sha256": "f1d83197228e5265f80a8cb9598c03c76d4280bfb2804aca6eef841f5972b449"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\jetpack-compose.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 12348,
+      "sha256": "3e39065aa4c08e88117905558979a6bad799f691f72dc570b82b6d206b627a1d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\laravel.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/laravel.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 20214,
+      "sha256": "2491ee000953ae99b929bcf9a3937672a8c4e0cc89d4737e12cb5fbe6d46d96d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\nextjs.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 18749,
+      "sha256": "ece292708d2d4d41aaa6f339640f4ffc1adf5d052a7d633cc0201d5a79307c37"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\nuxt-ui.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 28777,
+      "sha256": "5b76f8506e34369d23ea70c79f96c6292db91d8c5df52cf6534c7b36b22a4127"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\nuxtjs.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 23082,
+      "sha256": "ebe9bfe54cb1ee6e26c6776d72fa2290e7ba289d116afd6857e4d68a21475bb4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\react-native.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 14101,
+      "sha256": "1f7c99ea422ecd84ba3b0df5920c25f315ca9f3a15cf862a9a7183ed50e9a5e9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\react.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/react.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 21233,
+      "sha256": "6a4cb8e26393afe21f5a5ec171c6ed1c9438b46a5330923cc3d83bc99406cee6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\shadcn.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 23253,
+      "sha256": "14d303b0adef425c388367e6825b92808cacbc0846e554889507c288b9e8e53d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\svelte.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 15134,
+      "sha256": "59af6ab78a0550313489441fffe17d7317de5a819aa992b1e2dca73ecb0a82d6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\swiftui.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 15374,
+      "sha256": "29b62817abfc03a0789180247ce98ac6fe00b7e54632c328c71af707e68d6915"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\threejs.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/threejs.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 46823,
+      "sha256": "d690c41d86d87747d6b7be6e6e8cd95432d31edb31f19497c0e56e8997b35cfc"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\uno.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/uno.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 30151,
+      "sha256": "a52939b4c3c0fa604ab91d32216b7dba28fcd7b4b03a2e7f46b79749e3241228"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\uwp.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/uwp.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 24748,
+      "sha256": "ba334d0f2f478d73a7d80528b940f9e2f4ec6a8a7acafae92d69f0fb10837170"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\vue.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/vue.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 12863,
+      "sha256": "bb492b870b5bc7abff86dfebe73adad36c811a10907709f6a2da19c388f4edbf"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\winui.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/winui.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 27950,
+      "sha256": "0a2b7a991adc8f126a31a953b8ad211a8162889fcc4e66c1484328847b206849"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\stacks\\wpf.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/stacks/wpf.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 24215,
+      "sha256": "1b98ddc6354f7e3f05071679dae1c1f49dbda7639e48d5ceb2378e82cd3e2594"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\styles.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/styles.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 149567,
+      "sha256": "667595149f49cc894ac4b7b3468e7b9c6b0c2795ebea26dce20ca3f92044d517"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\typography.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/typography.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 50072,
+      "sha256": "5c32783790714baaa0f870131aacff021b865495008ed8ab65e7ddf894862581"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\ui-reasoning.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 77553,
+      "sha256": "8c45627a7ac18cc57b8abe909d840aae3cf9a9f3ef15b8a6e1bf6c64fb02ed64"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\data\\ux-guidelines.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 27636,
+      "sha256": "0552e850d47fb5b5cf0b2e35784e1d44f6b2aea52c9255193f7eb2588c2c9f4b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\references\\pro-rules.md",
+      "file": "guardrails/skills/ui-ux-pro-max/references/pro-rules.md",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 11026,
+      "sha256": "b64961a5f324bf0c480dd06c6154787298c4baa6d07fdcd8dab1fee7058c09f8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\references\\quick-reference.md",
+      "file": "guardrails/skills/ui-ux-pro-max/references/quick-reference.md",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 24782,
+      "sha256": "b3ada267d3fa7c6237834683748bc0b486c7c15ebf6f0590ce38bf6b988595d5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\core.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/core.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 42229,
+      "sha256": "9169fdda39bf41c5e528caf04a996f8c943bc8838062967c725fc39522760a4e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\design_system.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/design_system.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 73205,
+      "sha256": "64457f35d085208d5075f9a519cfc502089a7630ca43976df07652b97566cc41"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\reasoning_contract.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 5947,
+      "sha256": "094c8d35e7e69b243f57c4be5d61096634f8e2144fa03afd2b18c5f97de1cffb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\search.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/search.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 9550,
+      "sha256": "0e106775eed61e2954c0af41e9ed73b816c3bfbb2de936e07957907db846b7d6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\google-api.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-api.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 1115,
+      "sha256": "503a0d00ebf5621b70a1035425701d7204f18998b8a983b8aaf53e69848fcc8c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\google-catalog.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-catalog.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 1805,
+      "sha256": "b83a59f0374fbb771b37288cacca3b9525a1c6c435c8b51f34da4e8f7315eb11"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\google-existing.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-existing.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 483,
+      "sha256": "a897ec8bdccd93f416ec51797e7bd58ecb7009d0fb74b3bca615b1a073b50435"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\google-metadata.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-metadata.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 345,
+      "sha256": "12b4a4c05fdb56fa720a01bd83abc3da4a7dde2295998cab59d73a47b9428c10"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\google-overrides.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-overrides.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 104,
+      "sha256": "507032ab4482cc5079e427280e904ee89c9f255a0474ff7d32947cc0d75bc541"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\icons-curated.csv",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/icons-curated.csv",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 499,
+      "sha256": "e04ac4ef7d95a09276fec3311759206675609c1358300ea4e960214d6c1accfc"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\phosphor-core.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-core.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 594,
+      "sha256": "d22fc37d9e2f7db33ee6284590b87adc6664a251748d9ff9a0f9f78eaee5de33"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\phosphor-package.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-package.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 383,
+      "sha256": "186bfa5abdd5dd1f1629be711dcee8c95edb5c0bd3679c05ce84bd4e927bfde7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\phosphor-react-exports.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-exports.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 91,
+      "sha256": "2818efb3acdcfb68632b483928458f500c470bb70b53461f426101bd95b0fa10"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\catalogs\\phosphor-react-package.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-package.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 86,
+      "sha256": "c46b8f1a61cbf9211d1b3b6ae6dfd781533e7bbd6c9808cc90fa89d72de4911e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\relevance-baseline.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-baseline.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 92792,
+      "sha256": "f1cab931dc0fe61c8e668fbf8b16ae0d3a7374fc9db3481b49624e42aa8a4097"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\relevance-cases.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-cases.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 36845,
+      "sha256": "9ebf970dd96c5ffb62e1c533f344362c7becf4c8773c2956554578986fb4ffb1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\fixtures\\relevance-thresholds.json",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-thresholds.json",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 5179,
+      "sha256": "e7bc4b5fbd9f36d234277ce8a25bc4620a75e63d435603f44f1397bba45c2dae"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_catalog_refresh.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 19820,
+      "sha256": "8f006f97be04669a8c08aec20fcea3c02f54d0e047cbffb4f962b78d1f66a3f4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_catalog_summary_line_endings.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_catalog_summary_line_endings.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 3025,
+      "sha256": "273e1843cf64e129b7ca964b36c44bf7bb364d83e30d0a14e9522c3980264ad6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_core.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 17023,
+      "sha256": "2487a5d776ac2d8070d12686357124523dc0aec94d38acbfdd677e40c51a3857"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_core_data_quality.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 9152,
+      "sha256": "c1e58089471d86667656c2453da49b4adcac1e81d6e84eaddcc4a39fde509ee8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_data_contracts.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 19934,
+      "sha256": "0dfa5544bd5a2bd06a93e9a027dd2bbae0ad6351c37e9b7fb64e5aea78d76aae"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_design_system_mode.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 10048,
+      "sha256": "27554cfbcd375ce8f5b4ac97a0ab420bab182a264bf7d96aa37d3207abdb12c8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_design_system_stack.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_design_system_stack.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 2322,
+      "sha256": "0f9efc89b66a360933f0e748bbb0ff1a1845f74249632a29b50964825dbe3c6c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_native_desktop_stack_freshness.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 8554,
+      "sha256": "7fa718a4dc5472fdbe6767eb0fb08e660f9ddad8e27669cb9716e6e950b9857c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_relevance_evaluator.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 8612,
+      "sha256": "b5aef6bbdefd7b72ca3d23f6331a13671cf40ecbe3fbb20cb735c201e78f8f5a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_skill_script_paths.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_skill_script_paths.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 4387,
+      "sha256": "e9ddd562c16d577675707d9534a01b5237b6a4960a5fffa15c920d9a5b2858e2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_style_taxonomy.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 7600,
+      "sha256": "1257b28c39f2173289214f9462b780cb296467ba93e382560d076a4792b0df90"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_text_layout_resilience.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 5994,
+      "sha256": "da649f4c3e7ca751b8b5c76495c411f9efd137b78f17ca6e4ad35d831a8326b7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\tests\\test_web_stack_freshness.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 7878,
+      "sha256": "e35c8835c1c8bbef4c0996df749770ed4ba6598d85791cccfd04896d728bd5cd"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\scripts\\validate_data.py",
+      "file": "guardrails/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 53325,
+      "sha256": "0a40f854159a855133d08e73795abf94a8cb30f84c02f4d6e1d1c7a62225b2b6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\.agents\\skills\\ui-ux-pro-max\\SKILL.md",
+      "file": "guardrails/skills/ui-ux-pro-max/SKILL.md",
+      "authority": "REQUIRED_DESIGN_SKILL",
+      "bytes": 16183,
+      "sha256": "88aadd21220542083a455e373bd162ffe7843266a71f06f4d837bb3b34f9c9c7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\App.tsx",
+      "file": "implementation-reference/src/App.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 41521,
+      "sha256": "38608b96ba90381e27df93d0853d00ba716852b99808e5faade52ac5a14d274d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\auth\\AccessDenied.tsx",
+      "file": "implementation-reference/src/components/auth/AccessDenied.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1149,
+      "sha256": "df35d4d6fe2ee762401e80322b5d9cd214f2cd2ec9eb157378996392fb0fd2bd"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\auth\\EnterpriseSignIn.tsx",
+      "file": "implementation-reference/src/components/auth/EnterpriseSignIn.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5539,
+      "sha256": "10c6f257f016d5c8adc606a2695037d42914d4aed79b8cff7359cc562d21c0a8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\auth\\LandingLoginScreen.tsx",
+      "file": "implementation-reference/src/components/auth/LandingLoginScreen.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 32547,
+      "sha256": "2a17874213d006695fce6b754e60b5701e0c13bb0a9c26655d378c49f866b80b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\auth\\ProfileConfirmation.tsx",
+      "file": "implementation-reference/src/components/auth/ProfileConfirmation.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2780,
+      "sha256": "5de1affabca96cc0e50ed576c58b43da60ee40713b37127a98878dfb8d59312b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\auth\\StagingLogin.tsx",
+      "file": "implementation-reference/src/components/auth/StagingLogin.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2469,
+      "sha256": "fc7af78840f352f117c23714da90a4c63ffdd014c3ef3586bbac536657b67d44"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\classes\\ClassSelectionScreen.tsx",
+      "file": "implementation-reference/src/components/classes/ClassSelectionScreen.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 8578,
+      "sha256": "40e4a37fa0f1649b71cf5838acc22eaada78a8224b71219b5e6ef7f71c4dd844"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\ABCompareModal.tsx",
+      "file": "implementation-reference/src/components/common/ABCompareModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 30897,
+      "sha256": "4a622bfdf45999f6f05d7d7c813290900e6dd9c2a3e28cb2f0cf6bed5d929dc9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\AiCoach.tsx",
+      "file": "implementation-reference/src/components/common/AiCoach.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 36694,
+      "sha256": "d3400ef82252d04c37fc342a1963d22758a6979b27cbb3cf26fe5eae871ad0bb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\ApiKeyModal.tsx",
+      "file": "implementation-reference/src/components/common/ApiKeyModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3573,
+      "sha256": "519b3927ec2cef521cdd8b887e7f0f01680a37f87353d1fc43d061854e408ebe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\AttemptCompareDialog.tsx",
+      "file": "implementation-reference/src/components/common/AttemptCompareDialog.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5417,
+      "sha256": "58aed42126b62bdd374f919bd8738a616e42e837eb5f6fd5f73ee68cf6ebdb79"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\DiffCompareModal.tsx",
+      "file": "implementation-reference/src/components/common/DiffCompareModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1753,
+      "sha256": "885035dbf37e9857cf436c4b6fe8c353a84b51fb54c16a9eb09372a0cf7f3dd0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\ExpirationBanner.tsx",
+      "file": "implementation-reference/src/components/common/ExpirationBanner.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2579,
+      "sha256": "8382ca7732abac4afb70fc0ae0533c03eee239f62492b5195d41eba6a60ca576"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\GuidedWalkthrough.tsx",
+      "file": "implementation-reference/src/components/common/GuidedWalkthrough.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 23554,
+      "sha256": "806b5d96fcb602e90dff7cec89c387739361f48338ce241afb5eabce4d3c81e3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\LearningBadges.tsx",
+      "file": "implementation-reference/src/components/common/LearningBadges.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4963,
+      "sha256": "32cfc055772af009723685a3a4cecd6335ab5d5c7a5cff837bb84b3139051459"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\MarkdownView.tsx",
+      "file": "implementation-reference/src/components/common/MarkdownView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12756,
+      "sha256": "13f4be2494491539bbd1492a979c977de3373532fa9ac0d2060964263907fb0b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\MiniChallengeCard.tsx",
+      "file": "implementation-reference/src/components/common/MiniChallengeCard.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3891,
+      "sha256": "68eb3c4040512dbbe52b59fbeb92b0028c1385c7176a56bb30d8e23fc130a275"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\PromptifyMark.tsx",
+      "file": "implementation-reference/src/components/common/PromptifyMark.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 307,
+      "sha256": "3dccaaf3bf6be44305eac6191e13e4f4a76fce540a0f22975cdb0336cf520552"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\PromptLibraryModal.tsx",
+      "file": "implementation-reference/src/components/common/PromptLibraryModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13891,
+      "sha256": "11eec29fa5c99c9ba4d520e986d238978e350e7a38457a89b6d18f4bc11740a7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\PromptVersionBar.tsx",
+      "file": "implementation-reference/src/components/common/PromptVersionBar.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5173,
+      "sha256": "56fa6d5bb6bb96df5fdab5ee02c4a6618486326b68131bdfd176b1a5e6b684b7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\RubricScorecard.tsx",
+      "file": "implementation-reference/src/components/common/RubricScorecard.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4828,
+      "sha256": "29a4c2bf0216ad2709e0d8ca9442a7ef69628c80640940a6f7228f770902deb6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\SavePromptModal.tsx",
+      "file": "implementation-reference/src/components/common/SavePromptModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 7170,
+      "sha256": "08ef4d35291c2e6d46cd3b33ef150fcea19837db96166504a6ad73c8c0dd068f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\common\\WorkspaceReferenceDialog.tsx",
+      "file": "implementation-reference/src/components/common/WorkspaceReferenceDialog.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 843,
+      "sha256": "ab683a452a9c9613e921b441f89f8d85164c62d00aa853ce08cd531cb67d0ed3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\dashboard\\LearnerDashboard.tsx",
+      "file": "implementation-reference/src/components/dashboard/LearnerDashboard.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13349,
+      "sha256": "45b524493cf2e530a6128240118499dc7f3b14cb231e017bc3875860a596ce98"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\dashboard\\LearnerHome.tsx",
+      "file": "implementation-reference/src/components/dashboard/LearnerHome.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 7225,
+      "sha256": "a000c0c039ec75777536932e1a360d039d1804e49cb0c0407b0ac1119b042c5e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\history\\PromptHistoryView.tsx",
+      "file": "implementation-reference/src/components/history/PromptHistoryView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12356,
+      "sha256": "5dac3056bbeac1faf3aa13825a649fbc4a182ef2c8bb21f410d5f06dfed40a6d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\hybrid\\HybridView.tsx",
+      "file": "implementation-reference/src/components/hybrid/HybridView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 67117,
+      "sha256": "0ed4ed518ac10362bcf9318b7f565793885d91d384e18c84a596ffc725600962"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\hybrid\\SopLibrary.tsx",
+      "file": "implementation-reference/src/components/hybrid/SopLibrary.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2036,
+      "sha256": "818b7087ed4595825f96d085e3d1cd061287a20d502500464c393fc3982c5991"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\hybrid\\TrainerHintInbox.tsx",
+      "file": "implementation-reference/src/components/hybrid/TrainerHintInbox.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2000,
+      "sha256": "617572fe226903854f9f4f7462845c665ddee42ea603cc801ff96071b81d04ab"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\hybrid\\WorkshopBroadcastInbox.tsx",
+      "file": "implementation-reference/src/components/hybrid/WorkshopBroadcastInbox.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2659,
+      "sha256": "4ae7a9d1bc595b17335a6f2f2717dd6985bf8165a8d0103e2651fd11abc8f6d6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\ActivityStreamView.tsx",
+      "file": "implementation-reference/src/components/instructor/ActivityStreamView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6319,
+      "sha256": "704afd59b9bf8f85d0d83546538333bfb28880aeae4dba0ff4d5a584a5b6056e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\AddLearnerModal.tsx",
+      "file": "implementation-reference/src/components/instructor/AddLearnerModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 7055,
+      "sha256": "9526fd59f27be878f73aef00f201ebbf7f4655f9c6040e50371ce5a66faa4c66"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\ClassAnalytics.tsx",
+      "file": "implementation-reference/src/components/instructor/ClassAnalytics.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2653,
+      "sha256": "25f02cd4769954c799c031f24e984ddf70a2db6917939b7ef908c7a1c1f101a0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\ClassDetailView.tsx",
+      "file": "implementation-reference/src/components/instructor/ClassDetailView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 20207,
+      "sha256": "4f6a0a336fccce31ae6e94e7893ecf28626758c2b760d9321e0f13f304228134"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\CourseCurriculumEditor.tsx",
+      "file": "implementation-reference/src/components/instructor/CourseCurriculumEditor.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 28879,
+      "sha256": "b9a456fbef44446c270ecc64264ed125fdab0f6c778d2d226072cc2c95f2bf71"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\CourseManagementModal.tsx",
+      "file": "implementation-reference/src/components/instructor/CourseManagementModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 18373,
+      "sha256": "f061aab14610091a47b8806014076d6cb99e972de5978c8c5e15a25a3c692ca6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\FacilitatorPulse.tsx",
+      "file": "implementation-reference/src/components/instructor/FacilitatorPulse.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3123,
+      "sha256": "4afcc0b264fc20b0942db09f69946288b6156cdbe622641ff53ee9486e85c783"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\InstructorDashboard.tsx",
+      "file": "implementation-reference/src/components/instructor/InstructorDashboard.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 16432,
+      "sha256": "f4efb03764a1f9440058a869cbf3fb366e20387c7b3e09d84fc67070ca18dc9c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\InstructorNavbar.tsx",
+      "file": "implementation-reference/src/components/instructor/InstructorNavbar.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 8283,
+      "sha256": "96dfd452cc825c26f68b285ade04e64748eb8844840f9f836d163f9fcfe4737c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\InstructorViewShell.tsx",
+      "file": "implementation-reference/src/components/instructor/InstructorViewShell.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 21717,
+      "sha256": "45cf37c85e18bf7c4685fa2a8d75523302a0a9e8cd782bbfbd20ea803d15c9e8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\InstructorWalkthrough.tsx",
+      "file": "implementation-reference/src/components/instructor/InstructorWalkthrough.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 19941,
+      "sha256": "7d8e1b9313d8922809aaf54d22d6258c664267712bc9fa8e5da31591073eea1d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\LearnerDetailModal.tsx",
+      "file": "implementation-reference/src/components/instructor/LearnerDetailModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12864,
+      "sha256": "a7a3b6fa83a5d6404ea0cba008718f6cbfb1591e6778d15d41dd6a482548abad"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\LearnerTableView.tsx",
+      "file": "implementation-reference/src/components/instructor/LearnerTableView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 24297,
+      "sha256": "595cac99a7c427f873ba620c1be1afc599d24f2188dd8b15e3728801d34e3665"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\RebuildWorkshopPanel.tsx",
+      "file": "implementation-reference/src/components/instructor/RebuildWorkshopPanel.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3853,
+      "sha256": "1e66c1fccf1b7cd6124d96d8a8b830b2a9fc3448781eb2fbe9ab229dda647b7a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\RosterImportPanel.tsx",
+      "file": "implementation-reference/src/components/instructor/RosterImportPanel.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2746,
+      "sha256": "e67910ce48d15372ed0f5979f428e99599615d15c2c3c38c0aff2b23da66a3be"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\SopManagementPanel.tsx",
+      "file": "implementation-reference/src/components/instructor/SopManagementPanel.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3627,
+      "sha256": "02dd5fa1f13ce894e07624c1d54f20a6d32276bcb437e13f97fdb8364046dabc"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\TrainerAuditPanel.tsx",
+      "file": "implementation-reference/src/components/instructor/TrainerAuditPanel.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2835,
+      "sha256": "a0bfb2f59a6d381aee7959338a0a555f36c3335fdeea86947665447d890310a5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\instructor\\WorkshopBroadcastComposer.tsx",
+      "file": "implementation-reference/src/components/instructor/WorkshopBroadcastComposer.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1713,
+      "sha256": "232c4e6f9e17eed0afaa4b8596c79d6de6fda88a213f36b2c8e45bfd04b9babb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\landing\\AnimatedBrandWatermark.tsx",
+      "file": "implementation-reference/src/components/landing/AnimatedBrandWatermark.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3981,
+      "sha256": "a69ba1ec7b3a50b027268cb7e809038f57974cbad052762b95d503e156fd3839"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\landing\\LandingKeyVisuals.css",
+      "file": "implementation-reference/src/components/landing/LandingKeyVisuals.css",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 16431,
+      "sha256": "820f44acf484f66bd988225170f0f40738abd18b3c0712f9f3e9083b8eec2f97"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\landing\\LandingKeyVisuals.tsx",
+      "file": "implementation-reference/src/components/landing/LandingKeyVisuals.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 9603,
+      "sha256": "8bc3cc69006a815ca6fdf93b915a7b6fd246167a1a51273d0a9949f6861384c5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\landing\\RevealOnScroll.tsx",
+      "file": "implementation-reference/src/components/landing/RevealOnScroll.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2706,
+      "sha256": "8efe95b44795c55a3cd9ee726eee4515eb08f1f62fd830534a2e27c6889e8aed"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\lesson\\AssistanceConfirmModal.tsx",
+      "file": "implementation-reference/src/components/lesson/AssistanceConfirmModal.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6076,
+      "sha256": "510307f44f7f619492352ff378cbedcceb2a9efb6c7318c5185ace70b4e4ae63"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\lesson\\LessonBriefPanel.tsx",
+      "file": "implementation-reference/src/components/lesson/LessonBriefPanel.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 24589,
+      "sha256": "1d2daab21b12c6c8ceda3e554651ad0ea374cb1055f2f4876a8ea82f6b0a01d0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\lesson\\LessonHeaderBar.tsx",
+      "file": "implementation-reference/src/components/lesson/LessonHeaderBar.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4641,
+      "sha256": "ab828caeeac8bc250f0d83206069b91743cf11f8398083d7571dcc92d6517085"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\library\\PromptLibraryView.tsx",
+      "file": "implementation-reference/src/components/library/PromptLibraryView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11831,
+      "sha256": "41aa209186ecbd477ad4ba3893af8aa8654ff2eb228cf076e429bbb4539591d8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\navigation\\ProductNavbar.tsx",
+      "file": "implementation-reference/src/components/navigation/ProductNavbar.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 10440,
+      "sha256": "1c2a951a6f2ace327a03f997be6da31e2c53714a74fda19610b967897f937c47"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\notebook\\NotebookCell.tsx",
+      "file": "implementation-reference/src/components/notebook/NotebookCell.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 27453,
+      "sha256": "ac40ccfa9da54683a7bbd6cb5108004c43eaf3a1b00aba2f93bf39a85a422e3a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\notebook\\NotebookCoach.tsx",
+      "file": "implementation-reference/src/components/notebook/NotebookCoach.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 18687,
+      "sha256": "f246e64525e3629cc52c6e8ee0ee79165c5f0a821fefc380a563290093ac1bd7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\notebook\\NotebookView.tsx",
+      "file": "implementation-reference/src/components/notebook/NotebookView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 9270,
+      "sha256": "444ac18ca79a322857ad9b23018713b74804e13b0eaa48d3160f1f80c39baa1e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\playground\\PlaygroundView.tsx",
+      "file": "implementation-reference/src/components/playground/PlaygroundView.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 21520,
+      "sha256": "5379ea4c99b5fb9f79a32f74b2befe91a1ba53fb0ad00afb4213b941b4bd45c5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\prompt\\InlineDiffSuggestionCard.tsx",
+      "file": "implementation-reference/src/components/prompt/InlineDiffSuggestionCard.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 10652,
+      "sha256": "0b7602a5d52c594fe91df2ef571a013ec7af347826ef113ccd18be09dfb869c1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\prompt\\PromptComposer.tsx",
+      "file": "implementation-reference/src/components/prompt/PromptComposer.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 33155,
+      "sha256": "91b24a039c3d5c05f25009bed87c04e823e45bddf72296a739cc413970eea45a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\prompt\\PromptStructurePanel.tsx",
+      "file": "implementation-reference/src/components/prompt/PromptStructurePanel.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 16053,
+      "sha256": "80747cc494239177168d534a5adf61a0f57d89b21cb67d95e058df2fdb0df40c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\telemetry\\HistoryDrawer.tsx",
+      "file": "implementation-reference/src/components/telemetry/HistoryDrawer.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 7585,
+      "sha256": "a8518701b4828b99153d4e2ffc556b938c997e38194759415c60051a9a66dd46"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\data\\curriculumSeed.ts",
+      "file": "implementation-reference/src/data/curriculumSeed.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 372033,
+      "sha256": "8693fdcda958f86851c40416e273429821b7ca56a4e9e0b0d458ca1022810e52"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\data\\labsData.ts",
+      "file": "implementation-reference/src/data/labsData.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1203,
+      "sha256": "d56bc27216556e187b17e903aeafeed34b66467a43fc26e8fc17d1233b31c162"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\index.css",
+      "file": "implementation-reference/src/index.css",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3169,
+      "sha256": "f48731224f2800ceb87a19726f8279329b5aec279954a3a41af02e2a85b908be"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\main.tsx",
+      "file": "implementation-reference/src/main.tsx",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 238,
+      "sha256": "6003a74b73c222d52a99b7b2cd171f00170b01c74c0294d51c66dde6695508b0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\aiEvaluationContract.ts",
+      "file": "implementation-reference/src/services/aiEvaluationContract.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2717,
+      "sha256": "2227a6b75bcd0225cc9c16cd15eb8206bbd4d8fd3fbaca2fd862650da7b6e09f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\apiAuthorizationService.ts",
+      "file": "implementation-reference/src/services/apiAuthorizationService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3043,
+      "sha256": "2e9329ddc820aa3594ab22c9955cea5d3a7cbb35c7c6bb08cf0d08f3c7d28971"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\apiServerService.ts",
+      "file": "implementation-reference/src/services/apiServerService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 17575,
+      "sha256": "b9eab5ba53e9455e3c4bc93d08b553537ae301623a6aa4d8139700b8373731c9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\authErrorService.ts",
+      "file": "implementation-reference/src/services/authErrorService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1663,
+      "sha256": "664f80521e608cf352dfc5c4b3bc8dfa54baf758173390216f9c778798ff94d8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\businessEvaluationService.ts",
+      "file": "implementation-reference/src/services/businessEvaluationService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 15124,
+      "sha256": "f602ae579553ec9ea01479be342fada7caf63bc7986a48aadfd98f9fa94d47fa"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\curriculumAdapter.ts",
+      "file": "implementation-reference/src/services/curriculumAdapter.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3681,
+      "sha256": "1527496f9c6ea5a4674885ac119e62aa12757f6f1be384ad8aac067e67b59977"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\dbService.ts",
+      "file": "implementation-reference/src/services/dbService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 55796,
+      "sha256": "1f56679c03aaa6e594e221f2aecee61309f4039f811f1968f617818f87c65846"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\instructorTutorialConfig.ts",
+      "file": "implementation-reference/src/services/instructorTutorialConfig.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11826,
+      "sha256": "da038ed0d4daf07baeabbe94e99991cdc7f8f85999326853a77a8051e5a068eb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\labComplianceService.ts",
+      "file": "implementation-reference/src/services/labComplianceService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 14756,
+      "sha256": "6d14ca1071380fe1ece23af3d70bad56568fb8669bf0d0a0fa10383018282c55"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\lessonUrlState.ts",
+      "file": "implementation-reference/src/services/lessonUrlState.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 885,
+      "sha256": "aa798f6aeffc6c4a6d3af453b138ca6743059d5e1df86cceb1c1b263efadf12b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\llmService.ts",
+      "file": "implementation-reference/src/services/llmService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13589,
+      "sha256": "1d3291fd1627964846035ce60fec86f56226d5028ff95713acef4af0ad9bbe30"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\promptStructureAnalyzer.ts",
+      "file": "implementation-reference/src/services/promptStructureAnalyzer.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13880,
+      "sha256": "801564991714935af80b67f7c0e1453217c3bdee3ad7cbab1cb76b24a684d025"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\rebuildRunService.ts",
+      "file": "implementation-reference/src/services/rebuildRunService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6408,
+      "sha256": "240a7b16a56ad8281cba93cf4f508117938f5ae9c5aea22fa19251ab000fdd4a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\rosterImportService.ts",
+      "file": "implementation-reference/src/services/rosterImportService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2158,
+      "sha256": "082623e76a9871b06b4fec0661b3107c7060ef19b410651db0cb763ede2f40bb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\sopService.ts",
+      "file": "implementation-reference/src/services/sopService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 957,
+      "sha256": "19a3073ea3d8942c87363cd86b23aa325c08a6416740366f268b805cdfb9c61a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\supabaseClient.ts",
+      "file": "implementation-reference/src/services/supabaseClient.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1986,
+      "sha256": "f148fb47a5589a8147a74703d9450a0b2e387817b90e586f2c24e2603ba25fd0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\textDiffService.ts",
+      "file": "implementation-reference/src/services/textDiffService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1028,
+      "sha256": "9aa0747537c0c7bafaeea0563b1eaf0b00e320b81949eae00c9f95d9061c6d0c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\tutorialConfig.ts",
+      "file": "implementation-reference/src/services/tutorialConfig.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13603,
+      "sha256": "87d00a8c78d47ffcda7416385d221dfc3904feb8c10daaad1fd02fbb936f5fa3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\workshopMessagingService.ts",
+      "file": "implementation-reference/src/services/workshopMessagingService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 769,
+      "sha256": "0cbbeeb1bb2feacb8dee8e72e17a53c15dd657fd99337a621c1f29a23ace8079"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\workshopRealtimeService.ts",
+      "file": "implementation-reference/src/services/workshopRealtimeService.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 864,
+      "sha256": "a08b4df3a796d67a13ad9a7548c2c246facd6836baad6fc2bb8ace23d6209838"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\types\\database.ts",
+      "file": "implementation-reference/src/types/database.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5983,
+      "sha256": "643aecf54a7c408f0a8256ad899fb90b8d39f94953dc0bfc4c5eec369e1d3815"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\types\\index.ts",
+      "file": "implementation-reference/src/types/index.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5905,
+      "sha256": "98f02edaa8c09455d73ac03e8f7d5c6d304aeb253c0f2dc3989efce1f3fb8927"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\types\\instructor.ts",
+      "file": "implementation-reference/src/types/instructor.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1860,
+      "sha256": "624fc5aa703769f19f73624d3fc9537df405a5b28a04416b4e366a8f43b52a71"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\src\\vite-env.d.ts",
+      "file": "implementation-reference/src/vite-env.d.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 39,
+      "sha256": "bf144e3cdae616e27b064c8c2b94b14525e220fb3facc4cb4884d21b65eb5aa5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\api\\evaluate.ts",
+      "file": "implementation-reference/api/evaluate.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1254,
+      "sha256": "5f739757d2209f143ee63e8def6d0d3cd6ec2083041e9f185c05654a662da325"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\api\\generate.ts",
+      "file": "implementation-reference/api/generate.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1258,
+      "sha256": "cdcdb3062c17c43292ccae43a5d0cecab6295062e45170bfb69cb67df6810744"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\002_add_grants_and_rls.sql",
+      "file": "implementation-reference/supabase/migrations/002_add_grants_and_rls.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12105,
+      "sha256": "ffb188253e2dfba249b59d653290b7672ed6db8fb2b6df134b7f5ed98f9918e0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\003_create_prompt_attempts.sql",
+      "file": "implementation-reference/supabase/migrations/003_create_prompt_attempts.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2735,
+      "sha256": "b6448ced68aaad8ec9193194fa0122b35f3ff1caff0829c1271102e90c66ed59"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\004_course_content_management.sql",
+      "file": "implementation-reference/supabase/migrations/004_course_content_management.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11429,
+      "sha256": "bbc1585f72051bd58e8b26c98f0ec233aa7e33909b5e6c24db4b2e125ed77393"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\005_seed_curriculum_specs.sql",
+      "file": "implementation-reference/supabase/migrations/005_seed_curriculum_specs.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 220573,
+      "sha256": "948b909fe666ed34d845634bc5ef9e4f2ce1d6bfe5105f60847c51a6a19a20b9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\006_enforce_course_enrollment_access.sql",
+      "file": "implementation-reference/supabase/migrations/006_enforce_course_enrollment_access.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6029,
+      "sha256": "23c8200c9e6a9f605dc329994728ee21dfb8e9944ec3e808921df81c2492a3bf"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\007_user_tutorial_progress.sql",
+      "file": "implementation-reference/supabase/migrations/007_user_tutorial_progress.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1421,
+      "sha256": "fbe9ff0c555d0bb21216539b6fc9c24f1e17ba49a79c4b45e7df539d358b35d2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\008_seed_tester_course.sql",
+      "file": "implementation-reference/supabase/migrations/008_seed_tester_course.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13070,
+      "sha256": "8a82d7d0928ecc5a946677e983a7a39d1c787468d24bb3c6898585251920b2e4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\009_fill_tester_sample_prompts.sql",
+      "file": "implementation-reference/supabase/migrations/009_fill_tester_sample_prompts.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3904,
+      "sha256": "b4ac285355a93ed22a9c3bd48533b1ef871b90308dd95187d911ca9ff1fdbb1c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\010_allow_update_prompt_attempts.sql",
+      "file": "implementation-reference/supabase/migrations/010_allow_update_prompt_attempts.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 748,
+      "sha256": "f9e680ceae1959673c7bb5893e7a3268be73595af8237baa70d97eac3065c2e6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\011_update_agribank_curriculum.sql",
+      "file": "implementation-reference/supabase/migrations/011_update_agribank_curriculum.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 214188,
+      "sha256": "8778355b6b276ca08f22298b24f86bf90f7a3c5f0794813b1666eb15600ac071"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\012_public_testing_class_self_enrollment.sql",
+      "file": "implementation-reference/supabase/migrations/012_public_testing_class_self_enrollment.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3744,
+      "sha256": "0acf134e86776cf05738fff95e63a3b109cd94ddfe8397749ee5a294f43d10be"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\013_align_tester_solution_prompts.sql",
+      "file": "implementation-reference/supabase/migrations/013_align_tester_solution_prompts.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5082,
+      "sha256": "0c44ae8cbdba407c50e06180b0e4f079a72c30fc06cf9b4ecabfa4504afc509c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\014_improve_tester_theory_content.sql",
+      "file": "implementation-reference/supabase/migrations/014_improve_tester_theory_content.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4101,
+      "sha256": "7c2f62d3e14cf2dd2c035132e21babfe230b334710a80d04d8823e29405084b9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\015_remove_seed_mock_users.sql",
+      "file": "implementation-reference/supabase/migrations/015_remove_seed_mock_users.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 619,
+      "sha256": "bb5cfebe23defc3d8ca175a81e2a1c717d59fb5ea5aae3ce11bdc7da59a0a668"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\016_add_server_backed_lesson_progress.sql",
+      "file": "implementation-reference/supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 19933,
+      "sha256": "6b4ac34f3fe79276eb76896b80fa5dad4179c0f8b4555d2e0109f35686bf4fd9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\017_enforce_atomic_progress_writes.sql",
+      "file": "implementation-reference/supabase/migrations/017_enforce_atomic_progress_writes.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 683,
+      "sha256": "11ac8a9c016b0746dfda88f8f89e5f08dbd5044657e00d1810ac1e116c51dd6b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\018_rebuild_server_runs_and_hints.sql",
+      "file": "implementation-reference/supabase/migrations/018_rebuild_server_runs_and_hints.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6590,
+      "sha256": "90c56cf22a2ad88dcdf5194878569485daefb10c1019de9aa240ed0c46c48085"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\019_rebuild_hint_enrollment_scope.sql",
+      "file": "implementation-reference/supabase/migrations/019_rebuild_hint_enrollment_scope.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 544,
+      "sha256": "3cad4830a56d74136875801e4172d6361e7dab2a2e123c8c5fa4cb88f4b51a87"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\020_rebuild_profiles_and_class_analytics.sql",
+      "file": "implementation-reference/supabase/migrations/020_rebuild_profiles_and_class_analytics.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3254,
+      "sha256": "c51a1f0be277612c885ac61381ac057a34cff2a4597c62196d4279f94d4be67a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\021_rebuild_judge_single_claim.sql",
+      "file": "implementation-reference/supabase/migrations/021_rebuild_judge_single_claim.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2389,
+      "sha256": "e4304047e3d1d7693c252b2437de34fb023b894e3b1d0be42551d76c6062cc1e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\022_rebuild_workshop_broadcast.sql",
+      "file": "implementation-reference/supabase/migrations/022_rebuild_workshop_broadcast.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4194,
+      "sha256": "a5c1381638b4d44bc733d63418dfa15d699eded88e6e8fc23d8636618544860b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\023_rebuild_roster_import.sql",
+      "file": "implementation-reference/supabase/migrations/023_rebuild_roster_import.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3776,
+      "sha256": "602491d0455d72096d6c9d77501b86a3312d68ef68d2d9d09cd8240d900db109"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\024_rebuild_versioned_sops.sql",
+      "file": "implementation-reference/supabase/migrations/024_rebuild_versioned_sops.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4952,
+      "sha256": "aa3ebc08fa9ceec4947cb1434fcdfb657a3a71fe05d145240209b6ddbb09654a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\025_rebuild_trainer_audit.sql",
+      "file": "implementation-reference/supabase/migrations/025_rebuild_trainer_audit.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2650,
+      "sha256": "52b2f4a2bbafa285fa1a63f790914cf45ade21b2f669a41d95f70ce401698bff"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\026_rebuild_message_realtime.sql",
+      "file": "implementation-reference/supabase/migrations/026_rebuild_message_realtime.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1023,
+      "sha256": "1226392883a23e88f82e471c70472e79b9a2b524f0b1e3889147c9b2df826e05"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\rollback_016_add_server_backed_lesson_progress.sql",
+      "file": "implementation-reference/supabase/rollback_016_add_server_backed_lesson_progress.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 817,
+      "sha256": "38c866dddeb220a58edba7eecf86cb17e65b1f83eb3ab1b88e10462f22dbe788"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\rollback_017_enforce_atomic_progress_writes.sql",
+      "file": "implementation-reference/supabase/rollback_017_enforce_atomic_progress_writes.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 318,
+      "sha256": "ed581bbc9015ae0b39b4e5b70136ca05b7fc3be96a606ebb9b84131988dc446b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\schema.sql",
+      "file": "implementation-reference/supabase/schema.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 15769,
+      "sha256": "386854700fc94cf9f4d1a925acc1f53722f87ac3e860b287b9ebd25ecbc036a3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\staging\\README.md",
+      "file": "implementation-reference/supabase/staging/README.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4045,
+      "sha256": "cd520c1a4d742b30d361d03f3d6caeacce4189dcdb487fbc84e4325754803663"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\staging\\server_backed_progress_expected.json",
+      "file": "implementation-reference/supabase/staging/server_backed_progress_expected.json",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2653,
+      "sha256": "3052954a0222d328b0aef693f645869f6c7a7d3fae40ff3c45573faf3711119e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\staging\\server_backed_progress_fixture.sql",
+      "file": "implementation-reference/supabase/staging/server_backed_progress_fixture.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 9613,
+      "sha256": "251e24e7c0eb1c95443cc06411831f8e4f3f2e217fd91d01cf4f36a5403bc7d7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\staging\\verify_016_database.sql",
+      "file": "implementation-reference/supabase/staging/verify_016_database.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5769,
+      "sha256": "5975b4989cb91f7f82ebbb99d7fde5f2c9bf532fd1977ed8d0c437694d7d76f7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\supabase\\staging\\verify_017_grants.sql",
+      "file": "implementation-reference/supabase/staging/verify_017_grants.sql",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 940,
+      "sha256": "a19a7212dd03152a42cd525db0b9cdad13f7d32c04bc45e75db5a885eacde067"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\test_live_gemini.ts",
+      "file": "implementation-reference/test/test_live_gemini.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1673,
+      "sha256": "a62c3b2dc4c3241e181256e75676eb13f025142de8b7087abb2b4d5d4b9e0f92"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_ai_evaluation_contract.ts",
+      "file": "implementation-reference/test/verify_ai_evaluation_contract.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2614,
+      "sha256": "d6c1a69c293b55c5f6cfb3a89e66968d83c997f54eb344fa7fd318bbd98d4695"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_auth_errors.ts",
+      "file": "implementation-reference/test/verify_auth_errors.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 689,
+      "sha256": "92d089190c1e8c983b9c0a6ef175fe7a0db0d3eec82748a700eada87c72f42eb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_course_curriculum.ts",
+      "file": "implementation-reference/test/verify_course_curriculum.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4488,
+      "sha256": "b9916822ec1ee1c89326293fae3e5aada48e588e3842ede31d5aa347608616e6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_enrollment_access.ts",
+      "file": "implementation-reference/test/verify_enrollment_access.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3485,
+      "sha256": "045d00ef7b3d5ab338e59310dedf82fcc02311807da74e3fd3217e115bed7967"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_generation_grounding_and_evaluation.ts",
+      "file": "implementation-reference/test/verify_generation_grounding_and_evaluation.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4997,
+      "sha256": "814b4899b8df37a995acd0f357850801070df80bcb6b1141ca1965c6575fad63"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_generation_prompt_isolation.ts",
+      "file": "implementation-reference/test/verify_generation_prompt_isolation.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3191,
+      "sha256": "56168cc79671e92ff7115b9c9b6afff157aa83e2a946233ce615da418c63d37d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_highlight.ts",
+      "file": "implementation-reference/test/verify_highlight.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1855,
+      "sha256": "01cc6deee8788a76311435968add5b3d77b382462014c2a44ad5f1949b150523"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_identity_cleanup.ts",
+      "file": "implementation-reference/test/verify_identity_cleanup.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1100,
+      "sha256": "d42b9e7e14058c04c25ec5e7b525ba6a2df345fd12b91545169fec99975c1ec2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_interactive_tutorial.ts",
+      "file": "implementation-reference/test/verify_interactive_tutorial.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1549,
+      "sha256": "38e645b1f03d5b1126b198b1f29d2a9be38646cd1ffc4a25a1eda1395453dbbe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_learner_home_class_menu.ts",
+      "file": "implementation-reference/test/verify_learner_home_class_menu.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 979,
+      "sha256": "94fe521c0d3bce2d5e146590aef11ea14bd39109e07c8c1ece0ea919494a86cc"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_lesson_url_navigation.ts",
+      "file": "implementation-reference/test/verify_lesson_url_navigation.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1315,
+      "sha256": "1a0b8c6001c9195cf239d0eddef5543f25ceddfabf3e7fb6a713663fd7608882"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_live_api_endpoint.ts",
+      "file": "implementation-reference/test/verify_live_api_endpoint.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1201,
+      "sha256": "4c4f534bde3102538aefc3157eede42125d4206c4b94dec30cf075d564bbdba0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_live_evaluate_endpoint.ts",
+      "file": "implementation-reference/test/verify_live_evaluate_endpoint.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1636,
+      "sha256": "fca06876bac0307f04aefed8316d68ed229974909fc74f5fa747a8b634cbccb6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_logout.ts",
+      "file": "implementation-reference/test/verify_logout.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6346,
+      "sha256": "1e3d4771b1c9ec3723e8458982275c2e85e4b5c89135f3e21a8667d1248e1c0a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_oauth_enrollment.ts",
+      "file": "implementation-reference/test/verify_oauth_enrollment.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4455,
+      "sha256": "5f527b0359091dac9f8d065f8e6713413453cdc6fd8c4a80827c013d2105a5ce"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_pedagogical_flow.ts",
+      "file": "implementation-reference/test/verify_pedagogical_flow.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5370,
+      "sha256": "831b00ac7c558d003cd467c21011933e455a16ae8318141d3cb5fa4f3d8825aa"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_pii_and_autocompletion.ts",
+      "file": "implementation-reference/test/verify_pii_and_autocompletion.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3554,
+      "sha256": "41046f8dd263bd6e8a9e76c00354e26dbf7011dc44fee2d7cef05c3c0ec43790"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_progress_migration_staging.ts",
+      "file": "implementation-reference/test/verify_progress_migration_staging.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12670,
+      "sha256": "60538a1981a211f9f9000ac2bc474b229c1f292d5699601f0a3d873a85939982"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_prompt_analyzer.ts",
+      "file": "implementation-reference/test/verify_prompt_analyzer.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 8569,
+      "sha256": "99f0c9d7d0d3602e8d8fce53449ac35214232a6c75a670c2b97d5e777cac707d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_public_testing_class.ts",
+      "file": "implementation-reference/test/verify_public_testing_class.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 1956,
+      "sha256": "c6a5c7e489e403fe2e22410c5f6e3ca304bcdd5e3c677eff5f8041100bb48046"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_real_ai_flow.ts",
+      "file": "implementation-reference/test/verify_real_ai_flow.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 8047,
+      "sha256": "ea06ccfe3a9f5e5045f248fe8da7c5fa34fce1dd5e0ad8e4722b59dd5ca696b0"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_rebuild_runs.ts",
+      "file": "implementation-reference/test/verify_rebuild_runs.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 3674,
+      "sha256": "5ba16dc8b764ed4fecfe4ae338734d2658656e0c2c66cb62f450b575fd31c318"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_roster_csv.ts",
+      "file": "implementation-reference/test/verify_roster_csv.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 922,
+      "sha256": "4edd2fe183ec437575c4d8932c66f639cc63597a3a120f0ca1ff5d33935d7874"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_selective_integration_safety.ts",
+      "file": "implementation-reference/test/verify_selective_integration_safety.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2711,
+      "sha256": "d061f05d4a32493b5103e245cdcb8c6ee63b05344cc3f27a2a2fe3671c1b10fc"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_server_backed_learning_progress.ts",
+      "file": "implementation-reference/test/verify_server_backed_learning_progress.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 5707,
+      "sha256": "73cebefde5730f41708e1e83bcbc8c36180e51cacf7d69ecb4e9bf8bf9f83697"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_slice.ts",
+      "file": "implementation-reference/test/verify_slice.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 6735,
+      "sha256": "98109a8c0d25167e2b2cf9aae61e7cfc9a98ac044302b49cee65852f2604d1c4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_tab_switch.ts",
+      "file": "implementation-reference/test/verify_tab_switch.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 8161,
+      "sha256": "e94e1aa0bec54ce031214344424f31d2e1fd2182a0a030bdb65a2d6da4257a48"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_tester_sample_prompts.ts",
+      "file": "implementation-reference/test/verify_tester_sample_prompts.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 4240,
+      "sha256": "a15987d11b7fa939708d90876eadb40d97e1a8ead7b4132c819a3cd2d421ead7"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_text_diff.ts",
+      "file": "implementation-reference/test/verify_text_diff.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 636,
+      "sha256": "8afe3bc82700b8afe5f3b652d3acb0ed0a4770aa6e0998ea3bf88b8d4faad808"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\test\\verify_tutorial_tester_course.ts",
+      "file": "implementation-reference/test/verify_tutorial_tester_course.ts",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 2725,
+      "sha256": "569b72eef473da19b3cb6e1b6f52a70897a4cd1a1496732046291f02b3322fc1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\AUTO_COMPLETION_AND_EVALUATION_FIX_SPEC.md",
+      "file": "implementation-reference/curriculum-specs/AUTO_COMPLETION_AND_EVALUATION_FIX_SPEC.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11356,
+      "sha256": "da43c0f118072443bca8d4f3a9d6de4c92ac74cfa2ab6c545deb78803edc4312"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\INTERACTION_DESIGN_AND_BEFORE_AFTER_SPEC.md",
+      "file": "implementation-reference/curriculum-specs/INTERACTION_DESIGN_AND_BEFORE_AFTER_SPEC.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12637,
+      "sha256": "6c2828be1cb0f35fc30a8e4e3ec663fefea842d42409efb0109b1164ce695831"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_01_PII_SCRUBBING.md",
+      "file": "implementation-reference/curriculum-specs/LAB_01_PII_SCRUBBING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 10987,
+      "sha256": "f12b1e20f84a549452a7ee11ea7b4a8bd7b3d77b85be68c101eacc9e399f455c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_02_CONTEXT_ENGINEERING.md",
+      "file": "implementation-reference/curriculum-specs/LAB_02_CONTEXT_ENGINEERING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12225,
+      "sha256": "feb7a53c06601bef298926b07a610a264ce3e764e218c66b595a2b2bb03a8361"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_03_MULTISTEP_COT_GUARDRAILS.md",
+      "file": "implementation-reference/curriculum-specs/LAB_03_MULTISTEP_COT_GUARDRAILS.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12840,
+      "sha256": "0ee8834544f45aa9c22a24ebdb64976434e534f573caad9866ccd731c16c5ce2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_04_REACT_AGENTIC_WORKFLOW.md",
+      "file": "implementation-reference/curriculum-specs/LAB_04_REACT_AGENTIC_WORKFLOW.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13391,
+      "sha256": "4536906e6ee99a811a7da16afb87beae3547861c13c67f3f25673466ae9dea0c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_05_TEMPERATURE_AND_SAMPLING.md",
+      "file": "implementation-reference/curriculum-specs/LAB_05_TEMPERATURE_AND_SAMPLING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 9872,
+      "sha256": "529268bf539b176506b392c7bfc36d093ff23dfea407fc536ad2b7c89f639b65"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_06_STRUCTURED_OUTPUTS_EXTRACTION.md",
+      "file": "implementation-reference/curriculum-specs/LAB_06_STRUCTURED_OUTPUTS_EXTRACTION.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11992,
+      "sha256": "707996cf17b2ddd16c0e51068c26e0e1ca6880e4f10c96da8257093310dc502a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_07_PROMPT_INJECTION_AND_DEFENSE.md",
+      "file": "implementation-reference/curriculum-specs/LAB_07_PROMPT_INJECTION_AND_DEFENSE.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11883,
+      "sha256": "4bb0fe759fd539fad5f43e7247ca51eeb31406d4ac7c076e91a6484bbae72a87"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\LAB_08_STEPBACK_AND_META_PROMPTING.md",
+      "file": "implementation-reference/curriculum-specs/LAB_08_STEPBACK_AND_META_PROMPTING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11212,
+      "sha256": "209756d790df9c34688b7705898f4fdaec496d30a385797bc64ee9a740d93873"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-specs\\README.md",
+      "file": "implementation-reference/curriculum-specs/README.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13184,
+      "sha256": "dca2c2f3de655e8458976ac3219b59c0703d8174b0345ad5fb2c933f950b53ba"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\01_ZERO_SHOT_PROMPTING.md",
+      "file": "implementation-reference/curriculum-levels/01_ZERO_SHOT_PROMPTING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 9707,
+      "sha256": "5fb4fdaafa287223da7e1bd1e3c3245e0a96bd2d97b4f1c5edeb831604a9ec87"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\02_STRUCTURED_5_ELEMENTS.md",
+      "file": "implementation-reference/curriculum-levels/02_STRUCTURED_5_ELEMENTS.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11151,
+      "sha256": "9902a0378e1c23f89df1f2d5eead320a49bce87171d747f7d3615de4a2a93fbe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\03_FEW_SHOT_AND_IN_CONTEXT_LEARNING.md",
+      "file": "implementation-reference/curriculum-levels/03_FEW_SHOT_AND_IN_CONTEXT_LEARNING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 10555,
+      "sha256": "9b11b6af137a66f1d7e61158bd3a7c2362dbe7b0fcefbe12ffe12a97f9d3ac5f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\04_CHAIN_OF_THOUGHT_COT.md",
+      "file": "implementation-reference/curriculum-levels/04_CHAIN_OF_THOUGHT_COT.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11820,
+      "sha256": "47f8b520154a855d80280964040b6707cf537331e87f53f24af3ae90d6d2308a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\05_TREE_OF_THOUGHTS_TOT.md",
+      "file": "implementation-reference/curriculum-levels/05_TREE_OF_THOUGHTS_TOT.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12721,
+      "sha256": "31f8f979e97445330adcd6f56591d2c2934517f31d33eccc221cfaf04b730abb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\06_SELF_CONSISTENCY_AND_ENSEMBLING.md",
+      "file": "implementation-reference/curriculum-levels/06_SELF_CONSISTENCY_AND_ENSEMBLING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11632,
+      "sha256": "7402f81ec953651fec74e9da2d4f72397b66110864640085bf87b011ea58144b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\07_REACT_AND_AGENTIC_LOOPS.md",
+      "file": "implementation-reference/curriculum-levels/07_REACT_AND_AGENTIC_LOOPS.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13001,
+      "sha256": "d27ea5b01b0839c5d58b886070c40b41484c4949a63d1316dad78a2c448e05e9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\08_TOOL_AND_FUNCTION_CALLING.md",
+      "file": "implementation-reference/curriculum-levels/08_TOOL_AND_FUNCTION_CALLING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 10485,
+      "sha256": "3454ded3b03b6dcfdef43a17b645f916e604e3b472ae59242d475f2144a339f6"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\09_SAMPLING_PARAMETERS_T_AND_P.md",
+      "file": "implementation-reference/curriculum-levels/09_SAMPLING_PARAMETERS_T_AND_P.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12320,
+      "sha256": "ec077334fc1d6e6aec84988b15fac6504d512826559e86a40cb8846240595946"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\10_STRUCTURED_OUTPUTS_AND_JSON.md",
+      "file": "implementation-reference/curriculum-levels/10_STRUCTURED_OUTPUTS_AND_JSON.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11942,
+      "sha256": "b322df5aee9f352e87708cbe71b0fe733ca8b23bcdd8dc2cb0c19e5a7b5a61d2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\11_GROUNDING_RAG_CONTEXT_ENGINEERING.md",
+      "file": "implementation-reference/curriculum-levels/11_GROUNDING_RAG_CONTEXT_ENGINEERING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12470,
+      "sha256": "fcc0bae746a986f2f8dfd8378f39e2ea90f921ff0b8e4f74edceca14afaa1326"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\12_STEP_BACK_AND_META_PROMPTING.md",
+      "file": "implementation-reference/curriculum-levels/12_STEP_BACK_AND_META_PROMPTING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11901,
+      "sha256": "7dac5397b586e48499df52e411d4d3714c3d4ee7c9dc6acf3e1e7f4fd7387c4d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\13_PII_SCRUBBING_AND_DATA_PRIVACY.md",
+      "file": "implementation-reference/curriculum-levels/13_PII_SCRUBBING_AND_DATA_PRIVACY.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12141,
+      "sha256": "341ab23004540d7a4f685ff295d05afb6cee0190c1aa555916498c7c31cf8ca5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\14_PROMPT_INJECTION_AND_DEFENSE.md",
+      "file": "implementation-reference/curriculum-levels/14_PROMPT_INJECTION_AND_DEFENSE.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13594,
+      "sha256": "0a164a306bf792cecf1e0a0faba286f4804df455b16bdc1ec3cc9468bb5079c9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\15_FLIPPED_INTERACTION_AND_SOCRATIC.md",
+      "file": "implementation-reference/curriculum-levels/15_FLIPPED_INTERACTION_AND_SOCRATIC.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11891,
+      "sha256": "3ea02a86b9f60aa49d27035319c267b457b27195dc940767ebaf7426ce931e6a"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\16_DIPLOMATIC_AND_TONE_SHIFTING.md",
+      "file": "implementation-reference/curriculum-levels/16_DIPLOMATIC_AND_TONE_SHIFTING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13139,
+      "sha256": "81568266f64b58c4ef05876f3d9ffe4cca4bdfd21c5f39ae6c24d3e7e68dbaf5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\17_BLUF_AND_EXECUTIVE_BRIEFING.md",
+      "file": "implementation-reference/curriculum-levels/17_BLUF_AND_EXECUTIVE_BRIEFING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12025,
+      "sha256": "d34b88e76e7535d1f3dcffc77b1eb989ead4a601678c8853c5d04d54396603a4"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\18_DEVIL_ADVOCATE_AND_RISK_AUDIT.md",
+      "file": "implementation-reference/curriculum-levels/18_DEVIL_ADVOCATE_AND_RISK_AUDIT.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12067,
+      "sha256": "27f4b30945e4b41afe503ffbfaa1812b4b90ab540425d943cc8bbab03873c60e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\19_ACTION_BREAKDOWN_AND_SYNTHESIS.md",
+      "file": "implementation-reference/curriculum-levels/19_ACTION_BREAKDOWN_AND_SYNTHESIS.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11652,
+      "sha256": "a48ae78ff665f4d58062527707b5e61270b481725a51a565282e448812780c57"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\20_SELF_REFINE_AND_REFLEXION.md",
+      "file": "implementation-reference/curriculum-levels/20_SELF_REFINE_AND_REFLEXION.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 12702,
+      "sha256": "9e062e139d78381487676a47708e5318a9043ddb584f15ab076b6281aff01c0e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\21_MULTIMODAL_VISION_PROMPTING.md",
+      "file": "implementation-reference/curriculum-levels/21_MULTIMODAL_VISION_PROMPTING.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11927,
+      "sha256": "4450a71a95c2adff517f8376d148e9b5ad75687357f8a81b6f3ceaca543fe1ff"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\22_PROMPT_CACHING_AND_EFFICIENCY.md",
+      "file": "implementation-reference/curriculum-levels/22_PROMPT_CACHING_AND_EFFICIENCY.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 13883,
+      "sha256": "6dc2a43c27b0f6051bd45e74e1ae12dc787a8a73b814c8ca95c40d481c058ae5"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\curriculum-levels\\README.md",
+      "file": "implementation-reference/curriculum-levels/README.md",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 11136,
+      "sha256": "c8e9a78fd628ec884bbfe7559e7dd414c4f71f3391e7a12d843f7f5022f6b215"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\public\\brand\\promptify-mark.png",
+      "file": "implementation-reference/public/brand/promptify-mark.png",
+      "authority": "PARTIAL_RUNTIME_REFERENCE_NOT_UI_TARGET",
+      "bytes": 833168,
+      "sha256": "48d5f8a7601597f8522071200d1ae6b0dfd16c90dbbdeadc92bd03ea62c52dd8"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\package.json",
+      "file": "implementation-reference/package.json",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 1077,
+      "sha256": "7f60aee86a5bf8b01bdf5da994bde64cca8ea826640f7d65009d1907f94f7b84"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\package-lock.json",
+      "file": "implementation-reference/package-lock.json",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 114930,
+      "sha256": "2245dc803cd521f9fa893f3108c1b06a7ba1433080447a6336b1536daa43b9d9"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\vite.config.ts",
+      "file": "implementation-reference/vite.config.ts",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 3120,
+      "sha256": "a852d0fd5bdc73b636e2fef591d12bffd03b999fbcd3fa1569abc66def291899"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\tsconfig.json",
+      "file": "implementation-reference/tsconfig.json",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 550,
+      "sha256": "481e2c7b2ae327198faa52ecf0cbcc99e5de78a348a82e56ed5c075edb347097"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\tailwind.config.js",
+      "file": "implementation-reference/tailwind.config.js",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 736,
+      "sha256": "4ee11ec9a6bd88f29d3739eeb7dd38823103038e9ca0e75b83a0ec13d1e528b2"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\index.html",
+      "file": "implementation-reference/index.html",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 897,
+      "sha256": "7a1e20abb42c3b76cc20dd49bd6e60b57f27a6009e66f6ad6c97a51954cb0c8e"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\vercel.json",
+      "file": "implementation-reference/vercel.json",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 127,
+      "sha256": "6b9dab553e2f2601552230aca6ac6e18dcecdd0c44141a87ab2d3c4c4011cfac"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\AGENTS.md",
+      "file": "implementation-reference/AGENTS.md",
+      "authority": "BUILD_OR_REPOSITORY_CONTRACT",
+      "bytes": 1880,
+      "sha256": "edb9b1cc4588391a57797e5d8b1d8bbd88d2b1b8702a43ae55749821e2591bc3"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\audit_ui_requirements.cjs",
+      "file": "implementation-reference/scripts/audit_ui_requirements.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2231,
+      "sha256": "aa25db1639c6741c8aea626d26f85ef486b6ef90504f7e1a41dbd9bf6f874008"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_combined_ui.cjs",
+      "file": "implementation-reference/scripts/build_combined_ui.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 10153,
+      "sha256": "1f41838a01d5768fd11d9ca57af1ec7e9d6e100c31acbdb7a60df331b4b0d5ea"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_mockup_aligned_ui.cjs",
+      "file": "implementation-reference/scripts/build_mockup_aligned_ui.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 6958,
+      "sha256": "8def998de11960ae94c91c21566cbb56903d681217de72358bd3c496d9256f26"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_prd_gap_report.py",
+      "file": "implementation-reference/scripts/build_prd_gap_report.py",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 28838,
+      "sha256": "caaff1475418120c6815df273d2b2eb3fdd0cbadea64b6d4f90b5c5152afb64c"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_promptify_brd_from_example.py",
+      "file": "implementation-reference/scripts/build_promptify_brd_from_example.py",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 9314,
+      "sha256": "ec79da8a8a3ed42dda750c6c9b62ea0d376c2aba6e1b6f82ea2514d4efc69d0d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_promptify_pm_docs.py",
+      "file": "implementation-reference/scripts/build_promptify_pm_docs.py",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 23075,
+      "sha256": "7ce7a58d0b696ef172d7fb78935fe1c1e6829aa5a01c69ebf98715f687693747"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_prompt_assist_capture.cjs",
+      "file": "implementation-reference/scripts/build_prompt_assist_capture.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2918,
+      "sha256": "de419d11d8c2d825007eaf74866857294a39bfeae9a4576cfdaa27a7423ccf64"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_ui_comment_revision.cjs",
+      "file": "implementation-reference/scripts/build_ui_comment_revision.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 7461,
+      "sha256": "3d93b4992bcf2b8f5d6692614ac01427bbf5cd8675f0818000aae1715e444187"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\build_ui_comparison.cjs",
+      "file": "implementation-reference/scripts/build_ui_comparison.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2519,
+      "sha256": "e6771ff923f37d087a99bf2b7c7722ca93cd332e4ebc25d981c6693d5372da21"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\capture_combined_ui.cjs",
+      "file": "implementation-reference/scripts/capture_combined_ui.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 1826,
+      "sha256": "eab742564a81980387205c0dd88a42fb1d0b053cd98b9eb3eba755fc52dd1aba"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\clean-latex.mjs",
+      "file": "implementation-reference/scripts/clean-latex.mjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 1604,
+      "sha256": "6615eaaa371df0ef52694cabb8862ec06d76c10fbe5c26c68bf8026e36838577"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\export_ui_reading_sources.cjs",
+      "file": "implementation-reference/scripts/export_ui_reading_sources.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2552,
+      "sha256": "1da8e0d0db26b26c5096eb8311b02cdb9cd6379411c4b4b8ad87b7f980ddd98b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\generate-curriculum-seed.mjs",
+      "file": "implementation-reference/scripts/generate-curriculum-seed.mjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 71492,
+      "sha256": "5f15a667801142af996185445bbc4a9e544749a87cfd2ab4d6fadb6a84d8e974"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\package_rebuild_source_of_truth.py",
+      "file": "implementation-reference/scripts/package_rebuild_source_of_truth.py",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 4266,
+      "sha256": "7320a15dfea3519913add65b015220f516b424cef04e65e9b7f839bcc5982036"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\package_ui_combined.py",
+      "file": "implementation-reference/scripts/package_ui_combined.py",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2422,
+      "sha256": "9275dd0ecb75eead5f6d935c902a3e1c450a8cf9d93b1d51d8fc3030b28ad5fe"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\prepare_mockup_templates.cjs",
+      "file": "implementation-reference/scripts/prepare_mockup_templates.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 3263,
+      "sha256": "0d6fcbc2cd21369c89524bf4ec5f5c713449f05b086e0adb9100ee89fe36169f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\prepare_rebuild_staging.mjs",
+      "file": "implementation-reference/scripts/prepare_rebuild_staging.mjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2559,
+      "sha256": "b3febf01ffed28f05cc587c7a66f1903c2bee6e54c82e9cb684c51321a01317b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\prepare_rebuild_workshop_upgrade.mjs",
+      "file": "implementation-reference/scripts/prepare_rebuild_workshop_upgrade.mjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 955,
+      "sha256": "3ff5794fcc5415b78339eed1417e1f6d014e3d10f2159e810dd120b8a501547f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\prove_combined_baseline.cjs",
+      "file": "implementation-reference/scripts/prove_combined_baseline.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 2367,
+      "sha256": "11232bbf9bddf1f1e75ab4310ce4c98cb092b6a2e9d266a74c198353d6342c52"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\run_offline_checks.py",
+      "file": "implementation-reference/scripts/run_offline_checks.py",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 1716,
+      "sha256": "b8a09905c5a4727639affdd8c973aa7a4c4f02725110fa3cc6ca38425458bf6d"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\verify_combined_ui.cjs",
+      "file": "implementation-reference/scripts/verify_combined_ui.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 7591,
+      "sha256": "3e1ec7935e047ccc205fe49cbd60e0342d52804af2069a5f7e808b592430e63f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\verify_mockup_aligned_ui.cjs",
+      "file": "implementation-reference/scripts/verify_mockup_aligned_ui.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 4237,
+      "sha256": "b68abdc18efe6ede2c34969113e9137a829bc5b2d753bb7b4b6e2b3cd138550f"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\verify_ui_comment_revision.cjs",
+      "file": "implementation-reference/scripts/verify_ui_comment_revision.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 3891,
+      "sha256": "fbcf34848aa4dc9b15f70ae76f70e27bd2780698e7758e376f985be80eaa01f1"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\verify_ui_comparison.cjs",
+      "file": "implementation-reference/scripts/verify_ui_comparison.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 3350,
+      "sha256": "64dee66854b430d06bc6d17a0384957b60476c60baf4c199168d866c4895755b"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\verify_ui_guardrails.cjs",
+      "file": "implementation-reference/scripts/verify_ui_guardrails.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 10035,
+      "sha256": "49a71a3f2add5d1d05d7cce868dc330776a547a9f4be513a9e651187eecdfeeb"
+    },
+    {
+      "source": "C:\\Ki_OJT\\PromptforNontech\\scripts\\verify_updated_mockups.cjs",
+      "file": "implementation-reference/scripts/verify_updated_mockups.cjs",
+      "authority": "GENERATOR_OR_CHECK",
+      "bytes": 4585,
+      "sha256": "46cf278a22cfef352ae8d1f9d7ac152063ef9c1ad47866596aa64fcf753ba81c"
+    }
+  ],
+  "missing_originals": [
+    "C:\\Users\\Admin\\Downloads\\Promptify_UI_Mockup_vs_Combined_GAP.csv"
+  ]
+}

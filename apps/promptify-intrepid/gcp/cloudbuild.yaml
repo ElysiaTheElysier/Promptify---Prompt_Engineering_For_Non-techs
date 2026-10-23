@@ -1,0 +1,25 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args:
+    - build
+    - --build-arg
+    - VITE_FIREBASE_API_KEY=${_FIREBASE_API_KEY}
+    - --build-arg
+    - VITE_FIREBASE_AUTH_DOMAIN=${_FIREBASE_AUTH_DOMAIN}
+    - --build-arg
+    - VITE_FIREBASE_PROJECT_ID=$PROJECT_ID
+    - --build-arg
+    - VITE_FIREBASE_APP_ID=${_FIREBASE_APP_ID}
+    - -t
+    - ${_REGION}-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:${_TAG}
+    - .
+images:
+ - ${_REGION}-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:${_TAG}
+substitutions:
+ _REGION: asia-southeast1
+ _TAG: staging
+ _FIREBASE_API_KEY: REQUIRED
+ _FIREBASE_AUTH_DOMAIN: REQUIRED
+ _FIREBASE_APP_ID: REQUIRED
+options:
+ logging: CLOUD_LOGGING_ONLY

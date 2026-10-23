@@ -1,0 +1,97 @@
+{
+  "checks": [
+    {
+      "test": "UI-00 desktop overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-00 mobile overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-01 desktop overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-01 mobile overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-05 desktop overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-05 mobile overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-06 desktop overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-06 mobile overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-09 desktop overflow",
+      "passed": true
+    },
+    {
+      "test": "UI-09 mobile overflow",
+      "passed": true
+    },
+    {
+      "test": "Production looping key visual",
+      "passed": true
+    },
+    {
+      "test": "Data on demand",
+      "passed": true
+    },
+    {
+      "test": "Drawer Escape",
+      "passed": true
+    },
+    {
+      "test": "Autocomplete accept",
+      "passed": true
+    },
+    {
+      "test": "Run V3",
+      "passed": true
+    },
+    {
+      "test": "Captured versions",
+      "passed": true
+    },
+    {
+      "test": "Independent selector aligns",
+      "passed": true
+    },
+    {
+      "test": "Restore workspace",
+      "passed": true
+    },
+    {
+      "test": "Source V2 V3 exact data",
+      "passed": true
+    },
+    {
+      "test": "Same version accurate diff",
+      "passed": true
+    },
+    {
+      "test": "Studio selected lab context",
+      "passed": true
+    },
+    {
+      "test": "Learner inspection preserved",
+      "passed": true
+    },
+    {
+      "test": "Broadcast local state",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

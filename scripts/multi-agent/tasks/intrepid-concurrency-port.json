@@ -1,0 +1,21 @@
+{
+  "id": "intrepid-concurrency-port",
+  "base": "apps/promptify-intrepid",
+  "delivery": "code",
+  "allowExisting": true,
+  "syntaxOnly": true,
+  "objective": "Modify ONLY the loopback guard in runNativeConcurrency so it accepts numeric port55432 OR55433. Hostmustremainexact127.0.0.1 andsyntheticdatabase regex remainsunchanged. Preserveall assertions, fixtures, locks and SQL. Return full JavaScript ESmodule; no otherlogicchanges. Supervisor willrunactualnative suite beforeapply.",
+  "read": [
+    "tests/db-correctness/native_concurrency.mjs"
+  ],
+  "support": [],
+  "write": "tests/db-correctness/native_concurrency.mjs",
+  "tests": [],
+  "acceptance": [
+    "Onlyallowedport clause changes",
+    "No assertions/expectedresults relaxed",
+    "No envURL/nonloopback allowance"
+  ],
+  "maxAttempts": 1,
+  "timeoutSeconds": 100
+}

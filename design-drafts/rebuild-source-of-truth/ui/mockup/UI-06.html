@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{
+    lang: 'en',
+    userDept: 'Brand Solutions & Campaign Ops',
+    labTitle: 'Codelab 03: One-shot Brand Voice & Classification',
+    versionA: 2,
+    versionB: 3,
+    diffMode: 'split', // 'split' or 'unified'
+    viewTab: 'prompt', // 'prompt' or 'output'
+    versions: [
+        { version: 1, score: 4, timestamp: '10:14 AM', latency: '0.64s', tokens: '120 tokens' },
+        { version: 2, score: 6, timestamp: '10:18 AM', latency: '0.72s', tokens: '210 tokens' },
+        { version: 3, score: 8, timestamp: '10:22 AM', latency: '0.82s', tokens: '342 tokens' }
+    ],
+    // V2 Prompt Data
+    promptV2: `[Role]: Act as Senior Campaign Ops Lead.
+
+[Context]: Review customer feedback tickets from 11.11 Campaign.
+
+[Task]: Classify support ticket into SLA Level (P1, P2, P3).
+
+[One-Shot Example]:
+Ticket: 'Payment deducted twice but order status cancelled.'
+Classification: P1 - Critical.
+
+[Input Ticket]:
+{{ticket_text}}`,
+
+    // V3 Prompt Data (with additions)
+    promptV3: `[Role]: Act as Senior Campaign Ops Lead for Intrepid Asia.
+
+[Context]: Review customer feedback tickets from the latest 11.11 Mega Sale Campaign using Intrepid SLA SOP v4.
+
+[Task]: Classify the support ticket below into Priority SLA Level (P1 - Critical, P2 - High, P3 - Normal).
+
+[One-Shot Example]:
+Ticket: 'Payment deducted twice but order status shows cancelled.'
+Classification: P1 - Critical SLA (Max response time: 15 mins).
+
+[Input Ticket]:
+{{ticket_text}}
+
+[Format]: Return a clean Markdown Table with 3 columns: Ticket ID, Priority Level, Required Action.
+[Constraint]: Strictly cite page numbers from SOP-Campaign-Ops-v4.pdf.`,
+
+    // Output Data
+    outputV2: `Ticket INT-1111-9082 is classified as P1 Critical because payment was charged twice. Escalate immediately.`,
+    outputV3: `| Ticket ID | Priority Level | Required Action | SOP Citation |
+| :--- | :--- | :--- | :--- |
+| INT-1111-9082 | **P1 - Critical** | Escalate to Billing Lead & Refund within 15 mins. | SOP v4 Page 4 (Section 4.2) |`
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify - Side-by-Side Version Diff Viewer (UI-06)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN for Micro-Interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'on-primary': '#FFFFFF',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1',
+                            error: '#BA1A1A',
+                            'error-container': '#FFDAD6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+        .diff-add { background-color: #d1fae5; color: #065f46; border-left: 3px solid #10b981; padding: 2px 6px; display: block; }
+        .diff-remove { background-color: #fee2e2; color: #991b1b; text-decoration: line-through; opacity: 0.8; padding: 2px 6px; display: block; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased h-screen flex flex-col overflow-hidden selection:bg-m3-primary-container">
+
+<!-- ================================================================= -->
+<!-- TOP NAVIGATION BAR -->
+<!-- ================================================================= -->
+<header class="bg-white border-b border-m3-outline-variant/60 px-4 py-2.5 flex items-center justify-between shrink-0">
+
+    <!-- Left: Return to Playground Workspace -->
+    <div class="flex items-center gap-3">
+        <a href="/learner/playground/lab-3" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-m3-surface-container-low text-m3-on-surface-variant transition-colors" title="Return to Workspace">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+
+        <div class="h-5 w-px bg-m3-outline-variant/80"></div>
+
+        <div class="flex items-center gap-2 text-xs">
+                <span class="font-bold text-m3-primary flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">compare</span>
+                    <span>Side-by-Side Attempt Comparison</span>
+                </span>
+            <span class="text-m3-outline">•</span>
+            <span class="text-m3-on-surface-variant font-semibold" x-text="labTitle"></span>
+        </div>
+    </div>
+
+    <!-- Center: Comparison View Switcher -->
+    <div class="flex items-center gap-1 bg-m3-surface-container-low p-1 rounded-xl text-xs font-semibold">
+        <button @click="viewTab = 'prompt'"
+                :class="viewTab === 'prompt' ? 'bg-white shadow text-m3-primary font-bold' : 'text-m3-on-surface-variant'"
+                class="px-3 py-1 rounded-lg transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">edit_note</span>
+            <span>Prompt Syntax Diff</span>
+        </button>
+        <button @click="viewTab = 'output'"
+                :class="viewTab === 'output' ? 'bg-white shadow text-m3-primary font-bold' : 'text-m3-on-surface-variant'"
+                class="px-3 py-1 rounded-lg transition-all flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">output</span>
+            <span>Output Result Diff</span>
+        </button>
+    </div>
+
+    <!-- Right: Action CTA -->
+    <div class="flex items-center gap-2">
+        <button @click="alert(`Restoring Version ${versionB} to Prompt Composer...`)"
+                class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-semibold shadow hover:bg-m3-primary/90 transition-all">
+            <span class="material-symbols-outlined text-sm">restore</span>
+            <span x-text="`Restore Version V${versionB} to Workspace`"></span>
+        </button>
+    </div>
+
+</header>
+
+<!-- ================================================================= -->
+<!-- COMPARISON SELECTOR STRIP -->
+<!-- ================================================================= -->
+<div class="bg-m3-surface-container-low border-b border-m3-outline-variant/60 px-6 py-3 flex items-center justify-between shrink-0 text-xs">
+
+    <!-- Left Selector: Version A (Baseline) -->
+    <div class="flex items-center gap-3">
+        <span class="font-bold text-m3-on-surface-variant uppercase tracking-wider text-[11px]">Baseline Version (A):</span>
+        <select x-model="versionA" class="bg-white border border-m3-outline-variant rounded-xl px-3 py-1.5 font-mono font-bold text-m3-on-surface focus:outline-none">
+            <template x-for="v in versions" :key="v.version">
+                <option :value="v.version" x-text="`Version V${v.version} (Score: ${v.score}/10)`"></option>
+            </template>
+        </select>
+        <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-bold text-[10px]">OLDER</span>
+    </div>
+
+    <!-- Center Comparison Delta Icon -->
+    <div class="flex items-center gap-2 text-m3-primary font-bold">
+        <span class="material-symbols-outlined">compare_arrows</span>
+        <span x-text="`Comparing V${versionA} vs V${versionB}`"></span>
+    </div>
+
+    <!-- Right Selector: Version B (Comparison) -->
+    <div class="flex items-center gap-3">
+        <span class="font-bold text-m3-on-surface-variant uppercase tracking-wider text-[11px]">Comparison Version (B):</span>
+        <select x-model="versionB" class="bg-white border border-m3-outline-variant rounded-xl px-3 py-1.5 font-mono font-bold text-m3-primary focus:outline-none">
+            <template x-for="v in versions" :key="v.version">
+                <option :value="v.version" x-text="`Version V${v.version} (Score: ${v.score}/10)`"></option>
+            </template>
+        </select>
+        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">NEWER</span>
+    </div>
+
+</div>
+
+<!-- ================================================================= -->
+<!-- DUAL-PANE SIDE-BY-SIDE DIFF CONTAINER -->
+<!-- ================================================================= -->
+<div class="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-m3-surface">
+
+    <!-- ============================================================= -->
+    <!-- LEFT COLUMN: VERSION A (OLDER ATTEMPT) -->
+    <!-- ============================================================= -->
+    <div class="border-r border-m3-outline-variant/60 flex flex-col overflow-hidden bg-white">
+
+        <!-- Version A Metric Header -->
+        <div class="p-4 bg-slate-50 border-b border-m3-outline-variant/60 space-y-2 shrink-0">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center font-mono font-bold text-xs" x-text="`V${versionA}`"></span>
+                    <span class="font-bold text-sm text-m3-on-surface" x-text="`Attempt V${versionA} Execution`"></span>
+                </div>
+                <div class="flex items-center gap-1 font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 text-xs">
+                    <span class="material-symbols-outlined text-sm">star</span>
+                    <span>AI Judge Score: 6 / 10</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-m3-on-surface-variant font-mono">
+                <span>Timestamp: 10:18 AM</span>
+                <span>Model: Gemini 3.8 Flash (0.72s)</span>
+            </div>
+        </div>
+
+        <!-- Version A Content Body -->
+        <div class="flex-1 p-5 overflow-y-auto font-mono text-xs leading-relaxed space-y-3">
+            <template x-if="viewTab === 'prompt'">
+                <div class="space-y-2 text-m3-on-surface whitespace-pre-wrap">
+                    <p>[Role]: Act as Senior Campaign Ops Lead.</p>
+                    <p class="diff-remove">- [Context]: Review customer feedback tickets from 11.11 Campaign.</p>
+                    <p>- [Task]: Classify support ticket into SLA Level (P1, P2, P3).</p>
+                    <p>[One-Shot Example]:</p>
+                    <p>Ticket: 'Payment deducted twice but order status cancelled.'</p>
+                    <p>Classification: P1 - Critical.</p>
+                    <p>[Input Ticket]: {{ticket_text}}</p>
+                </div>
+            </template>
+
+            <template x-if="viewTab === 'output'">
+                <div class="p-4 bg-m3-surface-container-low rounded-xl border border-m3-outline-variant text-m3-on-surface leading-relaxed">
+                    <p x-text="outputV2"></p>
+                </div>
+            </template>
+        </div>
+
+        <!-- Version A Diagnostic Scorecard Summary -->
+        <div class="p-4 bg-slate-50 border-t border-m3-outline-variant/60 text-xs space-y-2 shrink-0">
+            <span class="font-bold text-m3-on-surface-variant text-[11px] uppercase tracking-wider block">Diagnostics Summary (V2):</span>
+            <div class="grid grid-cols-2 gap-2 text-[11px] text-m3-on-surface-variant">
+                <span class="text-emerald-700 font-semibold">✓ Task Completion: 2/2</span>
+                <span class="text-amber-700 font-semibold">⚠ Grounding: 1/2 (Missing SOP page)</span>
+                <span class="text-emerald-700 font-semibold">✓ Format Adherence: 2/2</span>
+                <span class="text-amber-700 font-semibold">⚠ Constraint: 1/2</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- RIGHT COLUMN: VERSION B (NEWER ATTEMPT WITH DIFFS) -->
+    <!-- ============================================================= -->
+    <div class="flex flex-col overflow-hidden bg-white">
+
+        <!-- Version B Metric Header -->
+        <div class="p-4 bg-m3-primary-container/30 border-b border-m3-outline-variant/60 space-y-2 shrink-0">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-m3-primary text-white flex items-center justify-center font-mono font-bold text-xs" x-text="`V${versionB}`"></span>
+                    <span class="font-bold text-sm text-m3-on-surface" x-text="`Attempt V${versionB} Execution`"></span>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-300">+2 Pts Improved</span>
+                </div>
+                <div class="flex items-center gap-1 font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300 text-xs">
+                    <span class="material-symbols-outlined text-sm">star</span>
+                    <span>AI Judge Score: 8 / 10</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-m3-on-surface-variant font-mono">
+                <span>Timestamp: 10:22 AM</span>
+                <span>Model: Gemini 3.8 Flash (0.82s)</span>
+            </div>
+        </div>
+
+        <!-- Version B Content Body with Visual Diffs -->
+        <div class="flex-1 p-5 overflow-y-auto font-mono text-xs leading-relaxed space-y-3">
+            <template x-if="viewTab === 'prompt'">
+                <div class="space-y-2 text-m3-on-surface whitespace-pre-wrap">
+                    <p>[Role]: Act as Senior Campaign Ops Lead <span class="diff-add inline">+ for Intrepid Asia.</span></p>
+                    <p class="diff-add">+ [Context]: Review customer feedback tickets from the latest 11.11 Mega Sale Campaign using Intrepid SLA SOP v4.</p>
+                    <p>[Task]: Classify the support ticket below into Priority SLA Level (P1 - Critical, P2 - High, P3 - Normal).</p>
+                    <p>[One-Shot Example]:</p>
+                    <p>Ticket: 'Payment deducted twice but order status shows cancelled.'</p>
+                    <p>Classification: P1 - Critical SLA (Max response time: 15 mins).</p>
+                    <p>[Input Ticket]: {{ticket_text}}</p>
+                    <p class="diff-add">+ [Format]: Return a clean Markdown Table with 3 columns: Ticket ID, Priority Level, Required Action.</p>
+                    <p class="diff-add">+ [Constraint]: Strictly cite page numbers from SOP-Campaign-Ops-v4.pdf.</p>
+                </div>
+            </template>
+
+            <template x-if="viewTab === 'output'">
+                <div class="p-4 bg-white rounded-xl border border-m3-outline-variant space-y-2">
+                    <span class="text-[10px] font-bold text-emerald-700 block uppercase">Structured Markdown Output (V3):</span>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                            <tr class="bg-m3-surface-container-low font-bold border-b border-m3-outline-variant">
+                                <th class="p-2">Ticket ID</th>
+                                <th class="p-2">Priority Level</th>
+                                <th class="p-2">Required Action</th>
+                                <th class="p-2">Citation</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y divide-m3-outline-variant/60 text-[11px]">
+                            <tr>
+                                <td class="p-2 font-bold text-m3-primary">INT-1111-9082</td>
+                                <td class="p-2"><span class="px-1.5 py-0.5 rounded bg-red-100 text-red-800 font-bold">P1 - Critical</span></td>
+                                <td class="p-2">Refund within 15 mins.</td>
+                                <td class="p-2 font-bold text-emerald-800">SOP v4 Page 4</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Version B Diagnostic Scorecard Summary -->
+        <div class="p-4 bg-m3-primary-container/20 border-t border-m3-outline-variant/60 text-xs space-y-2 shrink-0">
+            <span class="font-bold text-m3-on-surface text-[11px] uppercase tracking-wider block">Diagnostics Summary (V3):</span>
+            <div class="grid grid-cols-2 gap-2 text-[11px] text-m3-on-surface font-semibold">
+                <span class="text-emerald-700">✓ Task Completion: 2/2</span>
+                <span class="text-emerald-700">✓ Grounding: 2/2 (+1 Pt)</span>
+                <span class="text-emerald-700">✓ Format Adherence: 2/2</span>
+                <span class="text-amber-700">⚠ Constraint: 1/2</span>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================================================================= -->
+<!-- FOOTER SUMMARY BAR -->
+<!-- ================================================================= -->
+<footer class="bg-white border-t border-m3-outline-variant/60 px-6 py-3 flex items-center justify-between text-xs shrink-0">
+    <div class="flex items-center gap-2 text-m3-on-surface-variant">
+        <span class="material-symbols-outlined text-m3-primary text-sm">lightbulb</span>
+        <span><strong>Learning Loop Insight:</strong> Adding explicit <code>[Format]</code> and <code>[Constraint]</code> instructions in V3 increased Grounding score by +1 point.</span>
+    </div>
+
+    <button @click="alert('Restoring Version V3 into Prompt Composer...')"
+            class="px-4 py-1.5 rounded-full bg-m3-primary text-white font-semibold text-xs shadow hover:bg-m3-primary/90 transition-all">
+        Apply V3 to Workspace
+    </button>
+</footer>
+
+</body>
+</html>

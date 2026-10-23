@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {firebaseSignInError} from '../src/services/firebaseSignInErrorService';
+assert.match(firebaseSignInError({code:'auth/unauthorized-domain'},'en'),/localhost/);
+assert.match(firebaseSignInError({code:'auth/popup-blocked'},'en'),/Allow popups/);
+assert.match(firebaseSignInError({code:'auth/popup-closed-by-user'},'vi'),/chưa hoàn tất/);
+assert.match(firebaseSignInError({code:'auth/network-request-failed'},'vi'),/kết nối/);
+const secret='private provider token';
+assert.equal(firebaseSignInError({code:'unexpected',message:secret},'en').includes(secret),false);
+assert.equal(firebaseSignInError(null,'en'),'Unable to sign in. Please try again.');
+console.log('Firebase sign-in guidance PASS; provider payloads never rendered.');

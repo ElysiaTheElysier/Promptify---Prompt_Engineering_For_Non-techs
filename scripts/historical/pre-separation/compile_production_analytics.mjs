@@ -1,0 +1,17 @@
+import fs from 'node:fs';import {sourceRenderer,sourceImports} from './production_source_compiler.mjs';
+const t=JSON.parse(fs.readFileSync('src/components/rebuild/review-templates.json','utf8'))[12];
+const metricText={'Client: Intrepid Asia • 1,150 Target Workforce':'{clientName+" · "+kpis.totalEnrolled}','Based on 2.4h saved/emp/week':'{copy("Requires measured work-time inputs")}','Target >85% Met':'{copy("Completion from saved progress")}','3.3 SOPs / Learner':'{copy("SOP contributions")}','+104.7% Avg Competency Improvement':'{kpis.scoreDelta}','Pre-Masterclass Baseline (Avg 4.2)':'{copy("Pre-Masterclass Baseline")+" ("+kpis.preScoreAvg+")"}','Post-Masterclass Score (Avg 8.6)':'{copy("Post-Masterclass Score")+" ("+kpis.postScoreAvg+")"}'};
+const render=sourceRenderer({text:s=>s.includes('100-minute masterclass rollout')?'{copy("Recorded learning progress and rubric scores for authorized cohorts.")}':s.includes("Breakdown across Intrepid")?'{copy("Authorized departments and cohorts")}':metricText[s.trim()]||`{copy(${JSON.stringify(s)})}`,click:(action)=>action.startsWith('lang =')?"setProductLanguage(lang==='en'?'vi':'en')":'exportReport()'});
+fs.writeFileSync('src/components/rebuild/ProductionAnalyticsSource.tsx',sourceImports+`
+export default function ProductionAnalyticsSource({snapshot}:{snapshot:ProductSnapshot}){
+ const lang=useProductLanguage(),copy=(v:string)=>sourceUiText(v,lang),[data,setData]=useState<any>(null),[error,setError]=useState(''),[selectedDept,setSelectedDept]=useState('All Departments'),exportingReport=false;
+ useEffect(()=>{let active=true;productRequest('analytics',{clientId:snapshot.selectedClass?.client_id}).then(value=>{if(active)setData(value);}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[snapshot.selectedClass?.client_id]);
+ const number=(v:any)=>typeof v==='number'?v.toLocaleString(lang==='en'?'en-US':'vi-VN',{maximumFractionDigits:2}):'—';
+ const clientName=snapshot.selectedClass?.client_name||'',dateRange=copy('All available records'),departments=['All Departments',...new Set((data?.classes||[]).map((c:any)=>c.department))];
+ const kpis={annualRoiEst:'—',completionRate:data?.enrolled?number(data.completed/data.enrolled*100):'—',completedLearners:number(data?.completed),totalEnrolled:number(data?.enrolled),postScoreAvg:number(data?.post_score),preScoreAvg:number(data?.pre_score),scoreDelta:data?.pre_score>0?number((data.post_score-data.pre_score)/data.pre_score*100)+'%':'—',totalPromptsCreated:number(data?.published_sops),estHoursSavedPerWeek:'—'};
+ const techniqueBreakdown=(data?.techniques||[]).map((row:any)=>({name:row.title,pre:'—',post:number(row.average_score),gain:'—'})),deptLeaderboard=(data?.classes||[]).filter((row:any)=>selectedDept==='All Departments'||row.department===selectedDept).map((row:any)=>({dept:row.department+' · '+row.class_code,enrolled:row.enrolled,completed:row.completed,rate:row.enrolled?number(row.completed/row.enrolled*100)+'%':'—',avgScore:number(row.average_score),sopsCreated:number(row.published_sops),hoursSaved:'—'}));
+ const exportReport=()=>window.print();
+ return <div className="source-ui" data-source-ui="UI-12">${render(t.body)}{error&&<p role="alert" className="p-4 bg-red-50 text-red-800">{error}</p>}<p className="max-w-7xl mx-auto p-4 text-xs text-slate-500">{copy('Hours saved and annual ROI require measured work-time and cost inputs.')}</p></div>;
+}
+`);
+await import('./apply_combined_brand.mjs');console.log('Compiled source UI-12 from authorized analytics.');

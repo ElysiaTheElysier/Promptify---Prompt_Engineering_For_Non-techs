@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Default --validate/--dry-run mode stops before any cloud/database call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/gcp/SETUP_GUIDE.md before user execution.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='PROJECT_ID'
+region='REGION'
+# USER EXECUTION ONLY. These resources cost money. Review region/tier/budget first.
+# Fresh staging only. If a resource exists, inspect it and skip its CREATE command; never delete to rerun.
+gcloud artifacts repositories create promptify-intrepid --repository-format=docker --location="$region" --project="$project"
+gcloud sql instances create SQL_INSTANCE --database-version=POSTGRES_18 --edition=ENTERPRISE --tier=db-custom-2-8192 --enable-google-ml-integration --database-flags=cloudsql.enable_google_ml_integration=on --region="$region" --storage-size=10 --storage-type=SSD --availability-type=zonal --deletion-protection --backup-start-time=02:00 --enable-point-in-time-recovery --project="$project"
+gcloud sql databases create promptify_db --instance=SQL_INSTANCE --project="$project"
+gcloud storage buckets create "gs://${project}-intrepid-sop-staging" --location="$region" --uniform-bucket-level-access --public-access-prevention --project="$project"
+gcloud storage buckets create "gs://${project}-intrepid-build-staging" --location="$region" --uniform-bucket-level-access --public-access-prevention --project="$project"
+gcloud storage buckets update "gs://${project}-intrepid-sop-staging" --cors-file=outputs/gcp/storage-cors.json --project="$project"
+gcloud firestore databases create --database='(default)' --location="$region" --type=firestore-native --project="$project"
+gcloud secrets create intrepid-db-password --replication-policy=automatic --project="$project"
+for name in promptify-api promptify-worker promptify-scheduler promptify-workspace promptify-build; do
+ gcloud iam service-accounts create "$name" --project="$project"
+done
+echo 'Resources created. Next: schema, runtime password, IAM and BigQuery setup. No source data moved.'

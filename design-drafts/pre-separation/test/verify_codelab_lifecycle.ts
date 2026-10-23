@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {codelabAvailable} from '../src/services/codelabLifecycleService';
+const start='2026-10-08T01:00:00Z',end='2026-10-08T02:00:00Z',config={state:'SCHEDULED',startTime:start,endTime:end};
+assert.equal(codelabAvailable('published',config,Date.parse(start)-1),false);
+assert.equal(codelabAvailable('published',config,Date.parse(start)),true);
+assert.equal(codelabAvailable('published',config,Date.parse(end)),false);
+assert.equal(codelabAvailable('draft',{state:'ACTIVE'}),false);
+assert.equal(codelabAvailable('published',{state:'ARCHIVED'}),false);
+assert.equal(codelabAvailable('published',{state:'SCHEDULED',startTime:'invalid'}),false);
+assert.equal(codelabAvailable('published',null),true);
+console.log('Codelab lifecycle boundaries and invalid schedules passed. No live calls.');

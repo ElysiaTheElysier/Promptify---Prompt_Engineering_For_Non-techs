@@ -1,0 +1,2806 @@
+{
+  "tables": {
+    "classes": {
+      "id": "uuid",
+      "class_code": "text",
+      "course_id": "uuid",
+      "client_id": "uuid",
+      "department": "text",
+      "start_date": "timestamptz",
+      "end_date": "timestamptz",
+      "status": "text",
+      "enrollment_mode": "text",
+      "created_at": "timestamptz"
+    },
+    "clients": {
+      "id": "uuid",
+      "name": "text",
+      "industry": "text",
+      "created_at": "timestamptz"
+    },
+    "course_instructors": {
+      "course_id": "uuid",
+      "user_id": "uuid",
+      "permission": "text",
+      "assigned_at": "timestamptz"
+    },
+    "course_modules": {
+      "id": "uuid",
+      "course_id": "uuid",
+      "title": "text",
+      "description": "text",
+      "position": "int4",
+      "status": "text",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "courses": {
+      "id": "uuid",
+      "title": "text",
+      "description": "text",
+      "status": "text",
+      "created_by": "uuid",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz",
+      "slug": "text",
+      "publication_status": "text",
+      "version": "int4",
+      "published_at": "timestamptz"
+    },
+    "enrollments": {
+      "id": "uuid",
+      "learner_id": "uuid",
+      "class_id": "uuid",
+      "status": "text",
+      "joined_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "gcp_identity_bindings": {
+      "issuer": "text",
+      "external_subject": "text",
+      "user_id": "uuid",
+      "legacy_subject": "uuid",
+      "created_at": "timestamptz"
+    },
+    "learners": {
+      "id": "uuid",
+      "learner_code": "text",
+      "user_id": "uuid",
+      "created_at": "timestamptz"
+    },
+    "lesson_progress": {
+      "id": "uuid",
+      "learner_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "status": "text",
+      "attempts_count": "int4",
+      "best_score": "numeric",
+      "last_attempt_id": "uuid",
+      "started_at": "timestamptz",
+      "completed_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "lesson_resources": {
+      "id": "uuid",
+      "lesson_id": "uuid",
+      "resource_type": "text",
+      "title": "text",
+      "content": "text",
+      "url": "text",
+      "position": "int4",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "lesson_rubric_criteria": {
+      "id": "uuid",
+      "lesson_id": "uuid",
+      "criterion_key": "text",
+      "label": "text",
+      "description": "text",
+      "max_score": "numeric",
+      "position": "int4",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "lessons": {
+      "id": "uuid",
+      "module_id": "uuid",
+      "lesson_key": "text",
+      "title": "text",
+      "badge": "text",
+      "focus_skill": "text",
+      "scenario": "text",
+      "task_goal": "text",
+      "concept_title": "text",
+      "concept_content": "text",
+      "system_instruction": "text",
+      "starter_prompt": "text",
+      "baseline_prompt": "text",
+      "improved_prompt": "text",
+      "sample_input_context": "text",
+      "prompt_placeholder": "text",
+      "expected_output_format": "text",
+      "hints": "jsonb",
+      "focus_components": "jsonb",
+      "position": "int4",
+      "status": "text",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "product_attendance": {
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "learner_id": "uuid",
+      "present": "bool",
+      "recorded_by": "uuid",
+      "reason": "text",
+      "updated_at": "timestamptz"
+    },
+    "product_audit": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "actor_id": "uuid",
+      "action": "text",
+      "reason": "text",
+      "created_at": "timestamptz"
+    },
+    "product_awards": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "learner_id": "uuid",
+      "award_key": "text",
+      "kind": "text",
+      "title": "text",
+      "issuer": "text",
+      "evidence": "jsonb",
+      "issued_at": "timestamptz"
+    },
+    "product_class_grants": {
+      "user_id": "uuid",
+      "class_id": "uuid",
+      "permission": "text"
+    },
+    "product_domains": {
+      "client_id": "uuid",
+      "domain": "text",
+      "active": "bool",
+      "updated_by": "uuid",
+      "updated_at": "timestamptz"
+    },
+    "product_enterprise_requests": {
+      "id": "uuid",
+      "request_id": "uuid",
+      "company": "text",
+      "tax_id": "text",
+      "employees": "text",
+      "email": "text",
+      "status": "text",
+      "created_at": "timestamptz"
+    },
+    "product_governance_config": {
+      "id": "bool",
+      "config": "jsonb",
+      "revision": "int4",
+      "updated_by": "uuid",
+      "updated_at": "timestamptz"
+    },
+    "product_learner_context": {
+      "id": "uuid",
+      "owner_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "title": "text",
+      "content": "text",
+      "content_hash": "text",
+      "chunks": "jsonb",
+      "created_at": "timestamptz"
+    },
+    "product_learner_support": {
+      "learner_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "kind": "text",
+      "created_at": "timestamptz",
+      "reflection": "text"
+    },
+    "product_profile_corrections": {
+      "id": "uuid",
+      "user_id": "uuid",
+      "request_id": "uuid",
+      "reason": "text",
+      "status": "text",
+      "created_at": "timestamptz",
+      "assigned_department": "text",
+      "requested_department": "text",
+      "source_class_id": "uuid",
+      "target_class_id": "uuid",
+      "auto_approved": "boolean"
+    },
+    "product_prompt_drafts": {
+      "user_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "prompt": "text",
+      "revision": "int4",
+      "updated_at": "timestamptz"
+    },
+    "product_prompt_library": {
+      "id": "uuid",
+      "owner_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "attempt_id": "uuid",
+      "request_id": "uuid",
+      "title": "text",
+      "prompt": "text",
+      "settings": "jsonb",
+      "variables": "jsonb",
+      "score": "numeric",
+      "status": "text",
+      "reviewed_by": "uuid",
+      "review_reason": "text",
+      "created_at": "timestamptz",
+      "category": "text"
+    },
+    "product_request_budgets": {
+      "actor_id": "uuid",
+      "operation": "text",
+      "bucket": "timestamptz",
+      "count": "int4"
+    },
+    "product_roster_profiles": {
+      "user_id": "uuid",
+      "class_id": "uuid",
+      "country": "text",
+      "department": "text",
+      "updated_at": "timestamptz"
+    },
+    "product_rotation_approvals": {
+      "request_id": "uuid",
+      "user_id": "uuid",
+      "created_at": "timestamptz"
+    },
+    "product_rotation_requests": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "provider": "text",
+      "source_fingerprint": "text",
+      "requested_by": "uuid",
+      "reason": "text",
+      "status": "text",
+      "created_at": "timestamptz",
+      "applied_at": "timestamptz",
+      "deployment_id": "text"
+    },
+    "product_sandbox_runs": {
+      "actor_id": "uuid",
+      "request_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "prompt": "text",
+      "snapshot": "jsonb",
+      "result": "jsonb",
+      "evaluation": "jsonb",
+      "judge_claim": "uuid",
+      "created_at": "timestamptz"
+    },
+    "product_session_controls": {
+      "class_id": "uuid",
+      "state": "text",
+      "revision": "int4",
+      "updated_at": "timestamptz",
+      "updated_by": "uuid"
+    },
+    "product_sheet_connections": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "sheet_id": "text",
+      "name": "text",
+      "column_mapping": "jsonb",
+      "status": "text",
+      "last_synced_at": "timestamptz",
+      "created_by": "uuid",
+      "auto_sync": "bool",
+      "last_attempt_at": "timestamptz"
+    },
+    "product_sop_chunks": {
+      "version_id": "uuid",
+      "position": "int4",
+      "page": "int4",
+      "content": "text",
+      "embedding": "jsonb",
+      "model": "text",
+      "indexed_at": "timestamptz"
+    },
+    "product_sop_contributions": {
+      "id": "uuid",
+      "actor_id": "uuid",
+      "request_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "document_id": "uuid",
+      "title": "text",
+      "content": "text",
+      "metadata": "jsonb",
+      "chunks": "jsonb",
+      "status": "text",
+      "version_id": "uuid",
+      "reviewed_by": "uuid",
+      "review_reason": "text",
+      "indexing_claim": "uuid",
+      "indexed_chunks": "jsonb",
+      "created_at": "timestamptz",
+      "indexing_claimed_at": "timestamptz"
+    },
+    "product_studio": {
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "revision": "int4",
+      "config": "jsonb",
+      "updated_at": "timestamptz",
+      "updated_by": "uuid"
+    },
+    "product_sync_logs": {
+      "id": "uuid",
+      "connection_id": "uuid",
+      "class_id": "uuid",
+      "actor_id": "uuid",
+      "request_id": "uuid",
+      "status": "text",
+      "processed": "int4",
+      "result": "jsonb",
+      "error_code": "text",
+      "created_at": "timestamptz",
+      "finished_at": "timestamptz"
+    },
+    "product_worker_invocations": {
+      "nonce": "uuid",
+      "created_at": "timestamptz"
+    },
+    "prompt_attempts": {
+      "id": "uuid",
+      "learner_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "text",
+      "attempt_number": "int4",
+      "prompt_text": "text",
+      "ai_output": "text",
+      "evaluation_json": "jsonb",
+      "model": "text",
+      "latency_ms": "int4",
+      "created_at": "timestamptz",
+      "lesson_ref_id": "uuid",
+      "production_pass_threshold": "numeric"
+    },
+    "rebuild_judge_claims": {
+      "attempt_id": "uuid",
+      "subject": "uuid",
+      "claim_id": "uuid",
+      "claimed_at": "timestamptz",
+      "completed_at": "timestamptz"
+    },
+    "rebuild_roster_imports": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "actor_id": "uuid",
+      "request_id": "uuid",
+      "rows_json": "jsonb",
+      "result": "jsonb",
+      "created_at": "timestamptz"
+    },
+    "rebuild_runs": {
+      "subject": "uuid",
+      "request_id": "uuid",
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "prompt": "text",
+      "snapshot": "jsonb",
+      "attempt_id": "uuid",
+      "result": "jsonb",
+      "created_at": "timestamptz"
+    },
+    "rebuild_sop_bindings": {
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "document_id": "uuid",
+      "version_id": "uuid"
+    },
+    "rebuild_sop_documents": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "title": "text",
+      "created_by": "uuid",
+      "created_at": "timestamptz"
+    },
+    "rebuild_sop_versions": {
+      "id": "uuid",
+      "document_id": "uuid",
+      "version": "int4",
+      "content": "text",
+      "created_by": "uuid",
+      "created_at": "timestamptz"
+    },
+    "rebuild_trainer_actions": {
+      "id": "uuid",
+      "attempt_id": "uuid",
+      "actor_id": "uuid",
+      "request_id": "uuid",
+      "action": "text",
+      "reason": "text",
+      "created_at": "timestamptz"
+    },
+    "trainer_hints": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "learner_id": "uuid",
+      "trainer_id": "uuid",
+      "message": "text",
+      "created_at": "timestamptz"
+    },
+    "user_tutorial_progress": {
+      "user_id": "uuid",
+      "tutorial_key": "text",
+      "completed_at": "timestamptz"
+    },
+    "users": {
+      "id": "uuid",
+      "email": "text",
+      "full_name": "text",
+      "role": "text",
+      "auth_provider_id": "text",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz",
+      "profile_confirmed_at": "timestamptz"
+    },
+    "workshop_message_receipts": {
+      "message_id": "uuid",
+      "user_id": "uuid",
+      "read_at": "timestamptz"
+    },
+    "workshop_messages": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "trainer_id": "uuid",
+      "request_id": "uuid",
+      "message": "text",
+      "created_at": "timestamptz"
+    },
+    "product_judge_jobs": {
+      "attempt_id": "uuid",
+      "subject": "uuid",
+      "claim_id": "uuid",
+      "generation": "int4",
+      "status": "text",
+      "token_sha256": "text",
+      "dispatch_count": "int4",
+      "lease_until": "timestamptz",
+      "last_error_code": "text",
+      "last_upstream_status": "int4",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz",
+      "expires_at": "timestamptz"
+    },
+    "product_generation_jobs": {
+      "subject": "uuid",
+      "request_id": "uuid",
+      "generation": "integer",
+      "status": "text",
+      "token_sha256": "text",
+      "dispatch_count": "integer",
+      "fence": "uuid",
+      "lease_until": "timestamp with time zone",
+      "created_at": "timestamp with time zone",
+      "updated_at": "timestamp with time zone",
+      "expires_at": "timestamp with time zone",
+      "last_error_code": "text",
+      "dispatch_confirmed": "boolean"
+    }
+  },
+  "relations": [
+    {
+      "child": "classes",
+      "parent": "clients",
+      "columns": [
+        "client_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "classes",
+      "parent": "courses",
+      "columns": [
+        "course_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "course_instructors",
+      "parent": "courses",
+      "columns": [
+        "course_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "course_instructors",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "course_modules",
+      "parent": "courses",
+      "columns": [
+        "course_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "courses",
+      "parent": "users",
+      "columns": [
+        "created_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "enrollments",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "enrollments",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "gcp_identity_bindings",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "learners",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "prompt_attempts",
+      "columns": [
+        "last_attempt_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lesson_resources",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lesson_rubric_criteria",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "lessons",
+      "parent": "course_modules",
+      "columns": [
+        "module_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_attendance",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_attendance",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_attendance",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_attendance",
+      "parent": "users",
+      "columns": [
+        "recorded_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_audit",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_audit",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_awards",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_awards",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_awards",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_class_grants",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_class_grants",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_domains",
+      "parent": "clients",
+      "columns": [
+        "client_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_domains",
+      "parent": "users",
+      "columns": [
+        "updated_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_governance_config",
+      "parent": "users",
+      "columns": [
+        "updated_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_learner_context",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_learner_context",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_learner_context",
+      "parent": "users",
+      "columns": [
+        "owner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_learner_support",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_learner_support",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_learner_support",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_profile_corrections",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_drafts",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_drafts",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_drafts",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "prompt_attempts",
+      "columns": [
+        "attempt_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "users",
+      "columns": [
+        "owner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "users",
+      "columns": [
+        "reviewed_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_request_budgets",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_roster_profiles",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_roster_profiles",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_rotation_approvals",
+      "parent": "product_rotation_requests",
+      "columns": [
+        "request_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_rotation_approvals",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_rotation_requests",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_rotation_requests",
+      "parent": "users",
+      "columns": [
+        "requested_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sandbox_runs",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sandbox_runs",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sandbox_runs",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_session_controls",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_session_controls",
+      "parent": "users",
+      "columns": [
+        "updated_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sheet_connections",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sheet_connections",
+      "parent": "users",
+      "columns": [
+        "created_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_chunks",
+      "parent": "rebuild_sop_versions",
+      "columns": [
+        "version_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "rebuild_sop_documents",
+      "columns": [
+        "document_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "users",
+      "columns": [
+        "reviewed_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "rebuild_sop_versions",
+      "columns": [
+        "version_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_studio",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_studio",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_studio",
+      "parent": "users",
+      "columns": [
+        "updated_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sync_logs",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sync_logs",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_sync_logs",
+      "parent": "product_sheet_connections",
+      "columns": [
+        "connection_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "prompt_attempts",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "prompt_attempts",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "prompt_attempts",
+      "parent": "lessons",
+      "columns": [
+        "lesson_ref_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_judge_claims",
+      "parent": "prompt_attempts",
+      "columns": [
+        "attempt_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_roster_imports",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_roster_imports",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_runs",
+      "parent": "prompt_attempts",
+      "columns": [
+        "attempt_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_runs",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_runs",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "rebuild_sop_documents",
+      "columns": [
+        "document_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "lessons",
+      "columns": [
+        "lesson_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "rebuild_sop_versions",
+      "columns": [
+        "version_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_documents",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_documents",
+      "parent": "users",
+      "columns": [
+        "created_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_versions",
+      "parent": "users",
+      "columns": [
+        "created_by"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_sop_versions",
+      "parent": "rebuild_sop_documents",
+      "columns": [
+        "document_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_trainer_actions",
+      "parent": "users",
+      "columns": [
+        "actor_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "rebuild_trainer_actions",
+      "parent": "prompt_attempts",
+      "columns": [
+        "attempt_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "trainer_hints",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "trainer_hints",
+      "parent": "learners",
+      "columns": [
+        "learner_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "trainer_hints",
+      "parent": "users",
+      "columns": [
+        "trainer_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "user_tutorial_progress",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "workshop_message_receipts",
+      "parent": "workshop_messages",
+      "columns": [
+        "message_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "workshop_message_receipts",
+      "parent": "users",
+      "columns": [
+        "user_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "workshop_messages",
+      "parent": "classes",
+      "columns": [
+        "class_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "workshop_messages",
+      "parent": "users",
+      "columns": [
+        "trainer_id"
+      ],
+      "references": [
+        "id"
+      ]
+    },
+    {
+      "child": "product_profile_corrections",
+      "parent": "classes",
+      "columns": [
+        "source_class_id"
+      ],
+      "references": [
+        "id"
+      ],
+      "many": true
+    },
+    {
+      "child": "product_profile_corrections",
+      "parent": "classes",
+      "columns": [
+        "target_class_id"
+      ],
+      "references": [
+        "id"
+      ],
+      "many": true
+    },
+    {
+      "name": "sop_binding_document_class_fk",
+      "child": "rebuild_sop_bindings",
+      "parent": "rebuild_sop_documents",
+      "columns": [
+        "class_id",
+        "document_id"
+      ],
+      "references": [
+        "class_id",
+        "id"
+      ],
+      "navigation": false
+    },
+    {
+      "name": "sop_binding_version_document_fk",
+      "child": "rebuild_sop_bindings",
+      "parent": "rebuild_sop_versions",
+      "columns": [
+        "document_id",
+        "version_id"
+      ],
+      "references": [
+        "document_id",
+        "id"
+      ],
+      "navigation": false
+    }
+  ],
+  "rpcs": {
+    "check_user_privilege_escalation": {
+      "args": [],
+      "many": false
+    },
+    "current_user_id": {
+      "args": [],
+      "many": false
+    },
+    "generate_learner_code": {
+      "args": [],
+      "many": false
+    },
+    "has_active_class_enrollment": {
+      "args": [
+        {
+          "name": "target_class_id",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "has_active_course_enrollment": {
+      "args": [
+        {
+          "name": "target_course_id",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "is_instructor": {
+      "args": [],
+      "many": false
+    },
+    "legacy_valid_evaluation_total": {
+      "args": [
+        {
+          "name": "payload",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "lesson_belongs_to_class": {
+      "args": [
+        {
+          "name": "target_lesson_id",
+          "type": "uuid"
+        },
+        {
+          "name": "target_class_id",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_accept_worker_invocation": {
+      "args": [
+        {
+          "name": "p_nonce",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_analytics": {
+      "args": [
+        {
+          "name": "p_classes",
+          "type": "uuid[]"
+        },
+        {
+          "name": "p_start",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "p_end",
+          "type": "timestamp with time zone"
+        }
+      ],
+      "many": false
+    },
+    "product_approve_rotation": {
+      "args": [
+        {
+          "name": "p_request",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_awards_after_attempt": {
+      "args": [],
+      "many": false
+    },
+    "product_can_manage": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_can_read_class": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_can_read_course": {
+      "args": [
+        {
+          "name": "p_course",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_can_read_lesson": {
+      "args": [
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_can_read_user": {
+      "args": [
+        {
+          "name": "p_user",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_capture_attempt_threshold": {
+      "args": [],
+      "many": false
+    },
+    "product_claim_roster_sync": {
+      "args": [],
+      "many": false
+    },
+    "product_create_cohort": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_code",
+          "type": "text"
+        },
+        {
+          "name": "p_department",
+          "type": "text"
+        },
+        {
+          "name": "p_start",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "p_end",
+          "type": "timestamp with time zone"
+        }
+      ],
+      "many": false
+    },
+    "product_create_lesson": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_title",
+          "type": "text"
+        },
+        {
+          "name": "p_key",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_enroll_basic": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_email",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_finish_roster_sync": {
+      "args": [
+        {
+          "name": "p_log",
+          "type": "uuid"
+        },
+        {
+          "name": "p_rows",
+          "type": "jsonb"
+        },
+        {
+          "name": "p_error",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_finish_rotation": {
+      "args": [
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_fingerprint",
+          "type": "text"
+        },
+        {
+          "name": "p_deployment",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_guard_new_run": {
+      "args": [],
+      "many": false
+    },
+    "product_import_roster": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_rows",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_limit_ai_run": {
+      "args": [],
+      "many": false
+    },
+    "product_limit_basic_run": {
+      "args": [],
+      "many": false
+    },
+    "product_publish_contribution": {
+      "args": [
+        {
+          "name": "p_contribution",
+          "type": "uuid"
+        },
+        {
+          "name": "p_chunks",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_record_attendance": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_learner",
+          "type": "uuid"
+        },
+        {
+          "name": "p_present",
+          "type": "boolean"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_refresh_awards": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_learner",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_request_correction": {
+      "args": [
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_request_rotation": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_provider",
+          "type": "text"
+        },
+        {
+          "name": "p_fingerprint",
+          "type": "text"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_save_class": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_status",
+          "type": "text"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_save_domain": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_domain",
+          "type": "text"
+        },
+        {
+          "name": "p_active",
+          "type": "boolean"
+        }
+      ],
+      "many": false
+    },
+    "product_save_draft": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_prompt",
+          "type": "text"
+        },
+        {
+          "name": "p_expected_revision",
+          "type": "integer"
+        }
+      ],
+      "many": false
+    },
+    "product_save_sheet": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_sheet",
+          "type": "text"
+        },
+        {
+          "name": "p_name",
+          "type": "text"
+        },
+        {
+          "name": "p_mapping",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_save_studio": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_expected_revision",
+          "type": "integer"
+        },
+        {
+          "name": "p_config",
+          "type": "jsonb"
+        },
+        {
+          "name": "p_fields",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_session_control": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_state",
+          "type": "text"
+        },
+        {
+          "name": "p_expected_revision",
+          "type": "integer"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_set_class_access": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_email",
+          "type": "text"
+        },
+        {
+          "name": "p_role",
+          "type": "text"
+        },
+        {
+          "name": "p_permission",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_set_sheet_auto_sync": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_connection",
+          "type": "uuid"
+        },
+        {
+          "name": "p_enabled",
+          "type": "boolean"
+        }
+      ],
+      "many": false
+    },
+    "product_submit_enterprise_request": {
+      "args": [
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_company",
+          "type": "text"
+        },
+        {
+          "name": "p_tax",
+          "type": "text"
+        },
+        {
+          "name": "p_employees",
+          "type": "text"
+        },
+        {
+          "name": "p_email",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_take_budget": {
+      "args": [
+        {
+          "name": "p_actor",
+          "type": "uuid"
+        },
+        {
+          "name": "p_operation",
+          "type": "text"
+        },
+        {
+          "name": "p_limit",
+          "type": "integer"
+        }
+      ],
+      "many": false
+    },
+    "product_unlock_support": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_kind",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_unlock_support_reflected": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_kind",
+          "type": "text"
+        },
+        {
+          "name": "p_reflection",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_validate_studio_config": {
+      "args": [],
+      "many": false
+    },
+    "product_validate_studio_nested": {
+      "args": [],
+      "many": false
+    },
+    "rebuild_ack_workshop_message": {
+      "args": [
+        {
+          "name": "p_message",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_begin_run": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_prompt",
+          "type": "text"
+        },
+        {
+          "name": "p_snapshot",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_broadcast": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_message",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_can_manage_class": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_can_teach": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_claim_judge": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_claim",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_class_analytics": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_class_attempts": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_class_sops": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_confirm_profile": {
+      "args": [
+        {
+          "name": "p_full_name",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_finish_judge": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_claim",
+          "type": "uuid"
+        },
+        {
+          "name": "p_evaluation",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_finish_run": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_result",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_import_roster": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_rows",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_my_profile": {
+      "args": [],
+      "many": false
+    },
+    "rebuild_publish_sop": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_document",
+          "type": "uuid"
+        },
+        {
+          "name": "p_title",
+          "type": "text"
+        },
+        {
+          "name": "p_content",
+          "type": "text"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_record_trainer_action": {
+      "args": [
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_action",
+          "type": "text"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_save_evaluation": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_evaluation",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_sop_lesson_options": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_trainer_action_history": {
+      "args": [
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "rebuild_workshop_inbox": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "record_prompt_attempt_and_progress": {
+      "args": [
+        {
+          "name": "p_class_id",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson_id",
+          "type": "uuid"
+        },
+        {
+          "name": "p_prompt_text",
+          "type": "text"
+        },
+        {
+          "name": "p_ai_output",
+          "type": "text"
+        },
+        {
+          "name": "p_evaluation_json",
+          "type": "jsonb"
+        },
+        {
+          "name": "p_model",
+          "type": "text"
+        },
+        {
+          "name": "p_latency_ms",
+          "type": "integer"
+        }
+      ],
+      "many": false
+    },
+    "self_enroll_public_class": {
+      "args": [
+        {
+          "name": "target_class_id",
+          "type": "uuid"
+        }
+      ],
+      "many": true
+    },
+    "sync_lesson_progress_from_prompt_attempt": {
+      "args": [],
+      "many": false
+    },
+    "trigger_set_timestamp": {
+      "args": [],
+      "many": false
+    },
+    "update_prompt_attempt_evaluation_and_progress": {
+      "args": [
+        {
+          "name": "p_attempt_id",
+          "type": "uuid"
+        },
+        {
+          "name": "p_evaluation_json",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "valid_evaluation_total": {
+      "args": [
+        {
+          "name": "payload",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "intrepid_search_sop": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_versions",
+          "type": "uuid[]"
+        },
+        {
+          "name": "p_vector",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_auto_correct_department": {
+      "args": [
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_source",
+          "type": "uuid"
+        },
+        {
+          "name": "p_department",
+          "type": "text"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        },
+        {
+          "name": "p_full_name",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_enqueue_judge": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_claim",
+          "type": "uuid"
+        },
+        {
+          "name": "p_token_sha",
+          "type": "text"
+        },
+        {
+          "name": "p_ttl_seconds",
+          "type": "int4"
+        }
+      ],
+      "many": false
+    },
+    "product_lease_judge": {
+      "args": [
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_token_sha",
+          "type": "text"
+        },
+        {
+          "name": "p_lease_seconds",
+          "type": "int4"
+        }
+      ],
+      "many": false
+    },
+    "product_settle_judge": {
+      "args": [
+        {
+          "name": "p_attempt",
+          "type": "uuid"
+        },
+        {
+          "name": "p_generation",
+          "type": "int4"
+        },
+        {
+          "name": "p_outcome",
+          "type": "text"
+        },
+        {
+          "name": "p_error",
+          "type": "text"
+        },
+        {
+          "name": "p_upstream",
+          "type": "int4"
+        }
+      ],
+      "many": false
+    },
+    "product_enqueue_generation": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_prompt",
+          "type": "text"
+        },
+        {
+          "name": "p_snapshot",
+          "type": "jsonb"
+        },
+        {
+          "name": "p_token_sha",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_lease_generation": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_token_sha",
+          "type": "text"
+        },
+        {
+          "name": "p_fence",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_finish_generation": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_fence",
+          "type": "uuid"
+        },
+        {
+          "name": "p_result",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_fail_generation": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_fence",
+          "type": "uuid"
+        },
+        {
+          "name": "p_retry",
+          "type": "boolean"
+        },
+        {
+          "name": "p_error",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_generation_status": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_confirm_generation_dispatch": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_generation",
+          "type": "integer"
+        }
+      ],
+      "many": false
+    },
+    "product_generation_retrieve": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_fence",
+          "type": "uuid"
+        },
+        {
+          "name": "p_operation",
+          "type": "text"
+        },
+        {
+          "name": "p_versions",
+          "type": "uuid[]"
+        },
+        {
+          "name": "p_vector",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_freeze_generation_context": {
+      "args": [
+        {
+          "name": "p_subject",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_fence",
+          "type": "uuid"
+        },
+        {
+          "name": "p_evidence",
+          "type": "jsonb"
+        }
+      ],
+      "many": false
+    }
+  }
+}

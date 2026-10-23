@@ -1,0 +1,17 @@
+{
+  "entry": [
+    "src/main.tsx",
+    "api/**/*.ts",
+    "tests/*.{ts,mjs}",
+    "vite.config.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "api/**/*.ts"
+  ],
+  "vite": false,
+  "ignoreDependencies": [
+    "dependency-cruiser",
+    "knip"
+  ]
+}

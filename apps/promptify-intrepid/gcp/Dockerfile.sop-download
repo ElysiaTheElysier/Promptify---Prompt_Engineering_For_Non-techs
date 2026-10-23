@@ -1,0 +1,2 @@
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:700cb5d3135560e4502780b9e51fdc430314ca8dfbfd0c098621b4ac0cbda885
+COPY --chown=node:node src/services/cloudStorageService.ts /app/src/services/

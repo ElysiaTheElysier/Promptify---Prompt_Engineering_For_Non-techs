@@ -1,0 +1,8 @@
+-- USER execution only, after bigquery.sql and reviewed dataset ownership.
+-- Additive DCL preserves existing dataset ACLs/authorized views.
+GRANT `roles/bigquery.dataViewer` ON SCHEMA `PROJECT_ID.intrepid_raw` TO "serviceAccount:promptify-api@PROJECT_ID.iam.gserviceaccount.com";
+GRANT `roles/bigquery.dataViewer` ON SCHEMA `PROJECT_ID.intrepid_analytics` TO "serviceAccount:promptify-api@PROJECT_ID.iam.gserviceaccount.com";
+GRANT `roles/bigquery.dataViewer` ON SCHEMA `PROJECT_ID.intrepid_knowledge` TO "serviceAccount:promptify-api@PROJECT_ID.iam.gserviceaccount.com";
+GRANT `roles/bigquery.dataEditor` ON SCHEMA `PROJECT_ID.intrepid_raw` TO "serviceAccount:promptify-worker@PROJECT_ID.iam.gserviceaccount.com";
+GRANT `roles/bigquery.dataEditor` ON SCHEMA `PROJECT_ID.intrepid_analytics` TO "serviceAccount:promptify-worker@PROJECT_ID.iam.gserviceaccount.com";
+GRANT `roles/bigquery.dataEditor` ON SCHEMA `PROJECT_ID.intrepid_knowledge` TO "serviceAccount:promptify-worker@PROJECT_ID.iam.gserviceaccount.com";

@@ -1,0 +1,631 @@
+[
+  {
+    "order": 1,
+    "ui_id": "UI-00",
+    "name": "Public Landing",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "PARTIAL",
+    "html_file": "html/01_UI-00_Public-Landing.html",
+    "screenshot_file": "screenshots/UI-00.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-00.html",
+    "reference_sha256": "5d8a8dd026aae50e4ad3052440ca1147cf935073b5341a9ae3ae9196aa089c38",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs; CSV-comment revision with preserved source bindings and content",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "comment_revision": "2026-10-08",
+    "original_html": "../ui-combined/html/01_UI-00_Public-Landing.html",
+    "sha256": "8840cf14ddf0048f09e7e9aef87a83faaac982c7f5576e3e1407abefdefcb7be",
+    "original_sha256": "42a7a2400aef43fc25c183632bb9d4dda3390f9dde87ffe3e006b8a615023742"
+  },
+  {
+    "order": 2,
+    "ui_id": "UI-01",
+    "name": "Enterprise Authentication",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "PARTIAL",
+    "html_file": "html/02_UI-01_Enterprise-Authentication.html",
+    "screenshot_file": "screenshots/UI-01.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-01.html",
+    "reference_sha256": "b086b4c294854bb2d0b1a9a26b0cd17ce83e1960649742397c9f70508de204b0",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs; CSV-comment revision with preserved source bindings and content",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "comment_revision": "2026-10-08",
+    "original_html": "../ui-combined/html/02_UI-01_Enterprise-Authentication.html",
+    "sha256": "aa4444da1ed213e64248180b03bdacc7a4df5a87d3fe954499cb2efe3b220b88",
+    "original_sha256": "b80bc67c38eacb81c6f77b6f159ede33d8a99afe50509dca24ad1bd98c38bc8a"
+  },
+  {
+    "order": 3,
+    "ui_id": "UI-02",
+    "name": "Profile Confirmation",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "NOT_FOUND",
+    "html_file": "html/03_UI-02_Profile-Confirmation.html",
+    "screenshot_file": "screenshots/UI-02.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-02.html",
+    "reference_sha256": "372bdbca2b5aca82ab66ebc2b3129846da75060b72f369f0378a95d2fcfa80aa",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "NOT_FOUND in current audit; prototype only",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/03_UI-02_Profile-Confirmation.html",
+    "sha256": "56b750341236efb8c1ec699c63aef71718494512797e43405fcff1a34e2eb980",
+    "original_sha256": "56b750341236efb8c1ec699c63aef71718494512797e43405fcff1a34e2eb980"
+  },
+  {
+    "order": 4,
+    "ui_id": "UI-03",
+    "name": "Access Denied",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "NOT_FOUND",
+    "html_file": "html/04_UI-03_Access-Denied.html",
+    "screenshot_file": "screenshots/UI-03.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-03.html",
+    "reference_sha256": "c724022499f680a9d3f2c5a4f7b837c2bfba6b8ac1fc4fb68439009ccdfead76",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "NOT_FOUND in current audit; prototype only",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/04_UI-03_Access-Denied.html",
+    "sha256": "2ea4edc9c7ed8ebfd51b99730262356b880d96c41ed6d8a4655008a808d600e3",
+    "original_sha256": "2ea4edc9c7ed8ebfd51b99730262356b880d96c41ed6d8a4655008a808d600e3"
+  },
+  {
+    "order": 5,
+    "ui_id": "UI-04",
+    "name": "Department Training Hub",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "BLOCKED",
+    "html_file": "html/05_UI-04_Department-Training-Hub.html",
+    "screenshot_file": "screenshots/UI-04.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-04.html",
+    "reference_sha256": "1892952c46f9c49a8f1ffe567e45e9759cf52f2eac105400c6d4aeb200928118",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/05_UI-04_Department-Training-Hub.html",
+    "sha256": "48734aefbd4b61652a93f6b7f509b39ff234a93d1c60d7da524f42673f06a126",
+    "original_sha256": "48734aefbd4b61652a93f6b7f509b39ff234a93d1c60d7da524f42673f06a126"
+  },
+  {
+    "order": 6,
+    "ui_id": "UI-05",
+    "name": "Consolidated Master Workspace",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "BLOCKED",
+    "html_file": "html/06_UI-05_Consolidated-Master-Workspace.html",
+    "screenshot_file": "screenshots/UI-05.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-05.html",
+    "reference_sha256": "3c82e68dd2ed995d5b14eb120dceaa576f2b1820ac8a4ed56bbf7dcd425fc886",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs; CSV-comment revision with preserved source bindings and content",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "Consolidated Master Workspace",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "comment_revision": "2026-10-08",
+    "original_html": "../ui-combined/html/06_UI-05_Consolidated-Master-Workspace.html",
+    "sha256": "595b44f7c588885ac6f38ad094bae1a0e502a9d16521c1231082fb2a493fc092",
+    "original_sha256": "91c23ac69afd33099e771b1b069d27ed7385a50916122d1da1fccd1e05f13ff8"
+  },
+  {
+    "order": 7,
+    "ui_id": "UI-06",
+    "name": "Prompt and Output Diff",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "BLOCKED",
+    "html_file": "html/07_UI-06_Prompt-and-Output-Diff.html",
+    "screenshot_file": "screenshots/UI-06.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-06.html",
+    "reference_sha256": "c8a009cb3ceafcfb97e8ec203a1280f0025a06ef7ff720f930b2c0e5c70ad933",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs; CSV-comment revision with preserved source bindings and content",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "comment_revision": "2026-10-08",
+    "original_html": "../ui-combined/html/07_UI-06_Prompt-and-Output-Diff.html",
+    "sha256": "a779e42f60036ba960da9ead20b40498c687873560a13774d33e7caa646c8e9a",
+    "original_sha256": "3fa6732c11c0ea5b1c78c52b9f14c3d8dde4249b1a6cfacfb3860063f1580a17"
+  },
+  {
+    "order": 8,
+    "ui_id": "UI-07",
+    "name": "AI Judge Scorecard",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "BLOCKED",
+    "html_file": "html/08_UI-07_AI-Judge-Scorecard.html",
+    "screenshot_file": "screenshots/UI-07.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-07.html",
+    "reference_sha256": "bd9d3759ab22f46eb6ab4f90213155b47e4ede4b9613f55ca5e1efaf53966265",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/08_UI-07_AI-Judge-Scorecard.html",
+    "sha256": "6007d796c1e9c81b1665746d03363fcf96250080d0d511faba34c8d91077179f",
+    "original_sha256": "6007d796c1e9c81b1665746d03363fcf96250080d0d511faba34c8d91077179f"
+  },
+  {
+    "order": 9,
+    "ui_id": "UI-08",
+    "name": "SOP Context Inspector",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "PARTIAL",
+    "html_file": "html/09_UI-08_SOP-Context-Inspector.html",
+    "screenshot_file": "screenshots/UI-08.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-08.html",
+    "reference_sha256": "1bba7ff4e4e6f6efbda2d9e1a6f8ccb26639b8e312f6c311e988a9e357e240ce",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/09_UI-08_SOP-Context-Inspector.html",
+    "sha256": "243a235acb335cc060583aec42670628ec95b1322be95208b011efa81101a07e",
+    "original_sha256": "243a235acb335cc060583aec42670628ec95b1322be95208b011efa81101a07e"
+  },
+  {
+    "order": 10,
+    "ui_id": "UI-09",
+    "name": "Workshop Command Center v1.1",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "BLOCKED",
+    "html_file": "html/10_UI-09_Workshop-Command-Center-v1-1.html",
+    "screenshot_file": "screenshots/UI-09.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-09.html",
+    "reference_sha256": "dbd06d3e5765c1c58c7a36243c2adf03ab467c6345c831343723da66540beee1",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs; CSV-comment revision with preserved source bindings and content",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "1.1",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "comment_revision": "2026-10-08",
+    "original_html": "../ui-combined/html/10_UI-09_Workshop-Command-Center-v1-1.html",
+    "sha256": "af0c9f9c2bb13d4a807300dae874b89931a51d74ba997f636e2d81953f948096",
+    "original_sha256": "2555c492806f7cdfc9bb83e8890a23bd4c314b6fb650655726746232940a6db1"
+  },
+  {
+    "order": 11,
+    "ui_id": "UI-10",
+    "name": "Learner Detail Inspector",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "PARTIAL",
+    "html_file": "html/11_UI-10_Learner-Detail-Inspector.html",
+    "screenshot_file": "screenshots/UI-10.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-10.html",
+    "reference_sha256": "7d1f99231c1d8d187cab7e98bc01ab1955b95c2d90fbe643ea9af46eaf4d1364",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/11_UI-10_Learner-Detail-Inspector.html",
+    "sha256": "0352f928e97e2ff2002e221137fbdc4e71f1ae8d451e4d45315dcafbb8c8d21e",
+    "original_sha256": "0352f928e97e2ff2002e221137fbdc4e71f1ae8d451e4d45315dcafbb8c8d21e"
+  },
+  {
+    "order": 12,
+    "ui_id": "UI-11",
+    "name": "Curriculum and SOP Mapping Studio v1.2",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "BLOCKED",
+    "html_file": "html/12_UI-11_Curriculum-and-SOP-Mapping-Studio-v1-2.html",
+    "screenshot_file": "screenshots/UI-11.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-11.html",
+    "reference_sha256": "ada80368beb087fc035ef07748060846b56e62e8c73789a1b7765aaff8ec3085",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "Existing product feature adapted to mockup logic",
+    "reference_version": "1.2",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/12_UI-11_Curriculum-and-SOP-Mapping-Studio-v1-2.html",
+    "sha256": "3a325dd1b8425c687e51cd9b000cf050b819f335d93a44be24d9d0240395803d",
+    "original_sha256": "3a325dd1b8425c687e51cd9b000cf050b819f335d93a44be24d9d0240395803d"
+  },
+  {
+    "order": 13,
+    "ui_id": "UI-12",
+    "name": "L&D Impact Dashboard",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "NOT_FOUND",
+    "html_file": "html/13_UI-12_L-D-Impact-Dashboard.html",
+    "screenshot_file": "screenshots/UI-12.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-12.html",
+    "reference_sha256": "07dda429539536427669ee71ac86836aef3b7ed2505dd1e7eb928305cc6d6b34",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "NOT_FOUND in current audit; prototype only",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/13_UI-12_L-D-Impact-Dashboard.html",
+    "sha256": "b86e27ef95f02824d83cdbfda94c7aac9b15d066cc210d95a6f755841e51dbe0",
+    "original_sha256": "b86e27ef95f02824d83cdbfda94c7aac9b15d066cc210d95a6f755841e51dbe0"
+  },
+  {
+    "order": 14,
+    "ui_id": "UI-13",
+    "name": "Department SOP Upload",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "NOT_FOUND",
+    "html_file": "html/14_UI-13_Department-SOP-Upload.html",
+    "screenshot_file": "screenshots/UI-13.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-13.html",
+    "reference_sha256": "889aa963beee3f58582809a1ebd50c3c2cd1ec0f553f30389b6e3f50f6de2614",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "NOT_FOUND in current audit; prototype only",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/14_UI-13_Department-SOP-Upload.html",
+    "sha256": "42397723f76ec8a46cfc4ad6c9fd7c755fce2b30c83121e378a45f2f5daac499",
+    "original_sha256": "42397723f76ec8a46cfc4ad6c9fd7c755fce2b30c83121e378a45f2f5daac499"
+  },
+  {
+    "order": 15,
+    "ui_id": "UI-14",
+    "name": "System Governance",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "NOT_FOUND",
+    "html_file": "html/15_UI-14_System-Governance.html",
+    "screenshot_file": "screenshots/UI-14.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-14.html",
+    "reference_sha256": "dc19e3862939d83c65e1ea9653c25911d2884b47c29bab33fcb70ce62acf2dbb",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "NOT_FOUND in current audit; prototype only",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/15_UI-14_System-Governance.html",
+    "sha256": "dd2d8c9d4cc8d022b0b36bc4a31a59d68598ef88e2dc3bd4f4c6f20c9d0b53e8",
+    "original_sha256": "dd2d8c9d4cc8d022b0b36bc4a31a59d68598ef88e2dc3bd4f4c6f20c9d0b53e8"
+  },
+  {
+    "order": 16,
+    "ui_id": "UI-15",
+    "name": "Roster Sync",
+    "status": "DESIGN_PROPOSAL",
+    "original_audit_status": "NOT_FOUND",
+    "html_file": "html/16_UI-15_Roster-Sync.html",
+    "screenshot_file": "screenshots/UI-15.png",
+    "reference_file": "docs/UI Mockup-20261006T140854Z-1-001/UI Mockup/UI-15.html",
+    "reference_sha256": "891aa58cc160829d7ec5ecd1b581c3e270af80af1c03fe671daaf09cedc664f9",
+    "wording_source": "Reference HTML verbatim; no current-product copy substituted",
+    "interaction_source": "Reference state, conditions and event expressions rendered by React; placeholder alerts upgraded to local navigation/dialogs",
+    "theme_source": "Current deployed CSS and green Promptify logo; current surface palette, fonts and Lucide icons",
+    "baseline_commit": "bf1d194d67524683776606095fe13fa338252c12",
+    "reused_components": [
+      "PromptifyMark",
+      "Current typography, tokens and shared primitives"
+    ],
+    "capture_method": "Reference template ported to React with current styling, guardrail validation and isolated simulated state",
+    "language_support": [
+      "en",
+      "vi"
+    ],
+    "guardrail_version": "1.0.0",
+    "data_mode": "Local prototype; no AI/SSO/DB/Drive/Sheets requests",
+    "runtime_verified": true,
+    "approved_exceptions": [
+      "React and existing Lucide instead of Alpine/Material Symbols",
+      "Current green brand instead of blue primary",
+      "Self-contained offline HTML instead of CDN"
+    ],
+    "production_implementation_status": "NOT_FOUND in current audit; prototype only",
+    "reference_version": "original",
+    "exact_existing_component": false,
+    "screenshot_capture_state": "1440x1024, light, prefers-reduced-motion; reference content and interactions rendered in React, current green theme; default reference state",
+    "original_html": "../ui-combined/html/16_UI-15_Roster-Sync.html",
+    "sha256": "b3d7c09d2a09b20d8496ce1ed326a0bbdb07da0f3d40f996f2039d2788f545d8",
+    "original_sha256": "b3d7c09d2a09b20d8496ce1ed326a0bbdb07da0f3d40f996f2039d2788f545d8"
+  }
+]

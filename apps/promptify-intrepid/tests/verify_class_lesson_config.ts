@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {resolveClassLesson} from '../src/services/classLessonConfigService';
+import {codelabAvailable} from '../src/services/codelabLifecycleService';
+const base={id:'shared',title:'Course title',scenario:'Base scenario',system_instruction:'Base system',sample_input_context:'Base evidence',status:'draft',improved_prompt:'Private solution'};
+const a={state:'ACTIVE',lessonOverrides:{title:'Class A',scenario:'A scenario',sample_input_context:'A evidence',status:'published',improved_prompt:'Injected solution',id:'injected'}};
+const resolved=resolveClassLesson(base,a);
+assert.equal(resolved.title,'Class A');assert.equal(resolved.sample_input_context,'A evidence');
+assert.equal(resolved.improved_prompt,'Private solution');assert.equal(resolved.id,'shared');
+assert.equal(codelabAvailable(resolved.status,a),true);
+assert.equal(codelabAvailable(resolveClassLesson(base,null).status,null),false,'Other class cannot inherit publication');
+assert.equal(base.title,'Course title');assert.equal(base.status,'draft','Resolver never mutates course template');
+assert.equal(resolveClassLesson(base,{lessonOverrides:{system_instruction:null}}).system_instruction,null,'Explicit null does not resurrect old system instruction');
+assert.equal(resolveClassLesson(base,{state:'ACTIVE'}).title,'Course title','Legacy config falls back to current template');
+assert.deepEqual(resolveClassLesson(base,{lessonOverrides:[]}),base);
+console.log('PASS class-local lesson resolution: lifecycle, isolation, legacy and protected field contracts');

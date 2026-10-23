@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ 
+    lang: 'en',
+    activeLabId: 'LAB-BS-03',
+    selectedCohort: 'Intrepid Cohort 04 - Oct 2026',
+    sessionTimeRemaining: '64:12', // 100-min countdown
+    isBroadcasting: false,
+    broadcastSuccess: false,
+    selectedLearner: null,
+    inspectorModalOpen: false,
+    
+    // Cohorts List
+    cohorts: [
+        'Intrepid Cohort 04 - Oct 2026',
+        'Agribank Batch 01 - Nov 2026',
+        'Vietnam Airlines Batch 01 - Nov 2026'
+    ],
+
+    // 5-Technique Codelabs Heatmap Overview
+    codelabs: [
+        { id: 'LAB-BS-01', title: 'Lab 01: Zero-shot Prompting & SOP Audit', status: 'completed', passRate: '98%', stuckCount: 0, avgAttempts: 1.2 },
+        { id: 'LAB-BS-02', title: 'Lab 02: Structured Output (Markdown/JSON)', status: 'completed', passRate: '92%', stuckCount: 0, avgAttempts: 1.8 },
+        { id: 'LAB-BS-03', title: 'Lab 03: One-shot Brand Voice & Classification', status: 'active', passRate: '68%', stuckCount: 3, avgAttempts: 4.2 },
+        { id: 'LAB-BS-04', title: 'Lab 04: Few-shot System Instructions & Variables', status: 'upcoming', passRate: '0%', stuckCount: 0, avgAttempts: 0 },
+        { id: 'LAB-BS-05', title: 'Lab 05: Grounding & Anti-Hallucination Guardrails', status: 'upcoming', passRate: '0%', stuckCount: 0, avgAttempts: 0 }
+    ],
+
+    // Active Learners Matrix (Live Cohort Telemetry)
+    learners: [
+        { id: 'LRN-101', name: 'Linh Phạm', email: 'linh.pham@intrepid.asia', dept: 'Brand Solutions', currentLab: 'LAB-BS-03', attempts: 5, score: 6.5, status: 'stuck', lastRun: '12s ago', verbatim: 'Act as Campaign Ops Lead. Classify ticket #842...' },
+        { id: 'LRN-102', name: 'Được Võ', email: 'duoc.vo@intrepid.asia', dept: 'Customer Support', currentLab: 'LAB-BS-03', attempts: 6, score: 5.8, status: 'stuck', lastRun: '45s ago', verbatim: 'Classify ticket SLA and give response window...' },
+        { id: 'LRN-103', name: 'Hoàng Nam', email: 'nam.hoang@intrepid.asia', dept: 'Store Operations', currentLab: 'LAB-BS-03', attempts: 5, score: 7.2, status: 'stuck', lastRun: '1m ago', verbatim: 'Review customer ticket using SLA SOP...' },
+        { id: 'LRN-104', name: 'Thảo Nguyễn', email: 'thao.nguyen@intrepid.asia', dept: 'Brand Solutions', currentLab: 'LAB-BS-03', attempts: 2, score: 8.8, status: 'passed', lastRun: '2m ago', verbatim: '[Role]: Act as Senior Campaign Ops Lead...' },
+        { id: 'LRN-105', name: 'Minh Trí', email: 'tri.minh@intrepid.asia', dept: 'Commercial & BD', currentLab: 'LAB-BS-03', attempts: 3, score: 8.2, status: 'passed', lastRun: '3m ago', verbatim: 'Strictly cite page numbers from SOP-Campaign-Ops-v4.pdf...' }
+    ],
+
+    // Real-Time LLM Telemetry Log Stream
+    telemetryLogs: [
+        { id: 'LOG-8902', time: '10:35:12 AM', learner: 'Linh Phạm', lab: 'LAB-BS-03', attempt: 'V5', model: 'Gemini 3.8 Flash', latency: '0.74s', score: 6.5, status: 'warning', issue: 'Missing exact page number citation in Markdown table' },
+        { id: 'LOG-8901', time: '10:34:50 AM', learner: 'Thảo Nguyễn', lab: 'LAB-BS-03', attempt: 'V2', model: 'Gemini 3.8 Pro (Judge)', latency: '1.20s', score: 8.8, status: 'success', issue: 'None - Passed SLA criteria' },
+        { id: 'LOG-8900', time: '10:34:10 AM', learner: 'Được Võ', lab: 'LAB-BS-03', attempt: 'V6', model: 'Gemini 3.8 Flash', latency: '0.81s', score: 5.8, status: 'warning', issue: 'One-shot example pattern missing in system instruction' }
+    ],
+
+    // Trigger Broadcast SLA Hint
+    sendGroupHint() {
+        this.isBroadcasting = true;
+        setTimeout(() => {
+            this.isBroadcasting = false;
+            this.broadcastSuccess = true;
+            setTimeout(() => this.broadcastSuccess = false, 3000);
+        }, 600);
+    },
+
+    // Navigation Helper to UI-11
+    navigateToStudio(labId) {
+        let targetLab = labId || this.activeLabId;
+        alert(`[Navigation Event] Transferring context to UI-11 (Curriculum & SOP Mapping Studio) for Lab ID: ${targetLab}...`);
+        window.location.href = `/trainer/curriculum?labId=${targetLab}`;
+    }
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify - Real-Time Workshop Command Center (UI-09)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN for Micro-Interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'on-primary': '#FFFFFF',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1',
+                            error: '#BA1A1A',
+                            'error-container': '#FFDAD6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+    <!-- ================================================================= -->
+    <!-- TOP COMMAND CENTER NAVIGATION BAR -->
+    <!-- ================================================================= -->
+    <header class="sticky top-0 z-30 bg-slate-900 text-white border-b border-slate-800 px-4 lg:px-8 py-3 transition-all">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Brand & Live Workshop Context -->
+            <div class="flex items-center gap-3">
+                <a href="/trainer/dashboard" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-2xl bg-m3-primary text-white flex items-center justify-center font-bold text-lg shadow-md">
+                        P
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-base tracking-tight text-white">Workshop Command Center</span>
+                        <span class="text-[10px] font-mono text-emerald-400 font-bold flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span>LIVE MASTERCLASS MONITORING</span>
+                        </span>
+                    </div>
+                </a>
+
+                <div class="h-6 w-px bg-slate-800 hidden sm:block"></div>
+
+                <!-- Active Cohort Selector -->
+                <div class="hidden lg:flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-xl border border-slate-700 text-xs text-slate-300 font-semibold">
+                    <span class="material-symbols-outlined text-m3-primary-container text-sm">groups</span>
+                    <select x-model="selectedCohort" class="bg-transparent text-white font-bold focus:outline-none cursor-pointer">
+                        <template x-for="c in cohorts" :key="c">
+                            <option :value="c" x-text="c" class="bg-slate-900 text-white"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Header Actions: Jump to UI-11 Curriculum Studio & Countdown Timer -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Countdown Timer (100-min workshop) -->
+                <div class="bg-slate-800 px-3.5 py-1.5 rounded-full border border-slate-700 flex items-center gap-2 font-mono text-xs text-slate-200">
+                    <span class="material-symbols-outlined text-amber-400 text-sm">timer</span>
+                    <span>Session Remaining: <strong class="text-white text-sm" x-text="sessionTimeRemaining"></strong></span>
+                </div>
+
+                <!-- Cross-Navigation CTA to UI-11 (Curriculum & SOP Studio) -->
+                <button @click="navigateToStudio(activeLabId)" 
+                        class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-bold shadow hover:bg-m3-primary/90 transition-all">
+                    <span class="material-symbols-outlined text-sm">tune</span>
+                    <span x-text="lang === 'en' ? 'Curriculum & SOP Studio (UI-11)' : 'Quản trị Codelab & SOP (UI-11)'"></span>
+                </button>
+
+                <!-- Language Toggle -->
+                <button @click="lang = lang === 'en' ? 'vi' : 'en'" 
+                        class="px-2.5 py-1 rounded-full border border-slate-700 bg-slate-800 text-xs font-medium text-slate-300 hover:bg-slate-700 transition-colors">
+                    <span x-text="lang.toUpperCase()"></span>
+                </button>
+
+                <!-- Trainer Avatar -->
+                <div class="flex items-center gap-2 pl-2 border-l border-slate-800">
+                    <div class="w-8 h-8 rounded-full bg-m3-primary text-white font-bold text-xs flex items-center justify-center">
+                        VD
+                    </div>
+                    <div class="hidden lg:block text-left text-xs">
+                        <p class="font-bold text-white">Vo Tu Duc</p>
+                        <p class="text-[10px] text-slate-400">Masterclass Facilitator</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- MAIN COMMAND CENTER DASHBOARD -->
+    <!-- ================================================================= -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+        
+        <!-- PRE-WORKSHOP / CONTEXTUAL EDIT BANNER LINKING TO UI-11 -->
+        <section class="bg-gradient-to-r from-slate-900 via-m3-on-primary-container to-slate-900 text-white rounded-3xl p-5 border border-slate-800 shadow-md flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-m3-primary/20 border border-m3-primary/40 text-m3-primary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">edit_note</span>
+                </div>
+                <div>
+                    <h2 class="font-bold text-sm text-white flex items-center gap-2">
+                        <span>Active Lab Context:</span>
+                        <span class="text-m3-primary-container font-mono text-xs bg-white/10 px-2 py-0.5 rounded" x-text="activeLabId"></span>
+                    </h2>
+                    <p class="text-xs text-slate-300">Need to modify prompt scaffolds, dynamic variables, SOP document links, or AI Judge rubric weights?</p>
+                </div>
+            </div>
+
+            <button @click="navigateToStudio(activeLabId)" 
+                    class="px-4 py-2 rounded-full bg-white text-slate-900 font-bold text-xs shadow hover:bg-slate-100 transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-m3-primary">settings_suggest</span>
+                <span>Open Lab Setup in Studio (UI-11)</span>
+            </button>
+        </section>
+
+        <!-- BROADCAST HINT SUCCESS TOAST -->
+        <template x-if="broadcastSuccess">
+            <div class="p-4 bg-emerald-50 text-emerald-950 rounded-2xl border border-emerald-300 text-xs font-bold flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-600 text-lg">check_circle</span>
+                    <span x-text="lang === 'en' ? 'SLA Hint scaffold broadcasted directly to all stuck learners in UI-05 workspace!' : 'Đã phát gợi ý SLA trực tiếp đến màn hình UI-05 của các học viên đang bị kẹt!'"></span>
+                </div>
+                <span class="font-mono text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">3 Learners Notified</span>
+            </div>
+        </template>
+
+        <!-- TOP METRIC KPI COUNTERS -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Enrolled Cohort Size</span>
+                    <span class="material-symbols-outlined text-m3-primary">groups</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface font-mono">46</span>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">100% Online</span>
+                </div>
+                <p class="text-[11px] text-m3-outline">Intrepid Brand Solutions Cohort 04</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Cohort Average Score</span>
+                    <span class="material-symbols-outlined text-purple-600">insights</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface font-mono">8.4 / 10</span>
+                    <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">+104% vs Pre</span>
+                </div>
+                <p class="text-[11px] text-m3-outline">AI Judge Evaluation Engine</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Flagged Stuck Learners</span>
+                    <span class="material-symbols-outlined text-amber-600">warning</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-amber-700 font-mono">3</span>
+                    <span class="text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">&gt; 5 Failed Runs</span>
+                </div>
+                <p class="text-[11px] text-m3-outline">Requires Facilitator SLA Hint</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>LLM Execution Rate</span>
+                    <span class="material-symbols-outlined text-emerald-600">bolt</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface font-mono">142</span>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Runs / min</span>
+                </div>
+                <p class="text-[11px] text-m3-outline">Gemini 3.8 Flash & Pro Routing</p>
+            </div>
+
+        </section>
+
+        <!-- 5-TECHNIQUE CODELAB HEATMAP MATRIX WITH CONTEXTUAL EDIT BUTTONS -->
+        <section class="bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-m3-outline-variant/60 pb-3">
+                <div>
+                    <h3 class="font-bold text-base text-m3-on-surface">5-Technique Masterclass Codelabs Heatmap</h3>
+                    <p class="text-xs text-m3-on-surface-variant">Real-time progression tracking across all 5 practical prompt engineering modules.</p>
+                </div>
+
+                <!-- Broadcast SLA Hint CTA -->
+                <button @click="sendGroupHint()" 
+                        :disabled="isBroadcasting"
+                        class="px-4 py-2 rounded-full bg-amber-600 text-white font-bold text-xs shadow hover:bg-amber-700 transition-all flex items-center gap-1.5 disabled:opacity-50">
+                    <span class="material-symbols-outlined text-sm" :class="{ 'animate-spin': isBroadcasting }">
+                        <span x-text="isBroadcasting ? 'progress_activity' : 'campaign'"></span>
+                    </span>
+                    <span x-text="isBroadcasting ? 'Broadcasting...' : 'Broadcast SLA Hint to 3 Stuck Learners'"></span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <template x-for="c in codelabs" :key="c.id">
+                    <div :class="c.id === activeLabId ? 'bg-blue-50/60 border-2 border-m3-primary shadow-sm' : 'bg-m3-surface border border-m3-outline-variant/70'"
+                         class="p-3.5 rounded-2xl space-y-2 text-xs flex flex-col justify-between">
+                        
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-[10px] font-bold px-2 py-0.2 rounded"
+                                      :class="c.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : (c.status === 'active' ? 'bg-blue-100 text-blue-900' : 'bg-slate-200 text-slate-700')"
+                                      x-text="c.status.toUpperCase()"></span>
+                                <span class="font-mono text-[10px] text-m3-outline" x-text="c.id"></span>
+                            </div>
+
+                            <p class="font-bold line-clamp-2 text-m3-on-surface" x-text="c.title"></p>
+                        </div>
+
+                        <div class="pt-2 border-t border-m3-outline-variant/40 space-y-2 text-[11px]">
+                            <div class="flex items-center justify-between text-m3-on-surface-variant font-mono">
+                                <span>Pass Rate:</span>
+                                <strong class="text-m3-primary" x-text="c.passRate"></strong>
+                            </div>
+
+                            <!-- Contextual Edit Button Linking to UI-11 for this Specific Lab -->
+                            <button @click="navigateToStudio(c.id)" 
+                                    class="w-full py-1 px-2 rounded-xl border border-m3-outline-variant bg-white text-m3-primary hover:bg-m3-primary hover:text-white font-bold text-[10px] transition-all flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[12px]">edit</span>
+                                <span>Edit Lab Setup (UI-11)</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+        </section>
+
+        <!-- STUCK LEARNERS MATRIX & TELEMETRY STREAM (2-COLUMN GRID) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- LEFT: FLAGGED LEARNERS MATRIX (7 cols) -->
+            <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-base text-m3-on-surface">Flagged Stuck Learners (Lab 03)</h3>
+                        <p class="text-xs text-m3-on-surface-variant">Learners exceeding 5 attempts without achieving AI Judge pass threshold (≥8.0/10).</p>
+                    </div>
+
+                    <span class="px-2.5 py-0.5 rounded-full font-bold text-xs bg-amber-100 text-amber-900 border border-amber-300">
+                        3 Interventions Needed
+                    </span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-m3-surface-container-low font-bold text-m3-on-surface border-b border-m3-outline-variant">
+                                <th class="p-3">Learner Name</th>
+                                <th class="p-3">Department</th>
+                                <th class="p-3">Attempts</th>
+                                <th class="p-3">AI Score</th>
+                                <th class="p-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-m3-outline-variant/60 font-mono text-[11px]">
+                            <template x-for="l in learners" :key="l.id">
+                                <tr class="hover:bg-m3-surface transition-colors" :class="{ 'bg-amber-50/50': l.status === 'stuck' }">
+                                    <td class="p-3 font-sans font-bold text-m3-on-surface">
+                                        <p x-text="l.name"></p>
+                                        <p class="text-[10px] text-m3-outline font-mono" x-text="l.email"></p>
+                                    </td>
+                                    <td class="p-3 font-sans text-m3-on-surface-variant" x-text="l.dept"></td>
+                                    <td class="p-3 font-bold" :class="l.attempts >= 5 ? 'text-amber-800' : 'text-slate-700'" x-text="`${l.attempts} runs`"></td>
+                                    <td class="p-3 font-bold" :class="l.score >= 8.0 ? 'text-emerald-700' : 'text-amber-800'" x-text="`${l.score} / 10`"></td>
+                                    <td class="p-3 font-sans">
+                                        <button @click="
+                                            selectedLearner = l;
+                                            inspectorModalOpen = true;
+                                        " class="px-3 py-1 rounded-full bg-m3-primary text-white font-bold text-[10px] shadow hover:bg-m3-primary/90 transition-all">
+                                            Inspect Syntax (UI-10)
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RIGHT: LIVE LLM TELEMETRY LOG STREAM (5 cols) -->
+            <div class="lg:col-span-5 bg-slate-900 text-white p-5 rounded-3xl border border-slate-800 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <span class="text-xs font-bold uppercase tracking-wider text-m3-primary-container flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm text-emerald-400">receipt_long</span>
+                        <span>Live LLM Execution Telemetry</span>
+                    </span>
+                    <span class="text-[10px] font-mono text-emerald-400 animate-pulse">STREAMING</span>
+                </div>
+
+                <div class="space-y-2.5 font-mono text-[11px] max-h-96 overflow-y-auto">
+                    <template x-for="log in telemetryLogs" :key="log.id">
+                        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                            <div class="flex items-center justify-between text-[10px]">
+                                <span class="text-m3-primary-container font-bold" x-text="`${log.learner} (${log.attempt})`"></span>
+                                <span class="text-slate-400" x-text="log.time"></span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] text-slate-300">
+                                <span x-text="log.model"></span>
+                                <span class="font-bold" :class="log.score >= 8.0 ? 'text-emerald-400' : 'text-amber-400'" x-text="`Score: ${log.score}`"></span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight font-sans" x-text="`Diagnostic: ${log.issue}`"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- MODAL: LEARNER PROMPT INSPECTOR (UI-10 INTEGRATION) -->
+    <!-- ================================================================= -->
+    <div x-show="inspectorModalOpen" 
+         x-transition.opacity
+         class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" 
+         style="display: none;">
+        
+        <template x-if="selectedLearner">
+            <div @click.away="inspectorModalOpen = false" 
+                 class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-m3-outline-variant p-6 space-y-4">
+                
+                <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                    <div class="flex items-center gap-2 text-m3-primary">
+                        <span class="material-symbols-outlined text-2xl">troubleshoot</span>
+                        <div>
+                            <h3 class="font-extrabold text-base text-m3-on-surface" x-text="`Prompt Inspector: ${selectedLearner.name}`"></h3>
+                            <p class="text-[10px] font-mono text-m3-outline" x-text="`${selectedLearner.dept} • Attempt ${selectedLearner.attempts}`"></p>
+                        </div>
+                    </div>
+                    <button @click="inspectorModalOpen = false" class="text-m3-outline hover:text-m3-on-surface">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <span class="font-bold text-m3-on-surface block mb-1">Verbatim Student Prompt (Attempt V5):</span>
+                        <div class="p-3 bg-m3-surface-container-low rounded-2xl border border-m3-outline-variant font-mono text-xs text-m3-on-surface select-all" x-text="selectedLearner.verbatim"></div>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-950 space-y-1">
+                        <span class="font-bold block">AI Judge Diagnostic Feedback:</span>
+                        <p class="text-[11px] leading-relaxed">Failed Groundedness Criterion (SOP Citation weight: 30%). Prompt omitted explicit page number citations from SOP-Campaign-Ops-v4.pdf.</p>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-m3-outline-variant flex items-center justify-between text-xs">
+                    <button @click="navigateToStudio(selectedLearner.currentLab)" class="text-m3-primary font-bold hover:underline">
+                        Edit Rubric Weights in UI-11 →
+                    </button>
+
+                    <div class="flex items-center gap-2">
+                        <button @click="
+                            alert(`Pushing custom scaffolded hint to ${selectedLearner.name}'s workspace...`);
+                            inspectorModalOpen = false;
+                        " class="px-4 py-2 rounded-full bg-m3-primary text-white font-bold shadow">Push Custom Hint</button>
+                    </div>
+                </div>
+
+            </div>
+        </template>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================================= -->
+    <footer class="py-6 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-12">
+        <p>© 2026 Promptify x Intrepid Asia. Workshop Command Center Active.</p>
+    </footer>
+
+</body>
+</html>

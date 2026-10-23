@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {parseRoster} from '../src/services/googleRosterService';
+const mapping = {tab:'Roster',range:'A1:D500',email:'Email',fullName:'Full Name',department:'Department',country:'Country'};
+const headers = ['Email','Full Name','Department','Country'];
+const rows = parseRoster([headers,['A@example.com','Alice User','Finance','Vietnam'],['b@example.com','Bob User','Tech','Vietnam']],mapping,'Finance');
+assert.equal(rows.length,1); assert.equal(rows[0].email,'a@example.com');
+assert.throws(()=>parseRoster([['ID','Email','Country','Department'],['1','a@example.com','Vietnam','Finance']],mapping,'Finance'),/fullName/);
+assert.throws(()=>parseRoster([headers,['a@example.com','Alice','Finance','Vietnam'],['A@example.com','Alice','Finance','Vietnam']],mapping,'Finance'),/duplicate/);
+assert.throws(()=>parseRoster([headers,['a@example.com','','Finance','Vietnam']],mapping,'Finance'),/invalid/);
+assert.throws(()=>parseRoster([headers,['a@example.com','Alice','Tech','Vietnam']],mapping,'Finance'),/1 to 500/);
+const noName = parseRoster([['ID','Email','Country','Department'],['1','a@example.com','Vietnam','Finance']],{...mapping,fullName:''},'Finance');
+assert.equal(noName[0].fullName,'','Missing name must be entered during profile confirmation, not inferred from email');
+console.log('Roster header, required field, duplicate and department scope checks passed; optional missing names remain blank for Google profile confirmation. No live calls.');

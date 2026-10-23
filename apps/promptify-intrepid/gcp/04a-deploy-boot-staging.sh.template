@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# HUMAN EXECUTION ONLY. This is an independent infrastructure smoke deployment.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY. Fresh private boot staging; no SQL, source credentials, import or traffic cutover.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='PROJECT_ID'
+region='REGION'
+service='promptify-intrepid-api-boot-staging'
+account="promptify-staging-boot@${project}.iam.gserviceaccount.com"
+: "${STAGING_IMAGE_DIGEST:?Set the reviewed Artifact Registry image URI pinned with @sha256:}"
+[[ "$STAGING_IMAGE_DIGEST" == "${region}-docker.pkg.dev/${project}/promptify-intrepid/app@sha256:"* ]] || { echo 'Use a reviewed digest in this project repository'; exit 2; }
+[[ "$STAGING_IMAGE_DIGEST" =~ @sha256:[0-9a-f]{64}$ ]] || { echo 'Image digest must contain exactly 64 lowercase hex characters'; exit 2; }
+# User must have created the dedicated unprivileged runtime account first.
+gcloud iam service-accounts describe "$account" --project="$project" >/dev/null
+# Never update an existing service that might carry a database attachment or writer credentials.
+existing=$(gcloud run services list --project="$project" --region="$region" --format='value(metadata.name)')
+if grep -Fxq "$service" <<< "$existing"; then echo 'Boot service already exists: review its revision/config manually before updating.'; exit 2; fi
+gcloud run deploy "$service" --project="$project" --region="$region" --image="$STAGING_IMAGE_DIGEST" --service-account="$account" --no-allow-unauthenticated --port=8080 --cpu=1 --memory=512Mi --min-instances=0 --max-instances=1 --concurrency=20 --timeout=60 --set-env-vars="RUNTIME_MODE=api,GOOGLE_CLOUD_PROJECT=${project}"
+echo 'Expected /healthz=200, /readyz=503 until a separate SQL staging revision is configured.'
+echo 'Grant only your reviewer principal run.invoker for this private service. Do not switch Hosting or start schedules.'

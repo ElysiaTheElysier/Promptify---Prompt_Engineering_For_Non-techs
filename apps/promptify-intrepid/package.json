@@ -1,0 +1,76 @@
+{
+  "name": "promptify-intrepid",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "npm run check:architecture",
+    "check:architecture": "node scripts/check_architecture.mjs && depcruise src api --config .dependency-cruiser.cjs",
+    "test": "node scripts/run_offline_tests.mjs",
+    "test:boundaries": "node tests/architecture_guards.mjs",
+    "audit:unused": "knip --no-progress",
+    "test:smoke": "node scripts/dev_smoke.mjs",
+    "build:debug": "tsc && vite build --sourcemap",
+    "test:preview": "node scripts/preview_smoke.mjs",
+    "start:cloud": "node --import tsx api/cloud-run.ts",
+    "test:cloud": "node node_modules/tsx/dist/cli.mjs tests/verify_cloud_migration.ts",
+    "gcp:render": "node scripts/render_gcp_config.mjs",
+    "gcp:verify": "node scripts/verify_gcp_bundle.mjs",
+    "test:firestore": "firebase emulators:exec --project demo-intrepid --config firebase.emulators.json --only firestore \"node node_modules/tsx/dist/cli.mjs tests/verify_firestore_rules.ts\"",
+    "review:staging": "node scripts/prepare_staging_review.mjs",
+    "review:staging:check": "node scripts/prepare_staging_review.mjs --check",
+    "dev:staging": "vite --mode staging --host 127.0.0.1 --port 5195 --strictPort"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.27.20",
+    "@google-cloud/bigquery": "^9.2.0",
+    "@google-cloud/firestore": "^9.3.1",
+    "@google-cloud/storage": "^8.4.0",
+    "@pdf-lib/fontkit": "^1.1.1",
+    "@supabase/supabase-js": "^2.116.0",
+    "exceljs": "^4.4.0",
+    "firebase": "^13.0.0",
+    "firebase-admin": "^14.5.0",
+    "google-auth-library": "^11.2.0",
+    "lucide-react": "^1.16.0",
+    "mammoth": "^1.13.0",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.23.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsx": "^4.23.15"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "11.1.1"
+    },
+    "postcss-selector-parser": "7.1.6",
+    "@grpc/grpc-js": "1.14.6"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.9",
+    "@electric-sql/pglite-pgvector": "^0.0.10",
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@types/node": "^26.6.2",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "dependency-cruiser": "18.6.0",
+    "firebase-tools": "^15.33.0",
+    "knip": "6.41.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  }
+}

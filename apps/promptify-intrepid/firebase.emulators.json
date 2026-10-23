@@ -1,0 +1,20 @@
+{
+  "firestore": {
+    "rules": "gcp/firestore.rules",
+    "indexes": "gcp/firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8085
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true,
+    "auth": {
+      "host": "127.0.0.1",
+      "port": 9099
+    }
+  }
+}

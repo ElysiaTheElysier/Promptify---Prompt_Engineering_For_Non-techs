@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {extractSop,chunkSop} from '../src/services/sopIngestionService';
+const source='Approved service window: 15 minutes.\nEvidence: contract A.';
+const text=await extractSop(Buffer.from(source),'source.md');
+assert.equal(text.content,source);assert.equal(text.chunks.length,1);assert.equal(text.metadata.type,'MD');assert.equal(text.metadata.sha256.length,64);
+assert.equal(chunkSop([{page:4,text:'A'.repeat(4000)}])[0].page,4);
+assert.throws(()=>chunkSop([{page:null,text:''}]));
+await assert.rejects(()=>extractSop(Buffer.from('<script>bad</script>'),'source.html'));
+await assert.rejects(()=>extractSop(Buffer.from('invalid'),'source.pdf'));
+const ExcelJS=await import('exceljs');const workbook=new ExcelJS.default.Workbook();workbook.addWorksheet('SLA').addRow(['Priority','15 minutes']);
+const xlsx=await extractSop(Buffer.from(await workbook.xlsx.writeBuffer()),'source.xlsx');assert.match(xlsx.content,/15 minutes/);assert.match(xlsx.content,/Sheet: SLA/);
+console.log('SOP extraction passed: source preservation, page-aware chunks, invalid/empty input rejection and XLSX cell extraction. No live provider calls.');

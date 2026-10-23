@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Default --validate/--dry-run mode stops before any cloud/database call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/gcp/SETUP_GUIDE.md before user execution.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='PROJECT_ID'
+region='REGION'
+# USER EXECUTION ONLY. Firebase values are public app configuration, not server secrets.
+: "${FIREBASE_API_KEY:?Set public Firebase Web App apiKey}"
+: "${FIREBASE_AUTH_DOMAIN:?Set public Firebase Web App authDomain}"
+: "${FIREBASE_APP_ID:?Set public Firebase Web App appId}"
+gcloud builds submit . --config=gcp/cloudbuild.yaml --project="$project" --service-account="projects/${project}/serviceAccounts/promptify-build@${project}.iam.gserviceaccount.com" --gcs-source-staging-dir="gs://${project}-intrepid-build-staging/source" --substitutions="_REGION=${region},_TAG=staging,_FIREBASE_API_KEY=${FIREBASE_API_KEY},_FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN},_FIREBASE_APP_ID=${FIREBASE_APP_ID}"
+gcloud run services replace outputs/gcp/cloudrun-api.yaml --region="$region" --project="$project"
+gcloud run services replace outputs/gcp/cloudrun-worker.yaml --region="$region" --project="$project"
+# Public transport for Firebase end-user tokens; app still checks identity and SQL permissions.
+gcloud run services add-iam-policy-binding promptify-intrepid-api --member=allUsers --role=roles/run.invoker --region="$region" --project="$project"
+# Worker stays PRIVATE and also verifies OIDC audience + scheduler identity in code.
+gcloud run services add-iam-policy-binding promptify-intrepid-worker --member="serviceAccount:promptify-scheduler@${project}.iam.gserviceaccount.com" --role=roles/run.invoker --region="$region" --project="$project"
+worker_url=$(gcloud run services describe promptify-intrepid-worker --region="$region" --project="$project" --format='value(status.url)')
+gcloud run services update promptify-intrepid-worker --update-env-vars="WORKER_AUDIENCE=${worker_url}" --region="$region" --project="$project"
+echo "Worker URL: $worker_url"
+echo 'No schedules or source cutover created. Verify runtime role/password, /readyz, Firebase login and authorized API before continuing.'

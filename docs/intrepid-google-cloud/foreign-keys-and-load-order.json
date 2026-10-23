@@ -1,0 +1,656 @@
+{
+  "edges": [
+    {
+      "child": "classes",
+      "parent": "clients",
+      "constraint": "classes_client_id_fkey",
+      "definition": "FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE RESTRICT"
+    },
+    {
+      "child": "classes",
+      "parent": "courses",
+      "constraint": "classes_course_id_fkey",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT"
+    },
+    {
+      "child": "course_instructors",
+      "parent": "courses",
+      "constraint": "course_instructors_course_id_fkey",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "course_instructors",
+      "parent": "users",
+      "constraint": "course_instructors_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "course_modules",
+      "parent": "courses",
+      "constraint": "course_modules_course_id_fkey",
+      "definition": "FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "courses",
+      "parent": "users",
+      "constraint": "courses_created_by_fkey",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL"
+    },
+    {
+      "child": "enrollments",
+      "parent": "classes",
+      "constraint": "enrollments_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "enrollments",
+      "parent": "learners",
+      "constraint": "enrollments_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "gcp_identity_bindings",
+      "parent": "users",
+      "constraint": "gcp_identity_bindings_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "learners",
+      "parent": "users",
+      "constraint": "learners_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "classes",
+      "constraint": "lesson_progress_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "prompt_attempts",
+      "constraint": "lesson_progress_last_attempt_id_fkey",
+      "definition": "FOREIGN KEY (last_attempt_id) REFERENCES prompt_attempts(id) ON DELETE SET NULL"
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "learners",
+      "constraint": "lesson_progress_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "lesson_progress",
+      "parent": "lessons",
+      "constraint": "lesson_progress_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "lesson_resources",
+      "parent": "lessons",
+      "constraint": "lesson_resources_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "lesson_rubric_criteria",
+      "parent": "lessons",
+      "constraint": "lesson_rubric_criteria_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "lessons",
+      "parent": "course_modules",
+      "constraint": "lessons_module_id_fkey",
+      "definition": "FOREIGN KEY (module_id) REFERENCES course_modules(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "product_attendance",
+      "parent": "classes",
+      "constraint": "product_attendance_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_attendance",
+      "parent": "learners",
+      "constraint": "product_attendance_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id)"
+    },
+    {
+      "child": "product_attendance",
+      "parent": "lessons",
+      "constraint": "product_attendance_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_attendance",
+      "parent": "users",
+      "constraint": "product_attendance_recorded_by_fkey",
+      "definition": "FOREIGN KEY (recorded_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_audit",
+      "parent": "users",
+      "constraint": "product_audit_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_audit",
+      "parent": "classes",
+      "constraint": "product_audit_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_awards",
+      "parent": "classes",
+      "constraint": "product_awards_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_awards",
+      "parent": "learners",
+      "constraint": "product_awards_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id)"
+    },
+    {
+      "child": "product_awards",
+      "parent": "lessons",
+      "constraint": "product_awards_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_class_grants",
+      "parent": "classes",
+      "constraint": "product_class_grants_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_class_grants",
+      "parent": "users",
+      "constraint": "product_class_grants_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_domains",
+      "parent": "clients",
+      "constraint": "product_domains_client_id_fkey",
+      "definition": "FOREIGN KEY (client_id) REFERENCES clients(id)"
+    },
+    {
+      "child": "product_domains",
+      "parent": "users",
+      "constraint": "product_domains_updated_by_fkey",
+      "definition": "FOREIGN KEY (updated_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_governance_config",
+      "parent": "users",
+      "constraint": "product_governance_config_updated_by_fkey",
+      "definition": "FOREIGN KEY (updated_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_learner_context",
+      "parent": "classes",
+      "constraint": "product_learner_context_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_learner_context",
+      "parent": "lessons",
+      "constraint": "product_learner_context_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_learner_context",
+      "parent": "users",
+      "constraint": "product_learner_context_owner_id_fkey",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_learner_support",
+      "parent": "classes",
+      "constraint": "product_learner_support_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_learner_support",
+      "parent": "learners",
+      "constraint": "product_learner_support_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id)"
+    },
+    {
+      "child": "product_learner_support",
+      "parent": "lessons",
+      "constraint": "product_learner_support_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_profile_corrections",
+      "parent": "users",
+      "constraint": "product_profile_corrections_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_prompt_drafts",
+      "parent": "classes",
+      "constraint": "product_prompt_drafts_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_prompt_drafts",
+      "parent": "lessons",
+      "constraint": "product_prompt_drafts_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_prompt_drafts",
+      "parent": "users",
+      "constraint": "product_prompt_drafts_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "prompt_attempts",
+      "constraint": "product_prompt_library_attempt_id_fkey",
+      "definition": "FOREIGN KEY (attempt_id) REFERENCES prompt_attempts(id)"
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "classes",
+      "constraint": "product_prompt_library_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "lessons",
+      "constraint": "product_prompt_library_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "users",
+      "constraint": "product_prompt_library_owner_id_fkey",
+      "definition": "FOREIGN KEY (owner_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_prompt_library",
+      "parent": "users",
+      "constraint": "product_prompt_library_reviewed_by_fkey",
+      "definition": "FOREIGN KEY (reviewed_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_request_budgets",
+      "parent": "users",
+      "constraint": "product_request_budgets_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_roster_profiles",
+      "parent": "classes",
+      "constraint": "product_roster_profiles_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_roster_profiles",
+      "parent": "users",
+      "constraint": "product_roster_profiles_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_rotation_approvals",
+      "parent": "product_rotation_requests",
+      "constraint": "product_rotation_approvals_request_id_fkey",
+      "definition": "FOREIGN KEY (request_id) REFERENCES product_rotation_requests(id)"
+    },
+    {
+      "child": "product_rotation_approvals",
+      "parent": "users",
+      "constraint": "product_rotation_approvals_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_rotation_requests",
+      "parent": "classes",
+      "constraint": "product_rotation_requests_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_rotation_requests",
+      "parent": "users",
+      "constraint": "product_rotation_requests_requested_by_fkey",
+      "definition": "FOREIGN KEY (requested_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sandbox_runs",
+      "parent": "users",
+      "constraint": "product_sandbox_runs_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sandbox_runs",
+      "parent": "classes",
+      "constraint": "product_sandbox_runs_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_sandbox_runs",
+      "parent": "lessons",
+      "constraint": "product_sandbox_runs_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_session_controls",
+      "parent": "classes",
+      "constraint": "product_session_controls_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_session_controls",
+      "parent": "users",
+      "constraint": "product_session_controls_updated_by_fkey",
+      "definition": "FOREIGN KEY (updated_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sheet_connections",
+      "parent": "classes",
+      "constraint": "product_sheet_connections_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_sheet_connections",
+      "parent": "users",
+      "constraint": "product_sheet_connections_created_by_fkey",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sop_chunks",
+      "parent": "rebuild_sop_versions",
+      "constraint": "product_sop_chunks_version_id_fkey",
+      "definition": "FOREIGN KEY (version_id) REFERENCES rebuild_sop_versions(id)"
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "users",
+      "constraint": "product_sop_contributions_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "classes",
+      "constraint": "product_sop_contributions_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "rebuild_sop_documents",
+      "constraint": "product_sop_contributions_document_id_fkey",
+      "definition": "FOREIGN KEY (document_id) REFERENCES rebuild_sop_documents(id)"
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "lessons",
+      "constraint": "product_sop_contributions_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "users",
+      "constraint": "product_sop_contributions_reviewed_by_fkey",
+      "definition": "FOREIGN KEY (reviewed_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sop_contributions",
+      "parent": "rebuild_sop_versions",
+      "constraint": "product_sop_contributions_version_id_fkey",
+      "definition": "FOREIGN KEY (version_id) REFERENCES rebuild_sop_versions(id)"
+    },
+    {
+      "child": "product_studio",
+      "parent": "classes",
+      "constraint": "product_studio_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_studio",
+      "parent": "lessons",
+      "constraint": "product_studio_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "product_studio",
+      "parent": "users",
+      "constraint": "product_studio_updated_by_fkey",
+      "definition": "FOREIGN KEY (updated_by) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sync_logs",
+      "parent": "users",
+      "constraint": "product_sync_logs_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "product_sync_logs",
+      "parent": "classes",
+      "constraint": "product_sync_logs_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "product_sync_logs",
+      "parent": "product_sheet_connections",
+      "constraint": "product_sync_logs_connection_id_fkey",
+      "definition": "FOREIGN KEY (connection_id) REFERENCES product_sheet_connections(id)"
+    },
+    {
+      "child": "prompt_attempts",
+      "parent": "classes",
+      "constraint": "prompt_attempts_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "prompt_attempts",
+      "parent": "learners",
+      "constraint": "prompt_attempts_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "prompt_attempts",
+      "parent": "lessons",
+      "constraint": "prompt_attempts_lesson_ref_id_fkey",
+      "definition": "FOREIGN KEY (lesson_ref_id) REFERENCES lessons(id) ON DELETE SET NULL"
+    },
+    {
+      "child": "rebuild_judge_claims",
+      "parent": "prompt_attempts",
+      "constraint": "rebuild_judge_claims_attempt_id_fkey",
+      "definition": "FOREIGN KEY (attempt_id) REFERENCES prompt_attempts(id)"
+    },
+    {
+      "child": "rebuild_roster_imports",
+      "parent": "users",
+      "constraint": "rebuild_roster_imports_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "rebuild_roster_imports",
+      "parent": "classes",
+      "constraint": "rebuild_roster_imports_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "rebuild_runs",
+      "parent": "prompt_attempts",
+      "constraint": "rebuild_runs_attempt_id_fkey",
+      "definition": "FOREIGN KEY (attempt_id) REFERENCES prompt_attempts(id)"
+    },
+    {
+      "child": "rebuild_runs",
+      "parent": "classes",
+      "constraint": "rebuild_runs_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "rebuild_runs",
+      "parent": "lessons",
+      "constraint": "rebuild_runs_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "classes",
+      "constraint": "rebuild_sop_bindings_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "rebuild_sop_documents",
+      "constraint": "rebuild_sop_bindings_document_id_fkey",
+      "definition": "FOREIGN KEY (document_id) REFERENCES rebuild_sop_documents(id)"
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "lessons",
+      "constraint": "rebuild_sop_bindings_lesson_id_fkey",
+      "definition": "FOREIGN KEY (lesson_id) REFERENCES lessons(id)"
+    },
+    {
+      "child": "rebuild_sop_bindings",
+      "parent": "rebuild_sop_versions",
+      "constraint": "rebuild_sop_bindings_version_id_fkey",
+      "definition": "FOREIGN KEY (version_id) REFERENCES rebuild_sop_versions(id)"
+    },
+    {
+      "child": "rebuild_sop_documents",
+      "parent": "classes",
+      "constraint": "rebuild_sop_documents_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "rebuild_sop_documents",
+      "parent": "users",
+      "constraint": "rebuild_sop_documents_created_by_fkey",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id)"
+    },
+    {
+      "child": "rebuild_sop_versions",
+      "parent": "users",
+      "constraint": "rebuild_sop_versions_created_by_fkey",
+      "definition": "FOREIGN KEY (created_by) REFERENCES users(id)"
+    },
+    {
+      "child": "rebuild_sop_versions",
+      "parent": "rebuild_sop_documents",
+      "constraint": "rebuild_sop_versions_document_id_fkey",
+      "definition": "FOREIGN KEY (document_id) REFERENCES rebuild_sop_documents(id)"
+    },
+    {
+      "child": "rebuild_trainer_actions",
+      "parent": "users",
+      "constraint": "rebuild_trainer_actions_actor_id_fkey",
+      "definition": "FOREIGN KEY (actor_id) REFERENCES users(id)"
+    },
+    {
+      "child": "rebuild_trainer_actions",
+      "parent": "prompt_attempts",
+      "constraint": "rebuild_trainer_actions_attempt_id_fkey",
+      "definition": "FOREIGN KEY (attempt_id) REFERENCES prompt_attempts(id)"
+    },
+    {
+      "child": "trainer_hints",
+      "parent": "classes",
+      "constraint": "trainer_hints_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "trainer_hints",
+      "parent": "learners",
+      "constraint": "trainer_hints_learner_id_fkey",
+      "definition": "FOREIGN KEY (learner_id) REFERENCES learners(id)"
+    },
+    {
+      "child": "trainer_hints",
+      "parent": "users",
+      "constraint": "trainer_hints_trainer_id_fkey",
+      "definition": "FOREIGN KEY (trainer_id) REFERENCES users(id)"
+    },
+    {
+      "child": "user_tutorial_progress",
+      "parent": "users",
+      "constraint": "user_tutorial_progress_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "workshop_message_receipts",
+      "parent": "workshop_messages",
+      "constraint": "workshop_message_receipts_message_id_fkey",
+      "definition": "FOREIGN KEY (message_id) REFERENCES workshop_messages(id) ON DELETE CASCADE"
+    },
+    {
+      "child": "workshop_message_receipts",
+      "parent": "users",
+      "constraint": "workshop_message_receipts_user_id_fkey",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(id)"
+    },
+    {
+      "child": "workshop_messages",
+      "parent": "classes",
+      "constraint": "workshop_messages_class_id_fkey",
+      "definition": "FOREIGN KEY (class_id) REFERENCES classes(id)"
+    },
+    {
+      "child": "workshop_messages",
+      "parent": "users",
+      "constraint": "workshop_messages_trainer_id_fkey",
+      "definition": "FOREIGN KEY (trainer_id) REFERENCES users(id)"
+    }
+  ],
+  "load_order": [
+    "clients",
+    "product_enterprise_requests",
+    "product_worker_invocations",
+    "users",
+    "courses",
+    "gcp_identity_bindings",
+    "learners",
+    "product_domains",
+    "product_governance_config",
+    "product_profile_corrections",
+    "product_request_budgets",
+    "user_tutorial_progress",
+    "classes",
+    "course_instructors",
+    "course_modules",
+    "enrollments",
+    "lessons",
+    "product_audit",
+    "product_class_grants",
+    "product_roster_profiles",
+    "product_rotation_requests",
+    "product_session_controls",
+    "product_sheet_connections",
+    "rebuild_roster_imports",
+    "rebuild_sop_documents",
+    "trainer_hints",
+    "workshop_messages",
+    "lesson_resources",
+    "lesson_rubric_criteria",
+    "product_attendance",
+    "product_awards",
+    "product_learner_context",
+    "product_learner_support",
+    "product_prompt_drafts",
+    "product_rotation_approvals",
+    "product_sandbox_runs",
+    "product_studio",
+    "product_sync_logs",
+    "prompt_attempts",
+    "rebuild_sop_versions",
+    "workshop_message_receipts",
+    "lesson_progress",
+    "product_prompt_library",
+    "product_sop_chunks",
+    "product_sop_contributions",
+    "rebuild_judge_claims",
+    "rebuild_runs",
+    "rebuild_sop_bindings",
+    "rebuild_trainer_actions"
+  ],
+  "cycles_require_manual_review": []
+}

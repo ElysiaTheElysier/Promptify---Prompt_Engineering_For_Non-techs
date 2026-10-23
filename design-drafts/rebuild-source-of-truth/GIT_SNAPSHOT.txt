@@ -1,0 +1,57 @@
+Branch: rebuild
+HEAD: d7ac9d1fa28a4038cc922daea8ce20e27a13afd6
+Snapshot includes uncommitted files; HEAD alone cannot reproduce it.
+
+ M .gitignore
+ D HANDOFF.md
+ D PROMPTIFY_MENTOR_HANDOFF.md
+ D Promptify_Instructor_Decision_Note.docx
+ M README.md
+ D TEST_PLAN_AND_EXECUTION_LOG.md
+ M curriculum-levels/README.md
+ D docs/Promptify_Data_Dictionary_and_Data_Flow_2026-09-24.docx
+ D docs/Promptify_MVP_Completion_2026-09-24.docx
+ D docs/server-backed-progress-rollout.md
+ M src/components/auth/StagingLogin.tsx
+ D src/components/common/Header.tsx
+ D src/components/common/InlineCompareCard.tsx
+ D src/components/common/OnboardingTutorial.tsx
+?? AGENTS.md
+?? design-drafts/
+?? docs/00_PRODUCT_SOURCE_OF_TRUTH.md
+?? docs/01_CURRENT_STATE.md
+?? docs/02_IMPLEMENTATION_PLAN.md
+?? docs/03_DECISION_LOG.md
+?? docs/PRODUCTION_BACKEND_ARCHITECTURE_PLAN_2026-10-08.md
+?? docs/PRODUCTION_BACKEND_FLOWS_2026-10-08.md
+?? docs/Promptify_Intrepid_Progress_06-23_Oct_2026.xlsx
+?? docs/REPOSITORY_GUIDE.md
+?? "docs/UI Mockup-20261006T140854Z-1-001/"
+?? docs/USER_FLOWS_FROM_UI_MOCKUPS.md
+?? docs/archive/
+?? scripts/audit_ui_requirements.cjs
+?? scripts/build_combined_ui.cjs
+?? scripts/build_mockup_aligned_ui.cjs
+?? scripts/build_prd_gap_report.py
+?? scripts/build_prompt_assist_capture.cjs
+?? scripts/build_promptify_brd_from_example.py
+?? scripts/build_promptify_pm_docs.py
+?? scripts/build_ui_comment_revision.cjs
+?? scripts/build_ui_comparison.cjs
+?? scripts/capture_combined_ui.cjs
+?? scripts/export_ui_reading_sources.cjs
+?? scripts/historical/
+?? scripts/package_rebuild_source_of_truth.py
+?? scripts/package_ui_combined.py
+?? scripts/prepare_mockup_templates.cjs
+?? scripts/progress-tracker/
+?? scripts/prove_combined_baseline.cjs
+?? scripts/run_offline_checks.py
+?? scripts/verify_combined_ui.cjs
+?? scripts/verify_mockup_aligned_ui.cjs
+?? scripts/verify_ui_comment_revision.cjs
+?? scripts/verify_ui_comparison.cjs
+?? scripts/verify_ui_guardrails.cjs
+?? scripts/verify_updated_mockups.cjs
+?? src/services/authErrorService.ts
+?? test/verify_auth_errors.ts

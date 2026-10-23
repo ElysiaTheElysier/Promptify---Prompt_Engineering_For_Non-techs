@@ -1,0 +1,1801 @@
+{
+  "status": "repository-derived; not live database schema",
+  "files": [
+    {
+      "path": "supabase/schema.sql",
+      "sha256": "386854700fc94cf9f4d1a925acc1f53722f87ac3e860b287b9ebd25ecbc036a3",
+      "statements": 75
+    },
+    {
+      "path": "supabase/migrations/002_add_grants_and_rls.sql",
+      "sha256": "ffb188253e2dfba249b59d653290b7672ed6db8fb2b6df134b7f5ed98f9918e0",
+      "statements": 52
+    },
+    {
+      "path": "supabase/migrations/003_create_prompt_attempts.sql",
+      "sha256": "b6448ced68aaad8ec9193194fa0122b35f3ff1caff0829c1271102e90c66ed59",
+      "statements": 14
+    },
+    {
+      "path": "supabase/migrations/004_course_content_management.sql",
+      "sha256": "bbc1585f72051bd58e8b26c98f0ec233aa7e33909b5e6c24db4b2e125ed77393",
+      "statements": 54
+    },
+    {
+      "path": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "sha256": "948b909fe666ed34d845634bc5ef9e4f2ce1d6bfe5105f60847c51a6a19a20b9",
+      "statements": 53
+    },
+    {
+      "path": "supabase/migrations/006_enforce_course_enrollment_access.sql",
+      "sha256": "23c8200c9e6a9f605dc329994728ee21dfb8e9944ec3e808921df81c2492a3bf",
+      "statements": 24
+    },
+    {
+      "path": "supabase/migrations/007_user_tutorial_progress.sql",
+      "sha256": "fbe9ff0c555d0bb21216539b6fc9c24f1e17ba49a79c4b45e7df539d358b35d2",
+      "statements": 11
+    },
+    {
+      "path": "supabase/migrations/008_seed_tester_course.sql",
+      "sha256": "8a82d7d0928ecc5a946677e983a7a39d1c787468d24bb3c6898585251920b2e4",
+      "statements": 10
+    },
+    {
+      "path": "supabase/migrations/009_fill_tester_sample_prompts.sql",
+      "sha256": "b4ac285355a93ed22a9c3bd48533b1ef871b90308dd95187d911ca9ff1fdbb1c",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/010_allow_update_prompt_attempts.sql",
+      "sha256": "f9e680ceae1959673c7bb5893e7a3268be73595af8237baa70d97eac3065c2e6",
+      "statements": 3
+    },
+    {
+      "path": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "sha256": "8778355b6b276ca08f22298b24f86bf90f7a3c5f0794813b1666eb15600ac071",
+      "statements": 53
+    },
+    {
+      "path": "supabase/migrations/012_public_testing_class_self_enrollment.sql",
+      "sha256": "0acf134e86776cf05738fff95e63a3b109cd94ddfe8397749ee5a294f43d10be",
+      "statements": 12
+    },
+    {
+      "path": "supabase/migrations/013_align_tester_solution_prompts.sql",
+      "sha256": "0c44ae8cbdba407c50e06180b0e4f079a72c30fc06cf9b4ecabfa4504afc509c",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/014_improve_tester_theory_content.sql",
+      "sha256": "7c2f62d3e14cf2dd2c035132e21babfe230b334710a80d04d8823e29405084b9",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/015_remove_seed_mock_users.sql",
+      "sha256": "bb5cfebe23defc3d8ca175a81e2a1c717d59fb5ea5aae3ce11bdc7da59a0a668",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "sha256": "6b4ac34f3fe79276eb76896b80fa5dad4179c0f8b4555d2e0109f35686bf4fd9",
+      "statements": 28
+    },
+    {
+      "path": "supabase/migrations/017_enforce_atomic_progress_writes.sql",
+      "sha256": "11ac8a9c016b0746dfda88f8f89e5f08dbd5044657e00d1810ac1e116c51dd6b",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/018_rebuild_server_runs_and_hints.sql",
+      "sha256": "90c56cf22a2ad88dcdf5194878569485daefb10c1019de9aa240ed0c46c48085",
+      "statements": 25
+    },
+    {
+      "path": "supabase/migrations/019_rebuild_hint_enrollment_scope.sql",
+      "sha256": "3cad4830a56d74136875801e4172d6361e7dab2a2e123c8c5fa4cb88f4b51a87",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/020_rebuild_profiles_and_class_analytics.sql",
+      "sha256": "c51a1f0be277612c885ac61381ac057a34cff2a4597c62196d4279f94d4be67a",
+      "statements": 9
+    },
+    {
+      "path": "supabase/migrations/021_rebuild_judge_single_claim.sql",
+      "sha256": "e4304047e3d1d7693c252b2437de34fb023b894e3b1d0be42551d76c6062cc1e",
+      "statements": 11
+    },
+    {
+      "path": "supabase/migrations/022_rebuild_workshop_broadcast.sql",
+      "sha256": "a5c1381638b4d44bc733d63418dfa15d699eded88e6e8fc23d8636618544860b",
+      "statements": 17
+    },
+    {
+      "path": "supabase/migrations/023_rebuild_roster_import.sql",
+      "sha256": "602491d0455d72096d6c9d77501b86a3312d68ef68d2d9d09cd8240d900db109",
+      "statements": 9
+    },
+    {
+      "path": "supabase/migrations/024_rebuild_versioned_sops.sql",
+      "sha256": "aa3ebc08fa9ceec4947cb1434fcdfb657a3a71fe05d145240209b6ddbb09654a",
+      "statements": 15
+    },
+    {
+      "path": "supabase/migrations/025_rebuild_trainer_audit.sql",
+      "sha256": "52b2f4a2bbafa285fa1a63f790914cf45ade21b2f669a41d95f70ce401698bff",
+      "statements": 10
+    },
+    {
+      "path": "supabase/migrations/026_rebuild_message_realtime.sql",
+      "sha256": "1226392883a23e88f82e471c70472e79b9a2b524f0b1e3889147c9b2df826e05",
+      "statements": 6
+    },
+    {
+      "path": "supabase/migrations/027_production_ui_contract.sql",
+      "sha256": "41e65a00a3c1356a2b1ba723c3bb3625a1a997e2b788689e710505f524ec3316",
+      "statements": 23
+    },
+    {
+      "path": "supabase/migrations/028_product_support_and_roster.sql",
+      "sha256": "c1dc7fdbc42c5f57ef0b40776fb7563512af5cd8463e0f8b6f4da5d642993bae",
+      "statements": 16
+    },
+    {
+      "path": "supabase/migrations/029_product_private_content_and_sandbox.sql",
+      "sha256": "34259b087d8c63cd44035734f0ac3fbde1de342a9068a88f27ea0cf44514ec74",
+      "statements": 15
+    },
+    {
+      "path": "supabase/migrations/030_product_sop_ingestion.sql",
+      "sha256": "e6e581c3d31d027a45bae8f3489f0149ed6ffabd1ccdf0b969e46df49865ee17",
+      "statements": 9
+    },
+    {
+      "path": "supabase/migrations/031_product_sop_publish_fix.sql",
+      "sha256": "9dd43f1453444c530318cfda7de89e388919a3cb55b23913c622663a3e0b34cf",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/032_product_analytics_governance_and_sync.sql",
+      "sha256": "2875074b4bedf26e668775761ae1741aee27c13f81f763c590ab892c130552c8",
+      "statements": 13
+    },
+    {
+      "path": "supabase/migrations/033_product_scoped_rls_and_budgets.sql",
+      "sha256": "cad8668fba8a23182a7b2c693f148c552ec97804ff02a062e49e1bc1a548f82c",
+      "statements": 30
+    },
+    {
+      "path": "supabase/migrations/034_product_drafts_and_rpc_scope.sql",
+      "sha256": "61e1f26962a421c4d5f69c5f31ab129a9019e8c174796e5e9e8cc9a7c0a793ff",
+      "statements": 15
+    },
+    {
+      "path": "supabase/migrations/035_product_weighted_completion.sql",
+      "sha256": "d5e37343ebf1c70bdc12fe9580ab44f3a810b6d98b91120ab272d6e1017c56cd",
+      "statements": 9
+    },
+    {
+      "path": "supabase/migrations/036_product_enterprise_requests.sql",
+      "sha256": "2a4008b38080f93ae64265ac2e0e142112237f9369ced8f1c2de954120168e76",
+      "statements": 11
+    },
+    {
+      "path": "supabase/migrations/037_product_private_sop_storage.sql",
+      "sha256": "f91c2d98dcddaec7009d64179e29b473d7ad4e6b954102d9e5c51574e24b7808",
+      "statements": 3
+    },
+    {
+      "path": "supabase/migrations/038_product_roster_worker.sql",
+      "sha256": "b2e97e73cc1f4c9273d93e779b520c75aa809fd3738f5f403f20748d5caaea36",
+      "statements": 12
+    },
+    {
+      "path": "supabase/migrations/039_product_roster_scheduler.sql",
+      "sha256": "7ed044fddcdc1fd2f86a1a13957bcd152be4df4ff4b6cae2c344ee9ecd1e713d",
+      "statements": 14
+    },
+    {
+      "path": "supabase/migrations/040_product_public_basic.sql",
+      "sha256": "f82db6ce2fe2d2f416aaf1a923866abe695517997d271cc01604389cc81aa86c",
+      "statements": 10
+    },
+    {
+      "path": "supabase/migrations/041_product_public_basic_curriculum.sql",
+      "sha256": "c7c5d83601ae02815abfe8181e3e409321d4bb7068ec75fe6964fb50720d5d19",
+      "statements": 4
+    },
+    {
+      "path": "supabase/migrations/042_product_awards_and_attendance.sql",
+      "sha256": "87c20f47e953d9d846978ad0db2d7c3583ba9725f1e677ba6cf02729e8adeb44",
+      "statements": 17
+    },
+    {
+      "path": "supabase/migrations/043_product_studio_deep_validation.sql",
+      "sha256": "7020f296a5137e4fae5cae5c896c51da7ea9c2496606ad1172414e298ae55720",
+      "statements": 6
+    },
+    {
+      "path": "supabase/migrations/044_product_atomic_policies.sql",
+      "sha256": "f610c1ca364597937a5765185550c1d77d356f72aeb4a48b6397bb7ede5fc189",
+      "statements": 9
+    },
+    {
+      "path": "supabase/migrations/045_product_rotation_approvals.sql",
+      "sha256": "6d6071eeb2af1d6da63e4c8df82a09395775eb7a286ef29f73a5b3366cafe14c",
+      "statements": 13
+    },
+    {
+      "path": "supabase/migrations/046_product_isolated_trial_curriculum.sql",
+      "sha256": "94e6d52b9d22b8c81c5b69e734ba44eeb1aa7f69cd0ce3610b638870c51a75a9",
+      "statements": 5
+    },
+    {
+      "path": "supabase/migrations/047_product_rotation_application_audit.sql",
+      "sha256": "3e0ea2851e295cd74fa338581921b027db71bd8242e73c37d70ce514a197aec8",
+      "statements": 6
+    },
+    {
+      "path": "supabase/migrations/048_learner_prompt_library.sql",
+      "sha256": "05411056463ae4887588d738f3a568db3c42316cb9a61164d1215f1bba68539e",
+      "statements": 16
+    },
+    {
+      "path": "supabase/migrations/049_learner_library_category_and_replay.sql",
+      "sha256": "dd6fdecf9546b4a515572d99234e2903899e7a2533437d4f0a91dfdf71797043",
+      "statements": 5
+    }
+  ],
+  "included_statements": 522,
+  "excluded_statements": [
+    {
+      "source": "supabase/schema.sql",
+      "ordinal": 21,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/schema.sql",
+      "ordinal": 22,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/schema.sql",
+      "ordinal": 23,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/schema.sql",
+      "ordinal": 75,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/002_add_grants_and_rls.sql",
+      "ordinal": 52,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/003_create_prompt_attempts.sql",
+      "ordinal": 14,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/004_course_content_management.sql",
+      "ordinal": 2,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/004_course_content_management.sql",
+      "ordinal": 54,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 2,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 3,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 4,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 5,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 6,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 7,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 8,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 9,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 10,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 11,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 12,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 13,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 14,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 15,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 16,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 17,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 18,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 19,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 20,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 21,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 22,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 23,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 24,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 25,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 26,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 27,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 28,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 29,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 30,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 31,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 32,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 33,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 34,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 35,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 36,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 37,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 38,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 39,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 40,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 41,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 42,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 43,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 44,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 45,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 46,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 47,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 48,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 49,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 50,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 51,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 52,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/005_seed_curriculum_specs.sql",
+      "ordinal": 53,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/006_enforce_course_enrollment_access.sql",
+      "ordinal": 24,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/007_user_tutorial_progress.sql",
+      "ordinal": 11,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 2,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 3,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 4,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 5,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 6,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 7,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 8,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 9,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/008_seed_tester_course.sql",
+      "ordinal": 10,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/009_fill_tester_sample_prompts.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/009_fill_tester_sample_prompts.sql",
+      "ordinal": 2,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/009_fill_tester_sample_prompts.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/009_fill_tester_sample_prompts.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/010_allow_update_prompt_attempts.sql",
+      "ordinal": 3,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 2,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 3,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 4,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 5,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 6,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 7,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 8,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 9,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 10,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 11,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 12,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 13,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 14,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 15,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 16,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 17,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 18,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 19,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 20,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 21,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 22,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 23,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 24,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 25,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 26,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 27,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 28,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 29,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 30,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 31,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 32,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 33,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 34,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 35,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 36,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 37,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 38,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 39,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 40,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 41,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 42,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 43,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 44,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 45,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 46,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 47,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 48,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 49,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 50,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 51,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 52,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/011_update_agribank_curriculum.sql",
+      "ordinal": 53,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/012_public_testing_class_self_enrollment.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/012_public_testing_class_self_enrollment.sql",
+      "ordinal": 3,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/012_public_testing_class_self_enrollment.sql",
+      "ordinal": 11,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/012_public_testing_class_self_enrollment.sql",
+      "ordinal": 12,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/013_align_tester_solution_prompts.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/013_align_tester_solution_prompts.sql",
+      "ordinal": 2,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/013_align_tester_solution_prompts.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/013_align_tester_solution_prompts.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/014_improve_tester_theory_content.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/014_improve_tester_theory_content.sql",
+      "ordinal": 2,
+      "kind": "UpdateStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/014_improve_tester_theory_content.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/014_improve_tester_theory_content.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/015_remove_seed_mock_users.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/015_remove_seed_mock_users.sql",
+      "ordinal": 2,
+      "kind": "DeleteStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/015_remove_seed_mock_users.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/015_remove_seed_mock_users.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "ordinal": 14,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "ordinal": 15,
+      "kind": "DoStmt",
+      "reason": "data seed/backfill/diagnostic or Supabase publication block"
+    },
+    {
+      "source": "supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "ordinal": 27,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/016_add_server_backed_lesson_progress.sql",
+      "ordinal": 28,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/017_enforce_atomic_progress_writes.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/017_enforce_atomic_progress_writes.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/017_enforce_atomic_progress_writes.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/018_rebuild_server_runs_and_hints.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/018_rebuild_server_runs_and_hints.sql",
+      "ordinal": 25,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/019_rebuild_hint_enrollment_scope.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/019_rebuild_hint_enrollment_scope.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/019_rebuild_hint_enrollment_scope.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/020_rebuild_profiles_and_class_analytics.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/020_rebuild_profiles_and_class_analytics.sql",
+      "ordinal": 8,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/020_rebuild_profiles_and_class_analytics.sql",
+      "ordinal": 9,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/021_rebuild_judge_single_claim.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/021_rebuild_judge_single_claim.sql",
+      "ordinal": 10,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/021_rebuild_judge_single_claim.sql",
+      "ordinal": 11,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/022_rebuild_workshop_broadcast.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/022_rebuild_workshop_broadcast.sql",
+      "ordinal": 16,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/022_rebuild_workshop_broadcast.sql",
+      "ordinal": 17,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/023_rebuild_roster_import.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/023_rebuild_roster_import.sql",
+      "ordinal": 8,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/023_rebuild_roster_import.sql",
+      "ordinal": 9,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/024_rebuild_versioned_sops.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/024_rebuild_versioned_sops.sql",
+      "ordinal": 14,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/024_rebuild_versioned_sops.sql",
+      "ordinal": 15,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/025_rebuild_trainer_audit.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/025_rebuild_trainer_audit.sql",
+      "ordinal": 9,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/025_rebuild_trainer_audit.sql",
+      "ordinal": 10,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/026_rebuild_message_realtime.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/026_rebuild_message_realtime.sql",
+      "ordinal": 4,
+      "kind": "DoStmt",
+      "reason": "data seed/backfill/diagnostic or Supabase publication block"
+    },
+    {
+      "source": "supabase/migrations/026_rebuild_message_realtime.sql",
+      "ordinal": 5,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/026_rebuild_message_realtime.sql",
+      "ordinal": 6,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/027_production_ui_contract.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/027_production_ui_contract.sql",
+      "ordinal": 22,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/027_production_ui_contract.sql",
+      "ordinal": 23,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/028_product_support_and_roster.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/028_product_support_and_roster.sql",
+      "ordinal": 15,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/028_product_support_and_roster.sql",
+      "ordinal": 16,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/029_product_private_content_and_sandbox.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/029_product_private_content_and_sandbox.sql",
+      "ordinal": 14,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/029_product_private_content_and_sandbox.sql",
+      "ordinal": 15,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/030_product_sop_ingestion.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/030_product_sop_ingestion.sql",
+      "ordinal": 8,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/030_product_sop_ingestion.sql",
+      "ordinal": 9,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/031_product_sop_publish_fix.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/031_product_sop_publish_fix.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/031_product_sop_publish_fix.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/032_product_analytics_governance_and_sync.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/032_product_analytics_governance_and_sync.sql",
+      "ordinal": 12,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/032_product_analytics_governance_and_sync.sql",
+      "ordinal": 13,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/033_product_scoped_rls_and_budgets.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/033_product_scoped_rls_and_budgets.sql",
+      "ordinal": 29,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/033_product_scoped_rls_and_budgets.sql",
+      "ordinal": 30,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/034_product_drafts_and_rpc_scope.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/034_product_drafts_and_rpc_scope.sql",
+      "ordinal": 14,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/034_product_drafts_and_rpc_scope.sql",
+      "ordinal": 15,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/035_product_weighted_completion.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/035_product_weighted_completion.sql",
+      "ordinal": 8,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/035_product_weighted_completion.sql",
+      "ordinal": 9,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/036_product_enterprise_requests.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/036_product_enterprise_requests.sql",
+      "ordinal": 10,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/036_product_enterprise_requests.sql",
+      "ordinal": 11,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/037_product_private_sop_storage.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/037_product_private_sop_storage.sql",
+      "ordinal": 2,
+      "kind": "InsertStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/037_product_private_sop_storage.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/038_product_roster_worker.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/038_product_roster_worker.sql",
+      "ordinal": 11,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/038_product_roster_worker.sql",
+      "ordinal": 12,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 2,
+      "kind": "CreateExtensionStmt",
+      "reason": "platform extension; not required for retained application DDL"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 3,
+      "kind": "CreateExtensionStmt",
+      "reason": "platform extension; not required for retained application DDL"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 11,
+      "kind": "CreateFunctionStmt",
+      "reason": "Supabase Vault/pg_net dispatcher; replace with Cloud Scheduler OIDC"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 12,
+      "kind": "GrantStmt",
+      "reason": "Supabase Vault/pg_net dispatcher; replace with Cloud Scheduler OIDC"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 13,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/039_product_roster_scheduler.sql",
+      "ordinal": 14,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/040_product_public_basic.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/040_product_public_basic.sql",
+      "ordinal": 2,
+      "kind": "DoStmt",
+      "reason": "data seed/backfill/diagnostic or Supabase publication block"
+    },
+    {
+      "source": "supabase/migrations/040_product_public_basic.sql",
+      "ordinal": 9,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/040_product_public_basic.sql",
+      "ordinal": 10,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/041_product_public_basic_curriculum.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/041_product_public_basic_curriculum.sql",
+      "ordinal": 2,
+      "kind": "DoStmt",
+      "reason": "data seed/backfill/diagnostic or Supabase publication block"
+    },
+    {
+      "source": "supabase/migrations/041_product_public_basic_curriculum.sql",
+      "ordinal": 3,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/041_product_public_basic_curriculum.sql",
+      "ordinal": 4,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/042_product_awards_and_attendance.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/042_product_awards_and_attendance.sql",
+      "ordinal": 16,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/042_product_awards_and_attendance.sql",
+      "ordinal": 17,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/043_product_studio_deep_validation.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/043_product_studio_deep_validation.sql",
+      "ordinal": 5,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/043_product_studio_deep_validation.sql",
+      "ordinal": 6,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/044_product_atomic_policies.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/044_product_atomic_policies.sql",
+      "ordinal": 8,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/044_product_atomic_policies.sql",
+      "ordinal": 9,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/045_product_rotation_approvals.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/045_product_rotation_approvals.sql",
+      "ordinal": 12,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/045_product_rotation_approvals.sql",
+      "ordinal": 13,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/046_product_isolated_trial_curriculum.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/046_product_isolated_trial_curriculum.sql",
+      "ordinal": 2,
+      "kind": "DoStmt",
+      "reason": "data seed/backfill/diagnostic or Supabase publication block"
+    },
+    {
+      "source": "supabase/migrations/046_product_isolated_trial_curriculum.sql",
+      "ordinal": 4,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/046_product_isolated_trial_curriculum.sql",
+      "ordinal": 5,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/047_product_rotation_application_audit.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/047_product_rotation_application_audit.sql",
+      "ordinal": 5,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/047_product_rotation_application_audit.sql",
+      "ordinal": 6,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/048_learner_prompt_library.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/048_learner_prompt_library.sql",
+      "ordinal": 15,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/048_learner_prompt_library.sql",
+      "ordinal": 16,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/049_learner_library_category_and_replay.sql",
+      "ordinal": 1,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/049_learner_library_category_and_replay.sql",
+      "ordinal": 4,
+      "kind": "TransactionStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    },
+    {
+      "source": "supabase/migrations/049_learner_library_category_and_replay.sql",
+      "ordinal": 5,
+      "kind": "NotifyStmt",
+      "reason": "data/transaction/notification/platform statement; not schema DDL"
+    }
+  ]
+}

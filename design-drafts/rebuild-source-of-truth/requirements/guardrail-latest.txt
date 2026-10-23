@@ -1,0 +1,204 @@
+PROMPTIFY FRONTEND DEVELOPMENT STANDARD & GUARDRAILS SYSTEM DIRECTIVE
+Document Version: 1.0.0
+Target Audience: Frontend Engineering Agents, Autonomous Coding Bots, & Component Developers
+Scope: UI Prototypes UI-00 through UI-15 (Promptify Platform)
+
+
+SYSTEM DIRECTIVE OVERVIEW
+This document establishes the mandatory development standard, visual token directive, and functional guardrails for all user interfaces across the Promptify platform.
+
+Every AI agent or developer generating, modifying, or refactoring code for Promptify MUST strictly adhere to these rules without exception. Any code produced that violates these rules will be rejected during build automated testing.
+
+
+PILLAR 1: DESIGN SYSTEM & VISUAL TOKENS GUARDRAILS
+1.1 Color Palette & Material Design 3 (M3) Surface Tokens
+All component styling must strictly utilize Tailwind CSS mapped to the following standard Material Design 3 theme tokens:
+
+// tailwind.config.js - Mandatory Theme Extension
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { 
+        sans: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
+      },
+      colors: {
+        m3: {
+          primary: '#0B57D0',
+          'on-primary': '#FFFFFF',
+          'primary-container': '#D3E3FD',
+          'on-primary-container': '#041E49',
+          surface: '#F8FAFC',
+          'surface-container-low': '#F1F5F9',
+          'surface-container-high': '#E2E8F0',
+          'on-surface': '#0F172A',
+          'on-surface-variant': '#475569',
+          outline: '#94A3B8',
+          'outline-variant': '#CBD5E1',
+          error: '#BA1A1A',
+          'error-container': '#FFDAD6'
+        }
+      }
+    }
+  }
+}
+Strict Utility Usage Rules:
+Backgrounds: Use bg-m3-surface for primary page canvases, bg-white for card surfaces, and bg-m3-surface-container-low (#F1F5F9) for secondary inputs/panels.
+Borders: Apply border border-m3-outline-variant/60 (#CBD5E1) for structural borders and dividers.
+Primary Elements: Primary action CTAs must use bg-m3-primary text-white hover:bg-m3-primary/90.
+Selection: Standard text highlight must use selection:bg-m3-primary-container.
+1.2 Typography Hierarchy & Font Pairing
+Promptify uses a strict two-font system:
+
+font-sans (Inter): Used for all primary UI copy, headings, labels, button text, and body descriptions.
+font-mono (JetBrains Mono): MANDATORY for:
+Verbatim prompt syntax inputs/outputs (UI-05, UI-06, UI-10, UI-11)
+System variable tags (e.g., {{ticket_text}}, {{sop_context}})
+Grounding citations (e.g., [Citation: SOP-v4.pdf, Page 4])
+Telemetry IDs, log timestamps, environment variables, and API tokens (UI-09, UI-14, UI-15)
+Score numbers, execution latencies, and token counters
+1.3 Radii & Container Layouts
+Outer Cards & Hero Containers: rounded-3xl (24px)
+Inner Panels, Modals, & Inputs: rounded-2xl (16px) or rounded-xl (12px)
+Pills, Badges, & Action Buttons: rounded-full
+
+
+PILLAR 2: TECHNOLOGY STACK & ARCHITECTURE RULES
+2.1 Approved Technology Stack
+Agents must render code using the following zero-build frontend stack:
+
+HTML5: Semantic document structure (<header>, <main>, <section>, <article>, <footer>).
+Tailwind CSS (CDN/JIT): Utility-first styling utilizing extended m3 theme tokens.
+Alpine.js v3: Lightweight client-side reactive state management (x-data, x-show, x-model, x-text).
+Google Material Symbols Outlined: Icons loaded via Google Fonts CDN using <span class="material-symbols-outlined">icon_name</span>.
+2.2 Native Bilingual Architecture (EN | VI)
+Every component MUST natively support real-time bilingual switching without page reloads.
+Mandatory Alpine.js State Pattern:
+<div x-data="{ lang: 'vi', ... }">
+  <!-- Top Bar Language Toggle -->
+  <button @click="lang = lang === 'en' ? 'vi' : 'en'" 
+          class="px-2.5 py-1 rounded-full border border-m3-outline-variant text-xs font-semibold">
+      <span x-text="lang.toUpperCase()"></span>
+  </button>
+
+  <!-- Content Translation Template -->
+  <h2 class="text-xl font-bold">
+      <span x-show="lang === 'en'">Codelab 03: One-Shot Brand Voice</span>
+      <span x-show="lang === 'vi'">Bài tập 03: Thiết lập Giọng văn Thương hiệu</span>
+  </h2>
+</div>
+
+
+PILLAR 3: DOMAIN-SPECIFIC UX/UI FUNCTIONAL PATTERNS
+AI agents generating UI code must follow these standardized domain patterns corresponding to the 16 platform screens (UI-00 to UI-15):
+
++----------------------------------------------------------------------------------------------------+
+|                                    PROMPTIFY UI SCREEN MATRIX                                      |
++-------------------+---------------------------------------------+----------------------------------+
+| SCREEN ID         | MODULE NAME                                 | TARGET USER ROLE                 |
++-------------------+---------------------------------------------+----------------------------------+
+| UI-00             | Public Landing Page & Masterclass Portal    | Public / Unauthenticated         |
+| UI-01             | Dedicated Login & Session Expiration        | All Users                        |
+| UI-02             | Profile Confirmation & Dept Routing         | Newly Authenticated Learner     |
+| UI-03             | Access Denied & Domain Guard                | Unauthorized Login Attempts      |
+| UI-04             | Learner Department Training Hub             | Enrolled Learner                 |
+| UI-05             | Dual-Pane Interactive Codelab Workspace     | Enrolled Learner                 |
+| UI-06             | Side-by-Side Prompt & Output Diff Viewer    | Learner / Trainer                |
+| UI-07             | AI Judge Diagnostic Scorecard & Drawer      | Enrolled Learner                 |
+| UI-08             | SOP Context & Audit Inspector Drawer        | Enrolled Learner                 |
+| UI-09             | Real-Time Workshop Command Center          | Facilitator / Trainer            |
+| UI-10             | Learner Detail Modal & Prompt Inspector     | Facilitator / Trainer            |
+| UI-11             | Prompt SOP Enterprise Library               | Learner / Dept Head              |
+| UI-12             | L&D Executive Impact & ROI Analytics        | L&D Admin / Client PIC           |
+| UI-13             | Department SOP Upload & Context Modal       | Dept Head / L&D Admin            |
+| UI-14             | System Governance & API Key Monitor         | Platform / SysAdmin              |
+| UI-15             | Google Sheets Roster Sync Management View   | Platform / L&D Admin             |
++-------------------+---------------------------------------------+----------------------------------+
+Pattern A: Dual-Pane Codelab Workspace (UI-05 & UI-06)
+Left Pane (Prompt Composer): Must include monospaced prompt input, system variable inserters (e.g., {{ticket_text}}), parameter controls, and execution version counter (e.g., Run V5).
+Right Pane (Model Execution Output): Displays live responses generated by Gemini 3.8 Flash. Includes 1-click triggers for UI-06 Diff Viewer and UI-07 AI Judge Scorecard.
+Pattern B: Anti-Hallucination SOP Grounding & Citations (UI-08 & UI-13)
+Live Document Inspector (UI-08): End side-sheet rendering ingested SOP pages (PDF/Markdown/Excel).
+Citation Tag Rule: Ground-truth rules must include a 1-click "Copy Citation Tag" button yielding explicit syntax: [Citation: Document-Name.pdf, Page X, Section Y].
+Context Ingestion (UI-13): Must support drag-and-drop file upload and Google Drive Service Account URL syncing.
+Pattern C: AI Judge Diagnostic Scorecard (UI-07)
+Evaluations generated asynchronously via Gemini 3.8 Pro must use standardized score badges:
+
+Passing Score (≥ 8.0 / 10): bg-emerald-100 text-emerald-800 border-emerald-300 (Unlocks next lab & export to UI-11).
+Warning Score (5.0 – 7.9 / 10): bg-amber-100 text-amber-900 border-amber-300 (Displays diagnostic fix hints).
+Failing Score (< 5.0 / 10): bg-red-100 text-red-800 border-red-300 (Triggers stuck learner counter in UI-09).
+Pattern D: Admin Command Center & Telemetry Streams (UI-09, UI-10, UI-12, UI-14, UI-15)
+Live Status Indicator: Animated ping dot (<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>).
+Monospaced Telemetry Tables: All log streams, Run IDs (RUN-9081), and IP logs must be rendered in font-mono text-[11px].
+Stuck Learner Threshold: Flag any learner exceeding 5 failed attempts or >20 minutes on a single lab without passing (UI-09, UI-10).
+
+
+PILLAR 4: SECURITY, DATA PRIVACY & API GUARDRAILS
+4.1 Zero Raw Key Exposure Policy
+NO CLIENT-SIDE API KEYS: AI agents must NEVER insert raw API keys (e.g., AIzaSy...) or Supabase service role keys directly into client-side code, headers, or local variables.
+Server Gateway Isolation: All prompt runs must route through backend proxy endpoints (/api/v1/execute or /api/v1/evaluate).
+UI Masking (UI-14): In administrative views, secrets must be masked by default (••••••••••••••••) with an explicit "Unmask Secrets" toggle.
+4.2 Domain Guard Whitelist Enforcement (UI-03 & UI-14)
+Google SSO login must validate the user's email domain against B2B client whitelists (e.g., @intrepid.asia, @agribank.com.vn).
+Non-whitelisted domains must immediately redirect to UI-03 (Access Denied View) with clear contact information for the company's L&D Admin.
+4.3 Mock State Guidelines for AI Agents
+When generating standalone frontend prototypes, agents must mock backend delays and streaming telemetry using Alpine.js timers:
+
+// Approved Mock Execution Pattern
+startExecution() {
+  this.isExecuting = true;
+  this.executionProgress = 0;
+  
+  let timer = setInterval(() => {
+    if (this.executionProgress < 100) {
+      this.executionProgress += 25;
+    } else {
+      clearInterval(timer);
+      this.isExecuting = false;
+      this.aiScore = 9.2; // Mock score return from Gemini 3.8 Pro
+      this.showScorecard = true;
+    }
+  }, 200);
+}
+
+
+PILLAR 5: STRICT ANTI-PATTERNS ("DO NOT DO" RULES)
+Developers and AI agents are STRICTLY PROHIBITED from introducing the following anti-patterns:
+
++----------------------------------------------------------------------------------------------------+
+|                                    STRICT CODE ANTI-PATTERNS                                       |
++------------------------------------+---------------------------------------------------------------+
+| PROHIBITED PRACTICE                | MANDATORY APPROVED ALTERNATIVE                                |
++------------------------------------+---------------------------------------------------------------+
+| Native Browser Alerts              | Alpine.js Modal Dialogs or Toast Notifications               |
+| (alert(), confirm(), prompt())     |                                                               |
++------------------------------------+---------------------------------------------------------------+
+| Hardcoded Credentials in HTML      | Server-side API Proxy Routing / Mapped Env Variables          |
++------------------------------------+---------------------------------------------------------------+
+| External Heavy UI Frameworks       | Zero-build Stack: Tailwind CSS CDN + Alpine.js v3             |
+| (React, Vue, Bootstrap, Material)  |                                                               |
++------------------------------------+---------------------------------------------------------------+
+| Hardcoded Single-Language Text     | Dual-Language Templates (`x-show="lang === 'en/vi'"`)         |
++------------------------------------+---------------------------------------------------------------+
+| Unstyled Native Form Elements      | Tailwind Styled Inputs (`rounded-xl border-m3-outline-variant`) |
++------------------------------------+---------------------------------------------------------------+
+| Proportional Fonts for Code/IDs    | `font-mono` (`JetBrains Mono`) for all Prompts/JSON/IDs       |
++------------------------------------+---------------------------------------------------------------+
+| Unhandled Overflow / Page Scroll | Explicit Container Scrolls (`max-h-64 overflow-y-auto`)       |
++------------------------------------+---------------------------------------------------------------+
+
+
+PILLAR 6: VERIFICATION & COMPLIANCE CHECKLIST FOR CODING AGENTS
+Before delivering any UI component or code refactor, the AI agent must verify its output against this 6-point checklist:
+
+Design Token Check: Are all background, text, and border colors mapped to m3-* classes?
+Font Pairing Check: Is font-sans (Inter) used for UI copy and font-mono (JetBrains Mono) used for all prompts, tags, citations, and telemetry?
+Bilingual Check: Does every user-facing text element support both lang === 'en' and lang === 'vi'?
+Interactive Micro-Interactions Check: Are buttons, modals, drawers, tabs, and copy-to-clipboard triggers fully wired with Alpine.js?
+Security Check: Are there zero client-side API secrets embedded in the code? Is domain access checked?
+Layout Safety Check: Are container overflows constrained properly with clean scrolling (overflow-y-auto) without breaking responsive breakpoints?
+
+
+
+END OF DIRECTIVE. All AI agents and frontend developers working on Promptify must execute code strictly within the boundaries of this document.
+

@@ -1,0 +1,67 @@
+[
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\docs\\Promptify - UI code - for Review.docx",
+    "bytes": 7058804,
+    "sha256": "666CB5D869ED3AAAF347A5619D1D98A8E36ED650AB07F3AC2F72D5EE25F84E92"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\docs\\Promptify - UI code - for Review (1).docx",
+    "bytes": 3042559,
+    "sha256": "718A04398D78FE29183B50270DD36D779475E1C3DD2F7D165751E69AA54C7A51"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\docs\\Promptify - UI code - for Review (2).docx",
+    "bytes": 3010104,
+    "sha256": "C764967E8C99C994F0AEB1023BFB08736A07E0E72FD7C4D616ACC132B083EEE2"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\docs\\Promptify - UI code - for Review (3).docx",
+    "bytes": 3059582,
+    "sha256": "DCB3BD340D6D2890907509F8CE0F15BD35BE7AB1836B26C465C30B470305AAE4"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\docs\\PRODUCTION_UI_BASELINE.md",
+    "bytes": 2139,
+    "sha256": "D02A6E38AAB52D9CFB15C40E31C526306DDED278DD85F8B400618D670950AD4C"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\docs\\LEARNER_UI_UPGRADE_2026-10-10.md",
+    "bytes": 5324,
+    "sha256": "FE6BEF9BE2728660948CE3656AEAE40D643D55D553F981FA4FBD5AB5EB19B4D5"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\rebuild\\ProductionApp.tsx",
+    "bytes": 29153,
+    "sha256": "BAC61B77801347975DFA5F7F89F666165904230D2017B2FCB602E6B5638C55C9"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\rebuild\\ProductionWorkspaceV7.tsx",
+    "bytes": 26070,
+    "sha256": "C13398B42CA2EA0FB9EA3514CA64FB6498FB9716AF0615C91D678830E4188C2C"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\src\\components\\rebuild\\learner-workspace.css",
+    "bytes": 9300,
+    "sha256": "99D7BADF4D1BE43AA21356907B2F0B9BC8BA68A6A4470CC66AA296D85CA887E8"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\productionAiService.ts",
+    "bytes": 8168,
+    "sha256": "68E5EDE2CE4D60E05EDFAAA524E05BAC7FCC7D0EE146126C986910F839B6CC30"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\src\\services\\productionClientService.ts",
+    "bytes": 2160,
+    "sha256": "FA7406804935F280D9DAA909D7C2CAA36F627FDB0A43AC30A0A615E4CD6756BD"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\048_learner_prompt_library.sql",
+    "bytes": 2838,
+    "sha256": "05411056463AE4887588D738F3A568DB3C42316CB9A61164D1215F1BBA68539E"
+  },
+  {
+    "path": "C:\\Ki_OJT\\PromptforNontech\\supabase\\migrations\\049_learner_library_category_and_replay.sql",
+    "bytes": 2014,
+    "sha256": "DD6FDECF9546B4A515572D99234E2903899E7A2533437D4F0A91DFDF71797043"
+  }
+]

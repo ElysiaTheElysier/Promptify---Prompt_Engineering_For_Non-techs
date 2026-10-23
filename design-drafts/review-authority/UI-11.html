@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="vi" x-data="{ 
+    // State hai tầng: 'directory' (Danh mục tổng) vs 'studio' (Studio soạn thảo 5 Tab)
+    viewMode: 'directory',
+    activeTab: 'scope', // 'scope', 'prompt', 'materials', 'rubric', 'awards'
+
+    // Bộ lọc cho Master Directory
+    searchQuery: '',
+    filterState: 'ALL', // 'ALL', 'ACTIVE', 'DRAFT', 'SCHEDULED', 'ARCHIVED'
+    filterClient: 'ALL',
+    filterPillar: 'ALL',
+
+    // TẦNG 1: DATABASE DANH MỤC MASTER CODELABS DIRECTORY
+    codelabDirectory: [
+        {
+            id: 'LAB-BS-01',
+            code: 'LAB-BS-01',
+            title: 'LLM Prompt Foundations & Hallucination Awareness',
+            pillar: 'Pillar 1: LLM Foundations for Business Users',
+            client: 'Intrepid Asia',
+            cohort: 'Intrepid Cohort 04',
+            departments: ['Brand Solutions', 'Client Success'],
+            state: 'ACTIVE', // 'DRAFT', 'ACTIVE', 'SCHEDULED', 'ARCHIVED'
+            updatedAt: '2026-10-05 14:00',
+            learnerCount: 42,
+            avgScore: '8.9 / 10'
+        },
+        {
+            id: 'LAB-BS-02',
+            code: 'LAB-BS-02',
+            title: 'Few-Shot Text Generation & Brand Tone Alignment',
+            pillar: 'Pillar 2: Text Generation & Workflow AI',
+            client: 'Intrepid Asia',
+            cohort: 'Intrepid Cohort 04',
+            departments: ['Brand Solutions', 'Campaign Ops'],
+            state: 'ACTIVE',
+            updatedAt: '2026-10-06 09:30',
+            learnerCount: 38,
+            avgScore: '8.5 / 10'
+        },
+        {
+            id: 'LAB-BS-03',
+            code: 'LAB-BS-03',
+            title: 'One-shot Brand Voice & SLA Ticket Classification',
+            pillar: 'Pillar 2: Text Generation & Workflow AI',
+            client: 'Intrepid Asia',
+            cohort: 'Intrepid Cohort 04',
+            departments: ['Brand Solutions', 'Campaign Ops', 'Client Success'],
+            state: 'DRAFT',
+            updatedAt: '2026-10-07 18:20',
+            learnerCount: 0,
+            avgScore: 'N/A'
+        },
+        {
+            id: 'LAB-AG-01',
+            code: 'LAB-AG-01',
+            title: 'Agribank Loan Application Summary & Risk Audit',
+            pillar: 'Pillar 3: AI Workflow Integration & Automation',
+            client: 'Agribank',
+            cohort: 'Agribank Executive Cohort 01',
+            departments: ['Finance & Credit', 'Risk Audit'],
+            state: 'SCHEDULED',
+            updatedAt: '2026-10-07 11:15',
+            learnerCount: 0,
+            avgScore: 'N/A'
+        },
+        {
+            id: 'LAB-BS-00',
+            code: 'LAB-BS-00',
+            title: 'Legacy 2025 Prompting Basics (Deprecated)',
+            pillar: 'Pillar 1: LLM Foundations for Business Users',
+            client: 'Intrepid Asia',
+            cohort: 'Intrepid Cohort 01',
+            departments: ['Brand Solutions'],
+            state: 'ARCHIVED',
+            updatedAt: '2025-12-20 16:00',
+            learnerCount: 120,
+            avgScore: '7.8 / 10'
+        }
+    ],
+
+    // TẦNG 2: BÀI LAB ĐANG ĐƯỢC CHỈNH SỬA TRONG STUDIO
+    selectedLab: {
+        id: 'LAB-BS-03',
+        code: 'LAB-BS-03',
+        title: 'One-shot Brand Voice & SLA Ticket Classification',
+        pillar: 'Pillar 2: Text Generation & Workflow AI',
+        client: 'Intrepid Asia',
+        cohort: 'Intrepid Cohort 04',
+        branch: 'Ho Chi Minh HQ',
+        tier: 'ADVANCE Paid',
+        state: 'DRAFT', // Trạng thái vòng đời
+        startTime: '2026-10-10T10:00',
+        endTime: '2026-10-10T11:40',
+        departments: ['Brand Solutions', 'Campaign Ops', 'Client Success'],
+        scenarioBrief: 'During Intrepid\'s 11.11 Mega Sale Campaign, customer support receives Ticket #842 regarding a double payment charge where order status shows cancelled. Learners must classify ticket priority and cite SOP SLA windows.',
+        objectives: [
+            'Master One-Shot prompting pattern to standardize response formatting.',
+            'Correctly reference SOP-Campaign-Ops-v4.pdf Page 4 for P1 Critical SLA 15-minute response window.',
+            'Eliminate PII data exposure (CCCD, Phone) in prompt construction.'
+        ],
+        competencies: 'Certified Campaign Ops Prompt Engineer Level 2'
+    },
+
+    // Danh mục Phòng ban Onboarding Doanh nghiệp
+    onboardingDepartments: [
+        'Brand Solutions', 'Campaign Ops', 'Client Success', 'E-commerce Operations', 
+        'Finance & Tax', 'HR & People Ops', 'Legal & Compliance', 'Supply Chain & Logistics'
+    ],
+
+    // Thuật toán Lọc Danh mục
+    get filteredDirectory() {
+        return this.codelabDirectory.filter(lab => {
+            let matchSearch = lab.title.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                              lab.code.toLowerCase().includes(this.searchQuery.toLowerCase());
+            let matchState = this.filterState === 'ALL' || lab.state === this.filterState;
+            let matchClient = this.filterClient === 'ALL' || lab.client === this.filterClient;
+            let matchPillar = this.filterPillar === 'ALL' || lab.pillar === this.filterPillar;
+            return matchSearch && matchState && matchClient && matchPillar;
+        });
+    },
+
+    // Chuyển sang Studio Authoring
+    openAuthoringStudio(lab) {
+        this.selectedLab = JSON.parse(JSON.stringify(lab));
+        if (!this.selectedLab.departments) this.selectedLab.departments = ['Brand Solutions'];
+        if (!this.selectedLab.objectives) this.selectedLab.objectives = ['Master core prompt pattern'];
+        if (!this.selectedLab.scenarioBrief) this.selectedLab.scenarioBrief = 'Enter business scenario...';
+        this.viewMode = 'studio';
+        this.activeTab = 'scope';
+    },
+
+    createNewCodelab() {
+        let newId = 'LAB-NEW-' + Math.floor(100 + Math.random() * 900);
+        this.selectedLab = {
+            id: newId,
+            code: newId,
+            title: 'Untitled New Codelab',
+            pillar: 'Pillar 1: LLM Foundations for Business Users',
+            client: 'Intrepid Asia',
+            cohort: 'Intrepid Cohort 04',
+            branch: 'Ho Chi Minh HQ',
+            tier: 'ADVANCE Paid',
+            state: 'DRAFT',
+            startTime: '2026-10-15T09:00',
+            endTime: '2026-10-15T11:00',
+            departments: ['Brand Solutions'],
+            scenarioBrief: 'Mô tả bối cảnh bài tập thực hành...',
+            objectives: ['Nắm vững kỹ năng giao việc cho AI'],
+            competencies: 'Certified Prompt Engineer Level 1'
+        };
+        this.viewMode = 'studio';
+        this.activeTab = 'scope';
+    },
+
+    saveAndReturnToDirectory() {
+        let existingIdx = this.codelabDirectory.findIndex(l => l.id === this.selectedLab.id);
+        if (existingIdx >= 0) {
+            this.codelabDirectory[existingIdx] = JSON.parse(JSON.stringify(this.selectedLab));
+            this.codelabDirectory[existingIdx].updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        } else {
+            let newLabEntry = JSON.parse(JSON.stringify(this.selectedLab));
+            newLabEntry.updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            newLabEntry.learnerCount = 0;
+            newLabEntry.avgScore = 'N/A';
+            this.codelabDirectory.unshift(newLabEntry);
+        }
+        this.viewMode = 'directory';
+    },
+
+    toggleDepartment(dept) {
+        if (this.selectedLab.departments.includes(dept)) {
+            this.selectedLab.departments = this.selectedLab.departments.filter(d => d !== dept);
+        } else {
+            this.selectedLab.departments.push(dept);
+        }
+    },
+
+    // TAB 2 DATA STORES (PROMPT & SCAFFOLD SYNC)
+    systemPrompt: `You are an expert AI Judge evaluating student prompt templates for Intrepid Asia's Campaign Ops team.
+
+Verify that the student prompt meets the following requirements:
+1. Adopts Senior Campaign Ops Lead persona.
+2. References SOP-Campaign-Ops-v4.pdf Page 4 for P1 Critical SLA (15-min window).
+3. Provides 1 explicit One-Shot classification example.
+4. Outputs a clean 4-column Markdown Table.`,
+    
+    promptVariables: [
+        { name: '{ticket_id}', type: 'String', sample: '#842', mappedTo: 'UI-05 Header Badge' },
+        { name: '{ticket_text}', type: 'Text', sample: 'Payment deducted twice but order status cancelled.', mappedTo: 'UI-05 Task Brief Panel' },
+        { name: '{sop_doc}', type: 'File Citation', sample: 'SOP-Campaign-Ops-v4.pdf #Page 4', mappedTo: 'UI-08 Context Drawer' }
+    ],
+
+    addVariable() {
+        this.promptVariables.push({
+            name: `{var_${this.promptVariables.length + 1}}`,
+            type: 'String',
+            sample: 'Sample Data...',
+            mappedTo: 'UI-05 Task Brief Panel'
+        });
+    },
+
+    deleteVariable(index) {
+        this.promptVariables.splice(index, 1);
+    },
+
+    scaffoldChips: [
+        { id: 'c1', name: '+ Role Persona', active: true, tag: '[Role]: Senior Campaign Ops Lead', rubricKey: 'persona' },
+        { id: 'c2', name: '+ Context [CORE]', active: true, tag: '[Context]: Review Ticket #842 using SLA SOP v4', rubricKey: 'groundedness' },
+        { id: 'c3', name: '+ One-Shot Example', active: true, tag: '[One-Shot]: Ticket: Double charge -> P1 SLA', rubricKey: 'oneshot' },
+        { id: 'c4', name: '+ Markdown Format', active: true, tag: '[Format]: Output 4-column Markdown Table', rubricKey: 'format' },
+        { id: 'c5', name: '+ Actionability SLA', active: true, tag: '[SLA]: Identify 15-min response window', rubricKey: 'actionability' }
+    ],
+
+    // TAB 4 RUBRIC STORE
+    rubricCriteria: {
+        groundedness: { label: '1. Groundedness & SOP Citation', weight: 30, active: true },
+        persona: { label: '2. Task & Role Persona Completion', weight: 20, active: true },
+        format: { label: '3. Format Adherence (Markdown)', weight: 20, active: true },
+        oneshot: { label: '4. One-Shot Pattern Compliance', weight: 15, active: true },
+        actionability: { label: '5. Business Actionability & SLA', weight: 15, active: true }
+    },
+
+    toggleChip(chip) {
+        chip.active = !chip.active;
+        let anyActive = this.scaffoldChips.some(c => c.rubricKey === chip.rubricKey && c.active);
+        this.rubricCriteria[chip.rubricKey].active = anyActive;
+        this.rebalanceActiveRubric();
+    },
+
+    rebalanceActiveRubric() {
+        let activeKeys = Object.keys(this.rubricCriteria).filter(k => this.rubricCriteria[k].active);
+        Object.keys(this.rubricCriteria).forEach(k => {
+            if (!this.rubricCriteria[k].active) this.rubricCriteria[k].weight = 0;
+        });
+
+        if (activeKeys.length === 0) return;
+
+        let currentActiveSum = activeKeys.reduce((sum, k) => sum + Number(this.rubricCriteria[k].weight), 0);
+
+        if (currentActiveSum === 0) {
+            let equalShare = Math.floor(100 / activeKeys.length);
+            let remainder = 100 - (equalShare * activeKeys.length);
+            activeKeys.forEach((k, idx) => {
+                this.rubricCriteria[k].weight = equalShare + (idx === 0 ? remainder : 0);
+            });
+        } else {
+            let remainingTarget = 100;
+            activeKeys.forEach((k, idx) => {
+                if (idx === activeKeys.length - 1) {
+                    this.rubricCriteria[k].weight = Math.max(0, remainingTarget);
+                } else {
+                    let share = Math.round((Number(this.rubricCriteria[k].weight) / currentActiveSum) * 100);
+                    this.rubricCriteria[k].weight = Math.max(0, share);
+                    remainingTarget -= share;
+                }
+            });
+        }
+    },
+
+    updateWeight(changedKey, newValue) {
+        if (!this.rubricCriteria[changedKey].active) return;
+        let val = Math.max(0, Math.min(100, Number(newValue)));
+        this.rubricCriteria[changedKey].weight = val;
+
+        let otherActiveKeys = Object.keys(this.rubricCriteria).filter(k => k !== changedKey && this.rubricCriteria[k].active);
+        if (otherActiveKeys.length === 0) {
+            this.rubricCriteria[changedKey].weight = 100;
+            return;
+        }
+
+        let targetOtherSum = 100 - val;
+        let currentOtherSum = otherActiveKeys.reduce((sum, k) => sum + Number(this.rubricCriteria[k].weight), 0);
+
+        if (currentOtherSum > 0) {
+            let remainingTarget = targetOtherSum;
+            otherActiveKeys.forEach((k, idx) => {
+                if (idx === otherActiveKeys.length - 1) {
+                    this.rubricCriteria[k].weight = Math.max(0, remainingTarget);
+                } else {
+                    let share = Math.round((Number(this.rubricCriteria[k].weight) / currentOtherSum) * targetOtherSum);
+                    this.rubricCriteria[k].weight = Math.max(0, share);
+                    remainingTarget -= share;
+                }
+            });
+        } else {
+            let equalShare = Math.floor(targetOtherSum / otherActiveKeys.length);
+            let remainder = targetOtherSum - (equalShare * otherActiveKeys.length);
+            otherActiveKeys.forEach((k, idx) => {
+                this.rubricCriteria[k].weight = equalShare + (idx === 0 ? remainder : 0);
+            });
+        }
+    },
+
+    get totalWeight() {
+        return Object.values(this.rubricCriteria).reduce((sum, c) => sum + Number(c.weight), 0);
+    },
+
+    // TAB 3 DATA STORES
+    sopDocs: [
+        { id: 1, name: 'SOP-Campaign-Ops-v4.pdf', pages: 12, chunks: 48, status: 'INDEXED', vectorDate: '2026-10-06 14:20', citationPath: 'SOP-Campaign-Ops-v4.pdf #Page 4' },
+        { id: 2, name: 'Intrepid-Brand-Voice-Guide-2026.pdf', pages: 6, chunks: 18, status: 'INDEXED', vectorDate: '2026-10-06 14:22', citationPath: 'Intrepid-Brand-Voice-Guide-2026.pdf #Page 2' }
+    ],
+
+    nonSopMaterials: [
+        { id: 1, type: 'Pre-Read Deck', name: 'Intrepid_Prompting_Masterclass_PreRead.pdf', url: 'https://drive.google.com/file/d/intrepid-preread', version: 'v1.0', updated: '2026-10-01 09:00', log: 'Initial release for Cohort 04.' },
+        { id: 2, type: 'Sample Code Repo', name: 'github.com/intrepid-asia/prompt-templates', url: 'https://github.com/intrepid-asia/prompt-templates', version: 'v2.1', updated: '2026-10-05 16:30', log: 'Added Python execution script for ticket parsing.' }
+    ],
+
+    addNonSopMaterial() {
+        this.nonSopMaterials.push({
+            id: Date.now(),
+            type: 'Reference Guide',
+            name: 'New Learning Resource / Slide',
+            url: 'https://drive.google.com/...',
+            version: 'v1.0',
+            updated: new Date().toISOString().slice(0, 10),
+            log: 'Newly added material'
+        });
+    },
+
+    deleteNonSopMaterial(index) {
+        this.nonSopMaterials.splice(index, 1);
+    },
+
+    citationToast: false,
+
+    copyCitation(pathStr) {
+        navigator.clipboard.writeText(pathStr);
+        this.citationToast = true;
+        setTimeout(() => { this.citationToast = false; }, 2500);
+    },
+
+    // SANDBOX TEST STORE
+    sandboxPrompt: `[Role]: Act as Senior Campaign Ops Lead for Intrepid Asia.\n[Context]: Review ticket #842 using SOP-Campaign-Ops-v4.pdf Page 4.\n[One-Shot]: Double payment -> P1 Critical SLA (15 min response window).\n[Format]: Output a 4-column Markdown Table.`,
+    isTesting: false,
+    testExecuted: false,
+
+    runSandboxTest() {
+        this.isTesting = true;
+        this.testExecuted = false;
+        setTimeout(() => {
+            this.isTesting = false;
+            this.testExecuted = true;
+        }, 850);
+    },
+
+    // TAB 5 FULL INTERACTIVE DATA STORE & CRUD METHODS (RESTORED)
+    awardsData: {
+        gamificationLinks: [
+            { id: 1, title: 'Kahoot Icebreaker: LLM Hallucination Quiz', url: 'https://kahoot.it/challenge/091283', type: 'Kahoot', updated: '2026-10-06' },
+            { id: 2, title: 'Mentimeter Warmup: Prompting Painpoints Poll', url: 'https://menti.com/al819230', type: 'Mentimeter', updated: '2026-10-05' }
+        ],
+        badges: [
+            { id: 1, name: 'SOP Grounding Specialist', icon: 'verified', criteria: 'Score >= 9.0 in Groundedness Criterion', status: 'ACTIVE' },
+            { id: 2, name: 'Master Prompt Engineer - Level 2', icon: 'military_tech', criteria: 'Overall Lab Score >= 8.5/10 on First Attempt', status: 'ACTIVE' }
+        ],
+        certificate: {
+            title: 'Intrepid Certified Prompt Engineer (B2B Enterprise Accreditation)',
+            issuer: 'Promptify x Intrepid Asia L&D Committee',
+            eligibility: 'Pass LAB-BS-01 through LAB-BS-04 with Avg Score >= 8.0/10 and 100% Attendance.',
+            templateUrl: 'https://cert.promptify.ai/templates/intrepid-v2.pdf',
+            lastUpdated: '2026-10-07 18:00'
+        }
+    },
+
+    addGamificationLink() {
+        this.awardsData.gamificationLinks.push({
+            id: Date.now(),
+            title: 'Quiz Tương tác / Warmup Mới',
+            url: 'https://kahoot.it/...',
+            type: 'Kahoot',
+            updated: new Date().toISOString().slice(0, 10)
+        });
+    },
+
+    deleteGamificationLink(index) {
+        this.awardsData.gamificationLinks.splice(index, 1);
+    },
+
+    addBadge() {
+        this.awardsData.badges.push({
+            id: Date.now(),
+            name: 'Huy hiệu Kỹ năng Mới',
+            icon: 'workspace_premium',
+            criteria: 'Đạt điểm >= 8.0/10 cho bài lab này',
+            status: 'ACTIVE'
+        });
+    },
+
+    deleteBadge(index) {
+        this.awardsData.badges.splice(index, 1);
+    },
+
+    toggleBadgeStatus(index) {
+        this.awardsData.badges[index].status = this.awardsData.badges[index].status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    }
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify Intrepid - Master Codelabs Directory & Authoring Studio (UI-11)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1'
+                        },
+                        brand: {
+                            emerald: '#059669',
+                            amber: '#D97706',
+                            rose: '#BA1A1A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 18px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+    <!-- ================================================================= -->
+    <!-- GLOBAL HEADER NAVIGATION                                          -->
+    <!-- ================================================================= -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-2.5">
+        <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-2xl bg-purple-700 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    P
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-extrabold text-xs tracking-tight text-m3-on-surface">UI-11: Codelab Lifecycle Operations Studio</span>
+                    <span class="text-[10px] font-mono text-purple-700 font-bold" x-text="viewMode === 'directory' ? 'Master Curriculum Directory' : `Authoring Studio: ${selectedLab.code}`"></span>
+                </div>
+            </div>
+
+            <!-- Nút điều hướng chính -->
+            <div class="flex items-center gap-2">
+                <button x-show="viewMode === 'studio'" 
+                        @click="saveAndReturnToDirectory()" 
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-m3-surface-container-low border border-m3-outline-variant text-xs font-bold text-m3-on-surface hover:bg-m3-surface-container-high transition-all">
+                    <span class="material-symbols-outlined text-sm text-m3-primary">arrow_back</span>
+                    <span>← Lưu & Quay về Danh mục Codelabs</span>
+                </button>
+
+                <a href="/trainer/dashboard" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-m3-surface-container-low border border-m3-outline-variant text-xs font-bold text-m3-on-surface hover:bg-m3-surface-container-high transition-all">
+                    <span class="material-symbols-outlined text-sm text-m3-primary">dashboard</span>
+                    <span>Control Center (UI-09)</span>
+                </a>
+
+                <a href="/trainer/inspect/L-101" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-300 text-xs font-bold hover:bg-emerald-100 transition-all">
+                    <span class="material-symbols-outlined text-sm text-brand-emerald">search</span>
+                    <span>Inspect Sample Runs (UI-10)</span>
+                </a>
+
+                <button @click="createNewCodelab()" class="px-4 py-1.5 rounded-full bg-brand-emerald text-white text-xs font-bold shadow-xs hover:bg-emerald-700 transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    <span>+ Tạo bài Lab mới</span>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- TẦNG 1: MASTER CODELABS DIRECTORY & LIFECYCLE HUB VIEW            -->
+    <!-- ================================================================= -->
+    <main x-show="viewMode === 'directory'" class="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+        
+        <!-- Thẻ KPI Tổng quan -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div class="bg-white p-4 rounded-3xl border border-m3-outline-variant shadow-xs space-y-1">
+                <span class="text-m3-on-surface-variant font-bold block">Tổng số bài Codelab</span>
+                <span class="text-2xl font-black font-mono text-m3-on-surface" x-text="codelabDirectory.length"></span>
+                <span class="text-[10px] text-m3-outline block">Thuộc 3 Trụ cột Chương trình Đào tạo</span>
+            </div>
+
+            <div class="bg-white p-4 rounded-3xl border border-m3-outline-variant shadow-xs space-y-1">
+                <span class="text-m3-on-surface-variant font-bold block">Đã Xuất bản (Active Live)</span>
+                <span class="text-2xl font-black font-mono text-brand-emerald" x-text="codelabDirectory.filter(l => l.state === 'ACTIVE').length"></span>
+                <span class="text-[10px] text-emerald-700 font-bold block">Hiển thị trên Learner UI-04</span>
+            </div>
+
+            <div class="bg-white p-4 rounded-3xl border border-m3-outline-variant shadow-xs space-y-1">
+                <span class="text-m3-on-surface-variant font-bold block">Bản nháp (Drafts QA)</span>
+                <span class="text-2xl font-black font-mono text-amber-600" x-text="codelabDirectory.filter(l => l.state === 'DRAFT').length"></span>
+                <span class="text-[10px] text-amber-700 font-bold block">Đang biên soạn trong Studio</span>
+            </div>
+
+            <div class="bg-white p-4 rounded-3xl border border-m3-outline-variant shadow-xs space-y-1">
+                <span class="text-m3-on-surface-variant font-bold block">Lên lịch / Lưu trữ (Archived)</span>
+                <span class="text-2xl font-black font-mono text-purple-700" x-text="codelabDirectory.filter(l => l.state === 'SCHEDULED' || l.state === 'ARCHIVED').length"></span>
+                <span class="text-[10px] text-purple-800 font-bold block">Chờ kích hoạt & Lịch sử bài lab</span>
+            </div>
+        </div>
+
+        <!-- Thanh Tìm kiếm & Bộ lọc Lớp/Doanh nghiệp -->
+        <div class="bg-white p-4 rounded-3xl border border-m3-outline-variant shadow-xs space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+                
+                <div class="relative flex-1 min-w-[240px]">
+                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-m3-outline">search</span>
+                    <input type="text" x-model="searchQuery" placeholder="Tìm tên bài lab hoặc Mã Code (ví dụ: LAB-BS-03)..." class="w-full pl-9 pr-3 py-2 rounded-2xl border border-m3-outline-variant text-xs focus:outline-none focus:border-m3-primary bg-m3-surface-container-low">
+                </div>
+
+                <div class="flex items-center gap-1 font-bold text-[11px]">
+                    <button @click="filterState = 'ALL'" :class="filterState === 'ALL' ? 'bg-m3-primary text-white' : 'bg-m3-surface-container-low text-m3-on-surface-variant'" class="px-3 py-1.5 rounded-xl transition-all">Tất cả</button>
+                    <button @click="filterState = 'ACTIVE'" :class="filterState === 'ACTIVE' ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-900'" class="px-3 py-1.5 rounded-xl transition-all">🟢 Active</button>
+                    <button @click="filterState = 'DRAFT'" :class="filterState === 'DRAFT' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-900'" class="px-3 py-1.5 rounded-xl transition-all">📝 Draft</button>
+                    <button @click="filterState = 'SCHEDULED'" :class="filterState === 'SCHEDULED' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'" class="px-3 py-1.5 rounded-xl transition-all">⏰ Scheduled</button>
+                    <button @click="filterState = 'ARCHIVED'" :class="filterState === 'ARCHIVED' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-slate-700'" class="px-3 py-1.5 rounded-xl transition-all">📦 Archived</button>
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-m3-outline-variant/40">
+                <div>
+                    <label class="font-bold text-m3-on-surface block mb-1">Doanh nghiệp (Enterprise Client):</label>
+                    <select x-model="filterClient" class="w-full p-2 rounded-xl border border-m3-outline-variant font-bold bg-white">
+                        <option value="ALL">Tất cả Doanh nghiệp (Intrepid Asia, Agribank)</option>
+                        <option value="Intrepid Asia">Intrepid Asia</option>
+                        <option value="Agribank">Agribank</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="font-bold text-m3-on-surface block mb-1">Trụ cột Chương trình (Master Pillar):</label>
+                    <select x-model="filterPillar" class="w-full p-2 rounded-xl border border-m3-outline-variant font-bold bg-white">
+                        <option value="ALL">Tất cả 3 Trụ cột Đào tạo</option>
+                        <option value="Pillar 1: LLM Foundations for Business Users">Pillar 1: LLM Foundations</option>
+                        <option value="Pillar 2: Text Generation & Workflow AI">Pillar 2: Text Generation & Workflow AI</option>
+                        <option value="Pillar 3: AI Workflow Integration & Automation">Pillar 3: AI Workflow Integration</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bảng Danh mục Master Codelabs -->
+        <div class="bg-white rounded-3xl border border-m3-outline-variant shadow-xs overflow-hidden">
+            <div class="p-4 border-b border-m3-outline-variant/60 flex items-center justify-between">
+                <span class="font-extrabold text-sm text-m3-on-surface">Danh mục Bài Codelabs & Trạng thái Vòng đời Vận hành</span>
+                <span class="text-xs font-mono text-m3-outline" x-text="`Hiển thị ${filteredDirectory.length} / ${codelabDirectory.length} bài lab`"></span>
+            </div>
+
+            <div class="overflow-x-auto text-xs">
+                <table class="w-full text-left">
+                    <thead class="bg-m3-surface-container-low text-m3-on-surface-variant font-bold border-b border-m3-outline-variant/80">
+                        <tr>
+                            <th class="p-3.5">Mã Code</th>
+                            <th class="p-3.5">Tiêu đề Bài lab & Trụ cột</th>
+                            <th class="p-3.5">Doanh nghiệp & Lớp học</th>
+                            <th class="p-3.5">Trạng thái Vòng đời</th>
+                            <th class="p-3.5">Lượt làm</th>
+                            <th class="p-3.5">Điểm TB</th>
+                            <th class="p-3.5 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-m3-outline-variant/60 font-sans">
+                        <template x-for="lab in filteredDirectory" :key="lab.id">
+                            <tr class="hover:bg-m3-surface-container-low/50 transition-all">
+                                <td class="p-3.5 font-mono font-bold text-m3-primary" x-text="lab.code"></td>
+                                <td class="p-3.5">
+                                    <span class="font-bold text-m3-on-surface block" x-text="lab.title"></span>
+                                    <span class="text-[10px] text-m3-outline font-mono block" x-text="lab.pillar"></span>
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="font-bold block" x-text="lab.client"></span>
+                                    <span class="text-[10px] text-purple-800 font-mono block" x-text="lab.cohort"></span>
+                                </td>
+                                <td class="p-3.5">
+                                    <span x-show="lab.state === 'ACTIVE'" class="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">🟢 ACTIVE</span>
+                                    <span x-show="lab.state === 'DRAFT'" class="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">📝 DRAFT</span>
+                                    <span x-show="lab.state === 'SCHEDULED'" class="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-300">⏰ SCHEDULED</span>
+                                    <span x-show="lab.state === 'ARCHIVED'" class="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold bg-slate-200 text-slate-800 border border-slate-300">📦 ARCHIVED</span>
+                                </td>
+                                <td class="p-3.5 font-mono font-bold" x-text="`${lab.learnerCount} học viên`"></td>
+                                <td class="p-3.5 font-mono font-bold text-brand-emerald" x-text="lab.avgScore"></td>
+                                <td class="p-3.5 text-right space-x-2">
+                                    <button @click="openAuthoringStudio(lab)" class="px-3 py-1 rounded-xl bg-m3-primary text-white font-bold hover:bg-m3-primary/90 transition-all text-xs">
+                                        Chỉnh sửa / Cấu hình
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- TẦNG 2: 5-TAB AUTHORING STUDIO VIEW                              -->
+    <!-- ================================================================= -->
+    <div x-show="viewMode === 'studio'" class="flex-1 flex flex-col justify-between">
+        
+        <!-- THANH CHUYỂN TAB TÁC GIẢ -->
+        <div class="bg-white border-b border-m3-outline-variant px-4 lg:px-8 py-2">
+            <div class="max-w-[1600px] mx-auto flex items-center justify-between overflow-x-auto">
+                <div class="flex items-center gap-1 whitespace-nowrap">
+                    
+                    <button @click="activeTab = 'scope'" 
+                            :class="activeTab === 'scope' ? 'bg-m3-primary text-white shadow-xs font-bold' : 'text-m3-on-surface-variant font-semibold hover:bg-m3-surface-container-low'"
+                            class="px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">account_tree</span>
+                        <span>1. Scope, Schedule & Trạng thái Vòng đời</span>
+                    </button>
+
+                    <button @click="activeTab = 'prompt'" 
+                            :class="activeTab === 'prompt' ? 'bg-m3-primary text-white shadow-xs font-bold' : 'text-m3-on-surface-variant font-semibold hover:bg-m3-surface-container-low'"
+                            class="px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">terminal</span>
+                        <span>2. Instructions, Vars CRUD & Scaffold Sync</span>
+                    </button>
+
+                    <button @click="activeTab = 'materials'" 
+                            :class="activeTab === 'materials' ? 'bg-m3-primary text-white shadow-xs font-bold' : 'text-m3-on-surface-variant font-semibold hover:bg-m3-surface-container-low'"
+                            class="px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">folder_special</span>
+                        <span>3. SOP Assets (3A) & Material Hub (3B)</span>
+                    </button>
+
+                    <button @click="activeTab = 'rubric'" 
+                            :class="activeTab === 'rubric' ? 'bg-m3-primary text-white shadow-xs font-bold' : 'text-m3-on-surface-variant font-semibold hover:bg-m3-surface-container-low'"
+                            class="px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-sm">gavel</span>
+                        <span>4. Auto-Balancing Rubric Weights</span>
+                        <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300" x-text="`${totalWeight}% Auto`"></span>
+                    </button>
+
+                    <button @click="activeTab = 'awards'" 
+                            :class="activeTab === 'awards' ? 'bg-m3-primary text-white shadow-xs font-bold' : 'text-m3-on-surface-variant font-semibold hover:bg-m3-surface-container-low'"
+                            class="px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 text-amber-700">
+                        <span class="material-symbols-outlined text-sm">emoji_events</span>
+                        <span>5. Awards, Badges & Certifications</span>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 lg:px-8 py-6">
+
+            <!-- TAB 1: SCOPE, SCHEDULE & LIFECYCLE STATE -->
+            <div x-show="activeTab === 'scope'" class="bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-6 shadow-xs">
+                <div class="border-b border-m3-outline-variant/60 pb-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-extrabold text-base text-m3-on-surface">Tab 1: Codelab Scope, Schedule, Onboarding Departments & Lifecycle State</h2>
+                        <p class="text-xs text-m3-on-surface-variant">Cấu hình phạm vi, thời gian vận hành, phòng ban thụ hưởng từ Onboarding và trạng thái vòng đời.</p>
+                    </div>
+
+                    <!-- SELECTOR TRẠNG THÁI VÒNG ĐỜI -->
+                    <div class="flex items-center gap-2 bg-m3-surface-container-low p-2 rounded-2xl border border-m3-outline-variant">
+                        <span class="font-bold text-xs">Trạng thái Vòng đời:</span>
+                        <select x-model="selectedLab.state" class="p-1.5 rounded-xl border border-m3-outline-variant font-bold text-xs font-mono">
+                            <option value="DRAFT">📝 DRAFT (Ẩn đối với Học viên)</option>
+                            <option value="ACTIVE">🟢 ACTIVE (Đã xuất bản lên UI-04)</option>
+                            <option value="SCHEDULED">⏰ SCHEDULED (Tự mở theo Giờ bắt đầu)</option>
+                            <option value="ARCHIVED">📦 ARCHIVED (Lưu trữ lịch sử)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+                    
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Enterprise Client:</label>
+                        <input type="text" x-model="selectedLab.client" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold focus:outline-none focus:border-m3-primary bg-m3-surface-container-low">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Enterprise Cohort:</label>
+                        <input type="text" x-model="selectedLab.cohort" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold focus:outline-none focus:border-m3-primary">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Branch / Location:</label>
+                        <input type="text" x-model="selectedLab.branch" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold focus:outline-none focus:border-m3-primary">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Curriculum Master Pillar:</label>
+                        <select x-model="selectedLab.pillar" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold focus:outline-none focus:border-m3-primary">
+                            <option>Pillar 1: LLM Foundations for Business Users</option>
+                            <option>Pillar 2: Text Generation & Workflow AI</option>
+                            <option>Pillar 3: AI Workflow Integration & Automation</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Monetization Access Tier:</label>
+                        <select x-model="selectedLab.tier" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold focus:outline-none focus:border-m3-primary">
+                            <option>ADVANCE Paid</option>
+                            <option>BASIC Free</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Lab ID & Code:</label>
+                        <input type="text" x-model="selectedLab.code" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-mono font-bold focus:outline-none focus:border-m3-primary">
+                    </div>
+
+                    <!-- SCHEDULE LỊCH TRÌNH -->
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Start Schedule DateTime:</label>
+                        <input type="datetime-local" x-model="selectedLab.startTime" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-mono focus:outline-none focus:border-m3-primary">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Automated Expiration DateTime:</label>
+                        <input type="datetime-local" x-model="selectedLab.endTime" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-mono focus:outline-none focus:border-m3-primary">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-m3-on-surface block">Codelab Title:</label>
+                        <input type="text" x-model="selectedLab.title" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold text-m3-primary">
+                    </div>
+
+                    <!-- PHÒNG BAN ONBOARDING -->
+                    <div class="md:col-span-3 space-y-2 pt-2 border-t border-m3-outline-variant/60">
+                        <label class="font-bold text-m3-on-surface block">Target Eligible Departments (Chọn từ danh sách Onboarding Doanh nghiệp):</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <template x-for="dept in onboardingDepartments" :key="dept">
+                                <button @click="toggleDepartment(dept)" 
+                                        :class="selectedLab.departments.includes(dept) ? 'bg-m3-primary text-white border-m3-primary shadow-xs' : 'bg-white text-m3-on-surface border-m3-outline-variant hover:bg-m3-surface-container-low'"
+                                        class="p-2 rounded-xl border text-xs font-bold transition-all text-left flex items-center justify-between">
+                                    <span x-text="dept"></span>
+                                    <span class="material-symbols-outlined text-sm" x-text="selectedLab.departments.includes(dept) ? 'check_circle' : 'add_circle_outline'"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- BỐI CẢNH & MỤC TIÊU -->
+                    <div class="md:col-span-3 space-y-1.5 pt-2 border-t border-m3-outline-variant/60">
+                        <label class="font-bold text-m3-on-surface block">Business Scenario Brief (Hiển thị ở Learner Task Panel UI-05):</label>
+                        <textarea x-model="selectedLab.scenarioBrief" rows="3" class="w-full p-3 rounded-2xl border border-m3-outline-variant focus:outline-none focus:border-m3-primary leading-relaxed font-sans"></textarea>
+                    </div>
+
+                    <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="font-bold text-m3-on-surface block">Key Practice Objectives:</label>
+                            <div class="space-y-1.5">
+                                <template x-for="(obj, oIdx) in selectedLab.objectives" :key="oIdx">
+                                    <input type="text" x-model="selectedLab.objectives[oIdx]" class="w-full p-2 rounded-xl border border-m3-outline-variant font-sans">
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="font-bold text-m3-on-surface block">Post-Lab Target Competency:</label>
+                            <textarea x-model="selectedLab.competencies" rows="3" class="w-full p-2.5 rounded-xl border border-m3-outline-variant focus:outline-none focus:border-m3-primary font-bold text-brand-emerald leading-relaxed"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TAB 2: INSTRUCTIONS, VARIABLES CRUD & SCAFFOLD SYNC -->
+            <div x-show="activeTab === 'prompt'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="border-b border-m3-outline-variant/60 pb-3 flex items-center justify-between">
+                        <div>
+                            <h2 class="font-extrabold text-base text-m3-on-surface">System Instructions (Gemini 3.8 Execution Engine)</h2>
+                            <p class="text-xs text-m3-on-surface-variant">System prompt truyền tới Gemini 3.8 Flash để chấm điểm AI Judge.</p>
+                        </div>
+                        <span class="font-mono text-[10px] text-m3-outline">Monospaced Syntax</span>
+                    </div>
+                    <textarea x-model="systemPrompt" rows="12" class="w-full p-4 rounded-2xl border border-m3-outline-variant font-mono text-xs text-m3-on-surface leading-relaxed focus:outline-none focus:border-m3-primary bg-slate-950 text-slate-100 select-all"></textarea>
+                </div>
+
+                <div class="lg:col-span-5 space-y-4">
+                    <!-- VARIABLES CRUD -->
+                    <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-3 shadow-xs">
+                        <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-2">
+                            <span class="font-extrabold text-xs text-m3-on-surface">Dynamic Prompt Variables ({variables}) CRUD:</span>
+                            <button @click="addVariable()" class="px-3 py-1 rounded-xl bg-m3-primary text-white text-xs font-bold hover:bg-m3-primary/90 transition-all flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">add</span>
+                                <span>+ Thêm Biến</span>
+                            </button>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs">
+                            <template x-for="(v, vIdx) in promptVariables" :key="vIdx">
+                                <div class="p-3 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <input type="text" x-model="v.name" class="font-mono font-bold text-m3-primary px-2 py-1 rounded border border-m3-outline-variant w-1/3 bg-white">
+                                        <input type="text" x-model="v.mappedTo" class="text-[10px] text-slate-600 font-sans px-2 py-1 rounded border border-m3-outline-variant w-1/2 bg-white" placeholder="Vị trí hiển thị UI-05">
+                                        <button @click="deleteVariable(vIdx)" class="text-red-600 hover:text-red-800 p-1">
+                                            <span class="material-symbols-outlined text-sm">delete</span>
+                                        </button>
+                                    </div>
+                                    <input type="text" x-model="v.sample" class="w-full text-[11px] font-mono text-m3-on-surface px-2 py-1 rounded border border-m3-outline-variant/60 bg-white" placeholder="Giá trị mẫu">
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- SCAFFOLD SYNC -->
+                    <div class="bg-white rounded-3xl border border-m3-outline-variant p-5 space-y-3 shadow-xs">
+                        <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-2">
+                            <span class="font-extrabold text-xs text-m3-on-surface">Scaffold Chips ↔ Rubric Reactive Link:</span>
+                            <span class="text-[10px] font-mono text-m3-outline">Toggle tự động cập nhật Rubric</span>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <template x-for="(chip, cIdx) in scaffoldChips" :key="chip.id">
+                                <div class="p-2.5 rounded-2xl border transition-all space-y-1"
+                                     :class="chip.active ? 'bg-m3-surface border-m3-outline-variant/80' : 'bg-slate-100 border-slate-300 opacity-60'">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-m3-on-surface" x-text="chip.name"></span>
+                                        <button @click="toggleChip(chip)" 
+                                                :class="chip.active ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'"
+                                                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all"
+                                                x-text="chip.active ? 'ACTIVE' : 'DISABLED'"></button>
+                                    </div>
+                                    <div class="text-[10px] text-m3-outline font-mono" x-text="chip.tag"></div>
+                                    <div class="text-[10px] font-bold font-sans flex items-center gap-1"
+                                         :class="chip.active ? 'text-purple-800' : 'text-slate-500'">
+                                        <span class="material-symbols-outlined text-xs">link</span>
+                                        <span x-text="`Linked Rubric Key: ${chip.rubricKey} (${rubricCriteria[chip.rubricKey]?.weight || 0}%)`"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: SEPARATE 3A (SOPs) & 3B (MATERIAL HUB) -->
+            <div x-show="activeTab === 'materials'" class="space-y-6">
+                <!-- 3A: SOP PDFs -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-purple-700">menu_book</span>
+                            <h2 class="font-extrabold text-base text-m3-on-surface">Section 3A: Ground-Truth SOP Assets & RAG Vector Indexing (UI-08)</h2>
+                        </div>
+                        <button @click="alert('Attach SOP Modal')" class="px-4 py-1.5 rounded-full bg-purple-700 text-white text-xs font-bold shadow-xs hover:bg-purple-800 transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">upload_file</span>
+                            <span>+ Attach Official SOP PDF</span>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto border border-m3-outline-variant rounded-2xl text-xs">
+                        <table class="w-full text-left">
+                            <thead class="bg-m3-surface-container-low font-bold border-b border-m3-outline-variant/80">
+                                <tr>
+                                    <th class="p-3.5">Tên SOP</th>
+                                    <th class="p-3.5">Số trang</th>
+                                    <th class="p-3.5">Vector Chunks</th>
+                                    <th class="p-3.5">Trạng thái</th>
+                                    <th class="p-3.5">Thời gian Vectorize</th>
+                                    <th class="p-3.5 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-m3-outline-variant/60">
+                                <template x-for="sop in sopDocs" :key="sop.id">
+                                    <tr>
+                                        <td class="p-3.5 font-bold font-mono text-m3-primary flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-purple-700">description</span>
+                                            <span x-text="sop.name"></span>
+                                        </td>
+                                        <td class="p-3.5 font-mono" x-text="`${sop.pages} trang`"></td>
+                                        <td class="p-3.5 font-mono" x-text="`${sop.chunks} chunks`"></td>
+                                        <td class="p-3.5"><span class="px-2 py-0.5 rounded-full font-mono text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold" x-text="sop.status"></span></td>
+                                        <td class="p-3.5 font-mono text-m3-outline" x-text="sop.vectorDate"></td>
+                                        <td class="p-3.5 text-right space-x-2">
+                                            <button @click="copyCitation(sop.citationPath)" class="px-3 py-1 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 font-bold hover:bg-emerald-100 text-xs">
+                                                📋 Copy Citation Path
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3B: NON-SOP MATERIALS -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-m3-primary">folder_open</span>
+                            <h2 class="font-extrabold text-base text-m3-on-surface">Section 3B: Facilitator Codelab Material & Knowledge Checklist</h2>
+                        </div>
+                        <button @click="addNonSopMaterial()" class="px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-bold shadow-xs hover:bg-m3-primary/90 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">add_link</span>
+                            <span>+ Thêm Học liệu</span>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto border border-m3-outline-variant rounded-2xl text-xs">
+                        <table class="w-full text-left">
+                            <thead class="bg-m3-surface-container-low font-bold border-b border-m3-outline-variant/80">
+                                <tr>
+                                    <th class="p-3.5">Phân loại</th>
+                                    <th class="p-3.5">Tên Học liệu</th>
+                                    <th class="p-3.5">URL / Path</th>
+                                    <th class="p-3.5">Version & Ngày cập nhật</th>
+                                    <th class="p-3.5">Nhật ký thay đổi</th>
+                                    <th class="p-3.5 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-m3-outline-variant/60">
+                                <template x-for="(mat, mIdx) in nonSopMaterials" :key="mat.id">
+                                    <tr>
+                                        <td class="p-3.5"><input type="text" x-model="mat.type" class="p-1 border rounded font-mono text-[10px] font-bold text-m3-primary"></td>
+                                        <td class="p-3.5 font-bold"><input type="text" x-model="mat.name" class="p-1 border rounded w-full"></td>
+                                        <td class="p-3.5 font-mono text-m3-primary"><input type="text" x-model="mat.url" class="p-1 border rounded text-[11px] w-full"></td>
+                                        <td class="p-3.5 font-mono"><input type="text" x-model="mat.version" class="p-1 border rounded text-[10px] w-16"></td>
+                                        <td class="p-3.5"><input type="text" x-model="mat.log" class="p-1 border rounded text-[11px] w-full"></td>
+                                        <td class="p-3.5 text-right">
+                                            <button @click="deleteNonSopMaterial(mIdx)" class="px-2 py-1 rounded bg-red-50 text-red-700 font-bold hover:bg-red-100">Xóa</button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: RUBRIC & SANDBOX -->
+            <div x-show="activeTab === 'rubric'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-6 bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <h2 class="font-extrabold text-base text-m3-on-surface">Smart Auto-Balancing Rubric Weights</h2>
+                        <span class="px-3 py-1 rounded-full font-mono font-extrabold text-xs bg-emerald-100 text-emerald-900 border border-emerald-300" x-text="`Tổng: ${totalWeight}%`"></span>
+                    </div>
+
+                    <div class="space-y-4 text-xs">
+                        <template x-for="(criterion, rKey) in rubricCriteria" :key="rKey">
+                            <div class="p-3.5 rounded-2xl border space-y-1.5" :class="criterion.active ? 'bg-m3-surface border-m3-outline-variant/60' : 'bg-slate-100 opacity-50'">
+                                <div class="flex justify-between font-bold">
+                                    <span x-text="criterion.label"></span>
+                                    <span class="font-mono text-m3-primary" x-text="`${criterion.weight}% (${(criterion.weight * 0.1).toFixed(1)} / 10.0 pts)`"></span>
+                                </div>
+                                <input type="range" min="0" max="100" step="5" :disabled="!criterion.active" :value="criterion.weight" @input="updateWeight(rKey, $event.target.value)" class="w-full accent-m3-primary">
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <h2 class="font-extrabold text-base text-m3-on-surface">Prompt Sandbox Test Runner</h2>
+                        <span class="text-[10px] font-mono text-emerald-700 font-bold">Gemini 3.8 Flash Engine</span>
+                    </div>
+                    <textarea x-model="sandboxPrompt" rows="6" class="w-full p-3 rounded-2xl border font-mono text-xs bg-m3-surface-container-low"></textarea>
+                    <button @click="runSandboxTest()" :disabled="isTesting" class="w-full py-2.5 rounded-full bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-2">
+                        <span x-text="isTesting ? 'Simulating Evaluation...' : 'Run Test in Sandbox'"></span>
+                    </button>
+                    <div x-show="testExecuted" class="p-4 bg-slate-950 text-slate-100 rounded-2xl font-mono text-xs space-y-1 border border-slate-800">
+                        <div class="flex justify-between text-emerald-400 font-bold"><span>✓ Evaluation Successful</span><span>8.8 / 10.0 Max Grade</span></div>
+                        <p class="text-[11px] text-slate-300">Groundedness: 3.0/3.0 • Persona: 2.0/2.0 • Format: 2.0/2.0 • One-Shot: 1.5/1.5 • Actionability: 0.3/1.5</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- TAB 5: AWARDS, BADGES, GAMIFICATION & CERTIFICATIONS      -->
+            <!-- (RESTORED FULL INTERACTIVE EDITABLE INPUTS & CONTROLS)     -->
+            <!-- ========================================================= -->
+            <div x-show="activeTab === 'awards'" class="space-y-6">
+                
+                <!-- 1. LIVE WORKSHOP GAMIFICATION & QUIZ LINKS (FULL CRUD) -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <div>
+                            <h2 class="font-extrabold text-base text-m3-on-surface">Live Workshop Gamification & Icebreaker Links</h2>
+                            <p class="text-xs text-m3-on-surface-variant">Lưu trữ và chỉnh sửa trực tiếp các liên kết game tương tác Kahoot, Mentimeter poll, Quizizz cho buổi workshop.</p>
+                        </div>
+
+                        <button @click="addGamificationLink()" class="px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-bold shadow-xs hover:bg-m3-primary/90 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">add</span>
+                            <span>+ Thêm Quiz / Poll Link</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <template x-for="(g, gIdx) in awardsData.gamificationLinks" :key="g.id">
+                            <div class="p-3.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                                <div class="md:col-span-4 space-y-1">
+                                    <label class="font-bold text-m3-on-surface text-[11px] block">Tên Hoạt động Game/Quiz:</label>
+                                    <input type="text" x-model="g.title" class="w-full p-2 rounded-xl border border-m3-outline-variant font-bold bg-white text-xs">
+                                </div>
+
+                                <div class="md:col-span-4 space-y-1">
+                                    <label class="font-bold text-m3-on-surface text-[11px] block">Nền tảng Tương tác:</label>
+                                    <select x-model="g.type" class="w-full p-2 rounded-xl border border-m3-outline-variant font-bold bg-white text-xs text-amber-800">
+                                        <option value="Kahoot">Kahoot</option>
+                                        <option value="Mentimeter">Mentimeter</option>
+                                        <option value="Quizizz">Quizizz</option>
+                                        <option value="Slido">Slido</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-3 space-y-1">
+                                    <label class="font-bold text-m3-on-surface text-[11px] block">Đường dẫn Live Session URL:</label>
+                                    <input type="text" x-model="g.url" class="w-full p-2 rounded-xl border border-m3-outline-variant font-mono text-m3-primary bg-white text-[11px]">
+                                </div>
+
+                                <div class="md:col-span-1 flex justify-end pt-4">
+                                    <button @click="deleteGamificationLink(gIdx)" class="p-2 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 font-bold transition-all border border-red-200">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 2. DIGITAL ACHIEVEMENT BADGES CONFIGURATION (FULL CRUD) -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="flex items-center justify-between border-b border-m3-outline-variant/60 pb-3">
+                        <div>
+                            <h2 class="font-extrabold text-base text-m3-on-surface">Digital Achievement Badges Configuration</h2>
+                            <p class="text-xs text-m3-on-surface-variant">Cấu hình biểu tượng Huy hiệu số và thiết lập điều kiện tự động cấp huy hiệu cho Học viên.</p>
+                        </div>
+
+                        <button @click="addBadge()" class="px-4 py-1.5 rounded-full bg-purple-700 text-white text-xs font-bold shadow-xs hover:bg-purple-800 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">add_moderator</span>
+                            <span>+ Thêm Huy hiệu mới</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <template x-for="(b, bIdx) in awardsData.badges" :key="b.id">
+                            <div class="p-4 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 space-y-3">
+                                <div class="flex items-center justify-between gap-2 border-b border-m3-outline-variant/40 pb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-amber-700 text-xl" x-text="b.icon"></span>
+                                        <input type="text" x-model="b.name" class="font-bold text-m3-on-surface p-1 border border-m3-outline-variant rounded bg-white w-full">
+                                    </div>
+                                    <button @click="toggleBadgeStatus(bIdx)" 
+                                            :class="b.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-slate-200 text-slate-700 border-slate-300'"
+                                            class="px-2.5 py-0.5 rounded-full font-mono text-[10px] border font-bold" 
+                                            x-text="b.status"></button>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-m3-on-surface text-[11px] block">Material Icon Name:</label>
+                                    <input type="text" x-model="b.icon" class="w-full p-1.5 rounded border border-m3-outline-variant font-mono text-[11px] bg-white">
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="font-bold text-m3-on-surface text-[11px] block">Điều kiện Tự động Cấp (Automated Threshold):</label>
+                                    <textarea x-model="b.criteria" rows="2" class="w-full p-2 rounded border border-m3-outline-variant font-sans bg-white text-[11px]"></textarea>
+                                </div>
+
+                                <div class="flex justify-end pt-1">
+                                    <button @click="deleteBadge(bIdx)" class="px-2.5 py-1 rounded bg-red-50 text-red-700 font-bold hover:bg-red-100 border border-red-200 text-[11px]">
+                                        Xóa Huy hiệu
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 3. ENTERPRISE CERTIFICATE & COMPLETION GOVERNANCE (EDITABLE FORMS) -->
+                <div class="bg-white rounded-3xl border border-m3-outline-variant p-6 space-y-4 shadow-xs">
+                    <div class="border-b border-m3-outline-variant/60 pb-3">
+                        <h2 class="font-extrabold text-base text-m3-on-surface">Enterprise Certificate & Completion Governance</h2>
+                        <p class="text-xs text-m3-on-surface-variant">Cấu hình tiêu đề phôi chứng chỉ B2B, đơn vị cấp phép, điều kiện tốt nghiệp và đường dẫn mẫu PDF.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="space-y-1.5">
+                            <label class="font-bold text-m3-on-surface block">Tiêu đề Chứng chỉ Doanh nghiệp:</label>
+                            <input type="text" x-model="awardsData.certificate.title" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold text-brand-emerald bg-white">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="font-bold text-m3-on-surface block">Đơn vị Cấp Bằng / Ủy ban Đào tạo:</label>
+                            <input type="text" x-model="awardsData.certificate.issuer" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-bold bg-white">
+                        </div>
+
+                        <div class="md:col-span-2 space-y-1.5">
+                            <label class="font-bold text-m3-on-surface block">Quy tắc & Điều kiện Tốt nghiệp (Eligibility Rules):</label>
+                            <textarea x-model="awardsData.certificate.eligibility" rows="2" class="w-full p-2.5 rounded-xl border border-m3-outline-variant font-sans bg-white leading-relaxed"></textarea>
+                        </div>
+
+                        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3 p-3.5 bg-m3-surface rounded-2xl border border-m3-outline-variant/60 items-center">
+                            <div class="md:col-span-2 space-y-1">
+                                <label class="font-bold block text-m3-on-surface">Mẫu Phôi Certificate PDF Template URL:</label>
+                                <input type="text" x-model="awardsData.certificate.templateUrl" class="w-full p-2 rounded-xl border border-m3-outline-variant font-mono text-[11px] text-m3-primary bg-white">
+                            </div>
+
+                            <div class="space-y-1 text-right">
+                                <span class="font-bold block text-m3-on-surface text-[11px]">Lần cuối cập nhật Phôi:</span>
+                                <span class="font-mono text-[11px] text-m3-outline block" x-text="awardsData.certificate.lastUpdated"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="py-3 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-8">
+        <p>© 2026 Promptify x Intrepid Asia. Master Codelabs Directory & Lifecycle Studio (UI-11) Active.</p>
+    </footer>
+
+</body>
+</html>

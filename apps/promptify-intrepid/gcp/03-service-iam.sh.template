@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Default --validate/--dry-run mode stops before any cloud/database call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/gcp/SETUP_GUIDE.md before user execution.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='PROJECT_ID'
+region='REGION'
+api="promptify-api@${project}.iam.gserviceaccount.com"
+worker="promptify-worker@${project}.iam.gserviceaccount.com"
+workspace="promptify-workspace@${project}.iam.gserviceaccount.com"
+build="promptify-build@${project}.iam.gserviceaccount.com"
+# USER EXECUTION ONLY. Review permissions before running.
+for account in "$api" "$worker"; do
+ gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$account" --role=roles/cloudsql.client
+ # BigQuery capability is retained. Grant job execution; dataset ACLs are separate below.
+ gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$account" --role=roles/bigquery.jobUser
+ gcloud secrets add-iam-policy-binding intrepid-db-password --member="serviceAccount:$account" --role=roles/secretmanager.secretAccessor --project="$project"
+ gcloud iam service-accounts add-iam-policy-binding "$workspace" --member="serviceAccount:$account" --role=roles/iam.serviceAccountTokenCreator --project="$project"
+done
+gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$api" --role=roles/aiplatform.user
+gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$api" --role=roles/firebaseauth.viewer
+gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$worker" --role=roles/datastore.user
+gcloud storage buckets add-iam-policy-binding "gs://${project}-intrepid-sop-staging" --member="serviceAccount:$api" --role=roles/storage.objectAdmin --project="$project"
+# Keyless signed URL generation: API identity may sign as itself.
+gcloud iam service-accounts add-iam-policy-binding "$api" --member="serviceAccount:$api" --role=roles/iam.serviceAccountTokenCreator --project="$project"
+gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$build" --role=roles/logging.logWriter
+gcloud artifacts repositories add-iam-policy-binding promptify-intrepid --location="$region" --member="serviceAccount:$build" --role=roles/artifactregistry.writer --project="$project"
+gcloud storage buckets add-iam-policy-binding "gs://${project}-intrepid-build-staging" --member="serviceAccount:$build" --role=roles/storage.objectViewer --project="$project"
+# Run rendered BigQuery DDL as the reviewed human dataset owner before these grants.
+# Dataset scope avoids broad project data-editor grants. API reads; worker projects writes.
+bq --project_id="$project" --location="$region" query --use_legacy_sql=false < outputs/gcp/bigquery-iam.sql
+echo 'Keep warehouse disabled until datasets, IAM, projection backfill and parity checks pass; then render with --warehouse-enabled=true.' 
+echo 'Share approved source Sheets/Drive files with the workspace service-account email. GCP IAM alone does not grant Drive file access.'
+echo 'The human deployment account needs permission to submit builds and act as the relevant service accounts; ask the project administrator if denied.'
+
+# Cloud SQL itself calls Vertex for embeddings. This is NOT the Cloud Run API identity.
+sql_account=$(gcloud sql instances describe SQL_INSTANCE --project="$project" --format='value(serviceAccountEmailAddress)')
+: "${sql_account:?Cloud SQL service account not found}"
+gcloud iam roles create intrepidSqlPredictor --project="$project" --title='Intrepid SQL Vertex Predictor' --permissions=aiplatform.endpoints.predict --stage=GA
+gcloud projects add-iam-policy-binding "$project" --member="serviceAccount:$sql_account" --role="projects/${project}/roles/intrepidSqlPredictor"

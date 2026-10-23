@@ -1,0 +1,467 @@
+You are preparing the IMPLEMENTATION PLAN for the Promptify Intrepid rebuild.
+
+DO NOT implement yet.
+DO NOT modify application code.
+DO NOT run migrations.
+DO NOT commit / push / deploy.
+
+Your goal is to produce a practical implementation plan that the team can review before coding.
+
+==================================================
+0. SOURCE-OF-TRUTH PRIORITY
+==================================================
+
+There are multiple documents with different authority levels.
+
+Use this priority strictly:
+
+LEVEL 1 — HIGHEST AUTHORITY
+"Đức’s thoughts" in the latest refined document.
+
+These are direct stakeholder decisions.
+
+LEVEL 2
+Structured Refinement & Actionable Summary.
+
+This is interpretation of Đức’s thoughts.
+
+LEVEL 3
+BRD 2.0.
+
+LEVEL 4
+PRD 1.0.
+
+LEVEL 5
+Previous As-Is Audit and Gap Analysis.
+
+Use the As-Is audit to understand existing implementation,
+NOT to override new business direction.
+
+IMPORTANT:
+
+If lower-level documents introduce something not explicitly supported by a higher-level source, mark it as:
+
+PROPOSED / NEEDS CONFIRMATION
+
+Do NOT silently treat it as confirmed.
+
+Examples:
+- Redis
+- 20 req/min
+- 50k tokens/session
+- Next.js 14
+- Fastify/Express
+- SSE requirement
+- WCAG target
+- exact Mastery %
+- 4-week sprint
+- Dynamic white-label theme
+
+These may be reasonable proposals, but must not automatically become committed requirements.
+
+==================================================
+1. CONFIRMED PHASE-1 DIRECTION
+==================================================
+
+Treat these as confirmed unless stronger evidence contradicts them:
+
+- Phase 1 is an INTERNAL Promptify version for Intrepid.
+- Not a generic multi-tenant SaaS yet.
+- Target users:
+  1. Intrepid Learner
+  2. Vo Tu Duc / Trainer
+  3. Department Head / Admin
+- Intrepid has multiple Business Functions across multiple countries.
+- Corporate Intrepid SSO.
+- Users are pre-onboarded from roster data.
+- After login, user confirms:
+  - email
+  - full name
+  - business function / department
+  - country
+- User is routed to their department-specific learning zone.
+- Training content should use:
+  - Intrepid SOPs
+  - department-specific sample data
+  - trainer-created exercises
+- Department Heads may:
+  - confirm/update SOP information
+  - provide sample operational data
+  - view department learning results
+  - view department prompt library
+- Vo Tu Duc is the primary trainer/admin for Phase 1.
+- All Intrepid users are treated as paid users.
+- No payment/subscription flow is required in Phase 1.
+- End users do NOT provide their own AI API key.
+- AI credentials are controlled backend-side by Intrepid.
+- English + Vietnamese should be supported through i18n architecture.
+- Analytics/reporting is important.
+- Success with Intrepid should create a reusable pattern for future enterprise deployments.
+- Generic multi-tenant / Agribank-style cloning is Phase 2, not the first implementation target.
+
+==================================================
+2. CURRENT SYSTEM
+==================================================
+
+Read the existing:
+
+docs/as-is-audit/
+
+especially:
+
+- 01_SYSTEM_OVERVIEW.md
+- 02_FEATURE_INVENTORY.md
+- 03_DATABASE_AND_SQL.md
+- 04_CURRENT_ARCHITECTURE.md
+- 05_USER_FLOWS.md
+- 06_AI_FLOW.md
+- 07_ACCESS_CONTROL.md
+- 08_TECH_DEBT_AND_RISKS.md
+- 09_TEST_AND_RUNTIME_STATUS.md
+- 10_AS_IS_EXECUTIVE_SUMMARY.md
+
+The current Promptify version must remain an independent version.
+
+DO NOT plan to overwrite it directly.
+
+The new Intrepid rebuild should be planned separately.
+
+==================================================
+3. FIRST: DETERMINE WHAT TO REUSE
+==================================================
+
+Before planning implementation, classify important existing capabilities into:
+
+KEEP
+REUSE WITH CHANGES
+REBUILD
+NOT NEEDED IN PHASE 1
+
+Pay special attention to:
+
+- Google login
+- users / learners
+- classes / enrollments
+- Course → Module → Lesson
+- curriculum editor
+- Prompt Playground
+- AI generation
+- AI evaluation
+- attempts
+- lesson_progress
+- compare
+- history
+- prompt library
+- instructor dashboard
+- RLS / access control
+- localStorage features
+- current API layer
+
+Do not assume "rebuild" means rewrite everything.
+
+Prefer retaining proven product logic where appropriate,
+while fixing boundaries that are unsafe or unsuitable for Intrepid.
+
+==================================================
+4. DEFINE THE PHASE-1 VERTICAL SLICE
+==================================================
+
+The implementation plan must first make this end-to-end flow work:
+
+INTREPID LEARNER
+
+Corporate SSO
+→ roster/profile match
+→ confirm department + country
+→ department zone
+→ assigned course/module
+→ open exercise
+→ see SOP/context/sample data
+→ write prompt
+→ run AI
+→ receive output
+→ receive feedback/evaluation
+→ improve and rerun
+→ compare attempts
+→ save progress
+→ optionally save useful prompt
+
+
+TRAINER
+
+Login
+→ see departments/cohorts
+→ manage course/module/lesson
+→ attach/reference SOP + sample data
+→ configure exercise/evaluation
+→ assign/publish content
+→ see learner progress
+
+
+DEPARTMENT HEAD
+
+Login
+→ only see own department
+→ see department learners/results
+→ review department prompt library
+→ provide/update SOP/sample data
+
+The implementation plan should optimize for getting THIS vertical slice working first.
+
+==================================================
+5. PRODUCE AN IMPLEMENTATION PLAN
+==================================================
+
+Create:
+
+docs/rebuild/03_IMPLEMENTATION_PLAN.md
+
+Structure it as follows:
+
+## A. Phase-1 Product Boundary
+
+Clearly state:
+
+IN SCOPE
+
+OUT OF SCOPE
+
+PROPOSED / NEEDS CONFIRMATION
+
+Do not mix the three.
+
+--------------------------------------------------
+
+## B. Reuse vs Rebuild Matrix
+
+Table:
+
+Capability
+Current As-Is
+Decision
+Why
+Main change required
+
+--------------------------------------------------
+
+## C. Target User Flows
+
+Provide simple Mermaid diagrams for:
+
+1. Learner
+2. Trainer
+3. Department Head
+
+Keep diagrams high-level.
+
+--------------------------------------------------
+
+## D. Implementation Workstreams
+
+Break implementation into practical workstreams.
+
+For example:
+
+- Identity & onboarding
+- Department / roster model
+- Curriculum & department zones
+- SOP / sample-data management
+- Prompt practice flow
+- AI execution & evaluation
+- Progress / attempts
+- Department Prompt Library
+- Trainer experience
+- Department Head analytics
+- i18n
+- security / API credential governance
+- testing / observability
+
+Do NOT force these exact names if the codebase suggests better boundaries.
+
+For each workstream include:
+
+Goal
+Existing code that can be reused
+What must change
+Dependencies
+Acceptance criteria
+
+--------------------------------------------------
+
+## E. Data Model Changes
+
+Do NOT immediately redesign the whole database.
+
+Start from the existing schema.
+
+For every required change state:
+
+Existing entity
+Problem
+Required Phase-1 change
+
+Only propose NEW entities when genuinely necessary.
+
+Do not produce final SQL yet.
+
+--------------------------------------------------
+
+## F. Implementation Order
+
+Create a dependency-aware order.
+
+Prefer a vertical-slice approach instead of:
+
+"finish all backend → finish all frontend".
+
+Example:
+
+Slice 1:
+SSO → profile → department routing
+
+Slice 2:
+department course → lesson → playground
+
+Slice 3:
+AI → evaluation → attempts/progress
+
+Slice 4:
+trainer content management
+
+Slice 5:
+department head + library + analytics
+
+Adjust based on actual repo dependencies.
+
+--------------------------------------------------
+
+## G. Milestones
+
+Define a small number of milestones.
+
+Each milestone must produce something demoable.
+
+For each milestone:
+
+- objective
+- included features
+- dependencies
+- definition of done
+- demo scenario
+
+Do NOT invent dates unless a real deadline exists in stakeholder sources.
+
+If timing is unknown, use relative effort:
+Small / Medium / Large
+or dependency order.
+
+--------------------------------------------------
+
+## H. Risk Register
+
+Focus only on real Phase-1 risks:
+
+- existing access-control debt
+- cross-department data leakage
+- AI credential abuse
+- SOP/sample-data privacy
+- current client-supplied evaluation provenance
+- curriculum/data inconsistency
+- roster/profile mismatch
+- i18n/content localization
+- AI usage/cost control
+
+For every risk:
+impact
+current evidence
+mitigation direction
+
+Do not invent infrastructure just to solve the risk.
+
+--------------------------------------------------
+
+## I. Technical Decisions Still Open
+
+Create a table:
+
+Decision
+Why it matters
+Options
+Current recommendation
+Status
+
+Examples might include:
+
+- keep Supabase vs change backend platform
+- streaming vs non-streaming
+- rate-limit mechanism
+- SOP ingestion approach
+- AI provider/runtime
+- analytics storage
+- deployment architecture
+
+IMPORTANT:
+
+Recommendations are allowed,
+but mark them clearly as PROPOSED.
+
+Do not present them as stakeholder-approved.
+
+==================================================
+6. VERY IMPORTANT SCOPE RULES
+==================================================
+
+PHASE 1 DOES NOT NEED:
+
+- payment
+- BASIC/FREE tier
+- public registration
+- generic multi-tenant SaaS
+- Partner Portal
+- revenue sharing
+- generic enterprise white-label product
+- Agribank implementation
+- ERP writeback
+- complex workflow automation
+
+unless direct stakeholder source explicitly moves them into Phase 1.
+
+Future scalability may influence interfaces/data boundaries,
+but must NOT cause premature implementation.
+
+==================================================
+7. HARNESS / TRACEABILITY
+==================================================
+
+Every major implementation item should be traceable to:
+
+CONFIRMED
+PROPOSED
+or CURRENT-AS-IS
+
+Do not allow an AI-generated PRD detail to become implementation scope silently.
+
+At the end create:
+
+### Decision Traceability Table
+
+Implementation Item
+Business Source
+Status: Confirmed / Proposed
+Blocking Confirmation?
+
+==================================================
+8. FINAL RESPONSE
+==================================================
+
+After creating the document, respond only with:
+
+1. Proposed Phase-1 vertical slice
+2. Number of KEEP / REUSE / REBUILD / NOT-NEEDED decisions
+3. Proposed implementation milestones
+4. Top 5 risks
+5. Technical decisions that still require human approval
+
+Then STOP.
+
+Do NOT implement.

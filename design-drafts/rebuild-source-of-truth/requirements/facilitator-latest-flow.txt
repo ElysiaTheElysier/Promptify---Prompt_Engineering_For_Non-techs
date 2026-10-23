@@ -1,0 +1,273 @@
+
+
+                      [ Facilitator Login (Google SSO) ]
+                                       │
+                                       ▼
+                  ┌──────────────────────────────────────────┐
+                  │   PHASE 1: SITUATIONAL AWARENESS HUB    │
+                  │        ("The Pulse" - Dashboard)         │
+                  └────────────────────┬─────────────────────┘
+                                       │
+                   Is a Masterclass session Active / Imminent?
+                                  /         \
+                             (YES)           (NO)
+                              /               \
+                             ▼                 ▼
+          ┌───────────────────────────┐   ┌───────────────────────────┐
+          │   PHASE 3: LIVE WORKSHOP  │   │   PHASE 2: LAB AUTHORING  │
+          │    ("In-Game / Execute")  │   │    ("Pre-Game / Govern")  │
+          └─────────────┬─────────────┘   └─────────────┬─────────────┘
+                        │                               │
+                ┌───────┴───────┐               ┌───────┴───────┐
+                │               │               │               │
+             [Quick          [Deep           [Quick          [Deep
+             Inline          UI-09           Inline          UI-11
+             Action]       Command]          Action]        Studio]
+
+
+
+Here are the high-level and detailed Facilitator User Flow Diagrams in Mermaid.js syntax, explicitly mapped with corresponding UI IDs (UI-00, UI-05, UI-08, UI-09, UI-10, UI-11, UI-12) across the 3-Phase Facilitator Ecosystem.
+
+That is a very smart and disciplined product design approach. Documenting the Refactoring Methodology & Core Principles established during the UI-09 update gives us an explicit quality benchmark. It ensures that when we refactor UI-10 (Prompt Inspector) and UI-11 (Curriculum Studio), we maintain total architectural consistency, data schema synchronization, and UX harmony.
+
+Below is the formalized Facilitator UI Refactoring Framework & Design Methodology.
+
+
+📐 Facilitator UI Refactoring Framework & Design Methodology
+1. Core Philosophy: Intent-Driven Operational Hierarchy
+Traditional admin dashboards present a flat menu of equal-weight options, causing cognitive fatigue. Our framework replaces this with an Intent-Driven Operational Hierarchy that adapts the UI based on what phase of work the facilitator is performing rather than forcing them to hunt for features.
+
+
+2. The 6 Core Design Principles
+Principle 1: 3-Phase Operational Hierarchy ("Observe → Prepare → Execute")
+Every Facilitator UI must align with or connect to one of three operational phases:
+
+Phase 1: Situational Awareness ("The Pulse") — Observe & Assess
+5-second health check: active cohorts, average rubric scores, stuck/PII alerts, and model latency.
+Adaptive hero banner that auto-promotes live sessions when active (\(\pm 30\) mins) or authoring tools when idle.
+Phase 2: Pre-Game Studio ("Prepare & Govern") — Build & Configure
+Everything needed to author Codelabs, set system prompts, attach SOP PDFs, verify RAG vector embeddings, and adjust 5-criteria rubric weights before class.
+Phase 3: Live War Room ("Execute & Intervene") — Monitor & Guide
+Real-time 5-technique heatmaps, automated stuck learner flags (>5 failed attempts), quick broadcast hints, and 1-on-1 verbatim prompt inspection.
+Principle 2: Dual-Layer Interaction Pattern ("Quick Inline vs. Deep Navigation")
+To prevent unnecessary full-page reloads for routine tasks, every interface must offer two interaction depth levels:
+
+Layer A (Quick Inline Control): High-frequency, low-friction actions performed directly on main views or cards (e.g., inline lifecycle status toggles Draft → Active, quick cohort reassignments, inline SLA hint broadcasts).
+Layer B (Deep Workspace Navigation): Dedicated, full-featured modal drawers or specialized pages (UI-10, UI-11) for multi-step, complex operations (e.g., editing system instructions, examining V1..V5 verbatim syntax diffs).
+Principle 3: Zero-Dead-End Navigation Triad (UI-09 ↔ UI-10 ↔ UI-11)
+No facilitator UI should exist as an isolated island. Every view must provide bidirectional navigation triggers to its counterpart screens while preserving state and context (learnerId, labId, cohortId):
+
+UI-09 → UI-10: Click learner card on Live Heatmap \(\rightarrow\) Open Inspector Drawer.
+UI-10 → UI-09: Click "Close Drawer" \(\rightarrow\) Return to Live Heatmap.
+UI-09 → UI-11: Click "Edit Lab" or "+ Create Lab" \(\rightarrow\) Open Curriculum Studio.
+UI-11 → UI-09: Click "Deploy & Launch War Room" \(\rightarrow\) Return to Control Center.
+UI-10 → UI-11: Click "Edit Master Template" (when multiple students fail the same step) \(\rightarrow\) Jump directly to edit the Codelab template in Studio.
+UI-11 → UI-10: Click "Inspect Baseline Runs" \(\rightarrow\) View sample or historical attempt logs.
+Principle 4: Strict Enterprise Domain & Data Schema Alignment
+All copy, data fields, and system logic must strictly ground in the Intrepid Asia enterprise scenario:
+
+Real-world Context: LAB-BS-03: One-shot Brand Voice & SLA Ticket Classification (11.11 Mega Sale Ticket #842 double payment dispute).
+Ground-Truth RAG SOP: Grounded against SOP-Campaign-Ops-v4.pdf (Page 4: P1 Critical SLA 15-min window).
+5 Weighted Rubric Criteria: Synchronized across all UIs:
+Groundedness & SOP Citation (30%)
+Task & Role Persona (20%)
+Format Adherence - Markdown Table (20%)
+One-Shot Pattern Compliance (15%)
+Business Actionability & SLA Window (15%)
+Principle 5: Actionable Observability & Cognitive Safeguards
+Automated Red Flags: Visual badges and red highlights trigger automatically when a student makes \(>5\) failed attempts ("Stuck") or inputs unscrubbed sensitive data ("PII Breach").
+Gated Cognitive Safeguards: Hints and solutions in learner views remain locked behind confirmation modals to prevent passive copying and protect learning integrity.
+Real-time Telemetry: Stream live latency, token counts, and execution timestamps (e.g. 0.72s • 184 tokens).
+Principle 6: Standardized M3 Visual & Color-Coded UX Hierarchy
+Design Tokens: Material Design 3 (M3) palette using Inter for UI text and JetBrains Mono for prompts, code, and telemetry.
+Color-Coded Status Tokens:
+🟢 Emerald (#059669): Completed, Passed (score \(\ge 8.0/10\)), Active state, Successful execution.
+🟡 Amber (#D97706): In Progress, Published state, Warning/Hint.
+🔴 Rose (#BA1A1A): Stuck learner (\(>5\) fails), Failed evaluation, Archived state.
+🟣 Purple (#7E22CE): PII Breach, Advanced Tier, SOP/RAG Indexing.
+🔵 Blue (#0B57D0): Primary actions, Draft state, Role personas.
+
+
+3. Refactoring Checklist for Upcoming UIs
+When we refactor UI-10 and UI-11, we will evaluate them against this explicit checklist:
+
+Check
+Refactoring Requirement
+Application to UI-10 (Inspector)
+Application to UI-11 (Studio)
+☐
+Domain Context
+Ground in Ticket #842 & SOP-Campaign-Ops-v4.pdf
+Ground in LAB-BS-03 setup & RAG embedding status
+☐
+Rubric Sync
+Display 5 itemized criteria matching 30/20/20/15/15 weights
+Include sliders/inputs that validate sum to 100%
+☐
+Interaction Depth
+Slide-over drawer with instant private 1-on-1 coaching bar
+4 structured tabs (Scope, Instructions, SOPs, Rubric)
+☐
+Triad Navigation
+Include explicit buttons back to UI-09 and jump to UI-11
+Include explicit buttons to deploy to UI-09 and jump to UI-10
+☐
+Visual Polish
+Monospaced V1..V5 verbatim syntax diff boxes & M3 styling
+Monospaced instruction editor, {variables} manager & test sandbox
+
+
+
+
+1. High-Level Facilitator User Flow (3-UI Ecosystem Overview)
+This diagram illustrates the macro-level loop: logging in, landing on the Control Center (UI-09), navigating between authoring (UI-11) and deep inspection (UI-10), and exiting after post-session analytics sync (UI-12).
+
+flowchart TD
+    %% Nodes & Flow
+    Login[1. Facilitator Login via Google SSO\nUI-00] --> Dashboard[2. Land on Facilitator Control Center\nUI-09]
+
+    subgraph Hub["UI-09: Facilitator Control Center (Central Hub)"]
+        Dashboard --> Phase1[Phase 1: Pulse & Telemetry Check\nUI-09]
+        Dashboard --> Phase2Quick[Phase 2: Quick Inline Lab Governance\nUI-09]
+        Dashboard --> Phase3Live[Phase 3: Live Heatmap & Broadcast Bar\nUI-09]
+    end
+
+    %% Deep Navigation Extensions
+    Phase2Quick -- "Click 'Edit in UI-11' or '+ Create Lab'" --> Studio[3. Curriculum & SOP Studio\nUI-11]
+    Studio -- "Attach SOPs / RAG Indexing" --> SOPLib[SOP Context Library\nUI-08]
+    SOPLib --> Studio
+    Studio -- "Save & Deploy to Cohort" --> Dashboard
+
+    Phase3Live -- "Click 'Inspect Prompts' on Learner Card" --> Inspector[4. Prompt Inspector Drawer\nUI-10]
+    Inspector -- "Send 1-on-1 Coaching Tip" --> LearnerWS[Student Workspace\nUI-05]
+    Inspector -- "Close Drawer" --> Dashboard
+
+    Phase3Live -- "Broadcast SLA Hint" --> LearnerWS
+
+    %% Wrap Up
+    Phase3Live -- "End Live Session" --> WrapUp[5. Session Auto-Lock & Analytics Sync\nUI-12]
+    WrapUp --> Logout[6. Logout / Exit\nUI-00]
+
+    %% Styling
+    classDef hub fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef studio fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+    classDef inspect fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+    classDef ext fill:#fff3e0,stroke:#f57c00,stroke-width:1.5px;
+
+    class Dashboard,Phase1,Phase2Quick,Phase3Live hub;
+    class Studio,SOPLib studio;
+    class Inspector inspect;
+    class Login,LearnerWS,WrapUp,Logout ext;
+
+
+Vector file link here.
+
+
+
+
+2. Comprehensive Detailed Facilitator User Flow
+This detailed chart covers all operational scenarios, decision points, inline quick actions, deep authoring workflows, and live interventions.
+
+Vector file link here.
+
+
+
+flowchart TD
+    %% ENTRY
+    Start([Start: Facilitator Logs In via Google SSO]) --> UI00_Auth[Authenticate Credentials & Verify Facilitator Role\nUI-00]
+    UI00_Auth --> UI09_Landing[Land on Facilitator Control Center\nUI-09]
+
+    %% PHASE 1: SITUATIONAL AWARENESS ("THE PULSE")
+    subgraph P1["PHASE 1: SITUATIONAL AWARENESS HUB ('THE PULSE') — UI-09"]
+        UI09_Landing --> P1_Telemetry[Inspect 5-Second System Telemetry Cards\n- Active Cohorts Count\n- Avg Rubric Score e.g. 8.4/10\n- Stuck Learner & PII Breach Alerts\n- Gemini 3.8 AI Gateway Latency\nUI-09]
+        P1_Telemetry --> P1_CheckSession{Is a Masterclass Session\nActive or Starting in <=30 mins?}
+    end
+
+    P1_CheckSession -- YES --> P1_PromoteLive[Hero Banner Auto-Promotes Live War Room\nUI-09]
+    P1_CheckSession -- NO --> P1_PromoteStudio[Hero Banner Auto-Promotes Codelab Studio\nUI-09]
+
+    %% PHASE 2: PRE-GAME STUDIO ("PREPARE & GOVERN")
+    subgraph P2["PHASE 2: PRE-GAME STUDIO ('PREPARE & GOVERN') — UI-09 / UI-11"]
+        P1_PromoteStudio --> P2_SelectType{Select Authoring Action Type}
+        
+        %% Scenario 2A: Quick Inline Actions on Dashboard
+        P2_SelectType -- "Quick Inline Action" --> P2_InlineCard[Locate Codelab Card on Dashboard\nUI-09]
+        P2_InlineCard --> P2_QuickToggle[Inline Status Dropdown:\nToggle DRAFT -> PUBLISHED -> ACTIVE -> ARCHIVED\nUI-09]
+        P2_InlineCard --> P2_QuickReassign[Inline Cohort Reassignment & Tier Toggle\ne.g. BASIC Free vs ADVANCE Paid\nUI-09]
+
+        %% Scenario 2B: Deep Authoring in UI-11
+        P2_SelectType -- "Deep Authoring" --> UI11_Launch[Open Curriculum & SOP Studio\nUI-11]
+        UI11_Launch --> UI11_Tab1[Tab 1: Configure Scope, Schedules & Eligible Departments\nUI-11]
+        UI11_Tab1 --> UI11_Tab2[Tab 2: Edit System Instructions, Variables & Scaffolding Chips\nUI-11]
+        UI11_Tab2 --> UI11_Tab3[Tab 3: Attach Ground-Truth SOP PDFs & Verify RAG Indexing\nUI-08 / UI-11]
+        UI11_Tab3 --> UI11_Tab4[Tab 4: Tune 5-Criteria Rubric Weights\nGroundedness 30%, Persona 20%, Format 20%, One-Shot 15%, Actionability 15%\nUI-11]
+        UI11_Tab4 --> UI11_Sandbox[Run Model Execution Verification in Prompt Sandbox\nUI-11]
+        UI11_Sandbox --> UI11_Deploy[Click 'Save & Deploy to Cohort'\nUI-11]
+        UI11_Deploy --> UI09_Landing
+    end
+
+    %% PHASE 3: LIVE WORKSHOP EXECUTION ("EXECUTE & INTERVENE")
+    subgraph P3["PHASE 3: LIVE WORKSHOP EXECUTION ('EXECUTE & INTERVENE') — UI-09 / UI-10"]
+        P1_PromoteLive --> P3_SelectAction{Select Live Intervention Type}
+
+        %% Scenario 3A: Quick Broadcast Hint
+        P3_SelectAction -- "Quick Broadcast" --> P3_BroadcastBar[Type Message in Quick Broadcast Bar\nUI-09]
+        P3_BroadcastBar --> P3_SendHint[Click 'Broadcast Hint': Blasts Pop-up Notification\nUI-05 Student Workspaces]
+
+        %% Scenario 3B: Heatmap Monitoring
+        P3_SelectAction -- "Live Heatmap Monitoring" --> P3_Heatmap[Monitor 5-Technique Live Heatmap Matrix\nZero-Shot, Structured, One-Shot, Few-Shot, Grounding\nUI-09]
+        P3_Heatmap --> P3_DetectStuck{Are Learners Flagged?}
+        
+        P3_DetectStuck -- "Stuck >5 Fails or PII Breach" --> P3_RedFlag[Display Red Alert Badge & Visual Highlight\nUI-09]
+        P3_DetectStuck -- "Normal Progress" --> P3_Heatmap
+
+        %% Scenario 3C: Deep Inspection via UI-10 Drawer
+        P3_RedFlag --> UI10_Open[Click 'Inspect Prompts': Open Prompt Inspector Drawer\nUI-10]
+        UI10_Open --> UI10_InspectVerbatim[Review Verbatim Prompt Syntax History V1..V5 & Latency\nUI-10]
+        UI10_InspectVerbatim --> UI10_InspectScore[Inspect 5-Criteria Score Breakdown & AI Diagnostic Feedback\nUI-10]
+        UI10_InspectScore --> UI10_PrivateCoaching[Send Direct Private Coaching Tip to Student\nUI-05 Student Workspace]
+        UI10_PrivateCoaching --> UI10_Close[Close Inspector Drawer\nUI-09]
+
+        %% Scenario 3D: Group Session Control
+        P3_SelectAction -- "Group Session Control" --> P3_Freeze[Click 'Freeze Session'\nPauses Editors with Debrief Overlay in UI-05]
+        P3_Freeze --> P3_Debrief[Conduct Group Discussion]
+        P3_Debrief --> P3_Unfreeze[Click 'Unfreeze Session'\nRestores Editing in UI-05]
+    end
+
+    %% POST-WORKSHOP WRAP-UP
+    subgraph P4["POST-WORKSHOP & SESSION WRAP-UP — UI-09 / UI-12"]
+        P3_SendHint --> P4_CheckEnd{Session Expired or\nTrainer Clicked 'End Session'?}
+        UI10_Close --> P4_CheckEnd
+        P3_Unfreeze --> P4_CheckEnd
+
+        P4_CheckEnd -- YES --> P4_AutoLock[Auto-Transition Status: ACTIVE -> INACTIVE/ARCHIVED\nUI-09]
+        P4_AutoLock --> P4_LockStudentWS[Lock Student Workspaces UI-05 to Read-Only Mode]
+        P4_LockStudentWS --> P4_SyncAnalytics[Sync Telemetry & Rubric Scores to L&D Impact Analytics\nUI-12]
+        P4_SyncAnalytics --> P4_Exit([Facilitator Logs Out / Session Complete\nUI-00])
+    end
+
+    %% Node Color Styling
+    classDef p1Style fill:#e1f5fe,stroke:#0288d1,stroke-width:1.5px;
+    classDef p2Style fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1.5px;
+    classDef p3Style fill:#e8f5e9,stroke:#388e3c,stroke-width:1.5px;
+    classDef p4Style fill:#fff3e0,stroke:#f57c00,stroke-width:1.5px;
+
+    class P1_Telemetry,P1_CheckSession,P1_PromoteLive,P1_PromoteStudio p1Style;
+    class P2_SelectType,P2_InlineCard,P2_QuickToggle,P2_QuickReassign,UI11_Launch,UI11_Tab1,UI11_Tab2,UI11_Tab3,UI11_Tab4,UI11_Sandbox,UI11_Deploy p2Style;
+    class P3_SelectAction,P3_BroadcastBar,P3_SendHint,P3_Heatmap,P3_DetectStuck,P3_RedFlag,UI10_Open,UI10_InspectVerbatim,UI10_InspectScore,UI10_PrivateCoaching,UI10_Close,P3_Freeze,P3_Debrief,P3_Unfreeze p3Style;
+    class P4_CheckEnd,P4_AutoLock,P4_LockStudentWS,P4_SyncAnalytics,P4_Exit p4Style;
+
+
+Key UI Mapping Summary
+UI-00: Login & Role Authentication.
+UI-05: Learner Codelab Workspace (receives broadcast SLA hints, private coaching tips, and session freeze overlays).
+UI-08: Ground-Truth SOP Context Library (RAG indexing and document citation verification).
+UI-09: Facilitator Control Center (central hub for Phase 1 telemetry, Phase 2 inline status toggles, and Phase 3 live heatmap monitoring).
+UI-10: Prompt Inspector Drawer (verbatim V1..V5 syntax review, 5-criteria diagnostic scores, and 1-on-1 private coaching).
+UI-11: Curriculum & SOP Studio (deep lab creation, system prompt editing, SOP linking, and rubric weight tuning).
+UI-12: L&D Admin Impact Analytics (receives post-workshop telemetry and score syncs).
+
+
+
+💡 Would you like me to update our PRD 2.0 Document or User Story Matrix with these updated flow charts?
+

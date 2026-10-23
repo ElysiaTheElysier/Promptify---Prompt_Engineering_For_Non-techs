@@ -1,0 +1,8 @@
+import React,{useState} from 'react';
+import {ProductDialog} from '../common/ProductDialog';
+import type {ProductSnapshot} from '../../types/production';
+import {useProductLanguage} from '../../services/productI18nService';
+export default function LearnerProfile({snapshot,onClose,onAction,busy}:{snapshot:ProductSnapshot;onClose:()=>void;busy:boolean;onAction:(name:string,payload?:Record<string,unknown>,after?:(v:any)=>void)=>Promise<void>}){
+ const vi=useProductLanguage()==='vi',[employeeId,setEmployee]=useState(snapshot.profileDetails?.employee_id||''),[officeLocation,setOffice]=useState(snapshot.profileDetails?.office_location||''),[saved,setSaved]=useState(false);
+ return <ProductDialog title={vi?'Hồ sơ của tôi':'My profile'} onClose={onClose}><form className="lv-dialog" onSubmit={e=>{e.preventDefault();void onAction('saveProfileDetails',{employeeId,officeLocation},()=>setSaved(true));}}><p>{snapshot.profile.full_name} · {snapshot.profile.email}</p><p>{snapshot.selectedClass?.department} · {snapshot.profile.role}</p><label>{vi?'Mã nhân viên':'Employee ID'}<input maxLength={120} value={employeeId} onChange={e=>{setEmployee(e.target.value);setSaved(false);}}/></label><label>{vi?'Địa điểm làm việc':'Office location'}<input maxLength={160} value={officeLocation} onChange={e=>{setOffice(e.target.value);setSaved(false);}}/></label><button className="lv-primary" disabled={busy||!snapshot.feedbackAvailable}>{vi?'Lưu hồ sơ':'Save profile'}</button>{saved&&<p role="status">{vi?'Đã lưu hồ sơ':'Profile saved'}</p>}<button type="button" onClick={onClose}>{vi?'Đóng':'Close'}</button></form></ProductDialog>;
+}

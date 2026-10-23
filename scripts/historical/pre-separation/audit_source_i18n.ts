@@ -1,0 +1,4 @@
+import fs from 'node:fs';import {sourceUiText} from '../src/services/sourceUiTextService';
+const values=new Set<string>();
+for(const file of fs.readdirSync('src/components/rebuild').filter(f=>/^Production(Landing|Entry[123]|Hub|WorkspaceSource|CompareSource|JudgeSource|SopInspectorSource|WorkshopSource|LearnerInspectorSource|StudioSource|AnalyticsSource|SopSource|GovernanceSource|RosterSource)\.tsx$/.test(f))){for(const match of fs.readFileSync('src/components/rebuild/'+file,'utf8').matchAll(/copy\(("(?:[^"\\]|\\.)*")\)/g)){const value=JSON.parse(match[1]).trim();if(/[a-zA-Z]{3}/.test(value)&&!/[\n\r]|[<>]|\{\{|^\[/.test(value)&&sourceUiText(value,'vi')===value)values.add(value);}}
+fs.writeFileSync('outputs/rebuild-audit/untranslated-interface.json',JSON.stringify([...values],null,2));console.log([...values].join('\n'));

@@ -1,0 +1,34 @@
+{
+  "id": "intrepid-native-port",
+  "base": "apps/promptify-intrepid",
+  "delivery": "code",
+  "allowExisting": true,
+  "syntaxOnly": true,
+  "read": [
+    "scripts/run_local_database_tests.mjs"
+  ],
+  "support": [
+    "tests/db-correctness/native_concurrency.mjs",
+    "tests/db-correctness/verify_studio_scope_and_sop.pgtap.sql",
+    "gcp/sql/001_baseline.sql",
+    "gcp/sql/002_projection_outbox.sql",
+    "gcp/sql/003_runtime_role.sql",
+    "gcp/sql/004_pgvector_vertex.sql",
+    "gcp/sql/005_department_correction_auto_approval.sql",
+    "gcp/sql/006_studio_class_scope.sql",
+    "gcp/sql/007_sop_binding_integrity.sql",
+    "gcp/sql/008_scoped_progress_rls.sql",
+    "gcp/sql/009_projection_and_indexing_recovery.sql"
+  ],
+  "write": "scripts/run_local_database_tests.mjs",
+  "tests": [],
+  "objective": "Modify ONLY this isolated PostgreSQL18 test harness to accept --port N where N is strictly 55432 or55433, default55432. Use same validated numericport in pgClient connection and psql -p args. Keep host hardcoded127.0.0.1, fresh synthetic DB marker, no env URLs, refusal ofexistingDB, all9migrations including004 and nativeconcurrency. Add closedown of existingadminconnection exactlyascurrent. Do not change any expectedtests, SQL transformations or extensions. Preserve --psql support. No skip gates; syntax check will be followed by real native execution by supervisor. Return full JavaScript ESmodule source.",
+  "acceptance": [
+    "Onlyportargument plumbing changed",
+    "Reject remotehost/otherport bypass",
+    "NativeGoogleML-only double remainslabelled",
+    "Do not skip004 unlessexplicitwithout-vector"
+  ],
+  "maxAttempts": 1,
+  "timeoutSeconds": 150
+}

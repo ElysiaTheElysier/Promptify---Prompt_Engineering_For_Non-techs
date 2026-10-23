@@ -1,0 +1,70 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+ name: promptify-intrepid-worker
+ labels:
+  cloud.googleapis.com/location: REGION
+spec:
+ template:
+  metadata:
+   annotations:
+    autoscaling.knative.dev/maxScale: '1'
+    run.googleapis.com/cloudsql-instances: PROJECT_ID:REGION:SQL_INSTANCE
+  spec:
+   serviceAccountName: promptify-worker@PROJECT_ID.iam.gserviceaccount.com
+   containerConcurrency: 1
+   timeoutSeconds: 300
+   containers:
+    - image: REGION-docker.pkg.dev/PROJECT_ID/promptify-intrepid/app:IMAGE_TAG
+      ports:
+       - containerPort: 8080
+      resources:
+       limits:
+        memory: 1Gi
+        cpu: '1'
+      env:
+       - name: GOOGLE_CLOUD_PROJECT
+         value: PROJECT_ID
+       - name: RUNTIME_MODE
+         value: worker
+       - name: PGHOST
+         value: /cloudsql/PROJECT_ID:REGION:SQL_INSTANCE
+       - name: PGDATABASE
+         value: promptify_db
+       - name: PGUSER
+         value: promptify_runtime
+       - name: PGPASSWORD
+         valueFrom:
+          secretKeyRef:
+           name: intrepid-db-password
+           key: 'SECRET_VERSION'
+       - name: PGPOOL_MAX
+         value: '5'
+       - name: GCP_SOP_BUCKET
+         value: PROJECT_ID-intrepid-sop-staging
+       - name: AI_PROVIDER
+         value: vertex
+       - name: VERTEX_LOCATION
+         value: GENERATION_LOCATION
+       - name: EMBEDDING_LOCATION
+         value: REGION
+       - name: GEMINI_MODEL
+         value: GENERATION_MODEL
+       - name: EMBEDDING_MODEL
+         value: text-multilingual-embedding-002
+       - name: GOOGLE_WORKSPACE_SERVICE_ACCOUNT
+         value: promptify-workspace@PROJECT_ID.iam.gserviceaccount.com
+       - name: BQ_LOCATION
+         value: REGION
+       - name: GCP_ANALYTICS_MODE
+         value: postgres
+       - name: GCP_VECTOR_MODE
+         value: pgvector
+       - name: WORKER_AUDIENCE
+         value: WORKER_URL
+       - name: WORKER_INVOKER_EMAIL
+         value: promptify-scheduler@PROJECT_ID.iam.gserviceaccount.com
+       - name: EMBEDDING_PROVIDER
+         value: cloudsql
+       - name: GCP_WAREHOUSE_ENABLED
+         value: 'WAREHOUSE_ENABLED'

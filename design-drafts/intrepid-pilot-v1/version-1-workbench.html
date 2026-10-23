@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promptify Intrepid — Version 1: AI Studio Spatial Workbench</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="setVersion('v1'); setMode('workspace'); setRole('learner');">
+
+  <header class="demo-controller-bar">
+    <div class="controller-brand">
+      <span class="brand-badge">Version 1 Standalone</span>
+      <span>AI Studio Spatial Workbench</span>
+    </div>
+    <div class="controller-group">
+      <a href="index.html" class="ctrl-btn ctrl-btn-outline" style="text-decoration: none;">← Master Deck</a>
+      <a href="version-2-guided.html" class="ctrl-btn ctrl-btn-outline" style="text-decoration: none;">View Version 2 (Guided) →</a>
+      <button class="ctrl-btn" onclick="openCompareModal()">⚖️ Compare Attempts</button>
+    </div>
+  </header>
+
+  <nav class="app-navbar">
+    <div class="nav-left">
+      <a href="#" class="promptify-logo">
+        <div class="logo-icon">P</div>
+        <span>Promptify</span>
+      </a>
+      <div class="tenant-badge">
+        <div class="tenant-dot"></div>
+        <span>Intrepid Group · Commercial Ops (Spatial Workbench)</span>
+      </div>
+    </div>
+    <div class="nav-center">
+      <div class="gcp-credential-chip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>GCP AI Gateway: Active (Vertex / Gemini 1.5 Pro)</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="user-chip">
+        <div class="user-avatar">ND</div>
+        <span>Nguyen Hai Dang</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-view-container">
+    <section class="view-section active" id="view-learner-v1">
+      <div class="workbench-layout-v1">
+        
+        <!-- Left Sidebar: Lesson Meta & SOP Documents -->
+        <aside class="sidebar-v1">
+          <div class="sidebar-section">
+            <div class="sidebar-heading">Assigned Curriculum</div>
+            <div class="lesson-meta-card">
+              <div class="lesson-number">Lesson 02 · Module 1</div>
+              <div class="lesson-title-text">SOP-MKT-042: CAC Anomaly Synthesis & Reporting</div>
+              <div style="margin-top: 8px; font-size: 11px; color: var(--slate-500);">
+                Objective: Ground AI analysis strictly on Intrepid SOP thresholds.
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-heading">Grounding SOP Document</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <a href="#sop" class="sop-badge-link" onclick="showToast('SOP-MKT-042 v3.1 opened in preview.'); return false;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>SOP-MKT-042 (CAC Threshold: >25% WoW)</span>
+              </a>
+              <div style="font-size: 11px; color: var(--slate-600); line-height: 1.4; background: var(--slate-50); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--slate-200);">
+                <strong>Key Guideline §3.2:</strong> An ad campaign is flagged as anomalous if Customer Acquisition Cost exceeds the previous 7-day benchmark by more than 25%.
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-heading">Sample Business Data</div>
+            <div style="font-size: 11px; font-family: var(--font-mono); background: var(--slate-900); color: #e2e8f0; padding: 10px; border-radius: var(--radius-sm); overflow-x: auto;">
+              CampA: $8.5k | ROAS 4.2x | CAC $16.20<br>
+              CampB: $12.4k | ROAS 2.6x | CAC $26.50 (+32.4%)<br>
+              CampC: $4.3k | ROAS 3.9x | CAC $17.80<br>
+              CampD: $3.2k | ROAS 4.5x | CAC $14.10
+            </div>
+          </div>
+
+          <div class="sidebar-section" style="margin-top: auto;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 600; color: var(--slate-500);">Progress Status</span>
+              <span style="font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 6px; border-radius: 4px;">
+                2 Attempts · Completed Run
+              </span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Center Canvas: Prompt Composer -->
+        <div class="composer-canvas-v1">
+          <div class="context-strip">
+            <div class="context-strip-header">
+              <div class="context-strip-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Task Specification (Output là đích, Prompt là phương tiện)</span>
+              </div>
+              <span style="font-size: 11px; color: var(--slate-500);">Commercial Ops · Cohort Q4</span>
+            </div>
+            <p class="context-body-text">
+              Write an executive prompt instructing the AI to analyze the Q4 campaign metrics against <strong>SOP-MKT-042</strong>. Ensure the output isolates anomalous spend, provides a clear markdown table, and proposes 3 immediate remediation steps.
+            </p>
+          </div>
+
+          <div class="prompt-editor-card">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; font-weight: 700; color: var(--slate-900);">Prompt Editor</span>
+                <div style="display: flex; gap: 4px;">
+                  <button class="ctrl-btn attempt-switch-btn" data-attempt="1" onclick="switchAttempt(1)">Attempt 1 (7.2)</button>
+                  <button class="ctrl-btn attempt-switch-btn active" data-attempt="2" onclick="switchAttempt(2)">Attempt 2 (8.8)</button>
+                </div>
+              </div>
+
+              <div class="prompt-tags-row">
+                <span class="prompt-tag selected">+ Role</span>
+                <span class="prompt-tag selected">+ SOP Context</span>
+                <span class="prompt-tag selected">+ Constraints</span>
+                <span class="prompt-tag selected">+ Format</span>
+              </div>
+            </div>
+
+            <textarea class="prompt-textarea" placeholder="Enter your prompt instructions here..."></textarea>
+
+            <div class="composer-bottom-bar">
+              <div class="token-stats">
+                <span>Tokens: ~348 / 4,000</span>
+                <span>•</span>
+                <span>Model: Gemini 1.5 Pro (GCP Backend)</span>
+                <span>•</span>
+                <span style="color: #10b981; font-weight: 600;">✓ Grounded in SOP</span>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="ctrl-btn ctrl-btn-outline" onclick="openCompareModal()">
+                  ⚖️ Compare with Attempt 1
+                </button>
+                <button class="btn-run-ai" id="btn-run-ai-action" onclick="runAiSimulation()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  <span>Run Live AI (Cmd+Enter)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Output & Rubric Scorecard -->
+        <aside class="output-judge-panel-v1">
+          <div class="panel-tabs-header">
+            <button class="panel-tab-btn active">Live AI Output & Rubric</button>
+          </div>
+
+          <div class="output-body">
+            <div class="rubric-scorecard" style="margin-bottom: 18px;">
+              <div class="score-overview-header">
+                <div>
+                  <div style="font-size: 11px; font-weight: 700; color: var(--slate-600); text-transform: uppercase;">
+                    Evaluation Score (AI Judge)
+                  </div>
+                  <div class="score-big score-big-val">8.8 / 10</div>
+                </div>
+                <div style="text-align: right;">
+                  <span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">
+                    Completed Run
+                  </span>
+                  <div style="font-size: 11px; color: var(--slate-500); margin-top: 4px;">Persisted to Intrepid DB</div>
+                </div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Role & Goal Clarity</span>
+                  <span>9 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 90%;"></div></div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Business Context & SOP Grounding</span>
+                  <span>9 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 90%;"></div></div>
+                <div class="criterion-note">Explicitly checks SOP-MKT-042 CAC thresholds (>25%).</div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Constraint Adherence</span>
+                  <span>8 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 80%;"></div></div>
+              </div>
+
+              <div class="criterion-row">
+                <div class="criterion-header">
+                  <span>Output Structure & Format</span>
+                  <span>9 / 10</span>
+                </div>
+                <div class="criterion-bar-bg"><div class="criterion-bar-fill" style="width: 90%;"></div></div>
+              </div>
+
+              <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: var(--radius-md); padding: 12px; margin-top: 6px;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--slate-700); margin-bottom: 4px;">AI Coach Advice:</div>
+                <p class="judge-feedback-note" style="font-size: 12px; color: var(--slate-600); line-height: 1.4;"></p>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--slate-200); padding-top: 16px;">
+              <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--slate-400); margin-bottom: 8px;">
+                Live Model Response
+              </h4>
+              <div class="ai-output-content diff-content-box"></div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Include Shared Modals and Controller -->
+  <div class="modal-backdrop" id="compare-attempts-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">⚖️ Compare Attempts · Lesson 02 (SOP-MKT-042 CAC Anomaly)</div>
+        <button class="modal-close-btn" onclick="closeCompareModal()">✕</button>
+      </div>
+      <div class="compare-diff-grid">
+        <div class="diff-column">
+          <div class="diff-pill-header pill-att1"><span>Attempt 1 (Baseline)</span><span>7.2 / 10</span></div>
+          <div class="diff-content-box" style="font-family: var(--font-mono); font-size: 12px;">Please summarize the campaign performance from the provided Lazada sales numbers and tell me if CAC is too high.</div>
+          <div class="diff-content-box">The campaign generated 1,450 orders with a total ad spend of SGD 28,400. Overall CAC stands at SGD 19.58, which is moderately high compared to previous quarters.</div>
+        </div>
+        <div class="diff-column">
+          <div class="diff-pill-header pill-att2"><span>Attempt 2 (SOP-Grounded)</span><span>8.8 / 10 (+1.6)</span></div>
+          <div class="diff-content-box" style="font-family: var(--font-mono); font-size: 12px; background: #f0fdf4;">Role: Senior Commercial & Media Analyst at Intrepid. Context: Apply guidelines from SOP-MKT-042 (CAC anomaly flag threshold: >25% WoW)...</div>
+          <div class="diff-content-box" style="background: #f0fdf4;">Executive Summary: Anomaly Triggered per SOP-MKT-042: Campaign B experienced a +32.4% CAC spike (SGD 26.50 vs target SGD 20.00)...</div>
+        </div>
+      </div>
+      <div style="padding: 14px 24px; background: var(--slate-50); display: flex; justify-content: flex-end;">
+        <button class="btn-run-ai" onclick="closeCompareModal()">Close Comparison</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="prototype.js"></script>
+</body>
+</html>
+

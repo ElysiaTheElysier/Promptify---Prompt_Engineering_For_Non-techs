@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ 
+    lang: 'en', 
+    clientName: 'Intrepid Asia',
+    dateRange: 'Q4 2026 (Oct 06 - Oct 23)',
+    exportingReport: false,
+    selectedDept: 'All Departments',
+    departments: [
+        'All Departments (27 Functions)',
+        'Brand Solutions & Campaign Ops',
+        'E-commerce Store Operations',
+        'Customer Support & SLA Desk',
+        'Commercial & Business Development',
+        'Supply Chain & Fulfillment',
+        'Finance, Tax & Billing'
+    ],
+    kpis: {
+        totalEnrolled: 1150,
+        completedLearners: 1017,
+        completionRate: 88.4,
+        preScoreAvg: 4.2,
+        postScoreAvg: 8.6,
+        scoreDelta: '+104.7%',
+        totalPromptsCreated: 3420,
+        estHoursSavedPerWeek: 2.4,
+        annualRoiEst: '\$184,200'
+    },
+    techniqueBreakdown: [
+        { name: '1. Zero-shot Prompting & SOP Audit', pre: 3.8, post: 9.2, gain: '+142%' },
+        { name: '2. Structured Output (Markdown/JSON)', pre: 4.5, post: 8.9, gain: '+97%' },
+        { name: '3. One-shot Brand Voice & Classification', pre: 4.1, post: 8.4, gain: '+105%' },
+        { name: '4. Few-shot System Instructions & Variables', pre: 4.0, post: 8.2, gain: '+105%' },
+        { name: '5. Grounding & Anti-Hallucination Guardrails', pre: 4.6, post: 8.7, gain: '+89%' }
+    ],
+    deptLeaderboard: [
+        { dept: 'Brand Solutions & Campaign Ops', enrolled: 240, completed: 228, rate: '95.0%', avgScore: 8.8, sopsCreated: 840, hoursSaved: '2.8h/wk' },
+        { dept: 'Customer Support & SLA Desk', enrolled: 310, completed: 285, rate: '91.9%', avgScore: 8.7, sopsCreated: 1120, hoursSaved: '3.1h/wk' },
+        { dept: 'E-commerce Store Operations', enrolled: 220, completed: 198, rate: '90.0%', avgScore: 8.5, sopsCreated: 680, hoursSaved: '2.2h/wk' },
+        { dept: 'Finance, Tax & Billing', enrolled: 180, completed: 151, rate: '83.8%', avgScore: 8.3, sopsCreated: 420, hoursSaved: '1.9h/wk' },
+        { dept: 'Supply Chain & Fulfillment', enrolled: 200, completed: 155, rate: '77.5%', avgScore: 8.2, sopsCreated: 360, hoursSaved: '1.8h/wk' }
+    ]
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify - L&D Executive Impact & ROI Dashboard (UI-12)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN for Micro-Interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'on-primary': '#FFFFFF',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1',
+                            error: '#BA1A1A',
+                            'error-container': '#FFDAD6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+    <!-- ================================================================= -->
+    <!-- TOP EXECUTIVE APP BAR -->
+    <!-- ================================================================= -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-3 transition-all">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <!-- Brand Logo & Client Context -->
+            <div class="flex items-center gap-4">
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-2xl bg-m3-primary text-white flex items-center justify-center font-bold text-lg shadow-md shadow-m3-primary/20">
+                        P
+                    </div>
+                    <span class="font-bold text-lg tracking-tight text-m3-on-surface hidden sm:inline-block">Promptify</span>
+                </a>
+
+                <div class="h-6 w-px bg-m3-outline-variant/80 hidden sm:block"></div>
+
+                <div class="flex items-center gap-2 bg-emerald-50 text-emerald-900 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold">
+                    <span class="material-symbols-outlined text-sm text-emerald-600">analytics</span>
+                    <span>L&D EXECUTIVE IMPACT DASHBOARD</span>
+                </div>
+            </div>
+
+            <!-- Right Controls: Date Range & Export Report -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Date Filter -->
+                <div class="hidden md:flex items-center gap-2 bg-m3-surface-container-low border border-m3-outline-variant rounded-xl px-3 py-1.5 text-xs font-bold text-m3-on-surface">
+                    <span class="material-symbols-outlined text-sm text-m3-primary">calendar_today</span>
+                    <span x-text="dateRange"></span>
+                </div>
+
+                <!-- Export Executive Report CTA -->
+                <button @click="
+                    exportingReport = true;
+                    setTimeout(() => {
+                        exportingReport = false;
+                        alert('Executive L&D ROI PDF Summary Report generated & downloaded successfully!');
+                    }, 1200);
+                " 
+                :disabled="exportingReport"
+                class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-m3-primary text-white text-xs font-semibold shadow hover:bg-m3-primary/90 transition-all disabled:opacity-50">
+                    
+                    <template x-if="!exportingReport">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                            <span>Export Executive ROI Report</span>
+                        </div>
+                    </template>
+
+                    <template x-if="exportingReport">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                            <span>Generating Report...</span>
+                        </div>
+                    </template>
+                </button>
+
+                <!-- Language Toggle -->
+                <button @click="lang = lang === 'en' ? 'vi' : 'en'" 
+                        class="px-2.5 py-1 rounded-full border border-m3-outline-variant bg-white text-xs font-medium text-m3-on-surface-variant hover:bg-m3-surface-container-low transition-colors">
+                    <span x-text="lang.toUpperCase()"></span>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================================================================= -->
+    <!-- MAIN DASHBOARD CONTENT -->
+    <!-- ================================================================= -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 space-y-8">
+        
+        <!-- HERO EXECUTIVE SUMMARY BANNER -->
+        <section class="bg-gradient-to-br from-m3-on-primary-container via-slate-900 to-m3-on-surface text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                
+                <div class="space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-m3-primary-container border border-white/15">
+                        <span class="material-symbols-outlined text-sm text-emerald-400">verified</span>
+                        <span>Client: Intrepid Asia • 1,150 Target Workforce</span>
+                    </div>
+
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        <span x-show="lang === 'en'">L&D Masterclass ROI & Skill Progression Impact</span>
+                        <span x-show="lang === 'vi'">Báo cáo Tác động & ROI Đào tạo L&D</span>
+                    </h1>
+                    
+                    <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                        Measurable competency growth and operational efficiency gains following Promptify's 100-minute masterclass rollout across Intrepid's 27 business functions.
+                    </p>
+                </div>
+
+                <!-- ROI Highlighting Badge -->
+                <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 text-center shrink-0 space-y-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">Est. Annual Productivity ROI:</span>
+                    <span class="text-3xl font-black text-white" x-text="kpis.annualRoiEst"></span>
+                    <span class="block text-[11px] text-slate-300">Based on 2.4h saved/emp/week</span>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TOP KPI METRIC CARDS (4 EXECUTIVE COUNTERS) -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- KPI 1: Completion Rate -->
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Program Completion Rate</span>
+                    <span class="material-symbols-outlined text-m3-primary">school</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface" x-text="`${kpis.completionRate}%`"></span>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Target >85% Met</span>
+                </div>
+                <p class="text-[11px] text-m3-outline" x-text="`${kpis.completedLearners} of ${kpis.totalEnrolled} employees completed`"></p>
+            </div>
+
+            <!-- KPI 2: Pre vs Post Skill Delta -->
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Competency Score Delta</span>
+                    <span class="material-symbols-outlined text-emerald-600">trending_up</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface" x-text="`${kpis.postScoreAvg} / 10`"></span>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full" x-text="kpis.scoreDelta"></span>
+                </div>
+                <p class="text-[11px] text-m3-outline" x-text="`Pre: ${kpis.preScoreAvg} / 10 → Post: ${kpis.postScoreAvg} / 10`"></p>
+            </div>
+
+            <!-- KPI 3: Enterprise Prompt SOPs Created -->
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Enterprise SOPs Created</span>
+                    <span class="material-symbols-outlined text-purple-600">local_library</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface" x-text="kpis.totalPromptsCreated"></span>
+                    <span class="text-xs font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">3.3 SOPs / Learner</span>
+                </div>
+                <p class="text-[11px] text-m3-outline">Saved to Supabase Enterprise Library</p>
+            </div>
+
+            <!-- KPI 4: Time Savings -->
+            <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+                <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                    <span>Weekly Efficiency Gain</span>
+                    <span class="material-symbols-outlined text-amber-500">schedule</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-m3-on-surface" x-text="`${kpis.estHoursSavedPerWeek}h`"></span>
+                    <span class="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full">Saved / Emp / Wk</span>
+                </div>
+                <p class="text-[11px] text-m3-outline">Automated ticket & SLA workflows</p>
+            </div>
+
+        </section>
+
+        <!-- PRE VS POST COMPETENCY GAIN COMPARISON (5 TECHNIQUES) -->
+        <section class="bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-m3-on-surface">5-Technique Skill Competency Gain (Pre vs. Post Masterclass)</h2>
+                    <p class="text-xs text-m3-on-surface-variant">Evaluated asynchronously via AI Judge rubric benchmarking (0–10 score range)</p>
+                </div>
+                <span class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">+104.7% Avg Competency Improvement</span>
+            </div>
+
+            <!-- Competency Progress Bars List -->
+            <div class="space-y-4 pt-2 text-xs">
+                <template x-for="item in techniqueBreakdown" :key="item.name">
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between font-semibold">
+                            <span class="text-m3-on-surface" x-text="item.name"></span>
+                            <div class="flex items-center gap-3 font-mono text-[11px]">
+                                <span class="text-m3-outline" x-text="`Pre: ${item.pre}`"></span>
+                                <span class="text-m3-primary font-bold" x-text="`Post: ${item.post} / 10`"></span>
+                                <span class="text-emerald-700 font-bold bg-emerald-100 px-2 py-0.2 rounded" x-text="item.gain"></span>
+                            </div>
+                        </div>
+
+                        <!-- Stacked Visual Bar -->
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden relative flex">
+                            <!-- Pre Bar -->
+                            <div class="bg-slate-300 h-full rounded-l-full" :style="`width: ${(item.pre / 10) * 100}%`" title="Pre-Score Baseline"></div>
+                            <!-- Gain Bar -->
+                            <div class="bg-emerald-500 h-full rounded-r-full" :style="`width: ${((item.post - item.pre) / 10) * 100}%`" title="Post-Score Gain"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-4 text-[11px] text-m3-on-surface-variant font-medium">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-slate-300"></span>
+                    <span>Pre-Masterclass Baseline (Avg 4.2)</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-emerald-500"></span>
+                    <span>Post-Masterclass Score (Avg 8.6)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEPARTMENT ADOPTION & SOP CREATION LEADERBOARD TABLE -->
+        <section class="bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-m3-on-surface">Department Adoption & SOP Creation Leaderboard</h2>
+                    <p class="text-xs text-m3-on-surface-variant">Breakdown across Intrepid's top business functions</p>
+                </div>
+
+                <select x-model="selectedDept" class="bg-m3-surface-container-low border border-m3-outline-variant rounded-xl px-3 py-1.5 text-xs font-bold text-m3-on-surface focus:outline-none">
+                    <template x-for="d in departments" :key="d">
+                        <option :value="d" x-text="d"></option>
+                    </template>
+                </select>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-m3-surface-container-low font-bold text-m3-on-surface border-b border-m3-outline-variant">
+                            <th class="p-3">Department Function</th>
+                            <th class="p-3">Enrolled</th>
+                            <th class="p-3">Completed</th>
+                            <th class="p-3">Completion Rate</th>
+                            <th class="p-3">Avg AI Score</th>
+                            <th class="p-3">Prompt SOPs Built</th>
+                            <th class="p-3">Time Saved</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-m3-outline-variant/60 font-mono text-[11px]">
+                        <template x-for="row in deptLeaderboard" :key="row.dept">
+                            <tr class="hover:bg-m3-surface transition-colors">
+                                <td class="p-3 font-sans font-bold text-m3-on-surface" x-text="row.dept"></td>
+                                <td class="p-3 text-m3-on-surface-variant" x-text="row.enrolled"></td>
+                                <td class="p-3 font-bold text-m3-primary" x-text="row.completed"></td>
+                                <td class="p-3">
+                                    <span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800" x-text="row.rate"></span>
+                                </td>
+                                <td class="p-3 font-bold" x-text="`${row.avgScore} / 10`"></td>
+                                <td class="p-3 text-purple-900 font-bold" x-text="row.sopsCreated"></td>
+                                <td class="p-3 text-amber-900 font-bold" x-text="row.hoursSaved"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- FOOTER -->
+    <!-- ================================================================= -->
+    <footer class="py-6 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-8">
+        <p>© 2026 Promptify x Intrepid Asia. Enterprise L&D Analytics Engine Active.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args: ['build', '-f', 'gcp/Dockerfile.judge-async-20261023', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:judge-async-20261023', '.']
+images:
+ - asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:judge-async-20261023
+options:
+ logging: CLOUD_LOGGING_ONLY

@@ -1,0 +1,172 @@
+{
+  "document": "docs\\Promptify - UI code - for Review.docx",
+  "document_sha256": "666cb5d869ed3aaaf347a5619d1d98a8e36ed650ab07f3ac2f72d5ee25f84e92",
+  "selection": "Last complete HTML block per UI in document order",
+  "candidate_blocks": 29,
+  "screens": [
+    {
+      "ui_id": "UI-00",
+      "title": "Promptify - Output is the Destination, Prompting is the Means",
+      "selected_block": 0,
+      "document_line": 1201,
+      "source_sha256": "389a0319ef74f92ec2afc4c32971340c4c11e015aebd6a565202c719c222edb0",
+      "normalized_sha256": "389a0319ef74f92ec2afc4c32971340c4c11e015aebd6a565202c719c222edb0",
+      "normalizations": [],
+      "file": "UI-00.html"
+    },
+    {
+      "ui_id": "UI-01",
+      "title": "Promptify - Enterprise Authentication",
+      "selected_block": 1,
+      "document_line": 1765,
+      "source_sha256": "3f000c5c17ac17545de2d5cbc727724e2ed356b81724e17d430e3494ce08949f",
+      "normalized_sha256": "3f000c5c17ac17545de2d5cbc727724e2ed356b81724e17d430e3494ce08949f",
+      "normalizations": [],
+      "file": "UI-01.html"
+    },
+    {
+      "ui_id": "UI-02",
+      "title": "Promptify - Intrepid Profile & Department Routing",
+      "selected_block": 2,
+      "document_line": 2014,
+      "source_sha256": "3e929cbc8d0d3a374d6dbb22cbdf8dbda6335053b45bfbe56c9f8a0ef7aafd9b",
+      "normalized_sha256": "3e929cbc8d0d3a374d6dbb22cbdf8dbda6335053b45bfbe56c9f8a0ef7aafd9b",
+      "normalizations": [],
+      "file": "UI-02.html"
+    },
+    {
+      "ui_id": "UI-03",
+      "title": "Promptify - Access Denied",
+      "selected_block": 3,
+      "document_line": 2275,
+      "source_sha256": "0415cf003392e799074562c0560ecb3f242cf8eea642d02f40323b8d9529f9e3",
+      "normalized_sha256": "0415cf003392e799074562c0560ecb3f242cf8eea642d02f40323b8d9529f9e3",
+      "normalizations": [],
+      "file": "UI-03.html"
+    },
+    {
+      "ui_id": "UI-04",
+      "title": "Promptify - Learner Department Training Hub",
+      "selected_block": 4,
+      "document_line": 2498,
+      "source_sha256": "c9bf4bdc066996af7ac537b17a947e7dc25597187b36b3e6b2641d4bbb5b95c9",
+      "normalized_sha256": "c9bf4bdc066996af7ac537b17a947e7dc25597187b36b3e6b2641d4bbb5b95c9",
+      "normalizations": [],
+      "file": "UI-04.html"
+    },
+    {
+      "ui_id": "UI-05",
+      "title": "Promptify Intrepid - Learner Workspace (UI-05)",
+      "selected_block": 7,
+      "document_line": 4234,
+      "source_sha256": "2595703bab94fcb6b8bee28443a6d99a675efb5564b07b5f206d30deee8a732b",
+      "normalized_sha256": "2595703bab94fcb6b8bee28443a6d99a675efb5564b07b5f206d30deee8a732b",
+      "normalizations": [],
+      "file": "UI-05.html"
+    },
+    {
+      "ui_id": "UI-06",
+      "title": "Promptify - Side-by-Side Version Diff Viewer (UI-06)",
+      "selected_block": 8,
+      "document_line": 4969,
+      "source_sha256": "2632a922d0569484603fc2cff7e6a20c5336c37d0ac124d8146465a5aa0a599b",
+      "normalized_sha256": "2632a922d0569484603fc2cff7e6a20c5336c37d0ac124d8146465a5aa0a599b",
+      "normalizations": [],
+      "file": "UI-06.html"
+    },
+    {
+      "ui_id": "UI-07",
+      "title": "Promptify - AI Judge Diagnostic Scorecard (UI-07)",
+      "selected_block": 9,
+      "document_line": 5340,
+      "source_sha256": "8789f7f4a45e324d8c86b38b4e3eb02414b3b5f67f59b1148b7aa598aa0da5d3",
+      "normalized_sha256": "8789f7f4a45e324d8c86b38b4e3eb02414b3b5f67f59b1148b7aa598aa0da5d3",
+      "normalizations": [],
+      "file": "UI-07.html"
+    },
+    {
+      "ui_id": "UI-08",
+      "title": "Promptify - SOP Context & Audit Inspector Drawer (UI-08)",
+      "selected_block": 10,
+      "document_line": 5700,
+      "source_sha256": "beb4c22a6b24183053ea64c19e867b5cb904cc73e58c54aec2a6f5dcd3c5f353",
+      "normalized_sha256": "beb4c22a6b24183053ea64c19e867b5cb904cc73e58c54aec2a6f5dcd3c5f353",
+      "normalizations": [],
+      "file": "UI-08.html"
+    },
+    {
+      "ui_id": "UI-09",
+      "title": "Promptify Intrepid - Facilitator Control Center (UI-09)",
+      "selected_block": 13,
+      "document_line": 6938,
+      "source_sha256": "ab00e48c7415c8dba7966bf0349306a7bd4006faa93c02b23408623147f3bf9f",
+      "normalized_sha256": "5cd7a6aea6d1377d0040d7c9781f7075ac94ced7ddf74b05733de80f704cf45f",
+      "normalizations": [
+        "Markdown escape before $event"
+      ],
+      "file": "UI-09.html"
+    },
+    {
+      "ui_id": "UI-10",
+      "title": "Promptify Intrepid - Refined Prompt Inspector (UI-10)",
+      "selected_block": 16,
+      "document_line": 8329,
+      "source_sha256": "2e211f840bad3f4ea0fe42a448c99f4180f6b5c0a7a39b9a000616bacdd44df1",
+      "normalized_sha256": "2e211f840bad3f4ea0fe42a448c99f4180f6b5c0a7a39b9a000616bacdd44df1",
+      "normalizations": [],
+      "file": "UI-10.html"
+    },
+    {
+      "ui_id": "UI-11",
+      "title": "Promptify Intrepid - Master Codelabs Directory & Authoring Studio (UI-11)",
+      "selected_block": 24,
+      "document_line": 13806,
+      "source_sha256": "9d6321173a1543c52f38f59006a2b4e7780554ab62cc680fb1d61fc5108996ea",
+      "normalized_sha256": "e1294923f0178d6acc08770f4b087f59428b671d05ad3c2840986fa7265e898e",
+      "normalizations": [
+        "Markdown escape before $event"
+      ],
+      "file": "UI-11.html"
+    },
+    {
+      "ui_id": "UI-12",
+      "title": "Promptify - L&D Executive Impact & ROI Dashboard (UI-12)",
+      "selected_block": 25,
+      "document_line": 14954,
+      "source_sha256": "7dad102b8826789a0501b396307fd7b1a07d847db5d19a4f388cbedf2a456a21",
+      "normalized_sha256": "7dad102b8826789a0501b396307fd7b1a07d847db5d19a4f388cbedf2a456a21",
+      "normalizations": [],
+      "file": "UI-12.html"
+    },
+    {
+      "ui_id": "UI-13",
+      "title": "Promptify - Department SOP Upload & Context Modal (UI-13)",
+      "selected_block": 26,
+      "document_line": 15346,
+      "source_sha256": "290ddab48841cf7b47c19137ca5bb8d6f1f4b57cdec0ca82ed8ff8e13a3bcc7e",
+      "normalized_sha256": "290ddab48841cf7b47c19137ca5bb8d6f1f4b57cdec0ca82ed8ff8e13a3bcc7e",
+      "normalizations": [],
+      "file": "UI-13.html"
+    },
+    {
+      "ui_id": "UI-14",
+      "title": "Promptify - System Governance & API Key Monitor (UI-14)",
+      "selected_block": 27,
+      "document_line": 15739,
+      "source_sha256": "89a421c1b7baf1b34eae0af311296b6f05c183f83cdb5ce909dd3ec9bbc4f923",
+      "normalized_sha256": "89a421c1b7baf1b34eae0af311296b6f05c183f83cdb5ce909dd3ec9bbc4f923",
+      "normalizations": [],
+      "file": "UI-14.html"
+    },
+    {
+      "ui_id": "UI-15",
+      "title": "Promptify - Google Sheets Roster Sync Management (UI-15)",
+      "selected_block": 28,
+      "document_line": 16292,
+      "source_sha256": "e941755d98d6aa6da8dc723a087e2eb0cd415c90fd50f6bbd1e9d26eeccc4374",
+      "normalized_sha256": "e941755d98d6aa6da8dc723a087e2eb0cd415c90fd50f6bbd1e9d26eeccc4374",
+      "normalizations": [],
+      "file": "UI-15.html"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "intrepid-export-fixture",
+  "base": "apps/promptify-intrepid",
+  "delivery": "code",
+  "allowExisting": true,
+  "syntaxOnly": true,
+  "read": [
+    "tests/verify_cloud_export.mjs",
+    "scripts/check_export_bundle.mjs",
+    "scripts/migration_scope.mjs"
+  ],
+  "support": [],
+  "write": "tests/verify_cloud_export.mjs",
+  "tests": [],
+  "objective": "Repair ONLY offline export test fixture for current approved-scope manifest contract. Keep every existing negative assertion (missing FK parent, noncanonical email, duplicate PK, missing table, bad checksum); update expected missing parent regex to current Missing approved parent wording. Write synthetic scope-approval.json and manifest.scope + scopeApprovalSha256 based on exact file bytes, format1 approvalReference synthetic-test and explicitly approved two classIds + current userId; clientIds/courseIds empty, includeUnscoped empty, userHistory product_profile_corrections currentuser. Keep initial no-classrows permitted fixture and later FK closure positive. Add meaningful negative checks for missing approval hash/file, approval file tamper/hash mismatch, unapproved class or user scope. Never weaken scripts or omit existing assertions. No external calls, fake personal names/emails remain synthetic. Supervisor executes candidate offline before apply.",
+  "acceptance": [
+    "Original integrity assertions retained",
+    "Positive fixture matches reviewed scope contract",
+    "Scope tamper/unapproved rows rejected"
+  ],
+  "maxAttempts": 1,
+  "timeoutSeconds": 140
+}

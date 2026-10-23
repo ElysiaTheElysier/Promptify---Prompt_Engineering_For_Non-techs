@@ -1,0 +1,7 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args: ['build', '-f', 'gcp/Dockerfile.capacity-20261022', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:capacity-20261022', '.']
+images:
+ - asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:capacity-20261022
+options:
+ logging: CLOUD_LOGGING_ONLY

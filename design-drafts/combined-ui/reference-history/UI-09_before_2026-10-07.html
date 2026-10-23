@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{
+    lang: 'en',
+    activeCohort: 'Cohort #04 - Brand Solutions (48 Learners)',
+    autoRefresh: true,
+    nudgeSent: false,
+    selectedLearner: null,
+    inspectModalOpen: false,
+    cohorts: [
+        'Cohort #04 - Brand Solutions (48 Learners)',
+        'Cohort #03 - E-Commerce Ops (52 Learners)',
+        'Cohort #02 - Customer SLA Desk (35 Learners)',
+        'Cohort #01 - Management & Execs (20 Learners)'
+    ],
+    stuckLearners: [
+        { id: 'L-842', name: 'Linh Pham', dept: 'Brand Solutions', lab: 'Lab 3: One-Shot Voice', attempts: 5, score: 4, issue: 'Failed SOP Citation', timeStuck: '8 mins' },
+        { id: 'L-911', name: 'Khang Nguyen', dept: 'Brand Solutions', lab: 'Lab 3: One-Shot Voice', attempts: 6, score: 5, issue: 'Missing Markdown Table', timeStuck: '12 mins' },
+        { id: 'L-204', name: 'Duong Tran', dept: 'Campaign Ops', lab: 'Lab 2: Structured Output', attempts: 4, score: 3, issue: 'JSON Schema Syntax Error', timeStuck: '5 mins' }
+    ],
+    telemetryStream: [
+        { id: 'RUN-9081', time: '10:44:12 AM', learner: 'Linh Pham', lab: 'Lab 3', attempt: 'V5', score: 4, model: 'Gemini 3.8 Flash', status: 'fail' },
+        { id: 'RUN-9080', time: '10:44:05 AM', learner: 'An Vo', lab: 'Lab 2', attempt: 'V3', score: 9, model: 'Gemini 3.8 Flash', status: 'pass' },
+        { id: 'RUN-9079', time: '10:43:52 AM', learner: 'Minh Le', lab: 'Lab 1', attempt: 'V2', score: 10, model: 'Gemini 3.8 Flash', status: 'pass' },
+        { id: 'RUN-9078', time: '10:43:30 AM', learner: 'Khang Nguyen', lab: 'Lab 3', attempt: 'V6', score: 5, model: 'Gemini 3.8 Flash', status: 'warn' }
+    ]
+}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promptify - Trainer Command Center (UI-09)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Material Symbols & Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN for Micro-Interactions -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        m3: {
+                            primary: '#0B57D0',
+                            'on-primary': '#FFFFFF',
+                            'primary-container': '#D3E3FD',
+                            'on-primary-container': '#041E49',
+                            surface: '#F8FAFC',
+                            'surface-container-low': '#F1F5F9',
+                            'surface-container-high': '#E2E8F0',
+                            'on-surface': '#0F172A',
+                            'on-surface-variant': '#475569',
+                            outline: '#94A3B8',
+                            'outline-variant': '#CBD5E1',
+                            error: '#BA1A1A',
+                            'error-container': '#FFDAD6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-m3-surface text-m3-on-surface font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-m3-primary-container">
+
+<!-- ================================================================= -->
+<!-- TOP NAVIGATION & COHORT CONTROL BAR -->
+<!-- ================================================================= -->
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-m3-outline-variant/60 px-4 lg:px-8 py-3 transition-all">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+
+        <!-- Brand & Trainer Context -->
+        <div class="flex items-center gap-3">
+            <a href="/" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-2xl bg-m3-primary text-white flex items-center justify-center font-bold text-lg shadow-md shadow-m3-primary/20">
+                    P
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-base tracking-tight text-m3-on-surface">Promptify Trainer Center</span>
+                    <span class="text-[10px] font-bold text-m3-primary tracking-wide uppercase">Enterprise Workshop Command Center</span>
+                </div>
+            </a>
+
+            <div class="h-6 w-px bg-m3-outline-variant/80 hidden sm:block"></div>
+
+            <!-- Live Status Indicator -->
+            <div class="flex items-center gap-2 bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>LIVE 100-MIN MASTERCLASS ACTIVE</span>
+            </div>
+        </div>
+
+        <!-- Cohort Selector & Live Controls -->
+        <div class="flex items-center gap-3">
+
+            <!-- Cohort Dropdown -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-m3-on-surface-variant hidden md:inline-block">Active Cohort:</span>
+                <select x-model="activeCohort" class="bg-m3-surface-container-low border border-m3-outline-variant rounded-xl px-3 py-1.5 text-xs font-bold text-m3-on-surface focus:outline-none">
+                    <template x-for="c in cohorts" :key="c">
+                        <option :value="c" x-text="c"></option>
+                    </template>
+                </select>
+            </div>
+
+            <!-- Auto Refresh Switcher -->
+            <button @click="autoRefresh = !autoRefresh"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-m3-outline-variant text-xs font-semibold transition-all"
+                    :class="autoRefresh ? 'bg-m3-primary-container text-m3-on-primary-container border-m3-primary/30' : 'bg-white text-m3-outline'">
+                <span class="material-symbols-outlined text-sm" :class="{ 'animate-spin': autoRefresh }">sync</span>
+                <span x-text="autoRefresh ? 'Live Syncing (2s)' : 'Paused'"></span>
+            </button>
+
+            <!-- Language Switcher -->
+            <button @click="lang = lang === 'en' ? 'vi' : 'en'"
+                    class="px-2.5 py-1 rounded-full border border-m3-outline-variant bg-white text-xs font-medium text-m3-on-surface-variant">
+                <span x-text="lang.toUpperCase()"></span>
+            </button>
+
+            <!-- Trainer Profile -->
+            <div class="flex items-center gap-2 pl-2 border-l border-m3-outline-variant/60">
+                <div class="w-8 h-8 rounded-full bg-m3-on-primary-container text-white font-bold text-xs flex items-center justify-center">
+                    VD
+                </div>
+                <div class="hidden lg:block text-left text-xs">
+                    <p class="font-bold text-m3-on-surface">Vo Tu Duc</p>
+                    <p class="text-[10px] text-m3-primary font-semibold">Enterprise Training Lead</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</header>
+
+<!-- ================================================================= -->
+<!-- MAIN DASHBOARD CONTENT -->
+<!-- ================================================================= -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+    <!-- FEATURED ATTENTION CLASS CARD (CRITICAL INTERVENTION NEEDED) -->
+    <section class="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-extrabold uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-sm text-yellow-200">warning</span>
+                    <span>Trainer Action Required • 3 Learners Stuck</span>
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight">
+                    Cohort Bottleneck Detected in Codelab 03 (Few-Shot Voice)
+                </h1>
+                <p class="text-xs text-amber-100 max-w-2xl leading-relaxed">
+                    3 learners have exceeded 5 prompt attempts on Lab 03 without achieving a passing score (>8/10). Common issue: Missing SOP citation rules.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-3 shrink-0">
+                <button @click="
+                        nudgeSent = true;
+                        setTimeout(() => nudgeSent = false, 3000);
+                    " class="px-5 py-3 rounded-full bg-white text-amber-950 font-extrabold text-xs shadow-lg hover:bg-amber-50 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-amber-600">notifications_active</span>
+                    <span x-text="nudgeSent ? 'Broadcasting Hint to Stuck Learners...' : 'Broadcast SLA Hint to Stuck Learners'"></span>
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- TOP METRIC CARDS (4 EXECUTIVE COUNTERS) -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Active Learners</span>
+                <span class="material-symbols-outlined text-m3-primary">group</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-m3-on-surface">48 / 50</span>
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">96% Online</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">2 offline / unaccounted in Roster</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Cohort Avg AI Score</span>
+                <span class="material-symbols-outlined text-amber-500">star</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-m3-on-surface">8.4 <span class="text-base font-normal text-m3-outline">/ 10</span></span>
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">+0.6 vs Cohort 3</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">Evaluated via Gemini 3.8 Pro</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Total Prompt Runs</span>
+                <span class="material-symbols-outlined text-purple-600">bolt</span>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <span class="text-3xl font-black text-m3-on-surface">312</span>
+                <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">6.5 runs/user</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">Server-side execution active</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-3xl border border-m3-outline-variant space-y-2 shadow-sm">
+            <div class="flex items-center justify-between text-m3-on-surface-variant text-xs font-semibold">
+                <span>Attention Flagged</span>
+                <span class="material-symbols-outlined text-m3-error">report</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-3xl font-black text-m3-error">3</span>
+                <span class="text-xs font-bold text-red-800 bg-red-100 px-2 py-0.5 rounded-full">Stuck > 5 attempts</span>
+            </div>
+            <p class="text-[11px] text-m3-outline">Action needed in Lab 3</p>
+        </div>
+
+    </section>
+
+    <!-- CENTER 5-TECHNIQUE COMPLETION HEATMAP MATRIX -->
+    <section class="bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-m3-on-surface">5-Technique Masterclass Completion Matrix</h2>
+                <p class="text-xs text-m3-on-surface-variant">Real-time completion distribution across 48 active learners</p>
+            </div>
+            <span class="text-xs font-bold text-m3-primary bg-m3-primary-container/60 px-3 py-1 rounded-full">Overall Progress: 64%</span>
+        </div>
+
+        <!-- Heatmap Progress Bars Grid -->
+        <div class="space-y-3 pt-2 text-xs">
+
+            <!-- Tech 1 -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between font-semibold">
+                    <span class="text-m3-on-surface">1. Zero-shot Prompting & SOP Audit</span>
+                    <span class="font-mono text-emerald-800 font-bold">46 / 48 Passed (96%)</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                    <div class="bg-emerald-600 h-full w-[96%]" title="Passed"></div>
+                    <div class="bg-amber-400 h-full w-[4%]" title="In Progress"></div>
+                </div>
+            </div>
+
+            <!-- Tech 2 -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between font-semibold">
+                    <span class="text-m3-on-surface">2. Structured Output & Markdown Tables</span>
+                    <span class="font-mono text-emerald-800 font-bold">42 / 48 Passed (88%)</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                    <div class="bg-emerald-600 h-full w-[88%]" title="Passed"></div>
+                    <div class="bg-amber-400 h-full w-[12%]" title="In Progress"></div>
+                </div>
+            </div>
+
+            <!-- Tech 3 -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between font-semibold">
+                    <span class="text-m3-on-surface">3. One-shot Brand Voice & Classification</span>
+                    <span class="font-mono text-amber-800 font-bold">31 / 48 Passed (64%) • [3 STUCK]</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                    <div class="bg-emerald-600 h-full w-[64%]" title="Passed"></div>
+                    <div class="bg-amber-500 h-full w-[28%]" title="In Progress"></div>
+                    <div class="bg-m3-error h-full w-[8%]" title="Stuck"></div>
+                </div>
+            </div>
+
+            <!-- Tech 4 -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between font-semibold">
+                    <span class="text-m3-on-surface">4. Few-shot System Instructions & {{variables}}</span>
+                    <span class="font-mono text-slate-700 font-bold">12 / 48 Passed (25%)</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                    <div class="bg-emerald-600 h-full w-[25%]" title="Passed"></div>
+                    <div class="bg-slate-300 h-full w-[75%]" title="Not Started"></div>
+                </div>
+            </div>
+
+            <!-- Tech 5 -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between font-semibold">
+                    <span class="text-m3-on-surface">5. Grounding & Anti-Hallucination Guardrails</span>
+                    <span class="font-mono text-slate-700 font-bold">5 / 48 Passed (10%)</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex">
+                    <div class="bg-emerald-600 h-full w-[10%]" title="Passed"></div>
+                    <div class="bg-slate-300 h-full w-[90%]" title="Not Started"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- BOTTOM GRID: STUCK LEARNERS LIST (LEFT) & LIVE TELEMETRY STREAM (RIGHT) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: STUCK LEARNERS ACTION TABLE (5 cols) -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-sm text-m3-on-surface flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-m3-error">warning</span>
+                        <span>Stuck Learners Needing Help (3)</span>
+                    </h3>
+                    <span class="text-[10px] font-bold text-m3-error bg-red-100 px-2 py-0.5 rounded-full">>5 failed runs</span>
+                </div>
+
+                <div class="space-y-3">
+                    <template x-for="s in stuckLearners" :key="s.id">
+                        <div class="p-3.5 bg-red-50/60 rounded-2xl border border-red-200 space-y-2 text-xs">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-full bg-m3-error text-white font-bold text-[11px] flex items-center justify-center">
+                                        <span x-text="s.name.substring(0,2).toUpperCase()"></span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-m3-on-surface" x-text="s.name"></p>
+                                        <p class="text-[10px] text-m3-on-surface-variant" x-text="s.dept"></p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-mono font-bold text-m3-error bg-white px-2 py-0.5 rounded border border-red-200" x-text="`${s.attempts} attempts`"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between text-[11px] text-red-950 pt-1">
+                                <span x-text="`Stuck on: ${s.lab}`"></span>
+                                <span class="font-bold" x-text="`Score: ${s.score}/10`"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-red-200/60">
+                                <span class="text-[10px] text-m3-outline italic" x-text="`Issue: ${s.issue}`"></span>
+
+                                <button @click="
+                                        selectedLearner = s;
+                                        alert(`Opening Learner Inspector for ${s.name} (UI-10)...`);
+                                    " class="px-3 py-1 rounded-lg bg-m3-primary text-white font-semibold text-[11px] shadow hover:bg-m3-primary/90 transition-all flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">search</span>
+                                    <span>Inspect Prompt (UI-10)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-m3-outline text-center pt-2">
+                Clicking Inspect Prompt opens verbatim prompt syntax & attempt history.
+            </p>
+        </div>
+
+        <!-- RIGHT COLUMN: LIVE TELEMETRY EVENT STREAM (7 cols) -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-m3-outline-variant space-y-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <h3 class="font-bold text-sm text-m3-on-surface">Live Execution Telemetry Stream</h3>
+                </div>
+                <span class="text-xs text-m3-outline font-mono">Server-side LLM Events</span>
+            </div>
+
+            <!-- Telemetry Event Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                    <tr class="bg-m3-surface-container-low font-bold text-m3-on-surface border-b border-m3-outline-variant">
+                        <th class="p-2.5">Run ID</th>
+                        <th class="p-2.5">Learner</th>
+                        <th class="p-2.5">Lab</th>
+                        <th class="p-2.5">Attempt</th>
+                        <th class="p-2.5">AI Score</th>
+                        <th class="p-2.5">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-m3-outline-variant/60 font-mono text-[11px]">
+                    <template x-for="t in telemetryStream" :key="t.id">
+                        <tr class="hover:bg-m3-surface transition-colors">
+                            <td class="p-2.5 font-bold text-m3-primary" x-text="t.id"></td>
+                            <td class="p-2.5 font-sans font-bold text-m3-on-surface" x-text="t.learner"></td>
+                            <td class="p-2.5 text-m3-on-surface-variant" x-text="t.lab"></td>
+                            <td class="p-2.5 font-bold" x-text="t.attempt"></td>
+                            <td class="p-2.5">
+                                        <span class="px-2 py-0.5 rounded font-bold"
+                                              :class="t.score >= 8 ? 'bg-emerald-100 text-emerald-800' : (t.score >= 5 ? 'bg-amber-100 text-amber-900' : 'bg-red-100 text-red-800')"
+                                              x-text="`${t.score} / 10`"></span>
+                            </td>
+                            <td class="p-2.5 font-sans">
+                                <button @click="alert(`Inspecting Telemetry Event ${t.id} for ${t.learner}...`)" class="text-m3-primary font-bold hover:underline">
+                                    View Log
+                                </button>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- FOOTER -->
+<!-- ================================================================= -->
+<footer class="py-6 text-center text-xs text-m3-on-surface-variant border-t border-m3-outline-variant/40 bg-white mt-8">
+    <p>© 2026 Promptify x Intrepid Asia. Real-Time Telemetry Active.</p>
+</footer>
+
+</body>
+</html>

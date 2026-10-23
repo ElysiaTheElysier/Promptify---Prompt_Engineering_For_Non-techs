@@ -1,0 +1,18 @@
+{
+  "status": "APPROVED_AND_APPLIED_STAGING_ONLY_2026_10_19",
+  "project": "ai-transformation-510302",
+  "service": "promptify-intrepid-api",
+  "region": "asia-southeast1",
+  "AI_PROVIDER": "vertex",
+  "GEMINI_MODEL": "gemini-3.8-flash",
+  "VERTEX_LOCATION": "global",
+  "JUDGE_STRATEGY": "parallel-v1",
+  "fallback": null,
+  "judgeDeadlineMs": 50000,
+  "maxConcurrentCriterionWorkers": 5,
+  "maximumJudgeCalls": 6,
+  "feedbackSynthesis": "deterministic; no automatic submission rewrite or score override",
+  "embeddingConfiguration": "unchanged; generation models are not substituted for embedding models",
+  "iamChanges": false,
+  "productionChanges": false
+}

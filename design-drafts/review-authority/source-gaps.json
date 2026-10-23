@@ -1,0 +1,7 @@
+[
+  {
+    "ui": "UI-00",
+    "issue": "Word contains an incomplete score-array expression. No criteria scores supplied.",
+    "status": "NEEDS_SOURCE"
+  }
+]

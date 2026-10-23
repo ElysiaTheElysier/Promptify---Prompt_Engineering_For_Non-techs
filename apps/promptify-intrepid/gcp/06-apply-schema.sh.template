@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Default --validate/--dry-run mode stops before any cloud/database call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/gcp/SETUP_GUIDE.md before user execution.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+# User execution only. Connect via Auth Proxy and source scripts/configure_target_env.sh first.
+: "${TARGET_DATABASE_URL:?Configure target migration-owner connection first}"
+# configure_target_env.sh supplies PG* for psql; never put the secret URI in argv/logs.
+: "${PGHOST:?PGHOST required}" "${PGDATABASE:?PGDATABASE required}" "${PGUSER:?PGUSER required}"
+node scripts/gcp_preflight.mjs
+psql -X -v ON_ERROR_STOP=1 <<'SQL'
+SELECT count(*)=0 AS target_empty FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE' \gset
+\if :target_empty
+\i outputs/gcp/schema-chain.psql
+\echo Set runtime password at this prompt. Store the SAME value as a NUMERIC Secret Manager version.
+\password promptify_runtime
+\else
+\echo Target already contains public tables. STOP: compare manifest/catalog; do not rerun baseline or delete.
+\quit 1
+\endif
+SQL
