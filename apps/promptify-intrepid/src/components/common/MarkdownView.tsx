@@ -1,4 +1,5 @@
 import React from 'react';
+import {getProductLanguage} from '../../services/productI18nService';
 
 interface Props {
   content: string;
@@ -54,7 +55,7 @@ function sanitizeLatexAndSymbols(text: string): string {
 
 export const MarkdownView: React.FC<Props> = ({ content, className = '', size = 'xs' }) => {
   if (!content) {
-    return <div className="text-slate-400 italic text-xs">Chưa có nội dung.</div>;
+    return <div className="text-slate-400 italic text-xs">{getProductLanguage()==='en'?'No content yet.':'Chưa có nội dung.'}</div>;
   }
 
   const sanitizedContent = sanitizeLatexAndSymbols(content);

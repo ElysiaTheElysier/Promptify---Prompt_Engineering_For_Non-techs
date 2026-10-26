@@ -24,13 +24,18 @@ export async function createJudgeTask(task:JudgeTask,env=process.env,request:typ
  if(!judgeAsyncEnabled(env))throw Error('Judge queue is not configured');
  if(!/^[0-9a-f-]{36}$/i.test(task.attemptId)||!Number.isInteger(task.generation)||!/^[0-9a-f]{64}$/.test(task.token))throw Error('Invalid judge task');
  const queue=env.JUDGE_QUEUE!,worker=new URL('/internal/judge',env.JUDGE_WORKER_URL).toString();
+ // Optional private worker: Cloud Tasks signs an OIDC token as JUDGE_TASK_INVOKER_SA (Cloud Run checks run.invoker);
+ // the per-job token header is still required by the app.
+ const invoker=env.JUDGE_TASK_INVOKER_SA;
+ if(invoker!==undefined&&!/^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z][a-z0-9-]{4,28}[a-z0-9]\.iam\.gserviceaccount\.com$/.test(invoker))throw Error('Invalid JUDGE_TASK_INVOKER_SA');
+ const oidc=invoker?{oidcToken:{serviceAccountEmail:invoker,audience:new URL(env.JUDGE_WORKER_URL!).origin}}:{};
  const token=await accessToken();
  if(!token)throw Error('Cloud Tasks credentials unavailable');
  const response=await request(`https://cloudtasks.googleapis.com/v2/${queue}/tasks`,{method:'POST',signal:AbortSignal.timeout(10000),
   headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
   body:JSON.stringify({task:{name:`${queue}/tasks/judge-${task.attemptId}-g${task.generation}`,dispatchDeadline:'300s',
    httpRequest:{httpMethod:'POST',url:worker,headers:{'Content-Type':'application/json','X-Promptify-Judge-Token':task.token},
-    body:Buffer.from(JSON.stringify({attemptId:task.attemptId}),'utf8').toString('base64')}}})});
+    body:Buffer.from(JSON.stringify({attemptId:task.attemptId}),'utf8').toString('base64'),...oidc}}})});
  // 409 ALREADY_EXISTS: this generation is already queued.
  if(!response.ok&&response.status!==409)throw Error('Cloud Tasks rejected the judge task (HTTP '+response.status+')');
 }

@@ -10,17 +10,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Promptify tokens (pine, emerald, mint, paper, line, ink); the m3 names stay so ported screens inherit them.
+        pine: '#103b30', paper: '#f3f6f4', mint: '#e1f4eb', ink: '#15231e', line: '#d6e1dc',
         m3: {
           primary: '#047857', 'on-primary': '#ffffff',
-          'primary-container': '#d1fae5', 'on-primary-container': '#065f46',
-          surface: '#f8fafc', 'surface-container': '#f1f5f9',
-          'surface-container-low': '#f1f5f9', 'surface-container-high': '#e2e8f0',
-          'on-surface': '#0f172a', 'on-surface-variant': '#475569',
-          outline: '#94a3b8', 'outline-variant': '#cbd5e1',
-          error: '#ba1a1a', 'error-container': '#ffdad6',
+          'primary-container': '#e1f4eb', 'on-primary-container': '#103b30',
+          surface: '#f3f6f4', 'surface-container': '#edf3f0',
+          'surface-container-low': '#f3f6f4', 'surface-container-high': '#e3ece8',
+          'on-surface': '#15231e', 'on-surface-variant': '#56675f',
+          outline: '#7f948b', 'outline-variant': '#d6e1dc',
+          error: '#b42318', 'error-container': '#fde8e6',
         },
         brand: {
-          emerald: '#059669', amber: '#d97706',
+          emerald: '#047857', amber: '#a35208',
           50: '#f0fdf4',
           100: '#dcfce7',
           500: '#22c55e',
@@ -35,8 +37,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        sans: ['Be Vietnam Pro', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Be Vietnam Pro', 'Inter', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       }
     },

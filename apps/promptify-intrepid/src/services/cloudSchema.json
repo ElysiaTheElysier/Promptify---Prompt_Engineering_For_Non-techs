@@ -496,6 +496,14 @@
       "expires_at": "timestamp with time zone",
       "last_error_code": "text",
       "dispatch_confirmed": "boolean"
+    },
+    "product_judge_stage_results": {
+      "attempt_id": "uuid",
+      "stage": "text",
+      "input_sha256": "text",
+      "result": "jsonb",
+      "view": "jsonb",
+      "created_at": "timestamptz"
     }
   },
   "relations": [
@@ -2798,6 +2806,27 @@
         {
           "name": "p_evidence",
           "type": "jsonb"
+        }
+      ],
+      "many": false
+    },
+    "product_promote_learner_to_instructor": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_email",
+          "type": "text"
+        },
+        {
+          "name": "p_permission",
+          "type": "text"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
         }
       ],
       "many": false

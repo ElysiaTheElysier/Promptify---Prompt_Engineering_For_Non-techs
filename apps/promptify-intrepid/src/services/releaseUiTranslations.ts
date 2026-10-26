@@ -514,10 +514,10 @@ Trên 1.000 nhân sự|1,000+ staff
 Studio giáo trình (UI-11)|Curriculum Studio (UI-11)
 2. Hướng dẫn, biến và khung prompt|2. Instructions, Vars CRUD & Scaffold Sync
 3. Nguồn SOP và kho học liệu|3. SOP Assets (3A) & Material Hub (3B)
-BẢN NHÁP|DRAFT
-ĐÃ LÊN LỊCH|SCHEDULED
-ĐANG HOẠT ĐỘNG|ACTIVE
-ĐÃ LƯU TRỮ|ARCHIVED
+Bản nháp|DRAFT
+Đã lên lịch|SCHEDULED
+Đang hoạt động|ACTIVE
+Đã lưu trữ|ARCHIVED
 Định nghĩa quy tắc bảo vệ dữ liệu và rubric|Governance rules and rubric
 Chọn phòng ban đề nghị bên dưới. Yêu cầu được ghi vào|Select the requested department below. Your correction is recorded in the
 nhật ký sửa hồ sơ|profile correction log

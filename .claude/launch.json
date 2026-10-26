@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "intrepid-staging-local",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "apps/promptify-intrepid",
+        "run",
+        "dev:staging"
+      ],
+      "port": 5195,
+      "url": "http://127.0.0.1:5195"
+    }
+  ]
+}

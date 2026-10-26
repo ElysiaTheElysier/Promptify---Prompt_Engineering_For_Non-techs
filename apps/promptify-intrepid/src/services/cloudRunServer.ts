@@ -11,6 +11,7 @@ import {runProjectionWorker} from './cloudProjectionService';
 import {judgeAsyncEnabled} from './judgeQueueService';
 import {runJudgeJob,runGenerationJob} from './rebuildRunService';
 import {generationStreamEnabled,handleGenerationStream} from './generationStreamService';
+import {judgeStreamEnabled,handleJudgeStream} from './judgeStreamService';
 import {getSqlPool,closeSqlPool} from './cloudPostgresService';
 import {OAuth2Client} from 'google-auth-library';
 
@@ -83,6 +84,8 @@ export async function cloudHandler(req:IncomingMessage,res:ServerResponse){
     'Access-Control-Allow-Origin':origin,
     'Access-Control-Allow-Methods':'POST',
     'Access-Control-Allow-Headers':'Content-Type, Authorization',
+    // Lets the browser skip one preflight round trip per AI Judge/stream click for 10 minutes.
+    'Access-Control-Max-Age':'600',
     'Vary':'Origin'
    });
    res.end();
@@ -132,14 +135,15 @@ export async function cloudHandler(req:IncomingMessage,res:ServerResponse){
  }
  if(['worker','ai-worker'].includes(process.env.RUNTIME_MODE||'')){json(res,404,{error:'Not found'});return;}
  // TC-PLAY-02: token streaming, reached directly on the Cloud Run URL because Hosting buffers responses.
- if(url.pathname==='/api/stream'){
-  if(!generationStreamEnabled()){json(res,404,{error:'Not found'});return;}
+ if(url.pathname==='/api/stream'||url.pathname==='/api/judge-stream'){
+  const judge=url.pathname==='/api/judge-stream';
+  if(!(judge?judgeStreamEnabled():generationStreamEnabled())){json(res,404,{error:'Not found'});return;}
   if(req.method!=='POST'){json(res,405,{error:'POST required'});return;}
   let bytes=0,body:any;const chunks:Buffer[]=[];
   try{for await(const chunk of req){bytes+=chunk.length;if(bytes>3000000){json(res,413,{error:'Request too large'});return;}chunks.push(Buffer.from(chunk));}
    body=JSON.parse(Buffer.concat(chunks).toString('utf8')||'{}');
   }catch{json(res,400,{error:'Invalid request'});return;}
-  await handleGenerationStream(req,res,body);return;
+  await (judge?handleJudgeStream(req,res,body):handleGenerationStream(req,res,body));return;
  }
  if(url.pathname.startsWith('/api/')){
   const handlers:Record<string,typeof product>={'/api/product':product,'/api/generate':generate,'/api/evaluate':evaluate,'/api/roster-worker':rosterCompatibility};

@@ -94,7 +94,7 @@ const React=req('react'),{renderToStaticMarkup}=req('react-dom/server');
 const mod={exports:{} as any};
 const source=ts.transpileModule(fs.readFileSync('src/components/rebuild/WorkshopMessaging.tsx','utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const storage=new Map<string,string>();
-vm.runInNewContext(source,{module:mod,exports:mod.exports,require:(name:string)=>name==='react'?React:name.includes('productI18nService')?{useProductLanguage:()=> 'en'}:name.endsWith('.css')?{}:req(name),
+vm.runInNewContext(source,{module:mod,exports:mod.exports,require:(name:string)=>name==='react'?React:name.includes('productI18nService')?{useProductLanguage:()=> 'en'}:name.includes('UiFeedback')?{confirmAction:async()=>({ok:true,reason:''})}:name.endsWith('.css')?{}:req(name),
  localStorage:{getItem:(k:string)=>storage.get(k)??null,setItem:(k:string,v:string)=>storage.set(k,v)},Date,JSON,Array,Set,document:{getElementById:()=>null},crypto:{randomUUID:()=> 'r'}});
 const {LearnerInbox,WorkshopSupportQueue,HintRequestPanel,HintRequestAlert}=mod.exports;
 const render=(type:any,props:any)=>renderToStaticMarkup(React.createElement(type,props));
@@ -139,6 +139,12 @@ const alert=render(HintRequestAlert,{snapshot:trainer,currentUi:14,onOpen:noop,b
 assert.ok(alert.includes('1 hint request waiting')&&alert.includes('Open Workshop')&&alert.includes('role="alert"'));
 assert.ok(alert.includes('Tried a table but columns are still wrong.')&&alert.includes('Approve &amp; show hints')&&alert.includes('Decline'),'review directly in the pop-up');
 assert.ok(render(HintRequestAlert,{snapshot:trainer,currentUi:9,onOpen:noop}).includes('Show requests'));
+// "Later" is remembered across reloads for the same waiting set; a new request brings the pop-up back.
+const pendingIds=queue.filter(r=>r.status==='pending').map(r=>r.id).join(',');
+storage.set('promptify-hint-alert-later:t:c1',pendingIds);
+assert.equal(render(HintRequestAlert,{snapshot:trainer,currentUi:14,onOpen:noop}),'','dismissed set stays hidden after reload');
+assert.ok(render(HintRequestAlert,{snapshot:{...trainer,supportRequests:[{...queue[0],id:'new-request'},...queue]},currentUi:14,onOpen:noop}).includes('hint requests waiting'),'a new request shows the pop-up again');
+storage.delete('promptify-hint-alert-later:t:c1');
 assert.equal(render(HintRequestAlert,{snapshot:{...trainer,supportRequests:queue.filter(r=>r.status!=='pending')},currentUi:14,onOpen:noop}),'');
 assert.equal(render(HintRequestAlert,{snapshot:base,currentUi:4,onOpen:noop}),'','learners never see the trainer pop-up');
 
@@ -146,7 +152,8 @@ assert.equal(render(HintRequestAlert,{snapshot:base,currentUi:4,onOpen:noop}),''
 const app=fs.readFileSync('src/components/rebuild/ProductionApp.tsx','utf8'),workspace=fs.readFileSync('src/components/rebuild/ProductionWorkspaceV7.tsx','utf8');
 assert.ok(app.includes('if(currentUi===4&&snapshot)return scoped(<><LearnerInbox'));
 assert.ok(app.includes('return scoped(<><LearnerInbox snapshot={snapshot} busy={busy} onAction={action}/><ProductionWorkspace'));
-assert.ok(app.includes('return scoped(<><WorkshopSupportQueue'));
+// The queue renders inside the Workshop screen, under its header.
+assert.ok(app.includes('onInspect={id=>{setLearnerId(id);navigate(10);}}><WorkshopSupportQueue snapshot={snapshot} busy={busy} onAction={action}/></ProductionWorkshopSource>'));
 assert.ok(app.includes('<HintRequestAlert snapshot={snapshot} currentUi={currentUi} onOpen={()=>navigate(9)} busy={busy} onAction={action}/>'));
 assert.equal(workspace.includes("['solution',"),false,'Solution tab removed');
 assert.equal(workspace.includes("unlock('hints')"),false,'no self-unlock of hints');

@@ -17,8 +17,8 @@ Mức bằng chứng: **CODE**, **OFFLINE**, **LIVE** (staging, có evidence), *
 | --- | --- |
 | Ứng dụng | Chỉ `apps/promptify-intrepid`. MVP đã gỡ khỏi repo ngày 22/10 |
 | GCP | **Chỉ có staging**: project `ai-transformation-510302`, region `asia-southeast1`. Chưa có project/Hosting/Cloud Run production |
-| API | Cloud Run `promptify-intrepid-api`. Revision `promptify-intrepid-api-life-1021` nhận 100% traffic. Ứng viên `rs-1022` (route roster theo lịch) có 0% traffic, tag `roster-review` |
-| Hosting | Firebase Hosting `ai-transformation-510302-intrepid-staging`, release `8c8ffe04005cc145` (21/10) |
+| API | Cloud Run `promptify-intrepid-api`. **Từ 26/10:** revision `promptify-intrepid-api-judge1-1026` nhận 100% (`JUDGE_STREAM=true`, `JUDGE_MODE=async`), rollback `promo1-1023`. Xem [handoffs/UPDATES_2026-10-26_27.md](handoffs/UPDATES_2026-10-26_27.md) |
+| Hosting | Firebase Hosting `ai-transformation-510302-intrepid-staging`. **Từ 27/10:** version `d926a77bb3d842c8`, rollback `3d04d040c6f5b63d` |
 | Cấu hình AI | `AI_PROVIDER=vertex`, `GEMINI_MODEL=gemini-3.8-flash`, `VERTEX_LOCATION=global`, `JUDGE_STRATEGY=parallel-v1`. Không có fallback model. **Từ 23/10:** `JUDGE_MODE=async` (Cloud Tasks queue `promptify-judge-staging`, revision `ja1-1023`, Hosting `0d48ba25…`); Judge async đã được kiểm chứng live |
 | Database | Cloud SQL PostgreSQL 18 `promptify-staging`, DB `promptify_db`, pool 5. Có backup và PITR; **chưa diễn tập restore** |
 | Scheduler | `promptify-roster-staging-qa`, **PAUSED** |
@@ -52,6 +52,8 @@ Evidence: `apps/promptify-intrepid/outputs/staging-release-2026-10-22-capacity-r
 ## Test hiện tại
 
 Chạy trong `apps/promptify-intrepid` ngày 22/10/2026, sau khi gỡ MVP: offline **56/56 PASS**; typecheck, boundaries, build, smoke đều PASS; lint 0 lỗi. Các warning đã biết: cycle `ProductionWorkspace.tsx` ↔ `ProductionWorkspaceV7.tsx` và chunk lớn hơn 500 kB.
+
+Ngày 26/10/2026 (bằng chứng OFFLINE): offline **83/83 PASS**; typecheck, lint, boundaries, build và smoke đều PASS.
 
 ## Rủi ro repository
 

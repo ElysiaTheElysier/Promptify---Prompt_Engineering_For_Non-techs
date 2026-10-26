@@ -1,0 +1,4 @@
+# Overlay on promo1-1023 for the ISOLATED load-test service only (promptify-judge-loadtest): watch hub, enqueue
+# optimizations, provider stub, guarded load-test identity, optional OIDC tasks. Not for promptify-intrepid-api.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:7fb401d1565623718912f641ddba818cca47004603da88a6bc900a40ce14f77e
+COPY --chown=node:node src/services/parallelJudgeService.ts src/services/productionAiService.ts src/services/rebuildRunService.ts src/services/judgeStreamService.ts src/services/cloudRunServer.ts src/services/cloudSchema.json src/services/firebaseServerIdentityService.ts src/services/vertexAiService.ts src/services/providerStubService.ts src/services/loadtestIdentityService.ts src/services/judgeQueueService.ts /app/src/services/

@@ -1,0 +1,3 @@
+# Overlay on hint3-1023: admin learner -> facilitator promotion (promoteLearner action, RPC allowlist). Requires SQL 019.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:eed6c13320513bc20a8d01e33196cd528e888551c02208fb0011e2026adc43f7
+COPY --chown=node:node src/services/productionServerService.ts src/services/cloudSchema.json /app/src/services/

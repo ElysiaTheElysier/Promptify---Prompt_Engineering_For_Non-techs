@@ -17,10 +17,14 @@ assert.match(client,/Date\.now\(\) - started < 30000 \? 3000 : 10000/,'poll ever
 assert.match(client,/started < 10000 \? 1000/,'fast Judge polls each second for the first 10s');
 assert.match(client,/document\.hidden\) continue/,'polling pauses in hidden tabs');
 const app=read('src/components/rebuild/ProductionApp.tsx');
-assert.match(app,/judge:async attemptId=>\{try\{await gradeAttempt\(/,'Run waits for the async grade');
+assert.doesNotMatch(app.slice(app.indexOf('const run = ('),app.indexOf('const insert =')),/gradeAttempt\(/,'Run only generates; AI Judge starts on demand');
 assert.match(app,/name==='judge'\?await gradeAttempt\(/,'Retry AI Judge waits for the async grade');
-assert.match(app,/flushSync\(\(\)=>setSnapshot[\s\S]*?evaluation_json:grade/,'authoritative grade renders before full snapshot refresh');
-assert.match(app,/waitForJudge\(\{classId,lessonId:lesson\.id,attemptId:attempt\.id\},setJudgeProgress,controller\.signal\)/,'reload resumes waiting');
+assert.match(app,/flushSync\(\(\)=>\{\s*setLiveCriteria\(\[\]\);[\s\S]*?setSnapshot[\s\S]*?evaluation_json:grade/,'authoritative grade renders before full snapshot refresh');
+assert.match(app,/requestJudgeStream\(\{classId,lessonId:lesson\.id,attemptId:attempt\.id\},[\s\S]*?setJudgeProgress,controller\.signal,true,/,'reload resumes the same job (resume=true never enqueues)');
+assert.match(app,/return \(\)=>\{controller\.abort\(\);setLiveCriteria\(\[\]\);setJudgeGraded\(0\);\}/,'switching attempt clears provisional rows');
+assert.match(client,/event==='resume'\)return null;[\s\S]*?return poll\(\);/,'stream end or resume continues by polling the durable job');
+assert.match(client,/result\.criteria\?\.forEach\(row => onCriterion\?\.\(row\)\)/,'polling also delivers stored criteria');
+assert.match(client,/resume\?\{resume:true\}:\{\}/,'resume flag is sent only on reconnect');
 const v7=read('src/components/rebuild/ProductionWorkspaceV7.tsx');
 assert.match(v7,/!attempt\.evaluation_json&&!busy&&!props\.judgeProgress&&<button/,'no duplicate retry while a job is active');
 assert.match(v7,/AI Judge đang xếp hàng/,'queued state is visible');

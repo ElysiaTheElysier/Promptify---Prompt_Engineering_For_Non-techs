@@ -571,6 +571,34 @@ Mở đầu thực hành Zero-shot có kiểm tra SOP|1. Zero-shot Prompting & S
 Portal học kỹ thuật Prompt|Prompt Engineering Portal
 Giao diện giảng viên|Instructor View
 Xem song song|Side-by-Side View
+Quản trị API Key Vault & Gateway AI Doanh nghiệp|Enterprise API Key Vault & AI Gateway
+Tự động hóa Đồng bộ Danh sách Học viên từ Google Sheets|Automated learner roster sync from Google Sheets
+BỊ KẸT (>5 lần sai)|STUCK (>5 Fails)
+Đóng góp SOP|SOP contribution
+Quản trị Promptify|Promptify Governance
+🟢 Đang hoạt động|🟢 ACTIVE
+🟢 ACTIVE|🟢 Active
+Đã tắt|disabled
+Đang bật|active
+Điều khiển phiên của giảng viên|Trainer session control
+Trainer session control|Facilitator session control
+Facilitator / Trainer Portal|Facilitator portal
+Quick Broadcast SLA Hint to All Student Workspaces (UI-05):|Broadcast a hint to every learner workspace:
+Send Private Hint to Student Workspace:|Send a private hint to this learner:
+Nhận xét và thiết lập sinh|Feedback & generation settings
+Xuất báo cáo tác động học tập|Export learning impact report
+Nguồn phòng ban đã xuất bản|Published department sources
+Thời gian tiết kiệm mỗi tuần (tự báo cáo)|Reported Weekly Time Saved
+Giờ tự báo cáo / tuần|Reported hours / week
+Ước tính năng suất dựa trên thời gian tác vụ học viên tự báo cáo và chi phí theo giờ đã cấu hình; không phải ROI đã kiểm toán.|Productivity estimates use self-reported task times and configured hourly cost; they are not audited ROI.
+Các kết nối đang bật được kiểm tra mỗi 15 phút. Workbook v1 theo tab Sync sau lần đồng bộ đầu tiên. Sheet mẫu không được tự động nhập.|Enabled connections are checked every 15 minutes. Workbook v1 follows the Sync tab after its initial synchronization. The sample Sheet is not imported automatically.
+🟢 Đang hoạt động|🟢 Active
+Đang bật|Enabled
+Đã tắt|Disabled
+Nội dung thông báo|Broadcast message
+Cho phép luyện tấn công prompt (bài prompt-injection)|Allow adversarial practice (prompt-injection lessons)
+Học viên được chạy prompt kiểu injection/jailbreak trong bài lab này. Các lần thử vẫn được ghi là sự kiện bảo mật.|Learners may run injection/jailbreak-style prompts in this lab. Attempts are still logged as security events.
+Đọc trực tiếp danh sách nhân viên B2B từ Google Sheets, phân tích cơ cấu phòng ban, cấp quyền lớp học và đồng bộ hồ sơ người dùng vào Cloud SQL PostgreSQL.|Seamlessly read B2B employee rosters directly from Google Sheets, parse department hierarchies, provision cohort access, and sync user profile updates to Cloud SQL PostgreSQL.
 `;
 const extra=`
 • Bấm thẻ đã có để định vị | Bấm (+) thẻ thiếu để chèn nhanh~• Select an existing component to locate it; select (+) to insert a missing component
@@ -730,7 +758,8 @@ Tắt|Disable
 const studioPairs="\n← Lưu & Quay về Danh mục Codelabs|← Save & return to Codelab directory\n+ Tạo bài Lab mới|+ Create Codelab\nTổng số bài Codelab|Total Codelabs\nThuộc 3 Trụ cột Chương trình Đào tạo|Across the training pillars\nĐã Xuất bản (Active Live)|Published (Active)\nHiển thị trên Learner UI-04|Visible on the learner dashboard\nBản nháp (Drafts QA)|Drafts\nĐang biên soạn trong Studio|Being authored in Studio\nLên lịch / Lưu trữ (Archived)|Scheduled / Archived\nChờ kích hoạt & Lịch sử bài lab|Awaiting activation and historical labs\nTất cả|All\nDoanh nghiệp (Enterprise Client):|Enterprise client:\nTrụ cột Chương trình (Master Pillar):|Training pillar:\nTất cả 3 Trụ cột Đào tạo|All training pillars\nDanh mục Bài Codelabs & Trạng thái Vòng đời Vận hành|Codelab directory and lifecycle\nMã Code|Code\nTiêu đề Bài lab & Trụ cột|Codelab title and pillar\nDoanh nghiệp & Lớp học|Client and cohort\nTrạng thái Vòng đời|Lifecycle state\nLượt làm|Attempts\nĐiểm TB|Average score\nThao tác|Actions\nChỉnh sửa / Cấu hình|Edit / Configure\n1. Scope, Schedule & Trạng thái Vòng đời|1. Scope, Schedule & Lifecycle\nCấu hình phạm vi, thời gian vận hành, phòng ban thụ hưởng từ Onboarding và trạng thái vòng đời.|Configure scope, operating times, eligible departments and lifecycle state.\nTrạng thái Vòng đời:|Lifecycle state:\n📝 DRAFT (Ẩn đối với Học viên)|📝 DRAFT (Hidden from learners)\n🟢 ACTIVE (Đã xuất bản lên UI-04)|🟢 ACTIVE (Published to learner dashboard UI-04)\n⏰ SCHEDULED (Tự mở theo Giờ bắt đầu)|⏰ SCHEDULED (Opens at the start time)\n📦 ARCHIVED (Lưu trữ lịch sử)|📦 ARCHIVED (Historical record)\nTarget Eligible Departments (Chọn từ danh sách Onboarding Doanh nghiệp):|Eligible departments (from enterprise onboarding):\nBusiness Scenario Brief (Hiển thị ở Learner Task Panel UI-05):|Business scenario brief (learner task panel UI-05):\nSystem prompt truyền tới Gemini để chấm điểm AI Judge.|System instruction sent to Gemini for AI Judge scoring.\n+ Thêm Biến|+ Add variable\nToggle tự động cập nhật Rubric|Update rubric automatically\nTên SOP|SOP name\nSố trang|Pages\nTrạng thái|Status\nThời gian Vectorize|Indexing time\n+ Thêm Học liệu|+ Add material\nPhân loại|Category\nTên Học liệu|Material name\nVersion & Ngày cập nhật|Version & update date\nNhật ký thay đổi|Change log\nXóa|Remove\nLưu trữ và chỉnh sửa trực tiếp các liên kết game tương tác Kahoot, Mentimeter poll, Quizizz cho buổi workshop.|Save and edit Kahoot, Mentimeter and Quizizz links for the workshop.\n+ Thêm Quiz / Poll Link|+ Add quiz / poll link\nTên Hoạt động Game/Quiz:|Game / quiz activity name:\nNền tảng Tương tác:|Interactive platform:\nĐường dẫn Live Session URL:|Live session URL:\nCấu hình biểu tượng Huy hiệu số và thiết lập điều kiện tự động cấp huy hiệu cho Học viên.|Configure badge icons and automatic award rules for learners.\n+ Thêm Huy hiệu mới|+ Add badge\nĐiều kiện Tự động Cấp (Automated Threshold):|Automatic award criteria:\nXóa Huy hiệu|Remove badge\nCấu hình tiêu đề phôi chứng chỉ B2B, đơn vị cấp phép, điều kiện tốt nghiệp và đường dẫn mẫu PDF.|Configure the certificate title, issuer, graduation rules and PDF template URL.\nTiêu đề Chứng chỉ Doanh nghiệp:|Enterprise certificate title:\nĐơn vị Cấp Bằng / Ủy ban Đào tạo:|Issuer / training committee:\nQuy tắc & Điều kiện Tốt nghiệp (Eligibility Rules):|Graduation eligibility rules:\nMẫu Phôi Certificate PDF Template URL:|Certificate PDF template URL:\nLần cuối cập nhật Phôi:|Template last updated:\n";
 const en=new Map<string,string>(),vi=new Map<string,string>();
 for(const [block,separator] of [[pairs,'|'],[extra,'~'],[extraPairs,'|'],[entryPairs,'|'],[productionPairs,'|'],[studioPairs,'|'],[releaseUiTranslations,'|']])for(const line of block.trim().split('\n')){const p=line.indexOf(separator);if(p<0)continue;const a=line.slice(0,p),b=line.slice(p+1);en.set(a,b);vi.set(b,a)}
-export function sourceUiText(s:string,language: 'en'|'vi'){const trimmed=s.trim();if(/^© 2026 Promptify x Intrepid Asia\./.test(trimmed))return s.replace(trimmed,'© 2026 Promptify · Intrepid');const dict=language==='en'?en:vi;const cleanUiCodes=(value:string)=>value.replace(/\s*\(UI-\d{2}\)|\s+UI-\d{2}\b|UI-\d{2}:\s*/g,'').replace(/^(Edit|Chỉnh sửa) in$/,'$1').replace(/^Chỉnh sửa trong$/,'Chỉnh sửa').replace(/^\+ Create New Lab in$/,'+ Create New Lab');const cleanLabel=cleanUiCodes(trimmed);const mapped=dict.get(trimmed)||dict.get(cleanLabel);const knownDisplayLabel=(language==='en'?en:vi).values();const exact=mapped?cleanUiCodes(mapped):Array.from(knownDisplayLabel).some(value=>cleanUiCodes(value)===cleanLabel)?cleanLabel:undefined;if(exact)return s.replace(trimmed,exact);let v=s;
+const ELLIPSIS=/\.\.\.(?=\s*$)/;
+export function sourceUiText(s:string,language: 'en'|'vi'){const trimmed=s.trim();if(/^© 2026 Promptify x Intrepid Asia\./.test(trimmed))return s.replace(trimmed,'© 2026 Promptify · Intrepid');const dict=language==='en'?en:vi;const cleanUiCodes=(value:string)=>value.replace(/\s*\(UI-\d{2}\)|\s+UI-\d{2}\b|UI-\d{2}:\s*/g,'').replace(/^(Edit|Chỉnh sửa) in$/,'$1').replace(/^Chỉnh sửa trong$/,'Chỉnh sửa').replace(/^\+ Create New Lab in$/,'+ Create New Lab');const cleanLabel=cleanUiCodes(trimmed);const mapped=dict.get(trimmed)||dict.get(cleanLabel);const knownDisplayLabel=(language==='en'?en:vi).values();const exact=mapped?cleanUiCodes(mapped):Array.from(knownDisplayLabel).some(value=>cleanUiCodes(value)===cleanLabel)?cleanLabel:undefined;if(exact)return s.replace(trimmed,exact).replace(ELLIPSIS,'…');let v=s;
  // Dynamic labels retain numbers, citations, model identifiers and user input.
  if(language==='en'){v=v.replace(/(\d+) lần thử nghiệm/g,'$1 attempts').replace(/(\d+) phút trước/g,'$1 minutes ago').replace(/(\d+) ngày trước/g,'$1 days ago');}
  else {v=v.replace(/(\d+) days ago/g,'$1 ngày trước').replace(/(\d+) minutes ago/g,'$1 phút trước').replace(/(\d+)h\/wk/g,'$1 giờ/tuần');}
@@ -739,6 +768,6 @@ export function sourceUiText(s:string,language: 'en'|'vi'){const trimmed=s.trim(
   v=v.split(' · ').map(part=>dict.get(part)||part).join(' · ');
  }
  if(language==='en')v=v.replace(/Hiển thị (\d+) \/ (\d+) bài lab/g,'Showing $1 / $2 Codelabs').replace(/(\d+) học viên/g,'$1 learners').replace(/Lần thử /g,'Attempt ').replace(/\(Mới nhất\)/g,'(Latest)').replace(/đ \(/g,' points (').replace(/lần thử\)/g,'attempts)');
- else v=v.replace(/(\d+) attempts\b/g,'$1 lần thử').replace(/(\d+) Codelabs\b/g,'$1 bài học').replace(/Score: /g,'Điểm: ').replace(/(\d+) chars\b/g,'$1 ký tự').replace(/ is outside the approved corporate domains\./g,' không thuộc tên miền doanh nghiệp được duyệt.').replace(/Attempt /g,'Lần thử ').replace(/\(Latest\)/g,'(Mới nhất)').replace(/Source: /g,'Nguồn: ');
- return v;
+ else v=v.replace(/(\d+) attempts\b/g,'$1 lần thử').replace(/^(\S+) of (\S+) employees completed$/,'$1 / $2 nhân viên đã hoàn thành').replace(/(\d+) Codelabs\b/g,'$1 bài học').replace(/Score: /g,'Điểm: ').replace(/(\d+) chars\b/g,'$1 ký tự').replace(/ is outside the approved corporate domains\./g,' không thuộc tên miền doanh nghiệp được duyệt.').replace(/Attempt /g,'Lần thử ').replace(/\(Latest\)/g,'(Mới nhất)').replace(/Source: /g,'Nguồn: ');
+ return v.replace(ELLIPSIS,'…');
 }

@@ -1,4 +1,5 @@
 import {GoogleAuth} from 'google-auth-library';
+import {providerStubEnabled,stubModelRequest,ProviderStubError} from './providerStubService';
 const adc=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
 export function normalizeModelPayload(model:string,payload:any){
  if(!/^gemini-3\.[6-9](?:[.-]|$)/.test(model)||!payload?.generationConfig)return payload;
@@ -14,6 +15,8 @@ export async function modelRequest(model:string,operation:ModelOperation,payload
  const suffix=operation==='streamGenerateContent'?'?alt=sse':'';
  if(!/^[a-zA-Z0-9._-]+$/.test(model))throw new ProviderSetupError('Invalid model');
  payload=normalizeModelPayload(model,payload);
+ // Staging load tests only (guarded inside): replaces just this network call.
+ if(providerStubEnabled())return stubModelRequest(model,operation,payload,timeout).catch(error=>{throw error instanceof ProviderStubError?new ProviderSetupError(error.message):error;});
  if(vertexEnabled()){
   const project=process.env.GOOGLE_CLOUD_PROJECT,region=(operation==='predict'?process.env.EMBEDDING_LOCATION:process.env.VERTEX_LOCATION)||'asia-southeast1';
   if(!project||!/^[a-z0-9-]+$/.test(project)||!/^[a-z0-9-]+$/.test(region))throw new ProviderSetupError('Vertex AI project/location not configured');

@@ -35,3 +35,59 @@
  .hub-progress-overview>summary>progress{grid-column:1/-1;grid-row:4;width:100%;min-width:0;height:6px}
 }
 .revised-hub :is(h1,h2,h3),.revised-hub .hub-welcome-copy{overflow-wrap:anywhere}
+
+/* Hub hierarchy: welcome, one next action, then the lab directory. */
+.learner-v7.revised-hub{max-width:1440px;margin:auto;padding:32px clamp(16px,3vw,48px) 48px;background:transparent}
+.revised-hub .hub-page-header{margin-bottom:28px}.revised-hub .hub-page-header h1{font-size:28px;letter-spacing:-.035em}
+.revised-hub .hub-welcome{background:transparent;border:0;border-top:1px solid var(--lv-line);border-bottom:1px solid var(--lv-line);border-radius:0;padding:28px 0;margin-bottom:0;grid-template-columns:minmax(0,1fr) minmax(360px,1fr)}
+.hub-course-name{font-size:13px;color:var(--lv-muted)}
+.hub-welcome h2{font-size:clamp(24px,2.2vw,34px);letter-spacing:-.035em;max-width:24ch}
+.hub-welcome-copy p{max-width:45ch}.hub-welcome-copy small{display:block;margin-top:20px}
+.hub-resume{border:0;border-left:3px solid #103b30;border-radius:0;background:transparent;padding:8px 0 8px 28px}
+.hub-resume h3{font-size:20px;max-width:34ch}.hub-resume .lv-primary{grid-column:1;grid-row:4;justify-self:start;margin-top:16px;max-width:none}
+.hub-resume .lv-eyebrow{font-size:13px;color:var(--lv-muted);margin:0}
+.hub-progress-overview{border:0;border-bottom:1px solid var(--lv-line);background:transparent;border-radius:0;margin-bottom:32px}
+.hub-progress-overview>summary{padding:16px 0}.hub-progress-overview>summary>.lv-badge{background:transparent;border:0;padding:0;color:var(--lv-muted);font-weight:400}
+.revised-hub .hub-accreditation-row{padding:0 0 24px}.revised-hub .hub-accreditation-row>.lv-card{border:0;border-radius:0;background:transparent;padding:16px 0}
+.revised-hub .hub-catalog-toolbar{padding:0;background:transparent;border:0;border-radius:0;gap:12px}
+.hub-search{background:white;border-radius:8px;flex:1 1 280px}.hub-pillar-tabs{flex:1 1 auto}
+.hub-pillar-tabs button[aria-pressed=true]{background:#e1f4eb;color:#103b30;border-color:#bfd8ca}
+.revised-hub .hub-lab{border-radius:12px;padding:24px;border-color:var(--lv-line);box-shadow:none}
+.hub-lab-tags .lv-eyebrow{margin:0;color:var(--lv-muted);font-weight:500}.hub-lab-status{font-size:12px;font-weight:600;margin-left:auto;display:inline-flex;align-items:center;gap:6px}.hub-lab-status:before{content:'';width:6px;height:6px;border-radius:50%;background:#6c7c74}.hub-lab-status.status-completed:before{background:#047857}.hub-lab-status.status-in_progress:before{background:#a35208}.hub-tier{font-size:12px;color:var(--lv-muted);padding-left:12px;border-left:1px solid var(--lv-line)}
+.hub-lab-score{font-size:13px;color:var(--lv-muted)}
+.revised-hub .hub-workshop{background:transparent;border:0;border-top:1px solid var(--lv-line);border-radius:0;padding:24px 0;margin-top:32px}
+@media(max-width:760px){.learner-v7.revised-hub{padding:24px 16px 32px}.revised-hub .hub-page-header h1{font-size:24px}.revised-hub .hub-welcome{grid-template-columns:1fr;padding:24px 0;gap:24px}.hub-welcome h2{font-size:25px}.hub-welcome-copy small{margin-top:10px}.hub-resume{padding:4px 0 4px 18px}.hub-resume .lv-primary{width:100%;justify-self:stretch}.hub-resume h3{font-size:19px}.hub-progress-overview>summary{padding:16px 0}.hub-progress-overview{margin-bottom:24px}.hub-catalog-toolbar .hub-pillar-tabs{gap:8px}.revised-hub .hub-lab{padding:20px}.hub-tier{display:block}.hub-lab-tags{gap:8px}.hub-lab-footer .lv-toolbar-actions{flex-wrap:nowrap}.hub-lab-footer button{font-size:13px}}
+
+/* Hub v2 (25/10): pine welcome hero with the resume card, quiz strip under it, progress + badges always visible,
+   labs as a card grid. Promptify tokens only: pine #103b30, emerald #047857, mint #e1f4eb, paper #f3f6f4. */
+.learner-v7.revised-hub .hub-welcome{grid-template-columns:minmax(0,1fr) minmax(300px,.42fr);gap:28px;padding:28px 32px;background:#103b30;border-color:#103b30;color:#e8f3ee}
+.learner-v7.revised-hub .hub-welcome h2{color:#fff;font-size:clamp(24px,2vw,32px);letter-spacing:-.015em}
+.learner-v7.revised-hub .hub-welcome-copy p,.learner-v7.revised-hub .hub-welcome-copy small{color:#b9d3c8}
+.learner-v7.revised-hub .hub-course-name{display:inline-flex;padding:2px 10px;border-radius:999px;background:#e1f4eb;color:#103b30;font-size:12px;font-weight:700}
+.learner-v7.revised-hub .hub-resume{background:#ffffff12;border-color:#ffffff2e;color:#fff}
+.learner-v7.revised-hub .hub-resume h3{color:#fff}
+.learner-v7.revised-hub .hub-resume p,.learner-v7.revised-hub .hub-resume .lv-section-heading>span{color:#b9d3c8}
+.learner-v7.revised-hub .hub-resume .lv-eyebrow{color:#ffd59a}
+.learner-v7.revised-hub .hub-resume .lv-primary{background:#e1f4eb;border-color:#e1f4eb;color:#103b30!important}
+.learner-v7.revised-hub .hub-resume .lv-primary:hover:not(:disabled){background:#fff}
+.learner-v7.revised-hub .hub-resume .lv-primary:focus-visible,.learner-v7.revised-hub .hub-welcome :focus-visible{outline:2px solid #8fe0bd;outline-offset:2px}
+.learner-v7.revised-hub .hub-workshop{margin:0 0 20px;padding:14px 20px;background:#fff;border:1px solid var(--lv-line)}
+.learner-v7.revised-hub .hub-accreditation-row{margin:0 0 28px;padding:0}
+.learner-v7.revised-hub .hub-accreditation-row>.lv-card{background:#fff;border:1px solid var(--lv-line)}
+.learner-v7.revised-hub .hub-labs{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+.learner-v7.revised-hub .hub-lab{padding:20px;border:1px solid var(--lv-line);box-shadow:none}
+.learner-v7.revised-hub .hub-lab-recommended{border-color:#a7dcc3}
+.learner-v7.revised-hub .hub-lab h3{font-size:17px;margin:12px 0 4px}
+.learner-v7.revised-hub .hub-lab-scenario{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:12px 0 0;padding:12px;border-radius:12px;background:#f3f6f4;font-size:13px;line-height:1.6}
+.learner-v7.revised-hub .hub-lab .hub-lab-facts{display:grid;gap:6px;margin:12px 0 0;padding:0;border:0;font-size:12px}
+.learner-v7.revised-hub .hub-lab-footer{margin-top:auto;padding-top:14px}
+@media(max-width:900px){.learner-v7.revised-hub .hub-welcome{grid-template-columns:1fr;padding:22px 20px}}
+.learner-v7.revised-hub .hub-welcome{border-radius:20px;margin:0 0 16px}
+.learner-v7.revised-hub .hub-workshop{border-radius:16px}
+.learner-v7.revised-hub .hub-accreditation-row>.lv-card{padding:20px 22px;border-radius:16px}
+.learner-v7.revised-hub .hub-accreditation-row .lv-section-heading{flex-wrap:wrap;gap:8px 16px}
+.learner-v7.revised-hub .hub-mastery{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px}
+.learner-v7.revised-hub progress{appearance:none;-webkit-appearance:none;width:100%;height:8px;border:0;border-radius:999px;background:#e3ece8;overflow:hidden}
+.learner-v7.revised-hub progress::-webkit-progress-bar{background:#e3ece8;border-radius:999px}
+.learner-v7.revised-hub progress::-webkit-progress-value{background:#047857;border-radius:999px}
+.learner-v7.revised-hub progress::-moz-progress-bar{background:#047857;border-radius:999px}

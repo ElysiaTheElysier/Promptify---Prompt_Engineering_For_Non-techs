@@ -247,7 +247,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     const published=ids.length?await result<any[]>(c.server.from('product_sop_contributions').select('class_id').in('class_id',ids).eq('status','published').gte('created_at',start.toISOString()).lt('created_at',end.toISOString())):[];
     return {...report,feedback,published_sops:published.length,classes:(report.classes||[]).map((row:any)=>({...row,published_sops:published.filter(source=>source.class_id===row.id).length}))};
   }
-  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest'].includes(body.action));
+  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner'].includes(body.action));
   if(c.profile.role==='learner'&&accessExpiryEnabled()&&READ_ONLY_BLOCKED.has(body.action))await assertWritableAccess(c.profile.id,cls.id);
   switch (body.action) {
     case 'accessRequests':return accessInbox(cls.id,c.profile.role==='admin');
@@ -353,6 +353,21 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(c.profile.role!=='admin')throw new ApiAccessError('Administrator required.',403);
       const domain=text(body.domain,253).toLowerCase().replace(/^@/,'');if(!/^[a-z0-9][a-z0-9.-]+\.[a-z]{2,}$/.test(domain)||typeof body.active!=='boolean')throw new ApiAccessError('Invalid domain policy.',422);
       await result(c.reader.rpc('product_save_domain',{p_class:cls.id,p_domain:domain,p_active:body.active}));return {saved:true};
+    }
+    case 'promoteLearner': {
+      // Admin-only, audited learner -> facilitator change (019); Class access still handles new or non-learner accounts.
+      if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);
+      const {data,error}=await c.reader.rpc('product_promote_learner_to_instructor',{p_class:cls.id,p_email:text(body.email,254).toLowerCase(),p_permission:body.permission,p_reason:text(body.reason,500)});
+      if(error){
+        const message=String(error.message||'');
+        if(/User not found/.test(message))throw new ApiAccessError('No account uses this email. Use Class access to invite a new facilitator.',404);
+        if(/Only a learner can be promoted/.test(message))throw new ApiAccessError(message.slice(message.indexOf('Only a learner')),409);
+        if(/Invalid permission|Reason must be/.test(message))throw new ApiAccessError(message.slice(message.search(/Invalid permission|Reason must be/)),422);
+        if(/administrator required/i.test(message))throw new ApiAccessError('System administrator required.',403);
+        if(['PGRST202','42883'].includes(error.code))throw new ApiAccessError('The role promotion schema upgrade (019) has not been applied.',503);
+        throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.',409);
+      }
+      return {userId:data};
     }
     case 'setAccess':return result(c.reader.rpc('product_set_class_access',{p_class:cls.id,p_email:text(body.email,254).toLowerCase(),p_role:body.role,p_permission:body.permission}));
     case 'saveClass':{

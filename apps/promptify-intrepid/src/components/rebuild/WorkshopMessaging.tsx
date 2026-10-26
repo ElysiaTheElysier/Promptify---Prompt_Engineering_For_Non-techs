@@ -2,12 +2,15 @@ import {useEffect,useRef,useState} from 'react';
 import type {HintRequest,ProductLesson,ProductSnapshot} from '../../types/production';
 import {useProductLanguage} from '../../services/productI18nService';
 import './workshop-messaging.css';
+import {confirmAction} from '../common/UiFeedback';
 
 type Action=(name:string,payload?:Record<string,unknown>,after?:(value:any)=>void)=>Promise<void>;
 const WEEK=7*86400000;
 const recent=(iso:string)=>Date.now()-Date.parse(iso)<WEEK;
 const dismissedKey=(userId:string)=>`promptify-dismissed-hints:${userId}`;
 const readDismissed=(userId:string):string[]=>{try{const value=JSON.parse(localStorage.getItem(dismissedKey(userId))||'[]');return Array.isArray(value)?value:[];}catch{return [];}};
+/** Declining sends no hint; ask first so a misclick does not close a learner's request. */
+const confirmDecline=async(r:HintRequest,p:(en:string,vi:string)=>string)=>(await confirmAction({title:p('Decline this hint request?','Từ chối yêu cầu gợi ý?'),body:p(`${r.learnerName||'The learner'} sees “Not approved” and your note, and can ask again.`,`${r.learnerName||'Học viên'} sẽ thấy “Chưa được duyệt” cùng ghi chú của bạn và có thể gửi lại.`),confirmLabel:p('Decline','Từ chối'),tone:'danger'})).ok;
 const useCopy=()=>{const lang=useProductLanguage();return {lang,p:(en:string,vi:string)=>lang==='en'?en:vi,when:(iso:string)=>new Date(iso).toLocaleString(lang==='en'?'en-GB':'vi-VN',{dateStyle:'short',timeStyle:'short'})};};
 
 /** Learner view of trainer broadcasts (whole class) and private hints. Shown on Learner Hub and Workspace. */
@@ -23,10 +26,10 @@ export function LearnerInbox({snapshot,busy,onAction}:{snapshot:ProductSnapshot;
   <h2>{p('Messages from your facilitator','Thông báo từ giảng viên')}</h2>
   {hints.map((h:any)=><article key={h.id} className="learner-inbox-item learner-inbox-private">
    <span className="learner-inbox-kind">{p('Private hint','Gợi ý riêng')}</span><p>{h.message}</p><time dateTime={h.created_at}>{when(h.created_at)}</time>
-   <button onClick={()=>dismiss(h.id)}>{p('Got it','Đã hiểu')}</button></article>)}
+   <button className="ui-btn ui-btn-ghost ui-btn-sm" onClick={()=>dismiss(h.id)}>{p('Got it','Đã hiểu')}</button></article>)}
   {broadcasts.map((m:any)=><article key={m.id} className="learner-inbox-item">
    <span className="learner-inbox-kind">{p('Whole class','Cả lớp')}</span><p>{m.message}</p><time dateTime={m.created_at}>{when(m.created_at)}</time>
-   <button disabled={busy} onClick={()=>void onAction('ackMessage',{messageId:m.id})}>{p('Mark as read','Đã đọc')}</button></article>)}
+   <button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>void onAction('ackMessage',{messageId:m.id})}>{p('Mark as read','Đã đọc')}</button></article>)}
  </section>;
 }
 
@@ -66,15 +69,15 @@ export function WorkshopSupportQueue({snapshot,busy,onAction}:{snapshot:ProductS
  if(!snapshot.selectedClass?.can_manage)return null;
  const rows=snapshot.supportRequests||[];
  const pending=rows.filter(r=>r.status==='pending'),decided=rows.filter(r=>r.status!=='pending');
- const decide=(r:HintRequest,decision:'approve'|'decline')=>void onAction('reviewHintRequest',{hintRequestId:r.id,decision,note:notes[r.id]||''},()=>setNotes(current=>({...current,[r.id]:''})));
+ const decide=async(r:HintRequest,decision:'approve'|'decline')=>{if(decision==='decline'&&!(await confirmDecline(r,p)))return;void onAction('reviewHintRequest',{hintRequestId:r.id,decision,note:notes[r.id]||''},()=>setNotes(current=>({...current,[r.id]:''})));};
  return <section className="workshop-support" id="hint-requests" aria-label={p('Hint requests','Yêu cầu gợi ý')}>
   <h2>{p('Hint requests','Yêu cầu gợi ý')} <span>{pending.length}</span></h2>
   {!pending.length&&<p className="workshop-support-empty">{p('No hint request is waiting for review.','Không có yêu cầu gợi ý nào đang chờ duyệt.')}</p>}
   <ul>{pending.map(r=><li key={r.id}>
    <div><strong>{r.learnerName}</strong> · {r.lessonTitle} · <time dateTime={r.createdAt}>{when(r.createdAt)}</time><p className="workshop-support-reason">“{r.reason}”</p></div>
    <div className="workshop-support-reply"><textarea rows={2} maxLength={2000} value={notes[r.id]||''} onChange={e=>setNotes(current=>({...current,[r.id]:e.target.value}))} aria-label={p('Hint for this learner','Gợi ý cho học viên')} placeholder={p('Hint for this learner — shown inside their request in the Hints tab…','Gợi ý cho học viên — hiện ngay trong yêu cầu ở tab Gợi ý…')}/>
-    <button className="workshop-support-approve" disabled={busy} onClick={()=>decide(r,'approve')}>{p('Approve & show hints','Duyệt & mở gợi ý')}</button>
-    <button disabled={busy} onClick={()=>decide(r,'decline')}>{p('Decline','Từ chối')}</button></div>
+    <div className="ui-btn-row"><button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>void decide(r,'approve')}>{p('Approve & show hints','Duyệt & mở gợi ý')}</button>
+    <button className="ui-btn ui-btn-danger ui-btn-sm" disabled={busy} onClick={()=>void decide(r,'decline')}>{p('Decline','Từ chối')}</button></div></div>
   </li>)}</ul>
   {decided.length>0&&<details><summary>{p('Recent decisions','Đã xử lý gần đây')} ({decided.length})</summary><ul>{decided.map(r=><li key={r.id}><div><strong>{r.learnerName}</strong> · {r.lessonTitle} · <span className={'workshop-support-kind '+r.status}>{r.status==='approved'?p('approved','đã duyệt'):p('declined','đã từ chối')}</span> · <time dateTime={r.decidedAt||r.createdAt}>{when(r.decidedAt||r.createdAt)}</time></div></li>)}</ul></details>}
  </section>;
@@ -85,7 +88,10 @@ export function HintRequestAlert({snapshot,currentUi,onOpen,busy=false,onAction}
  const {p}=useCopy();
  const pending=(snapshot.supportRequests||[]).filter(r=>r.status==='pending');
  const seen=useRef<Set<string>|undefined>(undefined);
- const [fresh,setFresh]=useState(0),[hidden,setHidden]=useState<string>(''),[notes,setNotes]=useState<Record<string,string>>({});
+ // "Later" survives reloads for the same set of waiting requests; a new request shows the pop-up again.
+ const laterKey=`promptify-hint-alert-later:${snapshot.profile.id}:${snapshot.selectedClass?.id}`;
+ const [fresh,setFresh]=useState(0),[hidden,setHidden]=useState<string>(()=>{try{return localStorage.getItem(laterKey)||'';}catch{return '';}}),[notes,setNotes]=useState<Record<string,string>>({});
+ const later=(value:string)=>{setHidden(value);try{localStorage.setItem(laterKey,value);}catch{}};
  const signature=pending.map(r=>r.id).join(',');
  useEffect(()=>{
   const ids=new Set(pending.map(r=>r.id));
@@ -99,10 +105,10 @@ export function HintRequestAlert({snapshot,currentUi,onOpen,busy=false,onAction}
    <span><b>{r.learnerName}</b> · {r.lessonTitle}</span><span className="hint-alert-reason">“{r.reason}”</span>
    {onAction&&<><input aria-label={p('Hint for this learner','Gợi ý cho học viên')} placeholder={p('Hint shown in their Hints tab…','Gợi ý hiện trong tab Gợi ý của học viên…')} maxLength={2000} value={notes[r.id]||''} onChange={e=>setNotes(current=>({...current,[r.id]:e.target.value}))}/>
     <div><button className="hint-alert-approve" disabled={busy} onClick={()=>{setFresh(0);void onAction('reviewHintRequest',{hintRequestId:r.id,decision:'approve',note:notes[r.id]||''});}}>{p('Approve & show hints','Duyệt & mở gợi ý')}</button>
-     <button disabled={busy} onClick={()=>{setFresh(0);void onAction('reviewHintRequest',{hintRequestId:r.id,decision:'decline',note:notes[r.id]||''});}}>{p('Decline','Từ chối')}</button></div></>}
+     <button disabled={busy} onClick={async()=>{if(!(await confirmDecline(r,p)))return;setFresh(0);void onAction('reviewHintRequest',{hintRequestId:r.id,decision:'decline',note:notes[r.id]||''});}}>{p('Decline','Từ chối')}</button></div></>}
   </div>)}
   <div>{currentUi!==9&&<button onClick={()=>{setFresh(0);onOpen();}}>{pending.length>3?p(`See all ${pending.length} in Workshop`,`Xem cả ${pending.length} yêu cầu trong Workshop`):p('Open Workshop','Mở Workshop')}</button>}
    {currentUi===9&&<button onClick={()=>{setFresh(0);document.getElementById('hint-requests')?.scrollIntoView({behavior:'smooth'});}}>{p('Show requests','Xem yêu cầu')}</button>}
-   <button onClick={()=>{setFresh(0);setHidden(signature);}}>{p('Later','Để sau')}</button></div>
+   <button onClick={()=>{setFresh(0);later(signature);}}>{p('Later','Để sau')}</button></div>
  </aside>;
 }

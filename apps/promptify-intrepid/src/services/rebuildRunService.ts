@@ -11,6 +11,7 @@ import {createDatabaseClient,requireCloudDatabase} from './cloudDatabaseService'
 import { assertAiLessonAccess, ApiAccessError } from './apiAuthorizationService.js';
 import { handleGenerateRequest, handleEvaluateRequest, AiServerError } from './apiServerService.js';
 import { productionGenerate, productionGenerateStream, productionEvaluate } from './productionAiService.js';
+import type {JudgeHooks,JudgeStageStore,CriterionProgress} from './parallelJudgeService.js';
 import {preflightRun,chargeSession,runTokens,sessionTokenCap,accessExpiryEnabled,userIdForSubject,assertWritableAccess} from './learnerSafeguardService';
 import { piiSignals } from './piiGuardService.js';
 import { DEFAULT_RUBRIC, validateRubric } from './weightedRubricService.js';
@@ -50,6 +51,27 @@ async function context(authorization: string, classId: string, lessonId: string)
   if (!Number.isFinite(threshold) || threshold < 0 || threshold > 10) throw new ApiAccessError('Invalid passing threshold.', 422);
   lesson.production_pass_threshold = threshold;
   return { reader, server, lesson, subject: identity.user.id };
+}
+/** Judge enqueue keeps the same gates as context() (canonical lesson id, class/lesson access, signed-in identity,
+ * published Codelab schedule) but loads no lesson content, rubric or SOP text, and reads the gate inputs in parallel. */
+async function judgeContext(authorization: string, classId: string, lessonId: string) {
+  if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(lessonId || '')) throw new ApiAccessError('Bài học cần UUID canonical.', 422);
+  await assertAiLessonAccess({ authorization, classId, lessonId });
+  try{requireCloudDatabase();}catch{throw new ApiAccessError('Cloud SQL persistence is not configured.',503);}
+  const reader=createDatabaseClient(authorization),server=createDatabaseClient();
+  const [{ data: identity, error: authError },{ data: lesson, error },{ data: studio, error: studioError },{data:classInfo,error:classError}]=await Promise.all([
+    reader.auth.getUser(authorization.replace(/^Bearer\s+/i,'')),
+    server.from('lessons').select('id,status').eq('id', lessonId).single(),
+    server.from('product_studio').select('config').eq('class_id', classId).eq('lesson_id', lessonId).maybeSingle(),
+    server.from('classes').select('class_code').eq('id',classId).single(),
+  ]);
+  if (authError || !identity.user) throw new ApiAccessError('Phiên đăng nhập không hợp lệ.', 401);
+  if (error || !lesson) throw new ApiAccessError('Không tải được bài học đã xuất bản.', 403);
+  if (studioError) throw new ApiAccessError('Production curriculum schema is unavailable.', 503);
+  if(classError||!classInfo)throw new ApiAccessError('Class configuration unavailable.',503);
+  const resolved=resolveClassLesson(lesson,studio?.config);
+  if(!codelabAvailable(resolved.status,studio?.config,Date.now(),classInfo.class_code==='PUBLIC-BASIC'?'BASIC Free':'ADVANCE Paid'))throw new ApiAccessError('This Codelab is outside its published schedule.',403);
+  return { reader, server, subject: identity.user.id };
 }
 /** A claim older than any possible request lifetime (Cloud Run timeout 300s) has no live writer. */
 export const JUDGE_CLAIM_STALE_MS=6*60*1000;
@@ -93,8 +115,10 @@ async function identifyLearner(authorization:string){
 }
 /** The attempt must belong to the signed-in learner, in the stated class and lesson. */
 async function ownedAttempt(c:{reader:any;subject:string},body:any){
-  const { data: attempt, error } = await c.reader.from('prompt_attempts').select('*').eq('id', body.attemptId).eq('class_id', body.classId).eq('lesson_ref_id', body.lessonId).single();
-  const { data: owner } = await c.reader.from('users').select('id').eq('auth_provider_id', c.subject).single();
+  const [{ data: attempt, error },{ data: owner }] = await Promise.all([
+    c.reader.from('prompt_attempts').select('*').eq('id', body.attemptId).eq('class_id', body.classId).eq('lesson_ref_id', body.lessonId).single(),
+    c.reader.from('users').select('id').eq('auth_provider_id', c.subject).single(),
+  ]);
   const { data: learner } = await c.reader.from('learners').select('id').eq('user_id', owner?.id).single();
   if (error || !attempt || !learner || attempt.learner_id !== learner.id) throw new ApiAccessError('Attempt không thuộc người học hiện tại.', 403);
   return {attempt,owner};
@@ -109,12 +133,43 @@ async function recoverLostJudgeWorker(attemptId:string,subject:string,at:number)
   console.warn(JSON.stringify({event:'judge_worker_lost',job:createHash('sha256').update(attemptId).digest('hex').slice(0,12)}));
   return true;
 }
+/** 020: validated stage answers for one attempt, so redispatch/refresh never re-grades a finished stage. */
+export function judgeStageStore(server:any,attemptId:string):JudgeStageStore{
+  return {
+    async load(){
+      const {data,error}=await server.from('product_judge_stage_results').select('stage,input_sha256,result').eq('attempt_id',attemptId);
+      if(error)throw error;
+      return Object.fromEntries((data||[]).map((row:any)=>[row.stage,{sha:row.input_sha256,result:row.result}]));
+    },
+    async save(stage,sha,result,view){
+      const {error}=await server.from('product_judge_stage_results').upsert({attempt_id:attemptId,stage,input_sha256:sha,result,view},{onConflict:'attempt_id,stage'});
+      if(error)throw error;
+    },
+  };
+}
+/** Criterion rows a learner may see while grading: only after a stored verdict says this is a task attempt. */
+export async function storedCriteria(server:any,attemptId:string):Promise<CriterionProgress[]>{
+  return (await storedProgress(server,attemptId)).criteria;
+}
+/** graded counts finished criteria with no key or score, so progress can show before the verdict;
+ * criteria (with scores) stay empty until a stored verdict says this is a task attempt. */
+export async function storedProgress(server:any,attemptId:string):Promise<{graded:number;criteria:CriterionProgress[]}>{
+  const {data,error}=await server.from('product_judge_stage_results').select('stage,view').eq('attempt_id',attemptId);
+  return error||!data?{graded:0,criteria:[]}:progressFrom(data);
+}
+function progressFrom(stages:Array<{stage:string;view:any}>){
+  const rows=stages.filter(row=>row.stage.startsWith('criterion:')&&typeof row.view?.key==='string'&&Number.isFinite(row.view?.score));
+  const verified=stages.find(row=>row.stage==='supervisor')?.view?.taskAttempt===true;
+  return {graded:rows.length,criteria:verified?rows.map(row=>row.view as CriterionProgress):[]};
+}
 type JudgeServiceOptions={generationQueue?:(task:GenerationTask)=>Promise<void>;queue?:(task:JudgeTask)=>Promise<void>;identify?:typeof identifyLearner;workerServer?:()=>any;streamGenerate?:typeof productionGenerateStream};
 /** TC-AUTH-04: an expired learner keeps read access but cannot start AI work. */
 async function assertNotReadOnly(subject:string,classId:string){if(accessExpiryEnabled())await assertWritableAccess(await userIdForSubject(subject),classId);}
-export function createRebuildRunService(resolve=context, generate=productionGenerate, evaluate: (body: any, deadlineMs?: number) => Promise<any> = productionEvaluate,
+export function createRebuildRunService(resolve=context, generate=productionGenerate, evaluate: (body: any, deadlineMs?: number, hooks?: JudgeHooks) => Promise<any> = productionEvaluate,
   retrieval={pgvector:retrievePgvectorContext,bigquery:retrieveBigqueryContext}, now=()=>Date.now(), options:JudgeServiceOptions={}) {
 const queue=options.queue||createJudgeTask, identify=options.identify||identifyLearner, workerServer=options.workerServer||(()=>createDatabaseClient());
+// Injected resolvers (tests) keep resolving enqueue too; production uses the lighter Judge gate.
+const resolveJudge=resolve===context?judgeContext:resolve;
 /** onDelta streams provider text (TC-PLAY-02); the saved result and all checks are identical to the JSON path. */
 async function generateSavedRun(authorization: string, body: any, queueOnly=false, onDelta?:(text:string)=>void) {
   const c = await resolve(authorization, body.classId, body.lessonId);
@@ -185,7 +240,8 @@ async function generateSavedRun(authorization: string, body: any, queueOnly=fals
   if(safeguardUser)await chargeSession(safeguardUser,body.classId,body.lessonId,key,runTokens(result,prompt,inputContext));
   return { ...result, saved };
 }
-async function evaluateSavedRun(authorization: string, body: any) {
+/** onCriterion streams provisional criterion rows (JUDGE_STREAM); the saved grade and all checks are unchanged. */
+async function evaluateSavedRun(authorization: string, body: any, onCriterion?: (row: any) => void) {
   const c = await resolve(authorization, body.classId, body.lessonId);
   await assertNotReadOnly(c.subject,body.classId);
   const { data: attempt, error } = await c.reader.from('prompt_attempts').select('*').eq('id', body.attemptId).eq('class_id', body.classId).eq('lesson_ref_id', body.lessonId).single();
@@ -216,7 +272,7 @@ async function evaluateSavedRun(authorization: string, body: any) {
     if(released.error||!released.data)throw new ApiAccessError('Judge quota reached and claim recovery is uncertain; contact the trainer.',503);
     throw new ApiAccessError('Judge quota reached: 40 grading attempts per hour. Try again next hour.',429);
   }
-  let evaluation;try{evaluation = await withProviderScope({tenant:c.subject,correlationId:attempt.id},()=>evaluate(judgeInput(attempt,s,controlData,body.language)));}
+  let evaluation;try{evaluation = await withProviderScope({tenant:c.subject,correlationId:attempt.id},()=>evaluate(judgeInput(attempt,s,controlData,body.language),undefined,{onCriterion,stages:judgeStageStore(c.server,attempt.id)}));}
   catch(error){
     // The provider work for this claim has settled and no score was saved under claimId, so no later
     // writer can finish it: releasing is safe even for an uncertain 504 (only provider billing is unknown).
@@ -232,10 +288,13 @@ async function evaluateSavedRun(authorization: string, body: any) {
 
 /** JUDGE_MODE=async: same authorization and evidence checks, then a durable job instead of a synchronous grade. */
 async function enqueueJudge(authorization: string, body: any) {
-  const c = await resolve(authorization, body.classId, body.lessonId);
-  await assertNotReadOnly(c.subject,body.classId);
-  const {attempt,owner}=await ownedAttempt(c,body);
-  const { data: run } = await c.server.from('rebuild_runs').select('snapshot').eq('attempt_id', attempt.id).eq('subject', c.subject).single();
+  const c = await resolveJudge(authorization, body.classId, body.lessonId);
+  // Independent reads in parallel; failures are still reported in the original order (expiry, ownership, evidence).
+  const [writable,owned,runRead]=await Promise.allSettled([assertNotReadOnly(c.subject,body.classId),ownedAttempt(c,body),
+    c.server.from('rebuild_runs').select('snapshot').eq('attempt_id', body.attemptId).eq('subject', c.subject).single()]);
+  for(const step of [writable,owned,runRead])if(step.status==='rejected')throw step.reason;
+  const {attempt,owner}=(owned as PromiseFulfilledResult<Awaited<ReturnType<typeof ownedAttempt>>>).value;
+  const { data: run } = (runRead as PromiseFulfilledResult<any>).value;
   if (!run) throw new ApiAccessError('Attempt thiếu snapshot server; không chấm dữ liệu do client gửi.', 409);
   if (attempt.evaluation_json) return attempt.evaluation_json;
   judgeEvidence(run.snapshot);
@@ -256,19 +315,93 @@ async function enqueueJudge(authorization: string, body: any) {
 }
 /** Polling: owner-only, no budget, no lesson/SOP load. Lazily expires a job nobody dispatched. */
 async function judgeStatus(authorization: string, body: any) {
-  const c=await identify(authorization);
+  return attemptJudgeStatus(await identify(authorization),body);
+}
+type JudgeState={status:string;evaluation?:any;criteria?:CriterionProgress[];graded?:number;updatedAt?:string;errorCode?:string;upstreamStatus?:number};
+const judgeActive=(status:string)=>['queued','running','retry_wait'].includes(status);
+async function attemptJudgeStatus(c:{reader:any;server:any;subject:string},body:any):Promise<JudgeState>{
   const {attempt}=await ownedAttempt(c,body);
   if(attempt.evaluation_json)return {status:'succeeded',evaluation:attempt.evaluation_json};
-  if(await recoverLostJudgeWorker(attempt.id,c.subject,now()))return {status:'failed',errorCode:'worker_lost'};
-  const {data:job,error}=await c.server.from('product_judge_jobs').select('status,generation,expires_at,last_error_code,last_upstream_status,updated_at').eq('attempt_id',attempt.id).eq('subject',c.subject).maybeSingle();
+  return jobState(c,attempt.id,true);
+}
+/** Job status for an attempt whose ownership is already verified. recover runs lost-worker recovery (an RPC). */
+async function jobState(c:{server:any;subject:string},attemptId:string,recover:boolean):Promise<JudgeState>{
+  if(recover&&await recoverLostJudgeWorker(attemptId,c.subject,now()))return {status:'failed',errorCode:'worker_lost'};
+  return (await readJudgeStates(c.server,[attemptId])).get(attemptId+'|'+c.subject)||{status:'none'};
+}
+/** Job state for many attempts in two reads (+ one for finished grades), keyed attemptId|subject: a job owned by
+ * another subject is simply absent ('none'). Expired active jobs are settled here, as judgeStatus always did. */
+async function readJudgeStates(server:any,attemptIds:string[]):Promise<Map<string,JudgeState>>{
+  const [{data:jobs,error},{data:stages}]=await Promise.all([
+    server.from('product_judge_jobs').select('attempt_id,subject,status,generation,expires_at,last_error_code,last_upstream_status,updated_at').in('attempt_id',attemptIds),
+    server.from('product_judge_stage_results').select('attempt_id,stage,view').in('attempt_id',attemptIds)]);
   if(error)throw new ApiAccessError('AI Judge status is unavailable.',503);
-  if(!job)return {status:'none'};
-  let status=job.status;
-  if(['queued','running','retry_wait'].includes(status)&&Date.parse(job.expires_at)<=now()){
-    await c.server.rpc('product_settle_judge',{p_attempt:attempt.id,p_generation:job.generation,p_outcome:'expired',p_error:'expired',p_upstream:null});
-    status='expired';
+  const states=new Map<string,JudgeState>();
+  for(const job of jobs||[]){
+    if(judgeActive(job.status)&&Date.parse(job.expires_at)<=now()){
+      await server.rpc('product_settle_judge',{p_attempt:job.attempt_id,p_generation:job.generation,p_outcome:'expired',p_error:'expired',p_upstream:null});
+      job.status='expired';
+    }
   }
-  return {status,updatedAt:job.updated_at,errorCode:job.last_error_code||undefined,upstreamStatus:job.last_upstream_status||undefined};
+  // The grade is written before the job settles; read it only for jobs that say so.
+  const finished=(jobs||[]).filter((job:any)=>job.status==='succeeded').map((job:any)=>job.attempt_id);
+  const saved=new Map<string,any>();
+  if(finished.length){const {data}=await server.from('prompt_attempts').select('id,evaluation_json').in('id',finished);for(const row of data||[])if(row.evaluation_json)saved.set(row.id,row.evaluation_json);}
+  for(const job of jobs||[]){
+    if(job.status==='succeeded'&&saved.has(job.attempt_id)){states.set(job.attempt_id+'|'+job.subject,{status:'succeeded',evaluation:saved.get(job.attempt_id)});continue;}
+    const status=job.status==='succeeded'?'running':job.status,live=judgeActive(status);
+    const progress=progressFrom((stages||[]).filter((row:any)=>row.attempt_id===job.attempt_id));
+    states.set(job.attempt_id+'|'+job.subject,{status,...(live&&progress.criteria.length?{criteria:progress.criteria}:{}),...(live&&progress.graded?{graded:progress.graded}:{}),
+      updatedAt:job.updated_at,errorCode:job.last_error_code||undefined,upstreamStatus:job.last_upstream_status||undefined});
+  }
+  return states;
+}
+/** JUDGE_STREAM + async: authenticates once, then follows the durable job and forwards each newly stored criterion.
+ * Returns the saved grade, the terminal status, or 'watching' when maxMs ends first (the client then polls). */
+/** owned: the same request has just verified ownership (enqueueJudge), so the first ownership read is skipped. */
+type WatchOptions={onCriterion:(row:CriterionProgress)=>void;onStatus?:(status:string)=>void;onProgress?:(graded:number)=>void;signal?:AbortSignal;maxMs?:number;sleep?:(ms:number)=>Promise<unknown>;owned?:boolean};
+async function watchJudge(authorization:string,body:any,{onCriterion,onStatus,onProgress,signal,maxMs=240000,sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms)),owned=false}:WatchOptions){
+  const c=await identify(authorization),started=now(),sent=new Map<string,number>();
+  let last='',graded=0;
+  // The first read proves ownership (unless already proven); later reads come from the shared per-instance hub,
+  // with this watcher's lost-worker recovery every 8th read.
+  let state:JudgeState=owned?await nextJudgeState(body.attemptId,c.subject):await attemptJudgeStatus(c,body);
+  for(let tick=1;;tick++){
+    if(state.status!==last){last=state.status;onStatus?.(state.status);}
+    if((state.graded||0)>graded){graded=state.graded!;onProgress?.(graded);}
+    for(const row of state.criteria||[])if(sent.get(row.key)!==row.score){sent.set(row.key,row.score);onCriterion(row);}
+    if(!judgeActive(state.status)||signal?.aborted)return state;
+    const elapsed=now()-started;
+    if(elapsed>=maxMs)return {status:'watching'};
+    // The hub ticks every 250 ms; long retry waits read less often.
+    await sleep(elapsed<10000?0:elapsed<60000?750:1750);
+    state=tick%8===0&&await recoverLostJudgeWorker(body.attemptId,c.subject,now())?{status:'failed',errorCode:'worker_lost'}:await nextJudgeState(body.attemptId,c.subject);
+  }
+}
+/** One reader per API instance: every open Judge stream on this instance shares two IN(...) reads per tick, so
+ * database load per tick stays constant however many learners are waiting. */
+const WATCH_TICK_MS=250;
+const watching=new Map<string,Array<{subject:string;done:(state:JudgeState|Error)=>void}>>();
+let hubRunning=false;
+async function hubLoop(){
+  hubRunning=true;
+  try{
+    while(watching.size){
+      await new Promise(r=>setTimeout(r,WATCH_TICK_MS));
+      const batch=new Map(watching);watching.clear();
+      let states:Map<string,JudgeState>|undefined,failure:Error|undefined;
+      try{states=await readJudgeStates(workerServer(),[...batch.keys()]);}catch(error){failure=error instanceof Error?error:Error(String(error));}
+      for(const [attemptId,list] of batch)for(const watcher of list)watcher.done(failure||states!.get(attemptId+'|'+watcher.subject)||{status:'none'});
+    }
+  }finally{hubRunning=false;}
+}
+function nextJudgeState(attemptId:string,subject:string){
+  return new Promise<JudgeState>((resolve,reject)=>{
+    const list=watching.get(attemptId)||[];
+    list.push({subject,done:value=>value instanceof Error?reject(value):resolve(value)});
+    watching.set(attemptId,list);
+    if(!hubRunning)void hubLoop();
+  });
 }
 /** Cloud Tasks worker: one dispatch of one job. Returns the HTTP status the queue should see
  * (2xx = finished, 503 = retry later). Never fabricates or partially saves a score. */
@@ -284,14 +417,16 @@ async function runJudgeJob(token: string, attemptId: string): Promise<{http:numb
   const settle=(outcome:string,code:string|null=null,upstream:number|null=null)=>fenced
    ?settleJudgeDispatch(attemptId,lease.generation,lease.dispatch_count,outcome,code,upstream)
    :server.rpc('product_settle_judge',{p_attempt:attemptId,p_generation:lease.generation,p_outcome:outcome,p_error:code,p_upstream:upstream});
-  const {data:attempt}=await server.from('prompt_attempts').select('*').eq('id',attemptId).single();
-  const {data:run}=await server.from('rebuild_runs').select('snapshot').eq('attempt_id',attemptId).eq('subject',lease.subject).single();
+  // Independent reads before grading run in parallel (each is its own short transaction).
+  const [{data:attempt},{data:run},{data:jobRow}]=await Promise.all([
+    server.from('prompt_attempts').select('*').eq('id',attemptId).single(),
+    server.from('rebuild_runs').select('snapshot').eq('attempt_id',attemptId).eq('subject',lease.subject).single(),
+    server.from('product_judge_jobs').select('created_at').eq('attempt_id',attemptId).maybeSingle()]);
   if(!attempt||!run){await settle('failed','evidence_missing');return {http:200,status:'failed'};}
   let controlData;try{controlData=judgeEvidence(run.snapshot);}catch{await settle('failed','evidence_inconsistent');return {http:200,status:'failed'};}
   let evaluation;
-  const {data:jobRow}=await server.from('product_judge_jobs').select('created_at').eq('attempt_id',attemptId).maybeSingle();
   const queueWaitMs=jobRow?.created_at?leasedAt-Date.parse(jobRow.created_at):null,evaluateStarted=now();
-  try{evaluation=await withProviderScope({tenant:lease.subject,correlationId:attemptId},()=>evaluate(judgeInput(attempt,run.snapshot,controlData),JUDGE_JOB_DEADLINE_MS));}
+  try{evaluation=await withProviderScope({tenant:lease.subject,correlationId:attemptId},()=>evaluate(judgeInput(attempt,run.snapshot,controlData),JUDGE_JOB_DEADLINE_MS,{stages:judgeStageStore(server,attemptId)}));}
   catch(error){
     const code=(error as any)?.statusCode,upstream=(error as any)?.upstreamStatus??null;
     metric('provider_error',{queueWaitMs,evaluateMs:now()-evaluateStarted,status:code??502,upstream});
@@ -401,6 +536,6 @@ async function runGenerationJob(token:string,subject:string,requestId:string):Pr
  if(!saveError&&usage&&sessionTokenCap()){const user=await userIdForSubject(subject).catch(()=>undefined);if(user)await chargeSession(user,lease.class_id,lease.lesson_id,requestId,usage);}
  return {http:saveError?503:200,status:saveError?'save_unconfirmed':saved?.status||'stale'};
 }
-return { generateSavedRun, evaluateSavedRun, enqueueJudge, judgeStatus, runJudgeJob, generationStatus, runGenerationJob };
+return { generateSavedRun, evaluateSavedRun, enqueueJudge, judgeStatus, watchJudge, runJudgeJob, generationStatus, runGenerationJob };
 }
-export const {generateSavedRun,evaluateSavedRun,enqueueJudge,judgeStatus,runJudgeJob,generationStatus,runGenerationJob}=createRebuildRunService();
+export const {generateSavedRun,evaluateSavedRun,enqueueJudge,judgeStatus,watchJudge,runJudgeJob,generationStatus,runGenerationJob}=createRebuildRunService();

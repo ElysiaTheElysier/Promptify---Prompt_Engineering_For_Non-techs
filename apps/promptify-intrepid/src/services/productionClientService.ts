@@ -29,7 +29,7 @@ const judgeMessage = (status: string, errorCode?: string) => {
   return (en ? 'AI Judge could not grade this attempt. Your output is saved; retry AI Judge.' : 'AI Judge chưa chấm được lần thử này. Kết quả đã được lưu; hãy thử chấm lại.') + (errorCode ? ` (${errorCode})` : '');
 };
 /** Polls an asynchronous AI Judge job until it finishes: every 3s for 30s, then every 10s, paused while the tab is hidden. */
-export async function waitForJudge(target: JudgeTarget, onStatus?: (status: JudgeProgress) => void, signal?: AbortSignal, maxMs = 15 * 60 * 1000) {
+export async function waitForJudge(target: JudgeTarget, onStatus?: (status: JudgeProgress) => void, signal?: AbortSignal, maxMs = 15 * 60 * 1000, onCriterion?: (row: JudgeCriterionProgress) => void, onProgress?: (graded: number) => void) {
   const started = Date.now();
   const sleep = (ms: number) => new Promise<void>((resolve, reject) => {
     if(signal?.aborted){reject(new DOMException('Stopped','AbortError'));return;}
@@ -41,21 +41,21 @@ export async function waitForJudge(target: JudgeTarget, onStatus?: (status: Judg
     // Fast Judge should not spend up to 3s waiting for its first visible scorecard.
     await sleep(Date.now() - started < 10000 ? 1000 : Date.now() - started < 30000 ? 3000 : 10000);
     if (typeof document !== 'undefined' && document.hidden) continue;
-    let result: { status: string; evaluation?: unknown; errorCode?: string };
+    let result: { status: string; evaluation?: unknown; errorCode?: string; criteria?: JudgeCriterionProgress[]; graded?: number };
     try { result = await productRequest('judgeStatus', target); }
     catch (cause) { if (cause instanceof ProductRequestError && [0, 502, 503, 504].includes(cause.status)) continue; throw cause; }
     if (result.status === 'succeeded') return result.evaluation;
-    if (judgeActive(result.status)) { onStatus?.(result.status); continue; }
+    if (judgeActive(result.status)) { onStatus?.(result.status); if (!signal?.aborted) { result.criteria?.forEach(row => onCriterion?.(row)); if (result.graded) onProgress?.(result.graded); } continue; }
     throw new ProductRequestError(judgeMessage(result.status, result.errorCode), 409);
   }
   throw new ProductRequestError(judgeMessage('expired'), 504);
 }
 /** Requests AI Judge. Synchronous mode returns the grade; JUDGE_MODE=async returns a queued job that is then polled. */
-export async function requestJudge(target: JudgeTarget, onStatus?: (status: JudgeProgress) => void, signal?: AbortSignal) {
+export async function requestJudge(target: JudgeTarget, onStatus?: (status: JudgeProgress) => void, signal?: AbortSignal, onCriterion?: (row: JudgeCriterionProgress) => void, onProgress?: (graded: number) => void) {
   const result = await productRequest<{ async?: boolean; status?: string }>('judge', target);
   if (!result?.async) return result;
   if (judgeActive(result.status)) onStatus?.(result.status);
-  return waitForJudge(target, onStatus, signal);
+  return waitForJudge(target, onStatus, signal, undefined, onCriterion, onProgress);
 }
 export const loadProduct = async (classId?: string, onboarding = new URLSearchParams(location.search).get('ui') === '02') => {
   const invitedClass=new URLSearchParams(location.search).get('classId');if(!classId&&invitedClass&&/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(invitedClass))classId=invitedClass;
@@ -116,27 +116,71 @@ export async function requestGenerationStream<T=any>(payload:GenerationTarget&Re
   if(!response.ok)throw generationError(response.status,result,payload.requestId);
   return result as T;
  }
- const reader=response.body!.getReader(),decoder=new TextDecoder();let buffer='';
  try{
-  for(;;){
-   const {done,value}=await reader.read();
-   buffer+=decoder.decode(value,{stream:!done});
-   let end;
-   while((end=buffer.search(/\r?\n\r?\n/))>=0){
-    const block=buffer.slice(0,end);buffer=buffer.slice(end).replace(/^\r?\n\r?\n/,'');
-    let event='message',data='';
-    for(const line of block.split(/\r?\n/)){if(line.startsWith('event:'))event=line.slice(6).trim();else if(line.startsWith('data:'))data+=line.slice(5).trim();}
-    if(!data)continue;
-    const message=JSON.parse(data);
-    if(event==='delta'&&typeof message.text==='string')onDelta(message.text);
-    else if(event==='done')return message as T;
-    else if(event==='error')throw generationError(Number(message.status)||502,message,payload.requestId);
-   }
-   if(done)break;
-  }
+  const result=await readSse(response,(event,message)=>{
+   if(event==='delta'&&typeof message.text==='string')onDelta(message.text);
+   else if(event==='done')return message as T;
+   else if(event==='error')throw generationError(Number(message.status)||502,message,payload.requestId);
+  });
+  if(result!==undefined)return result;
  }catch(cause){if(cause instanceof ProductRequestError)throw cause;}
  // No final event: the server keeps running and may have saved this Run. Refresh before retrying.
  throw new ProductRequestError(productText('unknownOutcome'),0,payload.requestId);
+}
+/** Reads SSE blocks and resolves with the first value `handle` returns, or undefined when the stream ends first. */
+async function readSse<T>(response:Response,handle:(event:string,message:any)=>T|undefined):Promise<T|undefined>{
+ const reader=response.body!.getReader(),decoder=new TextDecoder();let buffer='';
+ for(;;){
+  const {done,value}=await reader.read();
+  buffer+=decoder.decode(value,{stream:!done});
+  let end;
+  while((end=buffer.search(/\r?\n\r?\n/))>=0){
+   const block=buffer.slice(0,end);buffer=buffer.slice(end).replace(/^\r?\n\r?\n/,'');
+   let event='message',data='';
+   for(const line of block.split(/\r?\n/)){if(line.startsWith('event:'))event=line.slice(6).trim();else if(line.startsWith('data:'))data+=line.slice(5).trim();}
+   if(!data)continue;
+   const result=handle(event,JSON.parse(data));
+   if(result!==undefined)return result;
+  }
+  if(done)return undefined;
+ }
+}
+export type JudgeCriterionProgress={key:string;score:number;max:number;reasonEn:string;reasonVi:string};
+/** On-demand AI Judge: provisional criteria arrive as each one is graded; resolves with the saved grade.
+ * resume=true only follows an existing job (after reload) and never starts or charges a new grade.
+ * Without the stream route (unset origin, 404, blocked preflight) it uses requestJudge/waitForJudge; a dropped or
+ * ended stream continues by polling the same durable job. The server claim prevents double grading. */
+export async function requestJudgeStream(target:JudgeTarget,onCriterion:(row:JudgeCriterionProgress)=>void,onStatus?:(status:JudgeProgress)=>void,signal?:AbortSignal,resume=false,onProgress?:(graded:number)=>void){
+ const fallback=()=>resume?waitForJudge(target,onStatus,signal,undefined,onCriterion,onProgress):requestJudge(target,onStatus,signal,onCriterion,onProgress);
+ const poll=()=>waitForJudge(target,onStatus,signal,undefined,onCriterion,onProgress);
+ if(!generationStreamAvailable())return fallback();
+ const {data:{session}}=await identity.auth.getSession();
+ if(!session)throw new ProductRequestError(productText('signIn'),401);
+ let response:Response;
+ // The server bounds one watch window (~4 min) and then sends `resume`; this timeout only catches a stuck connection.
+ const timeout=AbortSignal.timeout(300000),abort=signal?(AbortSignal as any).any?.([signal,timeout])||timeout:timeout;
+ try{response=await fetch(streamOrigin+'/api/judge-stream',{method:'POST',mode:'cors',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({...target,language:getProductLanguage(),...(resume?{resume:true}:{})}),signal:abort});}
+ catch(cause){if(signal?.aborted)throw cause;return fallback();}
+ if(response.status===404)return fallback();
+ if(!(response.headers.get('content-type')||'').includes('text/event-stream')){
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok)throw generationError(response.status,result);
+  return result;
+ }
+ try{
+  const grade=await readSse(response,(event,message)=>{
+   if(signal?.aborted)throw new DOMException('Stopped','AbortError');
+   if(event==='criterion')onCriterion(message);
+   else if(event==='status'&&judgeActive(message.status))onStatus?.(message.status);
+   else if(event==='progress'&&Number.isInteger(message.graded))onProgress?.(message.graded);
+   else if(event==='done')return message;
+   else if(event==='resume')return null;
+   else if(event==='error')throw message.judgeStatus?new ProductRequestError(judgeMessage(message.judgeStatus,message.errorCode),409):generationError(Number(message.status)||502,message);
+  });
+  if(grade)return grade;
+ }catch(cause){if(cause instanceof ProductRequestError||signal?.aborted)throw cause;}
+ // `resume`, or the connection dropped: the durable job keeps grading; follow it by polling (reconnect-safe).
+ return poll();
 }
 /** Stores only request metadata in this tab. Refresh resumes polling and never submits another Run. */
 export async function requestGeneration<T=any>(payload:GenerationTarget&Record<string,unknown>,onStatus?:(status:GenerationProgress)=>void,signal?:AbortSignal):Promise<T>{

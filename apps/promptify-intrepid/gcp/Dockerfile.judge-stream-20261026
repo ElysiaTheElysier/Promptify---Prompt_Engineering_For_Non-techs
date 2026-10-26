@@ -1,0 +1,4 @@
+# Overlay on promo1-1023: async AI Judge per-criterion streaming (/api/judge-stream, JUDGE_STREAM), 020 stage reuse,
+# per-attempt cap + hedge + stage-only retry. Requires SQL 020 for stage reuse (missing table = previous behaviour).
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:7fb401d1565623718912f641ddba818cca47004603da88a6bc900a40ce14f77e
+COPY --chown=node:node src/services/parallelJudgeService.ts src/services/productionAiService.ts src/services/rebuildRunService.ts src/services/judgeStreamService.ts src/services/cloudRunServer.ts src/services/cloudSchema.json /app/src/services/

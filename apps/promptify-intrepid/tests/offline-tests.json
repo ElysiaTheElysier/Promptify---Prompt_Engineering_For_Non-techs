@@ -24,6 +24,14 @@
     "verify_parallel_judge.ts",
     "verify_staging_capacity_engine.ts",
     "verify_automatic_judge.ts",
+    "verify_judge_stream.ts",
+    "verify_judge_stage_results.ts",
+    "verify_judge_enqueue_path.ts",
+    "verify_judge_fault_injection.ts",
+    "verify_judge_multi_instance.ts",
+    "verify_provider_stub.ts",
+    "verify_loadtest_identity.ts",
+    "verify_loadtest_isolation.ts",
     "verify_provider_fallback.ts",
     "verify_rebuild_runs.ts",
     "verify_rubric_rounding.ts",
@@ -37,6 +45,7 @@
     "verify_governance_telemetry.ts",
     "verify_learner_content_language.ts",
     "verify_learner_ui_state.mjs",
+    "verify_sop_return_navigation.mjs",
     "verify_product_http.ts",
     "verify_roster_worker.ts",
     "verify_staging_roster_worker.ts",
@@ -72,7 +81,8 @@
     "verify_prompt_injection.ts",
     "verify_learner_safeguards.ts",
     "verify_generation_stream.ts",
-    "verify_workshop_messaging.ts"
+    "verify_workshop_messaging.ts",
+    "verify_learner_promotion.ts"
   ],
   "policy": "Explicit offline allowlist; credentials stripped, no .env loading or real provider/DB tests allowed."
 }

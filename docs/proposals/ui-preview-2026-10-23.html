@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xem trước UI Đợt A</title>
+<!-- Copy of src/components/common/ui-kit.css (23/10) so this preview matches the build. -->
+<style>
+/* Shared buttons, button rows, confirm dialog and toast for every role (UI review 23/10, wave A).
+   Doubled class selectors win over the older `.prod-app button` / Tailwind reset without !important. */
+.ui-btn.ui-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 16px;border-radius:12px;border:1px solid transparent;font:inherit;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s}
+.ui-btn.ui-btn:focus-visible{outline:2px solid #047857;outline-offset:2px}
+.ui-btn.ui-btn:disabled{opacity:.5;cursor:not-allowed}
+.ui-btn.ui-btn-sm{min-height:34px;padding:6px 12px;font-size:13px}
+.ui-btn.ui-btn-primary{background:#047857;border-color:#047857;color:#fff}
+.ui-btn.ui-btn-primary:hover:not(:disabled){background:#065f46;border-color:#065f46}
+.ui-btn.ui-btn-primary:active:not(:disabled){background:#064e3b}
+.ui-btn.ui-btn-secondary{background:#fff;border-color:#6ee7b7;color:#065f46}
+.ui-btn.ui-btn-secondary:hover:not(:disabled){background:#ecfdf5;border-color:#34d399}
+.ui-btn.ui-btn-danger{background:#fff;border-color:#fca5a5;color:#b91c1c}
+.ui-btn.ui-btn-danger:hover:not(:disabled){background:#fef2f2;border-color:#f87171}
+.ui-btn.ui-btn-danger.ui-btn-solid{background:#b91c1c;border-color:#b91c1c;color:#fff}
+.ui-btn.ui-btn-danger.ui-btn-solid:hover:not(:disabled){background:#991b1b}
+.ui-btn.ui-btn-ghost{background:transparent;border-color:#cbd5e1;color:#334155}
+.ui-btn.ui-btn-ghost:hover:not(:disabled){background:#f1f5f9}
+.ui-btn-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.ui-btn-row-end{justify-content:flex-end}
+/* Confirm dialog */
+.ui-confirm{display:grid;gap:14px;max-width:520px;color:#0f172a}
+.ui-confirm h2{margin:0;font-size:18px;font-weight:700}
+.ui-confirm p{margin:0;color:#334155;line-height:1.55}
+.ui-confirm label{display:grid;gap:6px;font-weight:600;font-size:14px}
+.ui-confirm textarea{width:100%;min-height:84px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-weight:400}
+.ui-confirm-danger h2{color:#991b1b}
+/* Toast */
+.ui-toast{position:fixed;left:20px;bottom:20px;z-index:110;display:flex;align-items:flex-start;gap:12px;max-width:min(560px,calc(100vw - 40px));padding:12px 14px;border-radius:14px;border:1px solid;box-shadow:0 10px 30px #0f172a26;font-size:14px;line-height:1.5}
+.ui-toast span{flex:1;overflow-wrap:anywhere}
+.ui-toast-error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.ui-toast-success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+@media (max-width:640px){.ui-toast{left:16px;right:16px;bottom:16px}}
+</style>
+<style>
+body{margin:0;background:#f8fafc;font:15px/1.5 system-ui,Segoe UI,sans-serif;color:#0f172a}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 120px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:32px 0 12px}
+.lead{color:#475569;margin:0 0 8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.pair{grid-template-columns:1fr}}
+.col>b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.col.before>b{color:#b91c1c}.col.after>b{color:#047857}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px;display:grid;gap:10px}
+.card h3{margin:0;font-size:16px}.muted{color:#64748b;font-size:13px;margin:0}
+input,textarea{font:inherit;padding:8px 10px;border:1px solid #cbd5e1;border-radius:10px;width:100%;box-sizing:border-box}
+/* "Before": the old reset left bare buttons looking like text, glued together */
+.old button{all:unset;cursor:pointer;color:#0f172a}
+.old .green{background:#047857;color:#fff;border-radius:8px;padding:8px;margin-right:12px}
+.hdr{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:10px 14px}
+.hdr div{display:flex;gap:8px}
+.dialog{background:#fff;border-radius:18px;padding:20px;box-shadow:0 20px 50px #0f172a33;max-width:520px}
+.toast-demo .ui-toast{position:static;max-width:none}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px 14px;font-size:14px}
+</style></head><body><main>
+<h1>Xem trước UI: Đợt A (đã làm) và Đợt B (đề xuất)</h1>
+<p class="lead">Trang tĩnh dùng đúng file <code>ui-kit.css</code> của app. Dữ liệu là mẫu. Cột trái: hiện tại trên staging. Cột phải: sau Đợt A.</p>
+
+<h2>1. Duyệt SOP (Approve / Reject)</h2>
+<div class="pair">
+ <div class="col before"><b>Trước</b><div class="card old"><h3>Quy trình xử lý khiếu nại v2</h3><p class="muted">Gửi bởi lan.nt · chờ duyệt</p><input placeholder="Lý do từ chối"><div><button class="green">Approve and index</button><button>Reject</button></div></div></div>
+ <div class="col after"><b>Sau</b><div class="card"><h3>Quy trình xử lý khiếu nại v2</h3><p class="muted">Gửi bởi lan.nt · chờ duyệt</p><input placeholder="Lý do từ chối" value="Thiếu bước escalate"><div class="ui-btn-row"><button class="ui-btn ui-btn-primary">Approve and index</button><button class="ui-btn ui-btn-danger">Reject</button></div><p class="muted">Bấm Reject sẽ hiện hộp xác nhận (mục 4).</p></div></div>
+</div>
+
+<h2>2. Hàng đợi yêu cầu gợi ý (Facilitator)</h2>
+<div class="pair">
+ <div class="col before"><b>Trước</b><div class="card old"><h3>Minh Anh · Bài 3</h3><p class="muted">"Em chưa biết đặt vai trò cho AI thế nào"</p><textarea placeholder="Gợi ý cho học viên"></textarea><div><button>Approve</button><button>Decline</button></div></div></div>
+ <div class="col after"><b>Sau</b><div class="card"><h3>Minh Anh · Bài 3</h3><p class="muted">"Em chưa biết đặt vai trò cho AI thế nào"</p><textarea placeholder="Gợi ý cho học viên"></textarea><div class="ui-btn-row"><button class="ui-btn ui-btn-primary ui-btn-sm">Duyệt và gửi gợi ý</button><button class="ui-btn ui-btn-danger ui-btn-sm">Từ chối</button></div></div></div>
+</div>
+
+<h2>3. Header và các nút phụ</h2>
+<div class="pair">
+ <div class="col before"><b>Trước</b><div class="hdr old"><strong>Promptify</strong><div><button>VI / EN</button><button>Sign out</button></div></div>
+  <div class="card old" style="margin-top:12px"><h3>Hiệu quả đào tạo L&amp;D</h3><div><button>Export CSV</button><button>Print / PDF report</button><button>Refresh</button></div></div></div>
+ <div class="col after"><b>Sau</b><div class="hdr"><strong>Promptify</strong><div><button class="ui-btn ui-btn-ghost ui-btn-sm">VI / EN</button><button class="ui-btn ui-btn-ghost ui-btn-sm">Đăng xuất</button></div></div>
+  <div class="card" style="margin-top:12px"><h3>Hiệu quả đào tạo L&amp;D</h3><div class="ui-btn-row"><button class="ui-btn ui-btn-secondary ui-btn-sm">Xuất CSV</button><button class="ui-btn ui-btn-secondary ui-btn-sm">In / báo cáo PDF</button><button class="ui-btn ui-btn-secondary ui-btn-sm">Làm mới</button><button class="ui-btn ui-btn-secondary ui-btn-sm" disabled>Đang tắt</button></div></div></div>
+</div>
+
+<h2>4. Hộp xác nhận chung (thay cho window.confirm)</h2>
+<div class="pair">
+ <div class="col before"><b>Trước</b><div class="card"><p class="muted">Bấm Reject là từ chối ngay, không hỏi lại. Promote dùng hộp xám mặc định của trình duyệt.</p></div></div>
+ <div class="col after"><b>Sau</b><div class="dialog"><div class="ui-confirm ui-confirm-danger"><h2>Từ chối SOP này?</h2><p>“Quy trình xử lý khiếu nại v2” sẽ không được index. Người gửi sẽ thấy lý do: “Thiếu bước escalate”.</p><div class="ui-btn-row ui-btn-row-end"><button class="ui-btn ui-btn-ghost">Huỷ</button><button class="ui-btn ui-btn-danger ui-btn-solid">Từ chối</button></div></div></div></div>
+</div>
+
+<h2>5. Toast chung (góc dưới trái)</h2>
+<div class="pair toast-demo">
+ <div class="col before"><b>Trước</b><div class="card"><p class="muted">Mỗi màn hình có một dòng lỗi đỏ riêng, cố định, không đóng được.</p></div></div>
+ <div class="col after"><b>Sau</b><div style="display:grid;gap:10px">
+  <div class="ui-toast ui-toast-error" role="alert"><span>Không lưu được: lớp đã kết thúc.</span><button class="ui-btn ui-btn-ghost ui-btn-sm" aria-label="Đóng">×</button></div>
+  <div class="ui-toast ui-toast-success" role="status"><span>Đã chuyển duc.vo@intrepid.asia thành facilitator.</span><button class="ui-btn ui-btn-ghost ui-btn-sm" aria-label="Đóng">×</button></div>
+  <p class="muted">Toast xanh tự ẩn sau 4 giây. Toast đỏ ở lại tới khi bấm × hoặc chuyển màn hình.</p></div></div>
+</div>
+
+<h2>6. Đề xuất Đợt B (chưa làm): nút “Lưu vào thư viện”</h2>
+<div class="pair">
+ <div class="col before"><b>Hiện tại</b><div class="card old"><p class="muted">Nút lưu nằm tách xa kết quả, ở cuối trang workspace.</p><div class="card"><h3>Kết quả AI</h3><p>Bản nháp email trả lời khách hàng…</p></div><div><button>Save to library</button></div></div></div>
+ <div class="col after"><b>Đề xuất</b><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Kết quả AI</h3><div class="ui-btn-row"><button class="ui-btn ui-btn-ghost ui-btn-sm">Sao chép</button><button class="ui-btn ui-btn-secondary ui-btn-sm">Lưu vào thư viện</button></div></div><p>Bản nháp email trả lời khách hàng…</p></div></div>
+</div>
+<p class="note">Bảng màu: xanh lá = hành động chính, viền xanh = phụ, viền đỏ = nguy hiểm, viền xám = huỷ/đóng. Các nút trong một hàng cách nhau 12px, và có viền focus khi dùng phím Tab.</p>
+</main></body></html>

@@ -1,4 +1,4 @@
-param([ValidateSet('access-roster','synthetic-workspace','lifecycle-originals','lifecycle-resume','lifecycle-ui-download','judge-repair','judge-async-p3','test-log-gaps','workshop-messaging','hint-requests','hint-multi','hint-inline')][string]$ReleaseSuffix='access-roster', [ValidatePattern('^2026-[0-9]{2}-[0-9]{2}$')][string]$ReleaseDate='2026-10-20', [switch]$ResumeCreatedVersion)
+param([ValidateSet('access-roster','synthetic-workspace','lifecycle-originals','lifecycle-resume','lifecycle-ui-download','judge-repair','judge-async-p3','test-log-gaps','workshop-messaging','hint-requests','hint-multi','hint-inline','role-promote','hint-later','sop-upload-ux','ui-waves-abc','ui-refactor')][string]$ReleaseSuffix='access-roster', [ValidatePattern('^2026-[0-9]{2}-[0-9]{2}$')][string]$ReleaseDate='2026-10-20', [switch]$ResumeCreatedVersion)
 $ErrorActionPreference='Stop'
 Set-Location (Join-Path $PSScriptRoot '..')
 $taskOut="outputs/staging-release-$ReleaseDate-$ReleaseSuffix"
@@ -11,7 +11,7 @@ if(Test-Path $taskBefore){
  $taskBeforeId=$taskBeforeReleases.releases[0].version.name.Split('/')[-1]
  $taskBaseline=Get-Content (Join-Path $taskOut "before/$taskSite-version-$taskBeforeId.json") -Raw|ConvertFrom-Json
 }else{
- if($ReleaseSuffix -like 'lifecycle-*' -or $ReleaseSuffix -in @('judge-repair','judge-async-p3','test-log-gaps','workshop-messaging','hint-requests','hint-multi','hint-inline')){throw 'Current staging Hosting baseline inventory required'}
+ if($ReleaseSuffix -like 'lifecycle-*' -or $ReleaseSuffix -in @('judge-repair','judge-async-p3','test-log-gaps','workshop-messaging','hint-requests','hint-multi','hint-inline','role-promote','hint-later','sop-upload-ux','ui-waves-abc','ui-refactor')){throw 'Current staging Hosting baseline inventory required'}
  $taskBaseline=Get-Content "outputs/staging-release-2026-10-20-access-roster/after/$taskSite-version-bf274db45915e5f0.json" -Raw|ConvertFrom-Json
 }
 if($taskBaseline.config.rewrites[0].run.serviceId -ne 'promptify-intrepid-api' -or $taskBaseline.config.rewrites[0].run.region -ne 'asia-southeast1'){throw 'Unexpected API rewrite'}

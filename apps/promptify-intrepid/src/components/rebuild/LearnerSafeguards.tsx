@@ -1,4 +1,5 @@
 import {useEffect,useState} from 'react';
+import {confirmAction} from '../common/UiFeedback';
 import type {ProductSnapshot} from '../../types/production';
 import {useProductLanguage} from '../../services/productI18nService';
 
@@ -25,7 +26,7 @@ export function AccessExpiryControl({snapshot,learnerId,busy,onAction}:{snapshot
  return <div className="space-y-1.5 text-xs"><label className="font-bold block" htmlFor={'access-expiry-'+learnerId}>{p('Access expires (read-only after)','Hạn truy cập (sau đó chỉ đọc)')}</label>
   <input id={'access-expiry-'+learnerId} type="datetime-local" className="w-full p-2 rounded-xl border border-m3-outline-variant" value={value} onChange={event=>setValue(event.target.value)}/>
   <div className="flex gap-2"><button className="flex-1 py-2 rounded-xl bg-m3-primary text-white font-bold" disabled={busy||!value} onClick={()=>void onAction('setAccessExpiry',{learnerId,expiresAt:new Date(value).toISOString()})}>{p('Save expiry','Lưu hạn')}</button>
-   <button className="flex-1 py-2 rounded-xl border border-m3-outline-variant" disabled={busy||!saved} onClick={()=>void onAction('setAccessExpiry',{learnerId,expiresAt:null})}>{p('Remove expiry','Bỏ hạn')}</button></div>
+   <button className="flex-1 py-2 rounded-xl border border-m3-outline-variant" disabled={busy||!saved} onClick={async()=>{const {ok}=await confirmAction({title:p('Remove access expiry?','Bỏ hạn truy cập?'),body:p('The learner keeps full access to this class with no end date.','Học viên sẽ có quyền vào lớp này không thời hạn.'),confirmLabel:p('Remove expiry','Bỏ hạn')});if(ok)void onAction('setAccessExpiry',{learnerId,expiresAt:null});}}>{p('Remove expiry','Bỏ hạn')}</button></div>
   <p>{saved?p('Current: ','Hiện tại: ')+new Date(saved).toLocaleString(lang==='en'?'en-GB':'vi-VN'):p('No expiry set.','Chưa đặt hạn.')}</p></div>;
 }
 type Props={snapshot:ProductSnapshot;lessonId:string;busy:boolean;onAction:(name:string,payload?:Record<string,unknown>)=>Promise<void>};

@@ -1,4 +1,5 @@
 import {vertexEnabled,ProviderSetupError} from './vertexAiService';
+import {providerStubEnabled} from './providerStubService';
 import {admittedModelRequest as modelRequest} from './admittedModelService';
 import {AdmissionError} from './providerAdmissionService';
 import {validateLearnerSettings} from './learnerSettingsService.js';
@@ -6,7 +7,7 @@ import { AiServerError, type GenerateRequestBody, type EvaluateRequestBody } fro
 import { validateRubric, validateWeightedEvaluation } from './weightedRubricService.js';
 import type { RubricCriterion } from '../types/production.js';
 import {piiSignals} from './piiGuardService.js';
-import {evaluateParallel,JUDGE_STRATEGIES,type JudgeStrategy} from './parallelJudgeService.js';
+import {evaluateParallel,JUDGE_STRATEGIES,type JudgeStrategy,type JudgeHooks} from './parallelJudgeService.js';
 
 /** Provider capacity retry wait: Retry-After (capped at 5s) or 0.8–1.6s jitter. */
 export function capacityRetryDelay(retryAfter?:string|null,random=Math.random){
@@ -33,7 +34,7 @@ async function providerResponse(payload: unknown, selectedModel:string|undefined
   let model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
   const fallback=process.env.GEMINI_FALLBACK_MODEL;
   if(selectedModel){if(![model,fallback].includes(selectedModel))throw new AiServerError('Model is not enabled by the administrator.',422);model=selectedModel;}
-  if (!key&&!vertexEnabled()) throw new AiServerError('Server Gemini configuration is missing.', 503);
+  if (!key&&!vertexEnabled()&&!providerStubEnabled()) throw new AiServerError('Server Gemini configuration is missing.', 503);
   if (!/^[a-zA-Z0-9._-]+$/.test(model)) throw new AiServerError('Invalid server model configuration.', 503);
   if(fallback&&!/^[a-zA-Z0-9._-]+$/.test(fallback))throw new AiServerError('Invalid fallback model configuration.',503);
   const send=async(target:string)=>{
@@ -137,7 +138,7 @@ export async function productionGenerateStream(body: GenerateRequestBody & {sett
   const data=await readGenerationStream(response.body,onDelta);
   return { ...interpretResponse(data,model), latencyMs: Math.round(performance.now() - started), streamed:true };
 }
-export async function productionEvaluate(body: EvaluateRequestBody & {language?:'en'|'vi'}, deadlineMs = 50000) {
+export async function productionEvaluate(body: EvaluateRequestBody & {language?:'en'|'vi'}, deadlineMs = 50000, hooks:JudgeHooks={}) {
   const rubric = validateRubric(body.lessonRubric as RubricCriterion[]);
   const strategy=process.env.JUDGE_STRATEGY as JudgeStrategy;
   // parallel-v1 (A) is production; consolidated-v1 (B) / integrated-v1 (C) are benchmark candidates with the same weighted-v1 contract.
@@ -145,7 +146,7 @@ export async function productionEvaluate(body: EvaluateRequestBody & {language?:
     if(process.env.GEMINI_MODEL!=='gemini-3.8-flash'||process.env.GEMINI_FALLBACK_MODEL&&process.env.GEMINI_FALLBACK_MODEL!=='gemini-3.8-flash')throw new AiServerError('Parallel grading requires the configured Gemini 3.8 Flash model.',503);
     // Synchronous requests keep 50s (Firebase Hosting allows 60s); the async worker passes a longer deadline.
     const deadline=Date.now()+deadlineMs;
-    return evaluateParallel(body,rubric,(payload,timeoutMs)=>gemini(payload,undefined,Math.min(deadline,Date.now()+(timeoutMs??deadlineMs))),deadlineMs,strategy);
+    return evaluateParallel(body,rubric,(payload,timeoutMs)=>gemini(payload,undefined,Math.min(deadline,Date.now()+(timeoutMs??deadlineMs))),deadlineMs,strategy,hooks);
   }
   const active = rubric.filter(c => c.active && c.weight > 0);
   // A greeting is not an attempt at any lesson, regardless of facts the generator volunteered.

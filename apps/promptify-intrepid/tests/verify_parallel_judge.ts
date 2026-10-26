@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { evaluateParallel } from '../src/services/parallelJudgeService';
+import { evaluateParallel,JUDGE_ATTEMPT_TIMEOUT_MS} from '../src/services/parallelJudgeService';
 import { DEFAULT_RUBRIC } from '../src/services/weightedRubricService';
 import type { EvaluateRequestBody } from '../src/services/apiServerService';
 import { AiServerError } from '../src/services/apiServerService';
@@ -185,7 +185,7 @@ for (const badCriterion of ['key', 'score'] as const) {
     const stage = input.stage === 'supervisor' ? input.stage : input.criterion!.key;
     const seen = attempts.get(stage) || [];
     seen.push(payload); attempts.set(stage, seen);
-    assert.ok(timeoutMs! > 45000 && timeoutMs! <= 50000, 'each attempt may use the remaining shared deadline');
+    assert.ok(timeoutMs! > 20000 && timeoutMs! <= JUDGE_ATTEMPT_TIMEOUT_MS, 'each attempt is capped below the shared deadline');
     if (seen.length === 1) throw new AiServerError('Transient timeout', 504);
     assert.strictEqual(payload, seen[0], 'retry reuses exact stage payload');
     return callResult(resultFor(input));

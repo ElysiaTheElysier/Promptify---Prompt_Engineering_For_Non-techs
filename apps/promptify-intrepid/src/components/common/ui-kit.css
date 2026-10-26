@@ -1,0 +1,66 @@
+/* Shared buttons, button rows, confirm dialog and toast for every role (UI review 23/10, wave A).
+   Doubled class selectors win over the older `.prod-app button` / Tailwind reset without !important. */
+.ui-btn.ui-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:8px 16px;border-radius:12px;border:1px solid transparent;font:inherit;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background-color .15s,border-color .15s,color .15s,box-shadow .15s}
+.ui-btn.ui-btn:focus-visible{outline:2px solid #047857;outline-offset:2px}
+.ui-btn.ui-btn:disabled{opacity:.5;cursor:not-allowed}
+/* The current choice in a set stays readable even though it cannot be picked again. */
+.ui-btn.ui-btn[aria-pressed=true]:disabled{opacity:1;cursor:default}
+.ui-btn.ui-btn-sm{min-height:34px;padding:6px 12px;font-size:13px}
+.ui-btn.ui-btn-primary{background:#047857;border-color:#047857;color:#fff}
+.ui-btn.ui-btn-primary:hover:not(:disabled){background:#065f46;border-color:#065f46}
+.ui-btn.ui-btn-primary:active:not(:disabled){background:#064e3b}
+.ui-btn.ui-btn-secondary{background:#fff;border-color:#6ee7b7;color:#065f46}
+.ui-btn.ui-btn-secondary:hover:not(:disabled){background:#ecfdf5;border-color:#34d399}
+.ui-btn.ui-btn-danger{background:#fff;border-color:#fca5a5;color:#b91c1c}
+.ui-btn.ui-btn-danger:hover:not(:disabled){background:#fef2f2;border-color:#f87171}
+.ui-btn.ui-btn-danger.ui-btn-solid{background:#b91c1c;border-color:#b91c1c;color:#fff}
+.ui-btn.ui-btn-danger.ui-btn-solid:hover:not(:disabled){background:#991b1b}
+.ui-btn.ui-btn-ghost{background:transparent;border-color:#cbd5e1;color:#334155}
+.ui-btn.ui-btn-ghost:hover:not(:disabled){background:#f1f5f9}
+.ui-btn-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.ui-btn-row-end{justify-content:flex-end}
+/* Confirm dialog */
+.ui-confirm{display:grid;gap:14px;max-width:520px;color:#0f172a}
+.ui-confirm h2{margin:0;font-size:18px;font-weight:700}
+.ui-confirm p{margin:0;color:#334155;line-height:1.55}
+.ui-confirm label{display:grid;gap:6px;font-weight:600;font-size:14px}
+.ui-confirm textarea{width:100%;min-height:84px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;font-weight:400}
+.ui-confirm-danger h2{color:#991b1b}
+/* Toast */
+.ui-toast{position:fixed;left:20px;bottom:20px;z-index:110;display:flex;align-items:flex-start;gap:12px;max-width:min(560px,calc(100vw - 40px));padding:12px 14px;border-radius:14px;border:1px solid;box-shadow:0 10px 30px #0f172a26;font-size:14px;line-height:1.5}
+.ui-toast span{flex:1;overflow-wrap:anywhere}
+.ui-toast-error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.ui-toast-success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+@media (max-width:640px){.ui-toast{left:16px;right:16px;bottom:16px}}
+
+/* ProductDialog: one overlay look for every role (portalled outside the shell, so tokens are restated). */
+.prod-modal-overlay.prod-modal-overlay{background:#0f2a2299;padding:24px;overscroll-behavior:contain;font-family:'Be Vietnam Pro',Inter,system-ui,sans-serif}
+.prod-modal-overlay.prod-modal-overlay>.prod-card{width:100%;max-width:600px;max-height:min(88dvh,860px);overflow:auto;margin:0;padding:24px 28px;border:1px solid #d6e1dc;border-radius:16px;background:#fff;color:#15231e;box-shadow:0 18px 48px #0f2a2233;animation:ui-dialog-in .16s ease-out}
+.prod-modal-overlay.prod-modal-overlay>.prod-card:focus{outline:none}
+.prod-modal-overlay h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.35}
+.prod-modal-overlay p{color:#56675f;line-height:1.6}
+.ui-dialog-head,.prod-modal-overlay .lv-library-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid #e8efeb}
+@keyframes ui-dialog-in{from{opacity:0;transform:translateY(6px) scale(.99)}to{opacity:1;transform:none}}
+@media(max-width:640px){.prod-modal-overlay.prod-modal-overlay{padding:0;place-items:end stretch}.prod-modal-overlay.prod-modal-overlay>.prod-card{max-width:none;max-height:92dvh;border-radius:16px 16px 0 0;padding:20px 16px}}
+@media (prefers-reduced-motion:reduce){.prod-modal-overlay.prod-modal-overlay>.prod-card{animation:none}}
+
+/* Shared primitives (UI refactor 24/10): segmented control, status badge, page/section header, toolbar, empty state. */
+.pi-segmented{display:inline-flex;max-width:100%;gap:2px;padding:3px;overflow-x:auto;border:1px solid #d6e1dc;border-radius:999px;background:#f3f6f4;scrollbar-width:none}
+.pi-segmented>button{flex-shrink:0;min-height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:#56675f;font:inherit;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background-color .15s,color .15s}
+.pi-segmented>button:hover{color:#15231e}
+.pi-segmented>button[aria-pressed=true],.pi-segmented>button[aria-selected=true]{background:#fff;color:#103b30;box-shadow:0 1px 2px #0f2a221f}
+.pi-segmented>button:focus-visible{outline:2px solid #047857;outline-offset:1px}
+.pi-status{display:inline-flex;align-items:center;gap:6px;min-height:26px;padding:0 10px;border:1px solid #d6e1dc;border-radius:999px;background:#f3f6f4;color:#3d4f48;font-size:12px;font-weight:600;white-space:nowrap}
+.pi-status::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.85}
+.pi-status-active,.pi-status-success,.pi-status-published,.pi-status-completed{border-color:#a7dcc3;background:#e1f4eb;color:#065f46}
+.pi-status-frozen,.pi-status-pending,.pi-status-warning,.pi-status-in_progress{border-color:#f3d6a8;background:#fff6e8;color:#8a4508}
+.pi-status-ended,.pi-status-rejected,.pi-status-danger{border-color:#f5c2bd;background:#fdf0ee;color:#9b1c13}
+.pi-page-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin:0 0 20px}
+.pi-page-header h1,.pi-page-header h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.015em;line-height:1.3;color:#15231e;text-wrap:balance}
+.pi-page-header p{margin:4px 0 0;max-width:72ch;color:#56675f;font-size:14px;line-height:1.6}
+.pi-section-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 12px}
+.pi-section-header h2,.pi-section-header h3{margin:0;font-size:17px;font-weight:700;color:#15231e}
+.pi-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.pi-empty{display:grid;justify-items:start;gap:6px;padding:20px;border:1px dashed #c9d7d0;border-radius:12px;background:#f8faf9;color:#56675f;font-size:14px;line-height:1.6}
+.pi-empty strong{color:#15231e;font-size:15px}
+@media (prefers-reduced-motion:reduce){.pi-segmented>button{transition:none}}
