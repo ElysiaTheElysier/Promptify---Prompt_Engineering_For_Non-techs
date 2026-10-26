@@ -13,7 +13,7 @@
 
 .learner-v7 details.lv-provider-log{padding:20px 24px;border:1px solid var(--lv-line);overflow-wrap:anywhere}.lv-provider-log summary{min-height:24px}.lv-provider-log[open] summary{margin-bottom:16px}
 
-.lv-rubric-summary{list-style:none;padding:0;margin:16px 0 0}.lv-rubric-summary li{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--lv-line);font-size:13px}.lv-rubric-summary strong{white-space:nowrap;color:var(--lv-green)}.lv-judge-details{margin-top:12px}.lv-judge-details summary{min-height:44px;display:list-item;align-content:center}.lv-scorecard{max-height:440px;overflow:auto;padding-right:8px;overscroll-behavior:contain}
+.lv-rubric-summary{list-style:none;padding:0;margin:16px 0 0}.lv-rubric-summary li{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--lv-line);font-size:13px}.lv-rubric-summary strong{white-space:nowrap;color:var(--lv-green)}.lv-judge-details{margin-top:12px}.lv-judge-details summary{min-height:44px;display:list-item;align-content:center}.lv-scorecard{max-height:440px;overflow:auto;padding-right:8px;}
 @media(min-width:761px) and (max-width:1250px){.lv-results>.lv-output{grid-column:1;grid-row:1/span 2}.lv-results>.lv-provider-log{grid-column:2;grid-row:1}.lv-results>.lv-judge{grid-column:2;grid-row:2}}
 
 .access-support{width:min(100% - 2rem,38rem);margin:1.5rem auto;padding:1.5rem;background:white;border:1px solid #cbd5e1;border-radius:1rem}.access-support label{display:block}.access-support textarea{display:block;width:100%;min-height:110px;border:1px solid #94a3b8;border-radius:.6rem;padding:.75rem;margin:.75rem 0}.access-support button{padding:.75rem 1rem;background:#047857;color:white;border-radius:2rem}.access-support button:disabled{opacity:.5}.lv-variable{display:flex;flex-wrap:wrap;gap:.5rem}.lv-variable input{min-width:0;width:100%;padding:.65rem;border:1px solid #94a3b8;border-radius:.5rem}.lv-provider-log{max-height:24rem;overflow:auto}.lv-resource-filters{flex-wrap:wrap}
@@ -127,7 +127,7 @@
 .lv-results .lv-section-heading h2{margin:0;font-size:17px}
 .lv-results .ui-btn-row{margin:0}.lv-results .lv-output-meta{margin:12px 0}
 @media(min-width:981px){
- .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 24px);min-height:520px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;position:sticky;top:calc(var(--app-header-h,64px) + 12px)}
+ .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 24px);min-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-gutter:stable;position:sticky;top:calc(var(--app-header-h,64px) + 12px)}
  .lv-revised-grid .lv-compose{min-height:100%;display:flex;flex-direction:column}
  .lv-revised-grid textarea#learner-prompt{flex:1;min-height:300px}
  .lv-revised-grid .lv-brief{min-height:100%}
