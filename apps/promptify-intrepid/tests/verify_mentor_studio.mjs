@@ -4,7 +4,7 @@ const code=ts.transpileModule(fs.readFileSync('src/components/rebuild/Production
 let states=[],refs=[],cursor=0,rc=0,calls=[];
 const React={createElement:(type,props,...children)=>({type,props:{...props,children}}),useState(initial){const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;return [states[i],v=>states[i]=typeof v==='function'?v(states[i]):v];},useRef(v){return refs[rc++]??={current:v};},useEffect(){}};
 const module={exports:{}};const rubric=[{key:'accuracy',weight:100,active:true}];
-const require=name=>name==='react'?{...React,default:React}:name.includes('weightedRubric')?{DEFAULT_RUBRIC:rubric,rebalanceRubric:x=>x}:name.includes('productI18n')?{useProductLanguage:()=> 'en'}:name.includes('sourceUiText')?{sourceUiText:x=>x}:new Proxy({},{get:(_,key)=>String(key)});
+const require=name=>name==='react'?{...React,default:React}:name.includes('weightedRubric')?{DEFAULT_RUBRIC:rubric,rebalanceRubric:x=>x,normalizeRubric:x=>x,validateRubric:x=>x}:name.includes('productI18n')?{useProductLanguage:()=> 'en',criterionLabel:(key,label)=>label||key}:name.includes('sourceUiText')?{sourceUiText:x=>x}:new Proxy({},{get:(_,key)=>String(key)});
 vm.runInNewContext(code,{module,exports:module.exports,require,structuredClone,Date,crypto:{randomUUID:()=> 'id'}});
 const lesson={id:'lab',lesson_key:'L1',title:'Lesson',scenario:'brief',task_goal:'goal',system_instruction:'old',starter_prompt:'prompt',studio:{revision:1,scaffold:[],variables:[],materials:[],rubric,awards:{}}};
 const props={snapshot:{selectedClass:{id:'class',client_id:'client',client_name:'Client',class_code:'C',department:'Tech'},classes:[],lessons:[lesson],attempts:[],sops:[]},busy:false,onAction:async(name,payload,after)=>{calls.push({name,payload});after?.(name==='saveStudio'?{revision:2}:{output:'result'});},navigate(){}};
@@ -15,8 +15,12 @@ render();states[0]={...states[0],viewMode:'studio',activeTab:'scope',selectedLab
 let tree=render();nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='').props.onChange({target:{value:'updated'}});
 states[0]={...states[0],activeTab:'rubric'};tree=render();const run=nodes(tree).find(n=>n.type==='button'&&text(n).includes('Run Test in Sandbox'));assert.equal(run.props.disabled,true);run.props.onClick();assert.equal(calls.length,0);
 nodes(tree).find(n=>n.type==='button'&&text(n)==='Save configuration').props.onClick();assert.equal(calls[0].name,'saveStudio');
-tree=render();nodes(tree).find(n=>n.type==='button'&&text(n).includes('Run Test in Sandbox')).props.onClick();assert.equal(calls[1].name,'sandboxGenerate');
-console.log('Mentor Studio PASS: unsaved edits block sandbox until explicit save.');
+tree=render();nodes(tree).find(n=>n.type==='button'&&text(n).includes('Run Test in Sandbox')).props.onClick();assert.equal(calls[1].name,'sandboxGenerate');assert.equal(calls[1].payload.rubric,undefined,'saved rubric is not resent');
+// An unsaved rubric alone may be previewed: the draft goes with the sandbox request.
+tree=render();nodes(tree).find(n=>n.props?.criteria).props.onChange([{key:'accuracy',label:'Draft',description:'d',weight:100,active:true}]);
+tree=render();const draftRun=nodes(tree).find(n=>n.type==='button'&&text(n).includes('Run Test in Sandbox'));assert.equal(draftRun.props.disabled,false);draftRun.props.onClick();
+assert.equal(calls[2].name,'sandboxGenerate');assert.equal(calls[2].payload.rubric[0].label,'Draft');
+console.log('Mentor Studio PASS: unsaved edits block sandbox until explicit save; an unsaved rubric alone is previewed as a draft.');
 
 // A snapshot refresh must not silently advance the revision of an editor opened earlier.
 states=[];refs=[];calls=[];lesson.studio.revision=1;
@@ -34,3 +38,24 @@ tree=render();nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='my local
 tree=render();nodes(tree).find(n=>n.type==='button'&&text(n)==='Save configuration').props.onClick();
 assert.equal(calls[1].payload.expectedRevision,2,'successful save advances the loaded revision');
 console.log('Studio conflict/navigation PASS: pinned revision, saved revision update, dirty navigation warning and retained edits.');
+
+// Removing the criterion a badge uses never retargets the badge: it is flagged and saving stays blocked until the trainer chooses again.
+states=[];refs=[];calls=[];lesson.studio.revision=1;
+lesson.studio.awards={badges:[{id:'b1',name:'Grounding star',icon:'verified',criteria:'',status:'ACTIVE',ruleType:'criterion_score',criterionKey:'accuracy',minimumScore:'9',attemptScope:'any'}]};
+tree=render();nodes(tree).find(n=>n.type==='button'&&text(n).includes('Chỉnh sửa / Cấu hình')).props.onClick();
+states[0]={...states[0],activeTab:'rubric'};tree=render();
+assert.deepEqual(nodes(tree).find(n=>n.props?.criteria).props.badgeIssues,[]);
+nodes(tree).find(n=>n.props?.criteria).props.onChange([{key:'tone',label:'Tone',description:'d',weight:100,active:true}]);
+tree=render();
+assert.deepEqual(nodes(tree).find(n=>n.props?.criteria).props.badgeIssues,['Grounding star'],'rubric tab warns about the orphaned badge');
+assert.equal(states[0].awardsData.badges[0].criterionKey,'accuracy','badge is not silently moved to another criterion');
+const saveButton=()=>nodes(render()).find(n=>n.type==='button'&&text(n)==='Save configuration');
+assert.equal(saveButton().props.disabled,true,'save is blocked');saveButton().props.onClick();assert.equal(calls.length,0);
+states[0]={...states[0],activeTab:'awards'};tree=render();
+const picker=nodes(tree).find(n=>n.type==='select'&&n.props['aria-invalid']===true);
+assert.ok(picker,'awards tab marks the badge criterion as invalid');assert.equal(picker.props.value,'');
+assert.ok(text(tree).includes('Choose again before saving'));
+picker.props.onChange({target:{value:'tone'}});
+assert.equal(saveButton().props.disabled,false);saveButton().props.onClick();
+assert.equal(calls[0].name,'saveStudio');assert.equal(calls[0].payload.config.awards.badges[0].criterionKey,'tone');
+console.log('Studio badge PASS: orphaned criterion badge is flagged, blocks saving and is saved only after the trainer re-selects.');

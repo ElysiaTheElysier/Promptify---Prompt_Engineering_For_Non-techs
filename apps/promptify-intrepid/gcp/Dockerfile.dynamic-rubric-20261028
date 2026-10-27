@@ -1,0 +1,4 @@
+# Overlay on judge1-1026 (judge-stream-20261026): trainer-defined rubric (1-8 criteria), draft-rubric sandbox preview,
+# named 422 for orphaned criterion badges, criterion label in streamed Judge rows. Requires SQL 021 applied first.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:cf39e6b62e534602391d4522f559fedddff606fa966f5880d407af3b6febc4d7
+COPY --chown=node:node src/services/weightedRubricService.ts src/services/parallelJudgeService.ts src/services/productionServerService.ts src/services/studioValidationService.ts /app/src/services/

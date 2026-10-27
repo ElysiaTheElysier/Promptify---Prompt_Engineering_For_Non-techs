@@ -10,7 +10,7 @@ import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react
 import type {FirebaseSession as Session} from '../../services/firebaseIdentityService';
 import {identity,subscribeClassUpdates} from '../../services/firebaseIdentityService';
 import { loadProduct, productRequest, ProductRequestError, requestJudgeStream, requestGeneration, requestGenerationStream, generationStreamAvailable, waitForGeneration, pendingGenerationKey, type GenerationProgress, type JudgeProgress, type JudgeCriterionProgress } from '../../services/productionClientService';
-import { productText as t, setProductLanguage, useProductLanguage } from '../../services/productI18nService';
+import { productText as t, criterionLabel, setProductLanguage, useProductLanguage } from '../../services/productI18nService';
 import type { ProductAttempt, ProductLesson, ProductSnapshot, WeightedEvaluation } from '../../types/production';
 import { PromptifyMark } from '../common/PromptifyMark';
 import {AppShell} from '../common/AppShell';
@@ -125,7 +125,7 @@ export default function ProductionApp() {
     catch(cause){setLiveCriteria([]);setJudgeGraded(0);throw cause;}
     flushSync(()=>{
       setLiveCriteria([]);setJudgeGraded(0);
-      if(!signal?.aborted&&grade?.contract==='weighted-v1'&&grade.criteria.length===5)setSnapshot(current=>current&&current.selectedClass?.id===target.classId
+      if(!signal?.aborted&&grade?.contract==='weighted-v1'&&grade.criteria.length>0)setSnapshot(current=>current&&current.selectedClass?.id===target.classId
         ?{...current,attempts:current.attempts.map(saved=>saved.id===target.attemptId?{...saved,evaluation_json:grade,judge_status:'succeeded'}:saved)}:current);
     });
     return grade;
@@ -196,7 +196,7 @@ export default function ProductionApp() {
     }).finally(()=>{activeWrite.current=false;setBusy(false);setExecutionPhase(undefined);setGenerationProgress(undefined);setStreamText('');});
   };
   const insert = (value:string) => {const area=promptRef.current;const start=area?.selectionStart??prompt.length,end=area?.selectionEnd??start;setPrompt(prompt.slice(0,start)+value+prompt.slice(end));requestAnimationFrame(()=>{area?.focus();area?.setSelectionRange(start+value.length,start+value.length);});};
-  const scoreCard = () => evaluation?.contract==='weighted-v1' ? <section className="prod-card"><h2>{t('rubric')} · {evaluation.total}/10</h2>{evaluation.criteria.map(c=><div key={c.key} className="prod-criterion"><strong>{t(c.key as any)}</strong><span>{c.score}/{c.max}</span><p>{feedback?.criteriaReasons[c.key]||c.reason}</p></div>)}{(['strengths','improvements'] as const).map(key=><div key={key}><h3>{t(key)}</h3><ul>{(feedback?.[key]||evaluation[key]).map((value,i)=><li key={i}>{value}</li>)}</ul></div>)}<h3>{t('nextHint')}</h3><p>{feedback?.nextHint||evaluation.nextHint}</p></section> : <p>{t('noData')}</p>;
+  const scoreCard = () => evaluation?.contract==='weighted-v1' ? <section className="prod-card"><h2>{t('rubric')} · {evaluation.total}/10</h2>{evaluation.criteria.map(c=><div key={c.key} className="prod-criterion"><strong>{criterionLabel(c.key,c.label)}</strong><span>{c.score}/{c.max}</span><p>{feedback?.criteriaReasons[c.key]||c.reason}</p></div>)}{(['strengths','improvements'] as const).map(key=><div key={key}><h3>{t(key)}</h3><ul>{(feedback?.[key]||evaluation[key]).map((value,i)=><li key={i}>{value}</li>)}</ul></div>)}<h3>{t('nextHint')}</h3><p>{feedback?.nextHint||evaluation.nextHint}</p></section> : <p>{t('noData')}</p>;
   const unlockDialog=()=>(unlock&&<ProductDialog title={unlock==='hints'?pair('Unlock hints?','Mở gợi ý?'):pair('Unlock solution?','Mở lời giải?')} onClose={()=>setUnlock(null)}><h2 id="unlock-title">{unlock==='hints'?pair('Unlock hints?','Mở gợi ý?'):pair('Unlock solution?','Mở lời giải?')}</h2><p>{pair('This support request is recorded on the server. It does not modify your prompt or AI score.','Yêu cầu hỗ trợ này được ghi trên máy chủ. Nội dung prompt và điểm AI của bạn không bị thay đổi.')}</p><label>{pair("Reflection before viewing the solution","Suy nghĩ của bạn trước khi xem lời giải")}<textarea value={reflection} onChange={e=>setReflection(e.target.value)} maxLength={1000}/></label><button className="ui-btn ui-btn-ghost ui-btn-sm" onClick={()=>setUnlock(null)}>{t('cancel')}</button><button disabled={busy||(unlock==='solution'&&reflection.trim().length<20)} onClick={()=>{const kind=unlock;setUnlock(null);void action('unlockSupport',{lessonId:lesson?.id,kind,reflection});}}>{pair('Confirm unlock','Xác nhận mở')}</button></ProductDialog>);
   const navIds=isLearner?[4,13]:snapshot?.profile.role==='head'?[12]:snapshot?.profile.role==='admin'?[9,11,12,13,14,15]:[9,11,12,13,15];
   // Sidebar groups by the job each destination serves; the learner hub stays current inside lesson screens, the War Room inside learner inspection.

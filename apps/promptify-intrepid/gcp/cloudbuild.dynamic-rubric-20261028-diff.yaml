@@ -1,0 +1,10 @@
+# Read-only: diff the overlay files against the running image (judge1-1026). Review before building.
+steps:
+ - name: asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:cf39e6b62e534602391d4522f559fedddff606fa966f5880d407af3b6febc4d7
+   entrypoint: sh
+   args:
+    - -c
+    - >-
+      cd /workspace && for f in src/services/weightedRubricService.ts src/services/parallelJudgeService.ts src/services/productionServerService.ts src/services/studioValidationService.ts; do echo "=== DIFF $$f"; diff -u /app/$$f $$f; done; true
+options:
+ logging: CLOUD_LOGGING_ONLY

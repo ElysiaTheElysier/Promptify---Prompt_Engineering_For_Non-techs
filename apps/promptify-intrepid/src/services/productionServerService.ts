@@ -462,7 +462,8 @@ export async function handleProductRequest(authorization: string, body: any) {
       let lab=await result<any>(c.server.from('lessons').select('*').eq('id',lessonId).in('module_id',modules.map(m=>m.id)).single());
       const studio=await result<any>(c.server.from('product_studio').select('config,revision').eq('class_id',cls.id).eq('lesson_id',lessonId).maybeSingle());
       lab=resolveClassLesson(lab,studio?.config);
-      const rubric=validateRubric(studio?.config?.rubric||DEFAULT_RUBRIC);
+      // An unsaved draft rubric may be previewed here; learners only ever get the saved one (frozen per Run).
+      let rubric;try{rubric=validateRubric(body.rubric??studio?.config?.rubric??DEFAULT_RUBRIC);}catch(error){throw new ApiAccessError((error as Error).message,422);}
       const sops=await result<any[]>(c.reader.rpc('rebuild_class_sops',{p_class:cls.id,p_lesson:lessonId}));
       const inputContext=[lab.sample_input_context,...sops.map(s=>`${s.citation} ${s.title}\n${s.content}`)].filter(Boolean).join('\n\n');
       if(inputContext.length>100000)throw new ApiAccessError('Sandbox source context exceeds the supported limit.',422);

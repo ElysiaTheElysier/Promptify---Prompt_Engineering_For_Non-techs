@@ -145,7 +145,7 @@ async function readSse<T>(response:Response,handle:(event:string,message:any)=>T
   if(done)return undefined;
  }
 }
-export type JudgeCriterionProgress={key:string;score:number;max:number;reasonEn:string;reasonVi:string};
+export type JudgeCriterionProgress={key:string;label?:string;score:number;max:number;reasonEn:string;reasonVi:string};
 /** On-demand AI Judge: provisional criteria arrive as each one is graded; resolves with the saved grade.
  * resume=true only follows an existing job (after reload) and never starts or charges a new grade.
  * Without the stream route (unset origin, 404, blocked preflight) it uses requestJudge/waitForJudge; a dropped or

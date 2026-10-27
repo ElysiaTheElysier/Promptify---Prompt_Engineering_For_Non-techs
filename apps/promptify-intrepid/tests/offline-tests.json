@@ -21,6 +21,7 @@
     "verify_learner_provider_contract.ts",
     "verify_learner_settings.ts",
     "verify_product_i18n.ts",
+    "verify_dynamic_rubric.ts",
     "verify_parallel_judge.ts",
     "verify_staging_capacity_engine.ts",
     "verify_automatic_judge.ts",

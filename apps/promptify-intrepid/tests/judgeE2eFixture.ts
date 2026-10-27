@@ -4,12 +4,12 @@ import {PGlite} from '@electric-sql/pglite';
 import {configureSqlPoolForTests,sqlTransaction} from '../src/services/cloudPostgresService';
 import {configureFirebaseVerifierForTests} from '../src/services/firebaseServerIdentityService';
 
-// Shared offline fixture for async Judge end-to-end tests: real SQL (001+005+012+015+020), real resolvers,
+// Shared offline fixture for async Judge end-to-end tests: real SQL (001+005+012+013+015+020+021), real resolvers,
 // injected Firebase verifier (counts calls). Callers set NODE_ENV/DATABASE_URL/JUDGE_* before importing services.
 export const id=(n:number,k=1)=>`${String(n).padStart(8,'0')}-0000-4000-8000-${String(k).padStart(12,'0')}`;
-export async function judgeFixture(learners=2,attempts=6){
+export async function judgeFixture(learners=2,attempts=6,rubric?:unknown[]){
   const db=new PGlite();
-  for(const f of ['001_baseline.sql','005_department_correction_auto_approval.sql','012_judge_jobs.sql','013_provider_admission.sql','015_judge_dispatch_fencing.sql','020_judge_stage_results.sql'])await db.exec(fs.readFileSync('gcp/sql/'+f,'utf8'));
+  for(const f of ['001_baseline.sql','005_department_correction_auto_approval.sql','012_judge_jobs.sql','013_provider_admission.sql','015_judge_dispatch_fencing.sql','020_judge_stage_results.sql','021_dynamic_rubric.sql'])await db.exec(fs.readFileSync('gcp/sql/'+f,'utf8'));
   const counts={firebase:0,statements:0,stageReads:0};
   let tail=Promise.resolve();
   configureSqlPoolForTests({async connect(){
@@ -23,7 +23,7 @@ export async function judgeFixture(learners=2,attempts=6){
   await db.query("INSERT INTO lessons(id,module_id,lesson_key,title,status) VALUES($1,$2,'L1','Lesson','published'),($3,$4,'L9','Foreign','published')",[id(9),id(8),id(19),id(18)]);
   // A real generation snapshot, so the production Judge path (productionEvaluate) can grade it.
   const snapshot=JSON.stringify({scenario:'Fictional ticket',task_goal:'Classify the ticket with a cited SOP section.',sample_input_context:'[SOP:QA:v1] Section 1.',
-    production_rubric:(await import('../src/services/weightedRubricService')).DEFAULT_RUBRIC});
+    production_rubric:rubric??(await import('../src/services/weightedRubricService')).DEFAULT_RUBRIC});
   const actors:Record<string,any>={};
   for(let u=1;u<=learners;u++){
     const user=id(100,u),subject=id(200,u),learner=id(300,u);

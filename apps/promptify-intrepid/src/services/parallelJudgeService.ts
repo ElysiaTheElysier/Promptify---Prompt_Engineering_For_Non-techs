@@ -1,11 +1,11 @@
 import {createHash} from 'node:crypto';
 import {AiServerError,type EvaluateRequestBody} from './apiServerService';
-import {validateRubric,validateWeightedEvaluation} from './weightedRubricService';
+import {JUDGE_WORKER_CONCURRENCY,validateRubric,validateWeightedEvaluation} from './weightedRubricService';
 import type {RubricCriterion} from '../types/production';
 
 type Call=(payload:unknown,timeoutMs?:number)=>Promise<{output:string;model:string;tokens?:number}>;
 type Body=EvaluateRequestBody&{language?:'en'|'vi'};
-const workerConcurrency=5;
+const workerConcurrency=JUDGE_WORKER_CONCURRENCY;
 export type JudgeStrategy='parallel-v1'|'consolidated-v1'|'integrated-v1';
 export const JUDGE_STRATEGIES:JudgeStrategy[]=['parallel-v1','consolidated-v1','integrated-v1'];
 /** Shared Judge deadline; Firebase Hosting allows a Cloud Run rewrite at most 60s per request. */
@@ -26,7 +26,7 @@ const list=(value:unknown)=>{if(!Array.isArray(value)||value.length>5)throw Erro
 
 // One supervisor gate, independent bounded workers, then deterministic feedback synthesis.
 // No extra serial model call can change scores or delay the final feedback.
-export type CriterionProgress={key:string;score:number;max:number;reasonEn:string;reasonVi:string};
+export type CriterionProgress={key:string;label?:string;score:number;max:number;reasonEn:string;reasonVi:string};
 /** Validated stage answers keyed by the SHA-256 of their exact provider payload (020 product_judge_stage_results). */
 export type JudgeStageStore={load():Promise<Record<string,{sha:string;result:unknown}>>;save(stage:string,sha:string,result:unknown,view:Record<string,unknown>):Promise<void>};
 /** onCriterion: provisional per-criterion rows for streaming UI, emitted only after the verdict says task attempt.
@@ -96,7 +96,7 @@ export async function evaluateParallel(body:Body,rubric:RubricCriterion[],call:C
   }
  };
  try{
-   // Shared rubric-anchor validation for every strategy: same five anchors, same bounds, same feedback text rules.
+   // Shared rubric-anchor validation for every strategy and any trainer rubric: same five anchor levels, same bounds, same feedback text rules.
    const validateRow=(criterion:RubricCriterion,row:any)=>{
     const maxScore=criterion.weight/10;
     if(!row||row.key!==criterion.key||!Number.isFinite(row.score)||row.score<0||row.score>maxScore)throw Error('Invalid criterion score');
@@ -113,7 +113,7 @@ export async function evaluateParallel(body:Body,rubric:RubricCriterion[],call:C
    const supervisorSchemaProps={taskAttempt:{type:'BOOLEAN'},summaryEn:textSchema,summaryVi:textSchema};
    const fromCriteria=(raw:any)=>active.map(c=>{try{return {status:'fulfilled',value:validateRow(c,{...raw?.criteria?.[c.key],key:c.key})} as PromiseFulfilledResult<ReturnType<typeof validateRow>>;}catch(reason){return {status:'rejected',reason} as PromiseRejectedResult;}});
    const gradeCriterion=(criterion:RubricCriterion)=>request('criterion:'+criterion.key,criterionInstruction,{stage:'criterion',...evidence,criterion:{...criterion,maxScore:criterion.weight/10}},{type:'OBJECT',properties:{key:textSchema,...rowSchema(criterion).properties},required:['key',...rowSchema(criterion).required]},1536,
-    raw=>validateRow(criterion,raw),row=>({key:row.key,score:row.score,max:criterion.weight/10,reasonEn:row.reasonEn,reasonVi:row.reasonVi}));
+    raw=>validateRow(criterion,raw),row=>({key:row.key,label:criterion.label,score:row.score,max:criterion.weight/10,reasonEn:row.reasonEn,reasonVi:row.reasonVi}));
    const acceptSupervisor=(raw:any)=>{if(typeof raw?.taskAttempt!=='boolean')throw Error('Missing alignment verdict');text(raw.summaryEn);text(raw.summaryVi);return raw;};
    let supervisorRun:Promise<PromiseSettledResult<any>[]>,workersRun:Promise<unknown>;
    let outcomes:Array<PromiseSettledResult<ReturnType<typeof validateRow>>>=new Array(active.length);
@@ -121,7 +121,7 @@ export async function evaluateParallel(body:Body,rubric:RubricCriterion[],call:C
    const send=(row:CriterionProgress)=>{try{onCriterion?.(row);}catch{}};
    const emit=(outcome:PromiseSettledResult<ReturnType<typeof validateRow>>)=>{
     if(!onCriterion||outcome.status!=='fulfilled')return;
-    const {key,score,reasonEn,reasonVi}=outcome.value,row={key,score,max:active.find(c=>c.key===key)!.weight/10,reasonEn,reasonVi};
+    const {key,score,reasonEn,reasonVi}=outcome.value,criterion=active.find(c=>c.key===key)!,row={key,label:criterion.label,score,max:criterion.weight/10,reasonEn,reasonVi};
     if(verdict===undefined)held.push(row);else if(verdict)send(row);
    };
    if(strategy==='integrated-v1'){

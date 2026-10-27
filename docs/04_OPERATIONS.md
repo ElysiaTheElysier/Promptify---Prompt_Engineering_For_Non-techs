@@ -46,7 +46,7 @@ Quy trình đã áp dụng (xem [governance 18/10](evidence/GCP_DEPLOYMENT_GOVER
 1. `scripts/capture_staging_governance.ps1`: chụp inventory "before" (IAM, Cloud Run, SQL, Hosting, Auth…), đã ẩn secret.
 2. Build bằng `scripts/build_staging_*.ps1` / Cloud Build.
 3. Deploy revision mới với `--no-traffic --tag=<name>` (`scripts/deploy_staging_*.ps1`), rồi kiểm `/health`, `/readyz`, các request không xác thực phải trả 401.
-4. Chỉ chuyển traffic sau khi review (`promote_*`). Hosting dùng `scripts/deploy_staging_hosting_rest.ps1`, chỉ deploy lên site staging.
+4. Chỉ chuyển traffic sau khi review (`promote_*`). Hosting dùng `scripts/deploy_staging_hosting_rest.ps1`, chỉ deploy lên site staging. Build bằng `npm run build -- --mode staging`: `apps/promptify-intrepid/.env.staging` (được commit, chỉ giá trị công khai) cấp `VITE_STREAM_API_URL`; thiếu biến này thì Run/Judge âm thầm quay về JSON + polling (các bản Hosting 27/10 đã bị như vậy).
 5. Chụp inventory "after", chạy `scripts/compare_staging_governance.ps1` để so sánh. Ghi kết quả vào `outputs/staging-release-<date>-*/` (bị ignore, nhạy cảm, chỉ để local).
 
 ## Rollback (tham khảo, chưa chạy)

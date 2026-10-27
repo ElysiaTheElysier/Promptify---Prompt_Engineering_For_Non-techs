@@ -6,3 +6,5 @@ tmp/
 *.log
 .env*
 !.env.example
+# Public, non-secret staging build values only (secrets stay in .env.staging.local).
+!.env.staging

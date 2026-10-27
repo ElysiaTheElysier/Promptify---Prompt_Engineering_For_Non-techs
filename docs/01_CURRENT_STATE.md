@@ -41,6 +41,7 @@ Evidence: `apps/promptify-intrepid/outputs/staging-release-2026-10-22-capacity-r
 | Thư viện prompt (cá nhân → chia sẻ chờ Head duyệt) | LIVE phần cá nhân; OFFLINE phần chia sẻ | Chưa kiểm luồng duyệt giữa đồng nghiệp |
 | Workshop: broadcast, gợi ý riêng, learner "stuck" (UI09); inspector (UI10) | OFFLINE/contract | Chưa chứng minh người nhận đúng mục tiêu nhận được |
 | Studio bài học/rubric/sandbox (UI11) | LIVE QA UI (18/10) | Sandbox judge không tính ngân sách |
+| Rubric động: giảng viên thêm/xóa/sửa 1–8 tiêu chí, sandbox chấm thử rubric nháp, badge mất tiêu chí bị chặn lưu (UI11) | **LIVE** 28/10: SQL 021, API `rubric1-1028`, Hosting `2adbcb98`; E2E trainer + học viên và benchmark 3/5/8 tiêu chí ([RESULT](../apps/promptify-intrepid/outputs/staging-release-2026-10-28-dynamic-rubric/RESULT.md), chỉ có ở local) | 8 tiêu chí = 9+ lời gọi, chạy 2 đợt worker, p95 37,6 s hôm benchmark; nhãn tham chiếu benchmark chưa được review |
 | Analytics (UI12) | Một phần | Bộ lọc cohort/heatmap chưa nghiệm thu live |
 | Đóng góp SOP: upload/Drive/duyệt/index (UI13) | LIVE với 4 file TXT giả lập | Chưa chứng nhận đủ PDF/DOCX/XLSX/Doc gốc trên live |
 | Governance: domain, cấp quyền lớp, rotation (UI14) | CODE/OFFLINE | — |

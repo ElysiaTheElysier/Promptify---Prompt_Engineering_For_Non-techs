@@ -40,6 +40,12 @@ const messages = {
 } as const;
 export type ProductMessageKey = keyof typeof messages;
 export const productText = (key: ProductMessageKey, locale = language): string => messages[key][locale === 'en' ? 0 : 1];
+const templateCriteria = ['groundedness', 'persona', 'format', 'oneshot', 'actionability'];
+/** Template criteria keep their bilingual names unless the trainer renamed them; custom criteria show the trainer's label. */
+export function criterionLabel(key: string, label: string | undefined, locale = language): string {
+  const pair = templateCriteria.includes(key) ? messages[key as ProductMessageKey] : undefined;
+  return pair && (!label || pair.includes(label as never)) ? pair[locale === 'en' ? 0 : 1] : label || key;
+}
 export function productErrorText(status: number, locale = language, detail?:unknown) {
   if(status===429&&detail==='Your AI run limit has been reached (40 per hour, 200 per day). Try again after the limit resets.')return productText('runQuota',locale);
   if(status===403&&detail==='This Workspace source is not approved for this class. Ask an administrator to configure its source binding.')return productText('workspaceSourceUnapproved',locale);
