@@ -1,0 +1,3 @@
+# Overlay on rubric1-1028 (dynamic-rubric-20261028): Generate replies in the learner's language (commit 6789ab9).
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:ae436e415f72bffc15123aee563531f554e23ba0ba781dd9d47b65f44b19f333
+COPY --chown=node:node gcp/overlay-reply-language-20261028/productionAiService.ts /app/src/services/

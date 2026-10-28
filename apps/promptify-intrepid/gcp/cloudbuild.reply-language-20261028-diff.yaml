@@ -1,0 +1,10 @@
+# Read-only: diff the overlay file against the running image (rubric1-1028). Must show only the reply-language line.
+steps:
+ - name: asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:ae436e415f72bffc15123aee563531f554e23ba0ba781dd9d47b65f44b19f333
+   entrypoint: sh
+   args:
+    - -c
+    - >-
+      cd /workspace && echo "=== DIFF src/services/productionAiService.ts" && diff -u /app/src/services/productionAiService.ts gcp/overlay-reply-language-20261028/productionAiService.ts; true
+options:
+ logging: CLOUD_LOGGING_ONLY

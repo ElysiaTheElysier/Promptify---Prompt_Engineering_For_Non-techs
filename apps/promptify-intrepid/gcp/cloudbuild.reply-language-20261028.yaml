@@ -1,0 +1,15 @@
+steps:
+ - name: gcr.io/cloud-builders/docker
+   args: ['build', '-f', 'gcp/Dockerfile.reply-language-20261028', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:reply-language-20261028', '.']
+ # Read-only check inside the built image: overlay hash, and the server module graph loads.
+ - name: asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:reply-language-20261028
+   entrypoint: sh
+   args:
+    - -c
+    - >-
+      cd /app && sha256sum src/services/productionAiService.ts &&
+      node --import tsx -e "import('./src/services/cloudRunServer.ts').then(m => console.log('server import ok', typeof m.cloudHandler))"
+images:
+ - asia-southeast1-docker.pkg.dev/$PROJECT_ID/promptify-intrepid/app:reply-language-20261028
+options:
+ logging: CLOUD_LOGGING_ONLY
