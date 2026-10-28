@@ -431,7 +431,7 @@ Business Scenario Brief (Hiển thị ở Learner Task Panel UI-05):|Business sc
 Mục tiêu thực hành chính:|Key Practice Objectives:
 Năng lực mục tiêu sau bài học:|Post-Lab Target Competency:
 Chỉ dẫn hệ thống cho Gemini|System Instructions (Gemini Execution Engine)
-System prompt truyền tới Gemini để chấm điểm AI Judge.|System instructions sent to Gemini for AI Judge evaluation.
+Chỉ dẫn hệ thống gửi cho Gemini khi học viên bấm Run (AI Judge không dùng).|System instructions sent to Gemini when the learner runs a prompt (not used by AI Judge).
 Cú pháp đơn cách|Monospaced Syntax
 Biến prompt động ({variables}):|Dynamic Prompt Variables ({variables}) CRUD:
 Liên kết scaffold và rubric:|Scaffold Chips ↔ Rubric Reactive Link:
