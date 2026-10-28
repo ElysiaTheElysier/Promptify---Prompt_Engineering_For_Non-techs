@@ -47,6 +47,7 @@
     "verify_learner_content_language.ts",
     "verify_learner_ui_state.mjs",
     "verify_sop_return_navigation.mjs",
+    "verify_cohort_manager_mount.mjs",
     "verify_product_http.ts",
     "verify_roster_worker.ts",
     "verify_staging_roster_worker.ts",
