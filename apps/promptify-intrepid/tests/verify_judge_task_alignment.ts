@@ -6,7 +6,7 @@ process.env.GEMINI_API_KEY='offline';process.env.GEMINI_MODEL='gemini-3-flash-pr
 let calls=0,taskAttempt=false,generation=false;
 globalThis.fetch=async(_url:any,options:any)=>{
  calls++;const p=JSON.parse(options.body);
- if(generation){assert.match(p.systemInstruction.parts[0].text,/not a tutor/);assert.match(p.systemInstruction.parts[0].text,/Do not infer the exercise/);assert.equal(p.generationConfig.thinkingConfig.thinkingLevel,'low');}
+ if(generation){assert.match(p.systemInstruction.parts[0].text,/not a tutor/);assert.match(p.systemInstruction.parts[0].text,/Do not infer the exercise/);assert.match(p.systemInstruction.parts[0].text,/Reply entirely in the language of learnerPrompt/,'reply follows the learner language');assert.equal(p.generationConfig.thinkingConfig.thinkingLevel,'low');}
  else{assert.equal(p.generationConfig.responseSchema.properties.taskAttempt.type,'BOOLEAN');assert.match(JSON.parse(p.contents[0].parts[0].text).scoringPolicy,/Never credit facts/);}
  const raw={taskAttempt,criteria:Object.fromEntries(DEFAULT_RUBRIC.map(c=>[c.key,{score:c.weight/10,reasonEn:'Evidence',reasonVi:'Căn cứ'}])),strengthsEn:[],strengthsVi:[],improvementsEn:['Specify task'],improvementsVi:['Nêu nhiệm vụ'],nextHintEn:'State task.',nextHintVi:'Nêu nhiệm vụ.'};
  return new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:generation?'Hello. What task should I perform?':JSON.stringify(raw)}]}}]}));
