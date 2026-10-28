@@ -128,7 +128,7 @@
 .lv-results .ui-btn-row{margin:0}.lv-results .lv-output-meta{margin:12px 0}
 @media(min-width:981px){
  .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 24px);min-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-gutter:stable;position:sticky;top:calc(var(--app-header-h,64px) + 12px)}
- .lv-revised-grid .lv-compose{min-height:100%;display:flex;flex-direction:column}
+ .lv-revised-grid .lv-compose{min-height:100%;flex-shrink:0;display:flex;flex-direction:column}
  .lv-revised-grid textarea#learner-prompt{flex:1;min-height:300px}
  .lv-revised-grid .lv-brief{min-height:100%}
 }
