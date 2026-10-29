@@ -40,7 +40,7 @@ export default function ProductionSopInspectorSource({source,classId,onClose}:{s
  const indexedAt=source.chunks?.[0]?.indexed_at,activeDoc={title:source.title,version:'v'+source.version,totalPages:sections.length,syncStatus:source.chunks?.length?copy('Indexed'):copy('Not indexed'),lastSynced:indexedAt?new Date(indexedAt).toLocaleString(lang==='en'?'en-US':'vi-VN'):'—'},driveUrl=source.metadata?.driveFileId?'https://drive.google.com/file/d/'+encodeURIComponent(source.metadata.driveFileId)+'/view':undefined;
  const downloadOriginal=async()=>{try{const result=await productRequest('sourceDownload',{classId,versionId:source.id});const a=document.createElement('a');a.href=result.url;a.rel='noopener';a.click();}catch(error){window.alert((error as Error).message);}};
  const copyCitation=async(value:string)=>{try{await navigator.clipboard.writeText(value);setCopiedCitation(true);}catch{setCopiedCitation(false);}};
- return <div className="source-ui fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex justify-end"><div ref={dialogRef} role="dialog" aria-modal="true" aria-label={copy('SOP inspector')} className="w-full max-w-xl h-full">${render(find(t.body))}</div></div>;
+ return <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex justify-end"><div ref={dialogRef} role="dialog" aria-modal="true" aria-label={copy('SOP inspector')} className="source-ui w-full max-w-xl h-full">${render(find(t.body))}</div></div>;
 }
 `);
 console.log('Compiled source UI-08 for canonical SOP text and actual page citations.');

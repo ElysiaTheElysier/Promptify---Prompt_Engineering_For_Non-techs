@@ -150,7 +150,7 @@ assert.equal(render(HintRequestAlert,{snapshot:base,currentUi:4,onOpen:noop}),''
 
 // 7. Wiring: inbox on both learner screens, queue on Workshop, pop-up in the shared layout, no learner Solution tab.
 const app=fs.readFileSync('src/components/rebuild/ProductionApp.tsx','utf8'),workspace=fs.readFileSync('src/components/rebuild/ProductionWorkspaceV7.tsx','utf8');
-assert.ok(app.includes('if(currentUi===4&&snapshot)return scoped(<><LearnerInbox'));
+assert.ok(app.includes('const hub=(state:ProductSnapshot)=><><LearnerInbox')&&app.includes('if(currentUi===4&&snapshot)return scoped(hub(snapshot));'));
 assert.ok(app.includes('return scoped(<><LearnerInbox snapshot={snapshot} busy={busy} onAction={action}/><ProductionWorkspace'));
 // The queue renders inside the Workshop screen, under its header.
 assert.ok(app.includes('onInspect={id=>{setLearnerId(id);navigate(10);}}><WorkshopSupportQueue snapshot={snapshot} busy={busy} onAction={action}/></ProductionWorkshopSource>'));
