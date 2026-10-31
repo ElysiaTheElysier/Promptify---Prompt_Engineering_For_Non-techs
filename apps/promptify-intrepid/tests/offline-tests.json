@@ -10,6 +10,7 @@
     "verify_drive_original_backfill.ts",
     "verify_judge_budget.ts",
     "verify_library_visibility.ts",
+    "verify_tenant_isolation.ts",
     "verify_judge_timeout_recovery.ts",
     "verify_workspace_recovery.ts",
     "verify_attempt_comparison.ts",
