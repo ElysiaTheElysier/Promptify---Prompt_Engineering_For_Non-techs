@@ -88,7 +88,12 @@ export default function ProductionApp() {
     const generation = ++latestLoad.current;
     pendingLoad.current={generation,classId:selectedClass};
     try { const state = await loadProduct(selectedClass); if (generation !== latestLoad.current) return; setSnapshot(state); setClassId(state.selectedClass?.id);requestedClass.current=state.selectedClass?.id; if(initializedProfile.current!==state.profile.id){setFullName(state.profile.full_name);initializedProfile.current=state.profile.id;} setLoadError(''); }
-    catch (cause) { if (generation === latestLoad.current) {setLoadError((cause as Error).message);if(cause instanceof ProductRequestError&&cause.status===403){setSnapshot(null);setUi(3);}} }
+    catch (cause) { if (generation === latestLoad.current) {setLoadError((cause as Error).message);if(cause instanceof ProductRequestError&&cause.status===403){
+      // Only a confirmed roster miss shows the "not on roster" entry screen; other 403s keep the session.
+      if(cause.code==='not_on_roster'){setSnapshot(null);setUi(3);}
+      // A stale or foreign cohort link: drop it once and load the user's own default cohort.
+      else if(new URLSearchParams(location.search).has('classId')){const url=new URL(location.href);url.searchParams.delete('classId');history.replaceState(null,'',url);requestedClass.current=undefined;queueMicrotask(()=>void refresh());}
+    }} }
     finally {if(pendingLoad.current?.generation===generation)pendingLoad.current=undefined;}
   }, []);
   useEffect(()=>{if(!classId||snapshot?.selectedClass?.id!==classId)return;const url=new URL(location.href);url.searchParams.set('classId',classId);history.replaceState(null,'',url);},[classId,snapshot?.selectedClass?.id]);

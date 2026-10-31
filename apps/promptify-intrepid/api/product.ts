@@ -16,6 +16,7 @@ export default async function handler(req: any, res: any) {
     return res.status(200).json(result);
   } catch (error) {
     const known = error instanceof ApiAccessError || error instanceof AiServerError;
-    return res.status(known ? error.statusCode : error instanceof SyntaxError ? 400 : 500).json({ error: known ? error.message : 'The server could not complete this request.' });
+    const code = known && typeof (error as any).code === 'string' ? (error as any).code : undefined;
+    return res.status(known ? error.statusCode : error instanceof SyntaxError ? 400 : 500).json({ error: known ? error.message : 'The server could not complete this request.', ...(code ? { code } : {}) });
   }
 }

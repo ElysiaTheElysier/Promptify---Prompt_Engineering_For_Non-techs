@@ -1,0 +1,9 @@
+# Overlay on lang1-1028 (reply-language-20261028): identity failures classified (rejection 401, outage 503),
+# not_on_roster code for the roster-miss 403, TM-002 missing-domain warning, TM-003 binding audit log. No SQL change.
+# firebaseServerIdentityService.ts and rebuildRunService.ts come from gcp/overlay-auth-classify-20261031: the live
+# image versions plus only this change, because local source carries undeployed work (memoized identity, load-test
+# identity, async Generation/Judge fencing) that needs migrations 013-015.
+FROM asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:f7dcf8bcb80f7534080c7e7fa8867f6af61ea939acbbd5a05586868d7f401a8d
+COPY --chown=node:node src/services/apiAuthorizationService.ts src/services/productionServerService.ts /app/src/services/
+COPY --chown=node:node gcp/overlay-auth-classify-20261031/firebaseServerIdentityService.ts gcp/overlay-auth-classify-20261031/rebuildRunService.ts /app/src/services/
+COPY --chown=node:node api/product.ts /app/api/

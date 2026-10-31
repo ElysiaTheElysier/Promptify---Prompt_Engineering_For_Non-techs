@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto';
 import {validateLearnerSettings} from './learnerSettingsService.js';
 import {codelabAvailable} from './codelabLifecycleService.js';
 import {createDatabaseClient,requireCloudDatabase} from './cloudDatabaseService';
-import { assertAiLessonAccess, ApiAccessError } from './apiAuthorizationService.js';
+import { assertAiLessonAccess, ApiAccessError, identityError } from './apiAuthorizationService.js';
 import { handleGenerateRequest, handleEvaluateRequest, AiServerError } from './apiServerService.js';
 import { productionGenerate, productionGenerateStream, productionEvaluate } from './productionAiService.js';
 import type {JudgeHooks,JudgeStageStore,CriterionProgress} from './parallelJudgeService.js';
@@ -24,7 +24,7 @@ async function context(authorization: string, classId: string, lessonId: string)
   const token=authorization.replace(/^Bearer\s+/i,'');
   const reader=createDatabaseClient(authorization);
   const { data: identity, error: authError } = await reader.auth.getUser(token);
-  if (authError || !identity.user) throw new ApiAccessError('Phiên đăng nhập không hợp lệ.', 401);
+  if (authError || !identity.user) throw identityError(authError, 'Phiên đăng nhập không hợp lệ.');
   // Authorization above uses only public lesson identifiers; private teaching
   // content is loaded on the server after that scope has been verified.
   const server=createDatabaseClient();
@@ -65,7 +65,7 @@ async function judgeContext(authorization: string, classId: string, lessonId: st
     server.from('product_studio').select('config').eq('class_id', classId).eq('lesson_id', lessonId).maybeSingle(),
     server.from('classes').select('class_code').eq('id',classId).single(),
   ]);
-  if (authError || !identity.user) throw new ApiAccessError('Phiên đăng nhập không hợp lệ.', 401);
+  if (authError || !identity.user) throw identityError(authError, 'Phiên đăng nhập không hợp lệ.');
   if (error || !lesson) throw new ApiAccessError('Không tải được bài học đã xuất bản.', 403);
   if (studioError) throw new ApiAccessError('Production curriculum schema is unavailable.', 503);
   if(classError||!classInfo)throw new ApiAccessError('Class configuration unavailable.',503);
@@ -110,7 +110,7 @@ async function identifyLearner(authorization:string){
   try{requireCloudDatabase();}catch{throw new ApiAccessError('Cloud SQL persistence is not configured.',503);}
   const reader=createDatabaseClient(authorization);
   const {data,error}=await reader.auth.getUser(authorization.replace(/^Bearer\s+/i,''));
-  if(error||!data.user)throw new ApiAccessError('Phiên đăng nhập không hợp lệ.',401);
+  if(error||!data.user)throw identityError(error,'Phiên đăng nhập không hợp lệ.');
   return {reader,server:createDatabaseClient(),subject:data.user.id};
 }
 /** The attempt must belong to the signed-in learner, in the stated class and lesson. */

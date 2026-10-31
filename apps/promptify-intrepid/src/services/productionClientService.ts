@@ -3,7 +3,7 @@ import type { ProductSnapshot } from '../types/production';
 import { getProductLanguage, productText, productErrorText } from './productI18nService';
 
 export class ProductRequestError extends Error {
-  constructor(message: string, public status: number, public requestId?: string) { super(message); }
+  constructor(message: string, public status: number, public requestId?: string, public code?: string) { super(message); }
 }
 export async function productRequest<T = any>(action: string, payload: Record<string, unknown> = {}): Promise<T> {
   const { data: { session } } = await identity.auth.getSession();
@@ -15,7 +15,7 @@ export async function productRequest<T = any>(action: string, payload: Record<st
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     const detail = ['judge','generate'].includes(action) && response.status !== 500 && typeof result.error === 'string' ? result.error.slice(0,1000) : '';
-    throw new ProductRequestError(detail ? `${productErrorText(response.status,getProductLanguage(),result.error)} ${detail}` : productErrorText(response.status,getProductLanguage(),result.error), response.status, payload.requestId as string);
+    throw new ProductRequestError(detail ? `${productErrorText(response.status,getProductLanguage(),result.error)} ${detail}` : productErrorText(response.status,getProductLanguage(),result.error), response.status, payload.requestId as string, typeof result.code === 'string' ? result.code : undefined);
   }
   return result as T;
 }

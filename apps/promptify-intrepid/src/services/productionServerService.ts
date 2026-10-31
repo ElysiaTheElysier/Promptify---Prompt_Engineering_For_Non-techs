@@ -20,7 +20,7 @@ import {accessExpiryEnabled,assertWritableAccess,learnerAccess,aiSessions,sessio
 /** TC-AUTH-04: learner actions refused once class access has expired (reads, drafts and telemetry stay available). */
 const READ_ONLY_BLOCKED=new Set(['generate','judge','savePromptLibrary','uploadLearnerContext','submitSop','prepareSopUpload','requestSopSync','unlockSupport','recordOutcome','resetAiSession','requestHint']);
 import {createDatabaseClient,requireCloudDatabase,type CloudDatabaseClient} from './cloudDatabaseService';
-import { ApiAccessError } from './apiAuthorizationService.js';
+import { ApiAccessError, identityError } from './apiAuthorizationService.js';
 import { generateSavedRun, evaluateSavedRun, enqueueJudge, judgeStatus, generationStatus } from './rebuildRunService.js';
 import { judgeAsyncEnabled } from './judgeQueueService.js';
 import { validateRubric, DEFAULT_RUBRIC } from './weightedRubricService.js';
@@ -53,14 +53,12 @@ async function context(authorization: string): Promise<Context> {
   try{requireCloudDatabase();}catch{throw new ApiAccessError('Cloud SQL server configuration is missing.',503);}
   const reader=createDatabaseClient(authorization),server=createDatabaseClient();
   const { data: identity, error } = await reader.auth.getUser(authorization.replace(/^Bearer\s+/i, ''));
-  if (error && ['ECONNRESET','ECONNREFUSED','ETIMEDOUT','ENOTFOUND','EAI_AGAIN','08001','08006','28P01','53300','57P01'].includes(String((error as any).code))) {
-    throw new ApiAccessError('Identity service is temporarily unavailable. Retry without signing out.', 503);
-  }
-  if (error || !identity.user?.email_confirmed_at || !identity.user.email) throw new ApiAccessError('Verified enterprise identity required.', 401);
+  if (error || !identity.user?.email_confirmed_at || !identity.user.email) throw identityError(error, 'Verified enterprise identity required.');
   const email = identity.user.email.trim().toLowerCase();
   const { data: profile, error: profileError } = await server.from('users').select('id,email,full_name,role,auth_provider_id,profile_confirmed_at').eq('email', email).maybeSingle();
   if (profileError) throw new ApiAccessError('Profile service unavailable.', 503);
-  if (!profile) throw new ApiAccessError('Your verified email is not on the provisioned roster.', 403);
+  // The client shows the "not on roster" screen only for this code; every other 403 keeps the user in place.
+  if (!profile) throw Object.assign(new ApiAccessError('Your verified email is not on the provisioned roster.', 403), { code: 'not_on_roster' });
   if (profile.auth_provider_id && profile.auth_provider_id !== identity.user.id) throw new ApiAccessError('Identity mapping conflict. Contact your training administrator.', 403);
   if (!profile.auth_provider_id) {
     const { data: linked, error: linkError } = await server.from('users').update({ auth_provider_id: identity.user.id }).eq('id', profile.id).is('auth_provider_id', null).select('id').maybeSingle();
@@ -77,6 +75,14 @@ async function result<T = any>(request: PromiseLike<{ data: T | null; error: any
     throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.', 409);
   }
   return data as T;
+}
+// TM-002: a client without a domain policy still admits every assigned user (fail-open by product decision).
+// Warn once per client per instance so administrators can add the missing domain before this becomes fail-closed.
+const missingDomainPolicyWarned=new Set<string>();
+function warnMissingDomainPolicy(clientId:string){
+  if(missingDomainPolicyWarned.has(clientId))return;
+  missingDomainPolicyWarned.add(clientId);
+  console.warn(JSON.stringify({event:'domain_policy_missing',clientId}));
 }
 async function classes(c: Context) {
  return c.classList??=readClasses(c);
@@ -103,7 +109,7 @@ async function readClassesScoped(c: Context) {
   if(c.profile.role!=='admin'){
     const domains=await result<any[]>(c.server.from('product_domains').select('client_id,domain,active'));
     const emailDomain=c.profile.email.split('@')[1];
-    rows=rows.filter(row=>{const configured=domains.filter(d=>d.client_id===row.client_id);return !configured.length||configured.some(d=>d.active&&d.domain===emailDomain);});
+    rows=rows.filter(row=>{const configured=domains.filter(d=>d.client_id===row.client_id);if(!configured.length)warnMissingDomainPolicy(row.client_id);return !configured.length||configured.some(d=>d.active&&d.domain===emailDomain);});
   }
   const manageable = c.profile.role==='admin'?rows.map(()=>({data:true})):await Promise.all(rows.map(row => c.reader.rpc('rebuild_can_manage_class', { p_class: row.id })));
   return rows.map((row, i) => ({ ...row, client_name: row.client?.name || '', course_title: row.course?.title || '', can_manage: manageable[i].data === true || c.profile.role === 'admin' }));
@@ -211,7 +217,7 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
 }
 export async function handleProductRequest(authorization: string, body: any) {
   if(body?.action==='supportConfig')return publicSupport(uuid(body.classId));
-  if(body?.action==='accessRequest'){const identity=await createDatabaseClient().auth.getUser(authorization.replace(/^Bearer\s+/i,''));const user=identity.data.user;if(identity.error||!user?.email_confirmed_at||!user.email)throw new ApiAccessError('Verified Google identity required.',401);return accessRequest(uuid(body.requestId),user.id,user.email,body.classId?uuid(body.classId):null,text(body.message,1500));}
+  if(body?.action==='accessRequest'){const identity=await createDatabaseClient().auth.getUser(authorization.replace(/^Bearer\s+/i,''));const user=identity.data.user;if(identity.error||!user?.email_confirmed_at||!user.email)throw identityError(identity.error,'Verified Google identity required.');return accessRequest(uuid(body.requestId),user.id,user.email,body.classId?uuid(body.classId):null,text(body.message,1500));}
   if (body?.action === 'enterpriseRequest') {
     try{requireCloudDatabase();}catch{throw new ApiAccessError('Request service unavailable.',503);}
     const email=text(body.email,254).toLowerCase();
@@ -225,7 +231,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     const server=createDatabaseClient();
     const identity=await server.auth.getUser(authorization.replace(/^Bearer\s+/i,''));
     const user=identity.data.user;
-    if(identity.error||!user?.email_confirmed_at||!user.email||!user.app_metadata.providers?.includes('google'))throw new ApiAccessError('Verified Google identity required.',401);
+    if(identity.error||!user?.email_confirmed_at||!user.email||!user.app_metadata.providers?.includes('google'))throw identityError(identity.error,'Verified Google identity required.');
     return {classId:await result(server.rpc('product_enroll_basic',{p_subject:user.id,p_email:user.email.trim().toLowerCase()}))};
   }
   const c = await context(authorization);

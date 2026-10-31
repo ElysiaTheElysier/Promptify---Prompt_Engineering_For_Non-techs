@@ -1,0 +1,10 @@
+# Read-only: diff the overlay files against the running image (lang1-1028). Review before building.
+steps:
+ - name: asia-southeast1-docker.pkg.dev/ai-transformation-510302/promptify-intrepid/app@sha256:f7dcf8bcb80f7534080c7e7fa8867f6af61ea939acbbd5a05586868d7f401a8d
+   entrypoint: sh
+   args:
+    - -c
+    - >-
+      cd /workspace && for f in src/services/firebaseServerIdentityService.ts src/services/apiAuthorizationService.ts src/services/productionServerService.ts src/services/rebuildRunService.ts api/product.ts; do echo "=== DIFF $$f"; diff -u /app/$$f $$f; done; true
+options:
+ logging: CLOUD_LOGGING_ONLY

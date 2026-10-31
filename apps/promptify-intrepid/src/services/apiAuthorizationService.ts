@@ -1,4 +1,5 @@
 import {createDatabaseClient,requireCloudDatabase} from './cloudDatabaseService';
+import {isIdentityRejection} from './firebaseServerIdentityService';
 
 export class ApiAccessError extends Error {
   statusCode: number;
@@ -8,6 +9,14 @@ export class ApiAccessError extends Error {
     this.name = 'ApiAccessError';
     this.statusCode = statusCode;
   }
+}
+
+/** A definitive identity rejection is 401. Firebase or Cloud SQL being unavailable is 503 (still denied), so the
+ * client retries instead of treating a valid account as signed out or off-roster. */
+export function identityError(error: unknown, message: string): ApiAccessError {
+  return !error || isIdentityRejection(error)
+    ? new ApiAccessError(message, 401)
+    : new ApiAccessError('Identity service is temporarily unavailable. Retry without signing out.', 503);
 }
 
 function readBearerToken(authorization?: string): string {
@@ -32,7 +41,7 @@ export async function assertAiLessonAccess(params: {
   const client=createDatabaseClient(`Bearer ${token}`);
 
   const { data: authData, error: authError } = await client.auth.getUser(token);
-  if (authError || !authData.user) throw new ApiAccessError('Phiên đăng nhập không hợp lệ hoặc đã hết hạn.', 401);
+  if (authError || !authData.user) throw identityError(authError, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.');
 
   const { data: classRecord, error: classError } = await client
     .from('classes')
