@@ -13,6 +13,7 @@ assert.equal(bindPromptVariables('Keep {unknown}',variables).prompt,'Keep {unkno
 const scaffolds=[{name:'Role',tag:'Role',active:true},{name:'Task',tag:'Task',active:true}];
 assert.equal(recognizedScaffolds('The role of this task is described in prose',scaffolds).length,0);
 assert.equal(recognizedScaffolds('[Role]: analyst\n[Task]: classify',scaffolds).length,2);
+assert.equal(recognizedScaffolds('[Role]: analyst. [Task]: classify. Context: inline prose',scaffolds).length,2,'bracket tags count on one line; bare inline words do not');
 const tabs=Object.fromEntries(Object.entries(WORKBOOK_TABS).map(([name,headers])=>[name,[[...headers]]]));
 tabs.Users.push(['one@example.test','One User','Tech','VN','E1','Office']);tabs.Users.push(['two@example.test','Two User','Other','VN','','']);
 tabs.Department.push(['Tech'],['Other']);tabs.Sync.push(['2027-01-01T08:00:00+07:00']);tabs.SOPs.push(['Tech SOP','Tech','https://example.test/tech'],['Other SOP','Other','https://example.test/other']);tabs['Main PIC'].push(['Tech Lead','lead@example.test','Tech']);

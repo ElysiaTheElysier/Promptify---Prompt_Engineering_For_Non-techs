@@ -140,6 +140,34 @@ Chuẩn bị production (owner chọn: chung project staging, tài nguyên riên
 
 Còn mở: I04 (chờ owner chọn chặn mềm/cứng), capacity B1 (chờ số người đồng thời), alert/restore B4 (chờ người nhận + chạy script), E2E 4 vai B5, deploy staging bản đã sửa.
 
+## E2E có đăng nhập trên staging 02/11 tối (LIVE, API `rel1-1102`, Hosting `ee654fb3`)
+
+Owner tự đăng nhập trong browser pane; Claude thao tác. 1 lần Run + 1 lần AI Judge thật.
+
+| Bước | Vai | Kết quả |
+| --- | --- | --- |
+| 1.1 Admin mở URL gốc → UI14 | Admin | ✅ PASS (lỗi 28/10 hết) |
+| Thẻ đếm domain | Admin | ✅ PASS (khớp danh sách: 1 → 3) |
+| Audit log: Actor | Admin | ✅ PASS hiện tên. Cột Target vẫn là UUID lớp |
+| Lớp Northstar không thấy (28/10) | Admin/Learner | ✅ Nguyên nhân là **dữ liệu**: client chỉ có domain `example.test` → ẩn lớp với mọi email khác. Đã thêm `intrepid.asia`, `gmail.com`; learner thấy lại lớp |
+| 3.4 Roster Sheet Sync now | Admin (quyền giảng viên) | ✅ success, 4 dòng, 0 lỗi. Cột Added/Updated hiện "—"; màn hình ghi "checked every 15 minutes" nhưng Scheduler PAUSED |
+| Drive: đọc thư mục được phép | Admin | ✅ liệt kê 2 file TXT. **PDF/DOCX/XLSX/Google Doc chưa kiểm** (thư mục không có file loại đó) |
+| Studio: nút Create draft | Admin | ✅ PASS (nền xanh, chữ trắng). Nút "Create new Codelab" nằm trong menu "More actions" |
+| Analytics | Admin | 🟡 hiển thị được; số liệu không khớp nhau: "Competency 8.07/10, -19.35%" vs bảng "Avg AI Score 8.92" |
+| 6.1 Hub | Learner | ✅ PASS |
+| 6.5 Run | Learner | ✅ 3,06 s, output đúng định dạng; thanh token phiên hiện đúng |
+| 6.6 AI Judge (async + kiểm quyền I05) | Learner | ✅ 10/10, 5 tiêu chí, ~5 s từ lúc bấm (queue 0,14 s, chấm 3,6 s) |
+| 6.7 Reload sau khi chấm | Learner | ✅ giữ 35 attempt, điểm giữ nguyên, không chấm lại |
+| 6.8 Compare Mode | Learner | ✅ hiển thị so sánh attempt có đánh dấu khác biệt |
+| 6.11 SOP từ bài lab | Learner | ✅ drawer: tìm kiếm, Insert context, Copy citation; đóng lại giữ nguyên nháp |
+| 4.4 Xin gợi ý | Learner | ✅ "Waiting for your facilitator" (khoá I10 chạy live). Phía giảng viên duyệt: chưa kiểm |
+| "Core elements 1/5" khi prompt viết trên một dòng | Learner | ❌ → **đã sửa ở local**: thẻ `[Task]:` giữa dòng giờ được nhận; chưa deploy |
+| Thương hiệu | Mọi vai | ❌ `<title>` "… Agribank & Corporate"; landing quảng cáo gói Basic $0 và logo Agribank |
+| Bố cục hẹp (~570 px) | Admin | 🟡 UI14 tràn ngang (939 px) |
+| Log API trong E2E | — | ✅ 0 ERROR/5xx, không có `sql_pool_idle_error` |
+
+Chưa kiểm: Head đăng nhập riêng (Analytics theo grant, export CSV, duyệt thư viện prompt), giảng viên duyệt gợi ý, cấp/thu hồi quyền lớp, chứng chỉ PDF, SOP PDF/DOCX/XLSX/Google Doc.
+
 ## Giới hạn của lần nghiệm thu này
 
 - Không đăng nhập staging: việc nhập mật khẩu tài khoản phải do người dùng làm. Mọi ô "chưa kiểm khi đăng nhập" cần người có tài khoản test chạy E2E guide.
