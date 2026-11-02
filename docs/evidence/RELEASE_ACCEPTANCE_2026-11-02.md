@@ -119,6 +119,27 @@ Rate limit 20/phút; hạn mức 50k token/phiên (có cờ nhưng **không ch�
 
 **Bước B — trước production:** hàng đợi provider 013 + load test có duyệt (B1); sửa I01, I03–I05; diễn tập restore; roster theo lịch chạy live; kiểm SOP thật PDF/DOCX/XLSX/Google Doc; review chất lượng chấm của Judge với người chấm; dựng project production.
 
+## Cập nhật 02/11 (chiều) — đã sửa ở local, chưa deploy
+
+Bằng chứng: CODE + OFFLINE (typecheck, lint 0 lỗi, boundaries, build, smoke, `npm test` 89/89). Chưa có bản nào lên staging.
+
+| Mục | Sửa | Test |
+| --- | --- | --- |
+| I01 cạn pool | Đọc theo quyền actor (RLS) chạy sau khi nhả kết nối service, ở `readClasses` và `snapshot` | `verify_service_sql_scope.ts` chặn `c.reader` trong service scope |
+| I02 pool lỗi idle | Đã sửa sáng 02/11 | `verify_sql_pool_errors.ts` |
+| I03 safeguard cho qua khi thiếu schema | Khi cờ bật mà thiếu 016: chặn ghi/budget bằng 503 `safeguard_schema_missing`; màn hình vẫn hiển thị | `verify_learner_safeguards.ts` |
+| I05 worker trễ | Worker Judge và Generation kiểm lại quyền lớp (RLS), hạn truy cập, ngân sách phiên ngay trước khi gọi AI; bị thu hồi → `failed` + `access_revoked`, không gọi AI, không retry | `verify_delayed_job_access.ts` (SQL thật) |
+| I10 race gợi ý | Khoá `pg_advisory_xact_lock` theo học viên/lớp/bài trước khi đếm | `verify_workshop_messaging.ts` (chỉ kiểm thứ tự lệnh; PGlite không tạo được race 2 kết nối) |
+| TM-002 | Cờ `DOMAIN_POLICY=require` (mặc định tắt) | `verify_tenant_isolation.ts` |
+| Basic/Public | Cờ `DISABLE_PUBLIC_BASIC=true` (mặc định tắt) | `verify_tenant_isolation.ts` |
+| Dependency | `npm audit fix`: hết lỗi high (`re2js` 2.9.1); còn 11 moderate qua `exceljs` cần bản breaking | `npm audit --omit=dev` |
+| UI 28/10 | Nút "Create draft" bị CSS `.prod-app button` làm trắng chữ; ô "Key Practice Objectives" không hiện khi danh sách rỗng; placeholder tiếng Việt khi EN; Actor trong audit log hiện tên/email; Admin/Head/… mở URL gốc tự vào màn chính | Typecheck/build; **chưa kiểm trên trình duyệt** |
+| UI 28/10 chưa sửa | Thẻ đếm domain hiện 0 (không tái hiện được từ code: thẻ và danh sách cùng nguồn); lớp Northstar không thấy (dữ liệu, cần Admin kiểm); Compare attempts đã được thay bằng công tắc Compare Mode ngày 01/11 | Cần kiểm khi đăng nhập |
+
+Chuẩn bị production (owner chọn: chung project staging, tài nguyên riêng): [runbook](../proposals/PRODUCTION_LAUNCH_RUNBOOK_2026-11-02.md), `gcp/10-create-production.sh.template`, `gcp/11-production-alerts.sh.template`, `gcp/production.env`. Câu hỏi gửi owner: [OWNER_QUESTIONS_2026-11-02.md](../proposals/OWNER_QUESTIONS_2026-11-02.md).
+
+Còn mở: I04 (chờ owner chọn chặn mềm/cứng), capacity B1 (chờ số người đồng thời), alert/restore B4 (chờ người nhận + chạy script), E2E 4 vai B5, deploy staging bản đã sửa.
+
 ## Giới hạn của lần nghiệm thu này
 
 - Không đăng nhập staging: việc nhập mật khẩu tài khoản phải do người dùng làm. Mọi ô "chưa kiểm khi đăng nhập" cần người có tài khoản test chạy E2E guide.

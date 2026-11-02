@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Production resources inside the staging project (owner decision 02/11/2026). Separate names from staging so
+# staging work never touches production data. Default --validate/--dry-run mode stops before any cloud call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud or database calls. Read docs/proposals/PRODUCTION_LAUNCH_RUNBOOK_2026-11-02.md first.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='ai-transformation-510302'
+region='asia-southeast1'
+# USER EXECUTION ONLY. These resources cost money (REGIONAL Cloud SQL is roughly twice ZONAL). Review tier/budget first.
+# If a resource exists, inspect it and skip its CREATE command; never delete to rerun.
+gcloud sql instances create promptify-prod --database-version=POSTGRES_18 --edition=ENTERPRISE --tier=db-custom-2-8192 \
+ --availability-type=REGIONAL --enable-point-in-time-recovery --backup-start-time=18:00 --retained-backups-count=14 \
+ --deletion-protection --enable-google-ml-integration --database-flags=cloudsql.enable_google_ml_integration=on \
+ --region="$region" --project="$project"
+gcloud sql databases create promptify_db --instance=promptify-prod --project="$project"
+gcloud storage buckets create "gs://${project}-intrepid-sop-prod" --location="$region" --uniform-bucket-level-access --public-access-prevention --project="$project"
+gcloud storage buckets update "gs://${project}-intrepid-sop-prod" --cors-file=outputs/gcp/storage-cors.json --project="$project"
+gcloud secrets create intrepid-prod-db-password --replication-policy=automatic --project="$project"
+for name in promptify-prod-api promptify-prod-worker promptify-prod-scheduler; do
+ gcloud iam service-accounts create "$name" --project="$project"
+done
+gcloud tasks queues create promptify-judge-prod --location="$region" --max-concurrent-dispatches=3 --max-attempts=4 --min-backoff=30s --project="$project"
+# Hosting site of its own; the existing Firebase project (and its Auth users) is shared with staging.
+firebase hosting:sites:create "${project}-intrepid-prod" --project="$project"
+echo 'Created. Next (runbook steps 4-7): apply gcp/sql 001..021 to promptify-prod, runtime role/password, IAM (03 template with the prod names), build/deploy with gcp/production.env, alerts (11 template).'

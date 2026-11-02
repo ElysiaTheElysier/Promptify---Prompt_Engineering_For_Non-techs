@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Minimum production monitoring (blocker B4): uptime check, 5xx rate, Judge queue backlog, pool idle errors, budget.
+# Default --validate/--dry-run mode stops before any cloud call.
+case "${1:---validate}" in
+ --validate|--dry-run) printf '%s\n' 'LOCAL REVIEW ONLY: no cloud calls. Needs ALERT_EMAIL and BILLING_ACCOUNT from the owner.'; exit 0 ;;
+ --execute) : ;;
+ *) printf '%s\n' 'Usage: ALERT_EMAIL=... BILLING_ACCOUNT=... bash SCRIPT --validate | --execute'; exit 2 ;;
+esac
+project='ai-transformation-510302'
+service='promptify-intrepid-api-prod'
+: "${ALERT_EMAIL:?Set the alert recipient chosen by the product owner}"
+: "${BILLING_ACCOUNT:?Set the billing account id for the budget alert}"
+: "${MONTHLY_BUDGET:=200}"
+# USER EXECUTION ONLY.
+channel=$(gcloud beta monitoring channels create --display-name='Promptify production' --type=email \
+ --channel-labels=email_address="$ALERT_EMAIL" --project="$project" --format='value(name)')
+url=$(gcloud run services describe "$service" --region=asia-southeast1 --project="$project" --format='value(status.url)')
+gcloud monitoring uptime create promptify-prod-readyz --resource-type=uptime-url \
+ --resource-labels=host="${url#https://}",project_id="$project" --path=/readyz --period=5 --timeout=10 --project="$project"
+policy(){ # name, filter, comparison, threshold, duration, aligner
+ gcloud alpha monitoring policies create --project="$project" --notification-channels="$channel" \
+  --display-name="$1" --condition-display-name="$1" --condition-filter="$2" \
+  --if="$3 $4" --duration="$5" --aggregation="{\"alignmentPeriod\":\"300s\",\"perSeriesAligner\":\"$6\"}"
+}
+policy 'API 5xx > 5 in 5 min' \
+ "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"$service\" AND metric.type=\"run.googleapis.com/request_count\" AND metric.labels.response_code_class=\"5xx\"" \
+ '>' 5 0s ALIGN_SUM
+policy 'Judge queue depth > 20 for 10 min' \
+ 'resource.type="cloud_tasks_queue" AND resource.labels.queue_id="promptify-judge-prod" AND metric.type="cloudtasks.googleapis.com/queue/depth"' \
+ '>' 20 600s ALIGN_MAX
+# Log-based metric for the I02 handler; any idle pool error is worth a look.
+gcloud logging metrics create promptify_prod_sql_pool_idle_error --project="$project" \
+ --log-filter="resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"$service\" AND jsonPayload.event=\"sql_pool_idle_error\""
+policy 'SQL pool idle error' \
+ 'resource.type="cloud_run_revision" AND metric.type="logging.googleapis.com/user/promptify_prod_sql_pool_idle_error"' \
+ '>' 0 0s ALIGN_SUM
+gcloud billing budgets create --billing-account="$BILLING_ACCOUNT" --display-name='Promptify monthly' \
+ --budget-amount="${MONTHLY_BUDGET}USD" --threshold-rule=percent=0.5 --threshold-rule=percent=0.9 --threshold-rule=percent=1.0
+echo 'Alerts created. Send a test notification from the console and confirm the owner received it (runbook step 8).'
