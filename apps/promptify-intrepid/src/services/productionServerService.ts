@@ -1,5 +1,5 @@
 import {generationAsyncEnabled} from './generationQueueService';
-import {requireWorkspaceSource,requireWorkspaceFileUrl} from './workspaceSourcePolicyService';
+import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl} from './workspaceSourcePolicyService';
 import {driveFolderId} from './driveFolderService';
 import {withServiceScope,sqlTransaction} from './cloudPostgresService';
 import {bindPromptVariables} from './promptVariableService';
@@ -330,7 +330,7 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(!source)throw new ApiAccessError('Source access denied.',403);
       const metadata=source.metadata;
       if(metadata.sha256!==expectedSha256||typeof metadata.driveFileId!=='string'||!/^[A-Za-z0-9_-]+$/.test(metadata.driveFileId))throw new ApiAccessError('The canonical Drive original hash does not match.',409);
-      requireWorkspaceSource(cls.id,'files',metadata.driveFileId);
+      await requireWorkspaceFile(cls.id,metadata.driveFileId,listDriveFolder);
       if(metadata.storageBucket==='product-sop-originals'&&metadata.storagePath)return {versionId,restored:false};
       const extracted=await extractDriveSop(`https://drive.google.com/file/d/${metadata.driveFileId}/view`,{classId:cls.id,expectedSha256});
       const originalPointer=originalSnapshotPointer(metadata,extracted.metadata);
@@ -427,7 +427,7 @@ export async function handleProductRequest(authorization: string, body: any) {
       const target=await result<any>(c.server.from('lessons').select('id,status').eq('id',lessonId).in('module_id',modules.map(m=>m.id)).maybeSingle());
       if(!target||!cls.can_manage&&!(await snapshot(c,cls.id)).lessons.some((lesson:any)=>lesson.id===lessonId))throw new ApiAccessError('Lesson scope denied.',403);
       let source;
-      if(body.driveUrl){const url=text(body.driveUrl,1000);requireWorkspaceFileUrl(cls.id,url);source=await extractDriveSop(url,{classId:cls.id});}
+      if(body.driveUrl){const url=text(body.driveUrl,1000);await requireWorkspaceFileUrl(cls.id,url,listDriveFolder);source=await extractDriveSop(url,{classId:cls.id});}
       else if(body.storagePath){
         const filename=text(body.filename,160),path=text(body.storagePath,500),prefix=`${c.profile.id}/${cls.id}/${lessonId}/${requestId}/`;
         if(!path.startsWith(prefix)||path!==prefix+filename||! /^[A-Za-z0-9_. -]+\.(pdf|docx|xlsx|md|csv|txt)$/i.test(filename))throw new ApiAccessError('Private source scope denied.',403);
@@ -452,13 +452,13 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(body.decision==='reject'){await result(c.server.from('product_sop_contributions').update({status:'rejected',reviewed_by:c.profile.id,review_reason:text(body.reason)}).eq('id',id).eq('status','pending'));return {status:'rejected'};}
       if(body.decision!=='approve')throw new ApiAccessError('Review decision required.',422);
       if(source.metadata?.syncRequest&&!source.indexed_chunks){
-        requireWorkspaceFileUrl(cls.id,source.metadata.driveUrl);
+        await requireWorkspaceFileUrl(cls.id,source.metadata.driveUrl,listDriveFolder);
         const extracted=await extractDriveSop(source.metadata.driveUrl,{classId:cls.id});
         source={...source,...extracted,metadata:{...source.metadata,...extracted.metadata}};
         await result(c.server.from('product_sop_contributions').update({content:source.content,chunks:source.chunks,metadata:source.metadata}).eq('id',id).eq('status','pending'));
       }
       if(source.metadata?.driveFileId){
-        requireWorkspaceSource(cls.id,'files',source.metadata.driveFileId);
+        await requireWorkspaceFile(cls.id,source.metadata.driveFileId,listDriveFolder);
         if(!source.metadata.storagePath){
           if(!/^[a-f0-9]{64}$/.test(source.metadata.sha256||''))throw new ApiAccessError('The pending Drive source requires a canonical original hash before publication.',409);
           const stored=await extractDriveSop(`https://drive.google.com/file/d/${source.metadata.driveFileId}/view`,{classId:cls.id,expectedSha256:source.metadata.sha256});

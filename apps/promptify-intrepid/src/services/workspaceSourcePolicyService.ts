@@ -10,8 +10,18 @@ export function requireWorkspaceSource(classId:string,kind:'sheets'|'folders'|'f
  if(!Array.isArray(ids)||!ids.every(id=>typeof id==='string'&&/^[A-Za-z0-9_-]+$/.test(id))||!ids.includes(sourceId))throw new ApiAccessError('This Workspace source is not approved for this class. Ask an administrator to configure its source binding.',403);
 }
 
-export function requireWorkspaceFileUrl(classId:string,url:string){
+type FolderLister=(folderUrl:string)=>Promise<{files:Array<{id:string}>}>;
+/** A file is approved when its ID is bound to the class, or when Drive itself lists it inside a folder bound to the class.
+ * The folder check asks Drive (never trusts the supplied ID), so new files dropped into an approved folder need no redeploy. */
+export async function requireWorkspaceFile(classId:string,fileId:string,listFolder:FolderLister,configuration=process.env.WORKSPACE_SOURCE_BINDINGS_JSON){
+ try{requireWorkspaceSource(classId,'files',fileId,configuration);return;}catch(error){if((error as any)?.statusCode!==403)throw error;}
+ const entry=(JSON.parse(configuration||'{}') as Record<string,any>)[classId];
+ const folders=Array.isArray(entry?.folders)?entry.folders.filter((id:unknown)=>typeof id==='string'&&/^[A-Za-z0-9_-]+$/.test(id)):[];
+ for(const folder of folders){if((await listFolder('https://drive.google.com/drive/folders/'+folder)).files.some(file=>file.id===fileId))return;}
+ throw new ApiAccessError('This Workspace source is not approved for this class. Ask an administrator to configure its source binding.',403);
+}
+export async function requireWorkspaceFileUrl(classId:string,url:string,listFolder:FolderLister){
  const match=url.match(/^https:\/\/(?:drive|docs)\.google\.com\/(?:file\/d|document\/d|spreadsheets\/d)\/([A-Za-z0-9_-]+)(?:\/|$)/);
  if(!match)throw new ApiAccessError('A Google Drive or Google Docs file URL is required.',422);
- requireWorkspaceSource(classId,'files',match[1]);
+ await requireWorkspaceFile(classId,match[1],listFolder);
 }
