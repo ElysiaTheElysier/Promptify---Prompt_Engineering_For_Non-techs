@@ -59,6 +59,7 @@
     "verify_cloud_migration.ts",
     "verify_cloud_http.ts",
     "verify_sql_pool_errors.ts",
+    "verify_delayed_job_access.ts",
     "verify_cloud_export.mjs",
     "verify_gemini_run_evidence.ts",
     "verify_gemini_indexing_recovery.ts",

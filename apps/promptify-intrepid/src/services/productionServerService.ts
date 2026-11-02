@@ -87,7 +87,12 @@ function warnMissingDomainPolicy(clientId:string){
 async function classes(c: Context) {
  return c.classList??=readClasses(c);
 }
-async function readClasses(c: Context) {return withServiceScope(()=>readClassesScoped(c));}
+async function readClasses(c: Context) {
+  const rows=await withServiceScope(()=>readClassesScoped(c));
+  // Actor RPCs run after the service connection is released; opening them inside the scope can exhaust the pool (I01).
+  const manageable = c.profile.role==='admin'?rows.map(()=>({data:true})):await Promise.all(rows.map(row => c.reader.rpc('rebuild_can_manage_class', { p_class: row.id })));
+  return rows.map((row, i) => ({ ...row, client_name: row.client?.name || '', course_title: row.course?.title || '', can_manage: manageable[i].data === true || c.profile.role === 'admin' }));
+}
 async function readClassesScoped(c: Context) {
   let query = c.server.from('classes').select('*,client:clients(name),course:courses(title)');
   if (c.profile.role === 'instructor') {
@@ -109,10 +114,11 @@ async function readClassesScoped(c: Context) {
   if(c.profile.role!=='admin'){
     const domains=await result<any[]>(c.server.from('product_domains').select('client_id,domain,active'));
     const emailDomain=c.profile.email.split('@')[1];
-    rows=rows.filter(row=>{const configured=domains.filter(d=>d.client_id===row.client_id);if(!configured.length)warnMissingDomainPolicy(row.client_id);return !configured.length||configured.some(d=>d.active&&d.domain===emailDomain);});
+    // TM-002: DOMAIN_POLICY=require hides classes of clients with no domain configured (default: allowed, as before).
+    const requireDomain=process.env.DOMAIN_POLICY==='require';
+    rows=rows.filter(row=>{const configured=domains.filter(d=>d.client_id===row.client_id);if(!configured.length){warnMissingDomainPolicy(row.client_id);return !requireDomain;}return configured.some(d=>d.active&&d.domain===emailDomain);});
   }
-  const manageable = c.profile.role==='admin'?rows.map(()=>({data:true})):await Promise.all(rows.map(row => c.reader.rpc('rebuild_can_manage_class', { p_class: row.id })));
-  return rows.map((row, i) => ({ ...row, client_name: row.client?.name || '', course_title: row.course?.title || '', can_manage: manageable[i].data === true || c.profile.role === 'admin' }));
+  return rows;
 }
 async function classScope(c: Context, id: unknown, manage = false) {
   const selected = (await classes(c)).find(row => row.id === uuid(id));
@@ -134,7 +140,7 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
   const [departments,feedback]=await Promise.all([onboarding||!c.profile.profile_confirmed_at?departmentOptions(c,available):Promise.resolve(undefined),feedbackSnapshot(c.profile.id,selectedClass?.id)]);
   const empty = { ...feedback,departments, profile: c.profile, classes: available, selectedClass: selectedClass || null, lessons: [], attempts: [], sops: [], messages: [], privateHints: [], learners: [], analytics: {}, controls: { state: 'active', revision: 0 }, connections: [], audit: [] };
   if (!selectedClass || onboarding || !c.profile.profile_confirmed_at) return empty;
-  return withServiceScope(async()=>{
+  const {data,learnerId}=await withServiceScope(async()=>{
   let moduleQuery = c.server.from('course_modules').select('id').eq('course_id', selectedClass.course_id);
   if (!selectedClass.can_manage) moduleQuery = moduleQuery.eq('status', 'published');
   const [modules,configs,controls]=await Promise.all([result<any[]>(moduleQuery),result<any[]>(c.server.from('product_studio').select('lesson_id,config,revision').eq('class_id',selectedClass.id)),result<any>(c.server.from('product_session_controls').select('state,revision').eq('class_id',selectedClass.id).maybeSingle())]);
@@ -158,15 +164,13 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
   if(c.profile.role==='head')libraryQuery=libraryQuery.or(`owner_id.eq.${c.profile.id},status.eq.pending,status.eq.approved`);
   else if(c.profile.role!=='admin')libraryQuery=libraryQuery.or(`owner_id.eq.${c.profile.id},status.eq.approved`);
   // All branches retain their original actor/class/lesson filters. The bounded SQL pool limits concurrency.
-  const [attempts,support,enrollmentRows,sopDocs,bindings,rawContributions,messages,privateHints,connections,syncLogs,drafts,progress,promptLibrary,learnerContexts]=await Promise.all([
+  const [attempts,support,enrollmentRows,sopDocs,bindings,rawContributions,connections,syncLogs,drafts,progress,promptLibrary,learnerContexts]=await Promise.all([
     result<any[]>(attemptsQuery),
     learnerId?result<any[]>(c.server.from('product_learner_support').select('lesson_id,kind').eq('learner_id',learnerId).eq('class_id',selectedClass.id)):Promise.resolve([]),
     result<any[]>(c.server.from('enrollments').select('learner_id,learner:learners(id,user:users(full_name,email))').eq('class_id',selectedClass.id).eq('status','active')),
     result<any[]>(c.server.from('rebuild_sop_documents').select('id,title').eq('class_id',selectedClass.id)),
     lessons.length?result<any[]>(c.server.from('rebuild_sop_bindings').select('version_id,lesson_id').eq('class_id',selectedClass.id).in('lesson_id',lessons.map(l=>l.id))):Promise.resolve([]),
     result<any[]>(contributionQuery),
-    c.profile.role==='learner'?result<any[]>(c.reader.rpc('rebuild_workshop_inbox',{p_class:selectedClass.id})):Promise.resolve([]),
-    learnerId?result<any[]>(c.reader.from('trainer_hints').select('id,message,created_at').eq('class_id',selectedClass.id).eq('learner_id',learnerId).order('created_at',{ascending:false}).limit(20)):Promise.resolve([]),
     selectedClass.can_manage?result<any[]>(c.server.from('product_sheet_connections').select('id,class_id,sheet_id,name,column_mapping,last_synced_at,status,auto_sync,last_attempt_at').eq('class_id',selectedClass.id)):Promise.resolve([]),
     selectedClass.can_manage?result<any[]>(c.server.from('product_sync_logs').select('id,connection_id,status,processed,result,error_code,created_at,finished_at').eq('class_id',selectedClass.id).order('created_at',{ascending:false}).limit(100)):Promise.resolve([]),
     result<any[]>(c.server.from('product_prompt_drafts').select('lesson_id,prompt,revision').eq('user_id',c.profile.id).eq('class_id',selectedClass.id)),
@@ -201,7 +205,7 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
   const isLearner=c.profile.role==='learner';
   const [access,sessions,expiries,supportQueue,ownHintRequests]=await Promise.all([isLearner?learnerAccess(c.profile.id,selectedClass.id):Promise.resolve(undefined),isLearner?aiSessions(c.profile.id,selectedClass.id):Promise.resolve([]),selectedClass.can_manage&&accessExpiryEnabled()?classAccessExpiries(selectedClass.id):Promise.resolve({} as Record<string,string>),selectedClass.can_manage?classHintRequests(selectedClass.id):Promise.resolve([]),learnerId?learnerHintRequests(learnerId,selectedClass.id):Promise.resolve([])]);
   const totals = attempts.map(a => a.evaluation_json?.total).filter(v => typeof v === 'number');
-  return { ...empty, lockedLessons,promptLibrary,learnerContexts,modelInfo:{name:process.env.GEMINI_MODEL||'gemini-2.5-flash',allowed:[process.env.GEMINI_MODEL||'gemini-2.5-flash',process.env.GEMINI_FALLBACK_MODEL].filter(Boolean)},awards,attendance,contributions,syncLogs,trainerNotes,drafts,progress, controls: controls || { state: 'active', revision: 0 }, attempts: c.profile.role === 'head' ? [] : attempts, learners:learners.map(row=>({...row,access_expires_at:expiries[row.id]||null})), sops, learnerAccess:access&&{...access,warningDays:ACCESS_EXPIRY_WARNING_DAYS}, aiSessions:sessions, aiSessionCap:isLearner?sessionTokenCap():0, accessExpiryEnabled:selectedClass.can_manage&&accessExpiryEnabled(), supportRequests:supportQueue, hintRequests:ownHintRequests, messages, privateHints, connections,
+  return {learnerId,data:{ ...empty, lockedLessons,promptLibrary,learnerContexts,modelInfo:{name:process.env.GEMINI_MODEL||'gemini-2.5-flash',allowed:[process.env.GEMINI_MODEL||'gemini-2.5-flash',process.env.GEMINI_FALLBACK_MODEL].filter(Boolean)},awards,attendance,contributions,syncLogs,trainerNotes,drafts,progress, controls: controls || { state: 'active', revision: 0 }, attempts: c.profile.role === 'head' ? [] : attempts, learners:learners.map(row=>({...row,access_expires_at:expiries[row.id]||null})), sops, learnerAccess:access&&{...access,warningDays:ACCESS_EXPIRY_WARNING_DAYS}, aiSessions:sessions, aiSessionCap:isLearner?sessionTokenCap():0, accessExpiryEnabled:selectedClass.can_manage&&accessExpiryEnabled(), supportRequests:supportQueue, hintRequests:ownHintRequests, connections,
     lessons: lessons.map(l => {
       const config = configs.find(r => r.lesson_id === l.id);
       const { improved_prompt: solution, hints, system_instruction: system, ...safeLesson } = l;
@@ -212,8 +216,14 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
       return { ...(selectedClass.can_manage ? l : safeLesson), studio: config ? { ...config.config, ...(selectedClass.can_manage?{}:{lessonOverrides:undefined}), revision: config.revision } : null, rubric: config?.config?.rubric || DEFAULT_RUBRIC };
     }),
     analytics: { enrolled: enrollmentRows.length, attempts: attempts.length, evaluated: totals.length, average_score: totals.length ? totals.reduce((a, b) => a + b, 0) / totals.length : null, data_limit: 200, truncated: attempts.length === 200 },
-  };
+  }};
   });
+  // Actor/RLS reads run after the service connection is released (I01).
+  const [messages,privateHints]=await Promise.all([
+    c.profile.role==='learner'?result<any[]>(c.reader.rpc('rebuild_workshop_inbox',{p_class:selectedClass.id})):Promise.resolve([]),
+    learnerId?result<any[]>(c.reader.from('trainer_hints').select('id,message,created_at').eq('class_id',selectedClass.id).eq('learner_id',learnerId).order('created_at',{ascending:false}).limit(20)):Promise.resolve([])
+  ]);
+  return {...data,messages,privateHints};
 }
 export async function handleProductRequest(authorization: string, body: any) {
   if(body?.action==='supportConfig')return publicSupport(uuid(body.classId));
@@ -226,6 +236,8 @@ export async function handleProductRequest(authorization: string, body: any) {
     return result(server.rpc('product_submit_enterprise_request',{p_request:uuid(body.requestId),p_company:text(body.company,200),p_tax:typeof body.taxId==='string'?body.taxId.slice(0,80):'',p_employees:body.employees,p_email:email}));
   }
   if(body?.action==='enrollBasic'){
+    // Public Basic is out of Phase 1 scope (D11); production sets DISABLE_PUBLIC_BASIC=true (TM-005).
+    if(process.env.DISABLE_PUBLIC_BASIC==='true')throw new ApiAccessError('Public Basic enrollment is not available.',403);
     if(!/^Bearer\s+\S+$/i.test(authorization))throw new ApiAccessError('Please sign in.',401);
     try{requireCloudDatabase();}catch{throw new ApiAccessError('Cloud SQL server configuration unavailable.',503);}
     const server=createDatabaseClient();
@@ -596,7 +608,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     }
     case 'governance': {
       if (c.profile.role !== 'admin') throw new ApiAccessError('System administrator required.', 403);
-      return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };
+      return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at,actor:users(full_name,email)').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };
     }
     default: throw new ApiAccessError('This action has no production handler.', 422);
   }

@@ -160,4 +160,11 @@ assert.equal(workspace.includes("unlock('hints')"),false,'no self-unlock of hint
 assert.ok(workspace.includes('<HintRequestPanel'));
 const server=fs.readFileSync('src/services/productionServerService.ts','utf8');
 assert.ok(server.includes("if(c.profile.role==='learner')throw new ApiAccessError('Hints are now requested from your facilitator"));
+// I10: the pending-count decision runs under a per-learner/class/lesson transaction lock. Offline PGlite has one
+// connection, so this checks the order of statements, not a real two-connection race.
+const seenSql:string[]=[];
+configureSqlPoolForTests({async connect(){return {async query(sql:string,values:any[]=[]){seenSql.push(sql);return {rows:JSON.parse(JSON.stringify((await db.query(sql,values)).rows))};},release(){}};}});
+await createHintRequest(id(1),id(6),id(19),id(70),reason);
+const lockAt=seenSql.findIndex(s=>s.includes('pg_advisory_xact_lock')),countAt=seenSql.findIndex(s=>s.includes("count(*) AS n FROM public.product_hint_requests"));
+assert.ok(lockAt>=0&&lockAt<countAt,'lock is taken before the pending count');
 console.log('verify_workshop_messaging: PASS');

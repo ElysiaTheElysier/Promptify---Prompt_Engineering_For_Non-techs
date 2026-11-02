@@ -35,6 +35,8 @@ export async function createHintRequest(userId:string,classId:string,lessonId:st
  try{return await sqlTransaction(undefined,async db=>{
   const learner=(await db.query("SELECT le.id FROM public.learners le JOIN public.enrollments e ON e.learner_id=le.id AND e.class_id=$2 AND e.status='active' WHERE le.user_id=$1",[userId,classId])).rows[0];
   if(!learner)throw new ApiAccessError('Learner is not active in this class.',403);
+  // I10: serialize count+insert per learner/class/lesson so two tabs at 4 pending cannot both pass the limit.
+  await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',['hint:'+learner.id+':'+classId+':'+lessonId]);
   const same=(await db.query('SELECT * FROM public.product_hint_requests WHERE learner_id=$1 AND request_id=$2',[learner.id,requestId])).rows[0];
   if(same){if(same.class_id!==classId||same.lesson_id!==lessonId)throw new ApiAccessError('This request ID was already used for another lesson.',409);return shape(same);}
   // Several open requests per lesson are allowed (018), bounded so a learner cannot flood the facilitator queue.

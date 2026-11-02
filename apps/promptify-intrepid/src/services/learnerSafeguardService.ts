@@ -13,8 +13,9 @@ export function safeguardsEnabled(){return accessExpiryEnabled()||sessionTokenCa
 export const ACCESS_EXPIRY_WARNING_DAYS=7;
 
 const rows=<T=any>(query:string,values:any[]=[])=>sqlTransaction(undefined,async db=>(await db.query(query,values)).rows as T[]);
-/** 016 not applied yet: behave as if the feature were off rather than breaking Runs. */
+/** 016 not applied yet: displays degrade to empty, enforcement (flag on) refuses with 503. */
 const schemaMissing=(error:unknown)=>['42P01','42703'].includes((error as any)?.code);
+const safeguardSchemaError=()=>Object.assign(new ApiAccessError('The learner safeguards schema upgrade (016) has not been applied.',503),{code:'safeguard_schema_missing'});
 
 export async function userIdForSubject(subject:string){
  const [row]=await rows<{id:string}>('SELECT id FROM public.users WHERE auth_provider_id=$1',[subject]);
@@ -22,7 +23,7 @@ export async function userIdForSubject(subject:string){
  return row.id;
 }
 
-export type LearnerAccess={expiresAt:string|null;readOnly:boolean};
+export type LearnerAccess={expiresAt:string|null;readOnly:boolean;unavailable?:boolean};
 export async function learnerAccess(userId:string,classId:string,at=Date.now()):Promise<LearnerAccess>{
  if(!accessExpiryEnabled())return {expiresAt:null,readOnly:false};
  try{
@@ -30,13 +31,15 @@ export async function learnerAccess(userId:string,classId:string,at=Date.now()):
   const value=row?.access_expires_at;if(!value)return {expiresAt:null,readOnly:false};
   const expiresAt=new Date(value).toISOString();
   return {expiresAt,readOnly:Date.parse(expiresAt)<=at};
- }catch(error){if(schemaMissing(error))return {expiresAt:null,readOnly:false};throw error;}
+ }catch(error){if(schemaMissing(error))return {expiresAt:null,readOnly:false,unavailable:true};throw error;}
 }
 export function accessExpiredError(expiresAt:string){
  return Object.assign(new ApiAccessError(`Your access to this class expired on ${expiresAt.slice(0,10)}. The workspace is read-only; contact your L&D administrator to extend access.`,403),{code:'access_expired'});
 }
 export async function assertWritableAccess(userId:string,classId:string,at=Date.now()){
  const access=await learnerAccess(userId,classId,at);
+ // Enforcement on but 016 missing: fail closed before any provider call (I03).
+ if(access.unavailable)throw safeguardSchemaError();
  if(access.readOnly&&access.expiresAt)throw accessExpiredError(access.expiresAt);
  return access;
 }
@@ -51,7 +54,7 @@ export async function assertSessionBudget(userId:string,classId:string,lessonId:
  const cap=sessionTokenCap();if(!cap)return;
  let used=0;
  try{used=(await rows<{tokens_used:number}>('SELECT tokens_used FROM public.product_ai_sessions WHERE user_id=$1 AND class_id=$2 AND lesson_id=$3',[userId,classId,lessonId]))[0]?.tokens_used||0;}
- catch(error){if(schemaMissing(error))return;throw error;}
+ catch(error){if(schemaMissing(error))throw safeguardSchemaError();throw error;}
  if(used>=cap)throw Object.assign(new ApiAccessError(`This lesson session has used ${used.toLocaleString('en-US')} of its ${cap.toLocaleString('en-US')} AI tokens. Start a new session to continue, or contact your L&D administrator.`,429),{code:'session_token_cap'});
 }
 /** Provider usage when reported, otherwise ~4 characters per token over prompt, context and output. */
@@ -106,6 +109,17 @@ export async function preflightRun(input:{subject:string;classId:string;lessonId
  return userId;
 }
 
+/** I05: a queued job re-checks, right before its provider call, what the request checked at enqueue: class access under
+ * the owner's RLS scope, access expiry and (Generation) the session budget. Workers have no Bearer token, only the subject. */
+export async function assertDelayedJobAccess(subject:string,classId:string,lessonId:string,budget:boolean){
+ const visible=await sqlTransaction({subject,email:'',firebaseUid:''},async db=>(await db.query('SELECT 1 FROM public.classes WHERE id=$1',[classId])).rows.length>0);
+ if(!visible)throw Object.assign(new ApiAccessError('Class access was revoked before this job ran.',403),{code:'access_revoked'});
+ if(!accessExpiryEnabled()&&!(budget&&sessionTokenCap()))return;
+ const userId=await userIdForSubject(subject);
+ await assertWritableAccess(userId,classId);
+ if(budget)await assertSessionBudget(userId,classId,lessonId);
+}
+
 /** Trainer/admin action; the change and its actor are written to product_audit in the same transaction. */
 export async function setAccessExpiry(classId:string,learnerId:string,expiresAt:string|null,actorId:string){
  if(expiresAt!==null&&(typeof expiresAt!=='string'||!Number.isFinite(Date.parse(expiresAt))))throw new ApiAccessError('Invalid access expiry date.',422);
@@ -115,7 +129,7 @@ export async function setAccessExpiry(classId:string,learnerId:string,expiresAt:
   if(!row)throw new ApiAccessError('Learner is not enrolled in this class.',404);
   await db.query('INSERT INTO public.product_audit(class_id,actor_id,action,reason) VALUES($1,$2,$3,$4)',[classId,actorId,'access.expiry',learnerId+' / '+(value||'none')]);
   return {learnerId:row.learner_id,accessExpiresAt:row.access_expires_at?new Date(row.access_expires_at).toISOString():null};
- });}catch(error){if(schemaMissing(error))throw new ApiAccessError('The learner safeguards schema upgrade (016) has not been applied.',503);throw error;}
+ });}catch(error){if(schemaMissing(error))throw safeguardSchemaError();throw error;}
 }
 /** Lesson must belong to the class's course; used before resetting a session. */
 export async function lessonInClass(classId:string,lessonId:string){

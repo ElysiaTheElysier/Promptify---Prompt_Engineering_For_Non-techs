@@ -22,3 +22,16 @@ await Promise.all([1,2].map(n=>withServiceScope(()=>sqlTransaction(undefined,db=
 assert.equal(connections.length,before+2,'concurrent requests never share their service connection');
 assert.ok(connections.slice(before).every(c=>c.queries.filter(q=>q.startsWith('SELECT request_')).length===1));
 console.log('SQL service scope PASS: fewer transactions, actor isolation, rollback/release and request isolation.');
+// I01: actor (RLS) reads open a second connection; inside a service scope that holds one, five requests can exhaust the pool.
+const {readFileSync}=await import('node:fs');
+const server=readFileSync(new URL('../src/services/productionServerService.ts',import.meta.url),'utf8');
+let scopes=0;
+for(let at=server.indexOf('withServiceScope(');at>=0;at=server.indexOf('withServiceScope(',at+1)){
+ if(server.slice(Math.max(0,at-7),at)==='import ')continue;
+ let depth=0,end=at+'withServiceScope'.length;
+ do{if(server[end]==='(')depth++;else if(server[end]===')')depth--;end++;}while(depth>0&&end<server.length);
+ const body=server.slice(at,end);if(body.includes('{withServiceScope'))continue;
+ scopes++;assert.ok(!/c\.reader\b/.test(body),'no actor read inside a service scope: '+body.slice(0,80));
+}
+assert.ok(scopes>=2,'service scopes found in productionServerService');
+console.log('SQL service scope PASS: no actor reads inside service scopes.');

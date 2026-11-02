@@ -130,5 +130,15 @@ const report=await call('head-a',{action:'analytics'});
 assert.ok((report.classes||[]).every((row:any)=>row.id!==id(B.cls)),'head A analytics exclude class B');
 
 assert.deepEqual(await companyB(),before,'no probe changed any company B row');
+// TM-002: a client with no domain configured stays visible by default and is hidden under DOMAIN_POLICY=require.
+await db.query('DELETE FROM product_domains WHERE client_id=$1',[id(A.client)]);
+assert.deepEqual((await call('learner-a',{action:'snapshot'})).classes.map((row:any)=>row.id),[id(A.cls)],'no domain configured: allowed by default');
+process.env.DOMAIN_POLICY='require';
+assert.deepEqual((await call('learner-a',{action:'snapshot'})).classes,[],'no domain configured: hidden when required');
+delete process.env.DOMAIN_POLICY;
+// TM-005: production refuses public Basic enrollment before any identity or database work.
+process.env.DISABLE_PUBLIC_BASIC='true';
+await assert.rejects(()=>call('learner-a',{action:'enrollBasic'}),(e:any)=>e.statusCode===403);
+delete process.env.DISABLE_PUBLIC_BASIC;
 await db.close();
 console.log(`Tenant isolation PASS: ${classActions.length} class-scoped actions x 3 company A roles denied on company B; ${nested.length+1} nested company B IDs rejected; company B rows unchanged; offline verifier only.`);

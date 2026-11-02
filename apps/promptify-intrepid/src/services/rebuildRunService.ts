@@ -12,7 +12,7 @@ import { assertAiLessonAccess, ApiAccessError, identityError } from './apiAuthor
 import { handleGenerateRequest, handleEvaluateRequest, AiServerError } from './apiServerService.js';
 import { productionGenerate, productionGenerateStream, productionEvaluate } from './productionAiService.js';
 import type {JudgeHooks,JudgeStageStore,CriterionProgress} from './parallelJudgeService.js';
-import {preflightRun,chargeSession,runTokens,sessionTokenCap,accessExpiryEnabled,userIdForSubject,assertWritableAccess} from './learnerSafeguardService';
+import {preflightRun,chargeSession,runTokens,sessionTokenCap,accessExpiryEnabled,userIdForSubject,assertWritableAccess,assertDelayedJobAccess} from './learnerSafeguardService';
 import { piiSignals } from './piiGuardService.js';
 import { DEFAULT_RUBRIC, validateRubric } from './weightedRubricService.js';
 import { createJudgeTask, newJudgeToken, judgeTokenSha, JUDGE_JOB_DEADLINE_MS, JUDGE_JOB_LEASE_SECONDS, JUDGE_JOB_TTL_SECONDS, JUDGE_MAX_DISPATCHES, type JudgeTask } from './judgeQueueService.js';
@@ -162,12 +162,13 @@ function progressFrom(stages:Array<{stage:string;view:any}>){
   const verified=stages.find(row=>row.stage==='supervisor')?.view?.taskAttempt===true;
   return {graded:rows.length,criteria:verified?rows.map(row=>row.view as CriterionProgress):[]};
 }
-type JudgeServiceOptions={generationQueue?:(task:GenerationTask)=>Promise<void>;queue?:(task:JudgeTask)=>Promise<void>;identify?:typeof identifyLearner;workerServer?:()=>any;streamGenerate?:typeof productionGenerateStream};
+type JudgeServiceOptions={generationQueue?:(task:GenerationTask)=>Promise<void>;queue?:(task:JudgeTask)=>Promise<void>;identify?:typeof identifyLearner;workerServer?:()=>any;streamGenerate?:typeof productionGenerateStream;delayedAccess?:typeof assertDelayedJobAccess};
+const DELAYED_DENIALS=new Set(['access_revoked','access_expired','session_token_cap','safeguard_schema_missing']);
 /** TC-AUTH-04: an expired learner keeps read access but cannot start AI work. */
 async function assertNotReadOnly(subject:string,classId:string){if(accessExpiryEnabled())await assertWritableAccess(await userIdForSubject(subject),classId);}
 export function createRebuildRunService(resolve=context, generate=productionGenerate, evaluate: (body: any, deadlineMs?: number, hooks?: JudgeHooks) => Promise<any> = productionEvaluate,
   retrieval={pgvector:retrievePgvectorContext,bigquery:retrieveBigqueryContext}, now=()=>Date.now(), options:JudgeServiceOptions={}) {
-const queue=options.queue||createJudgeTask, identify=options.identify||identifyLearner, workerServer=options.workerServer||(()=>createDatabaseClient());
+const queue=options.queue||createJudgeTask, identify=options.identify||identifyLearner, workerServer=options.workerServer||(()=>createDatabaseClient()), delayedAccess=options.delayedAccess||assertDelayedJobAccess;
 // Injected resolvers (tests) keep resolving enqueue too; production uses the lighter Judge gate.
 const resolveJudge=resolve===context?judgeContext:resolve;
 /** onDelta streams provider text (TC-PLAY-02); the saved result and all checks are identical to the JSON path. */
@@ -424,6 +425,12 @@ async function runJudgeJob(token: string, attemptId: string): Promise<{http:numb
     server.from('product_judge_jobs').select('created_at').eq('attempt_id',attemptId).maybeSingle()]);
   if(!attempt||!run){await settle('failed','evidence_missing');return {http:200,status:'failed'};}
   let controlData;try{controlData=judgeEvidence(run.snapshot);}catch{await settle('failed','evidence_inconsistent');return {http:200,status:'failed'};}
+  // I05: revocation or expiry while queued ends the job without a provider call; a failed check retries.
+  try{await delayedAccess(lease.subject,attempt.class_id,attempt.lesson_id,false);}
+  catch(error){
+    if((error as any)?.statusCode!==403&&lease.dispatch_count<JUDGE_MAX_DISPATCHES){await settle('retry_wait','access_check_unavailable');return {http:503,status:'retry_wait'};}
+    await settle('failed',typeof (error as any)?.code==='string'?(error as any).code:'access_check_unavailable');return {http:200,status:'failed'};
+  }
   let evaluation;
   const queueWaitMs=jobRow?.created_at?leasedAt-Date.parse(jobRow.created_at):null,evaluateStarted=now();
   try{evaluation=await withProviderScope({tenant:lease.subject,correlationId:attemptId},()=>evaluate(judgeInput(attempt,run.snapshot,controlData),JUDGE_JOB_DEADLINE_MS,{stages:judgeStageStore(server,attemptId)}));}
@@ -521,6 +528,8 @@ async function runGenerationJob(token:string,subject:string,requestId:string):Pr
    await assertCurrentCodelab();
   }
   const inputContext=judgeEvidence(s);
+  // I05: expiry or an exhausted session budget while queued ends the job before the provider call.
+  await delayedAccess(subject,lease.class_id,lease.lesson_id,true);
   const remaining=Math.min(240000,Date.parse(lease.lease_until)-now()-15000);
   if(!Number.isFinite(remaining)||remaining<1000)throw new ApiAccessError('Generation lease has insufficient time remaining.',503);
   result=await withProviderScope({tenant:subject,correlationId:requestId},()=>generate({prompt:lease.prompt,classId:lease.class_id,lessonId:lease.lesson_id,settings:s.generation_settings,inputContext,systemInstruction:s.system_instruction||undefined},remaining));
@@ -528,8 +537,10 @@ async function runGenerationJob(token:string,subject:string,requestId:string):Pr
  }catch(cause){
   const code=(cause as any)?.statusCode;
   // A timeout may have been billed. Never automatically repeat an uncertain generation.
-  const retry=[429,503].includes(code)&&lease.dispatch_count<3;
-  const {error:settleError}=await server.rpc('product_fail_generation',{p_subject:subject,p_request:requestId,p_fence:fence,p_retry:retry,p_error:typeof (cause as any)?.code==='string'&&(cause as any).code.startsWith('admission_')?(cause as any).code:typeof code==='number'?'provider_'+code:'invalid_result'});
+  const causeCode=(cause as any)?.code,delayedDenial=DELAYED_DENIALS.has(causeCode),denial=delayedDenial||typeof causeCode==='string'&&causeCode.startsWith('admission_');
+  // A session-cap 429 or revocation is final; capacity 429/503 retries.
+  const retry=!delayedDenial&&[429,503].includes(code)&&lease.dispatch_count<3;
+  const {error:settleError}=await server.rpc('product_fail_generation',{p_subject:subject,p_request:requestId,p_fence:fence,p_retry:retry,p_error:denial?causeCode:typeof code==='number'?'provider_'+code:'invalid_result'});
   return {http:settleError?503:retry?503:200,status:settleError?'settle_unconfirmed':retry?'retry_wait':'failed'};
  }
  const {data:saved,error:saveError}=await server.rpc('product_finish_generation',{p_subject:subject,p_request:requestId,p_fence:fence,p_result:result});
