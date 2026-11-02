@@ -8,6 +8,8 @@ function visit(node){if(ts.isVariableDeclaration(node)&&node.name.getText(ast)==
  ts.forEachChild(node,visit);}visit(ast);
 assert.ok(scoped,'scoped shell exists');
 for(const ui of [9,11,14,15])assert.ok(earlyReturns.includes(ui),`ui ${ui} renders through scoped()`);
-assert.ok(/editor&&snapshot\?\.selectedClass&&\[9,11,14,15\]\.includes\(currentUi\)&&<ProductionCohorts /.test(scoped),'scoped shell mounts ProductionCohorts for editors on 9/11/14/15');
+// Since 01/11 it opens from the header menu of every staff screen instead of sitting under four of them.
+assert.ok(/onManageCohorts=\{editor&&snapshot\?\.selectedClass\?/.test(scoped),'header menu offers Manage cohorts to class managers');
+assert.ok(/cohortsOpen&&editor&&snapshot\?\.selectedClass&&<ProductDialog[\s\S]*?><ProductionCohorts /.test(scoped),'scoped shell mounts ProductionCohorts in a dialog for editors');
 assert.equal(source.match(/<ProductionCohorts /g).length,1,'cohort manager mounted exactly once');
-console.log('Cohort manager mount PASS: Manage cohorts renders inside the staff shell on Workshop, Studio, Governance and Roster for class managers.');
+console.log('Cohort manager mount PASS: Manage cohorts opens from the staff header menu for class managers, mounted once inside the shell.');

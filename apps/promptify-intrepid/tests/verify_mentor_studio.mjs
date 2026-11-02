@@ -9,7 +9,8 @@ vm.runInNewContext(code,{module,exports:module.exports,require,structuredClone,D
 const lesson={id:'lab',lesson_key:'L1',title:'Lesson',scenario:'brief',task_goal:'goal',system_instruction:'old',starter_prompt:'prompt',studio:{revision:1,scaffold:[],variables:[],materials:[],rubric,awards:{}}};
 const props={snapshot:{selectedClass:{id:'class',client_id:'client',client_name:'Client',class_code:'C',department:'Tech'},classes:[],lessons:[lesson],attempts:[],sops:[]},busy:false,onAction:async(name,payload,after)=>{calls.push({name,payload});after?.(name==='saveStudio'?{revision:2}:{output:'result'});},navigate(){}};
 const render=()=>{cursor=0;rc=0;return module.exports.default(props);};
-const nodes=x=>!x||typeof x!=='object'?[]:[x,...[x.props?.children].flat(Infinity).flatMap(nodes)];
+// ShellHeader carries the screen's header actions in props, so walk those slots too.
+const nodes=x=>!x||typeof x!=='object'?[]:[x,...[x.props?.children,x.props?.heading,x.props?.actions].flat(Infinity).flatMap(nodes)];
 const text=x=>typeof x==='string'?x:x&&typeof x==='object'?[x.props?.children].flat(Infinity).map(text).join(''):'';
 render();states[0]={...states[0],viewMode:'studio',activeTab:'scope',selectedLab:{...states[0].selectedLab,id:'lab',code:'L1',title:'Lesson'},sandboxPrompt:'prompt'};
 let tree=render();nodes(tree).find(n=>n.type==='textarea'&&n.props.value==='').props.onChange({target:{value:'updated'}});

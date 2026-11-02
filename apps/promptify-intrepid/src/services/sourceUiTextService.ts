@@ -582,9 +582,6 @@ Quản trị Promptify|Promptify Governance
 Đang bật|active
 Điều khiển phiên của giảng viên|Trainer session control
 Trainer session control|Facilitator session control
-Facilitator / Trainer Portal|Facilitator portal
-Quick Broadcast SLA Hint to All Student Workspaces (UI-05):|Broadcast a hint to every learner workspace:
-Send Private Hint to Student Workspace:|Send a private hint to this learner:
 Nhận xét và thiết lập sinh|Feedback & generation settings
 Xuất báo cáo tác động học tập|Export learning impact report
 Nguồn phòng ban đã xuất bản|Published department sources

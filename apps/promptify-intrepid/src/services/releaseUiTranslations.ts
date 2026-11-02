@@ -531,4 +531,8 @@ Lớp đang chọn · ngày Việt Nam · chỉ Generate|Selected cohort · Viet
 Lượt thực thi đã ghi|Recorded executions
 Lượt có số đo token|Token measurements
 Số liệu một phần: 10.000 lượt thực thi đầu tiên|Partial telemetry: first 10,000 executions
+Studio chương trình|Curriculum Studio
++ Tạo bài lab mới|+ Create New Lab
+Liên hệ phụ trách đào tạo doanh nghiệp|Contact Enterprise Training Lead
+Quản trị viên Promptify|Promptify Admin
 `;

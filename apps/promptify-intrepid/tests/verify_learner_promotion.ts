@@ -61,7 +61,8 @@ assert.deepEqual((await db.query('SELECT permission FROM course_instructors WHER
 const server=fs.readFileSync('src/services/productionServerService.ts','utf8');
 assert.ok(server.includes("'reviewHintRequest','promoteLearner'].includes(body.action)"),'promoteLearner requires class management scope');
 assert.ok(server.includes("case 'promoteLearner':")&&server.includes("if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);"));
-assert.ok(fs.readFileSync('src/components/rebuild/ProductionApp.tsx','utf8').includes('<PromoteLearnerForm snapshot={snapshot} busy={busy} onAction={action}/>'));
+// The form lives in Governance tab 3 (Domain Guard & Tenant Whitelist) since 01/11.
+assert.ok(fs.readFileSync('src/components/rebuild/ProductionGovernanceSource.tsx','utf8').includes('<PromoteLearnerForm snapshot={snapshot} busy={busy} onAction={onAction}/>'));
 
 // Rollback removes only the function; the promotion stays.
 await db.exec(fs.readFileSync('gcp/sql/rollback/019_promote_learner_to_instructor.sql','utf8'));

@@ -7,47 +7,66 @@
  --pi-paper:#f3f6f4;--pi-surface:#fff;--pi-line:#d6e1dc;--pi-line-soft:#e8efeb;
  --pi-ink:#15231e;--pi-muted:#56675f;--pi-amber:#a35208;--pi-danger:#b42318;
  --pi-radius-sm:8px;--pi-radius:12px;--pi-radius-lg:16px;--pi-shadow-overlay:0 18px 48px #0f2a2233;
- --app-header-h:104px;--app-bar-h:104px;
+ --app-header-h:64px;--app-bar-h:64px;
  min-height:100dvh;background:var(--pi-paper);color:var(--pi-ink);
  font-family:'Be Vietnam Pro',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent
 }
 .app-skip{position:absolute;left:12px;top:-60px;z-index:80;padding:10px 14px;border-radius:var(--pi-radius-sm);background:var(--pi-surface);color:var(--pi-ink);font-weight:600;box-shadow:var(--pi-shadow-overlay)}
 .app-skip:focus{top:12px}
 
-/* Header: brand, cohort and account row, then the role's tabs */
-.app-header{position:sticky;top:0;z-index:40;background:var(--pi-pine);color:#d9ebe3}
-.app-header-row{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px clamp(16px,2.5vw,32px) 4px}
-.app-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:18px;font-weight:700;letter-spacing:-.01em}
-.app-stage{flex-shrink:0;font-size:12px;font-weight:600;color:#ffd59a;border:1px solid #ffd59a66;border-radius:999px;padding:1px 9px}
-.app-class-picker{appearance:none;flex:0 1 360px;min-width:0;height:38px;margin-left:8px;padding:0 36px 0 12px;border:1px solid #ffffff33;border-radius:var(--pi-radius-sm);color:#fff;font:inherit;font-size:14px;font-weight:600;text-overflow:ellipsis;cursor:pointer;
- background:#ffffff12 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%23d9ebe3' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center}
-.app-class-picker:hover{background-color:#ffffff1f}
-.app-class-picker option{color:var(--pi-ink);background:#fff}
-.app-header-actions{display:flex;align-items:center;gap:4px;margin-left:auto}
-.app-language{display:inline-flex;padding:3px;border:1px solid #ffffff2e;border-radius:999px}
-.app-language button{min-width:38px;height:28px;padding:0 10px;border:0;border-radius:999px;background:transparent;color:#a9c7ba;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
-.app-language button[aria-pressed=true]{background:var(--pi-paper);color:var(--pi-pine)}
-.app-header-button{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 12px;border:0;border-radius:var(--pi-radius-sm);background:transparent;color:#c4ddd2;font:inherit;font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer;transition:background-color .15s,color .15s}
-.app-header-button:hover{background:#ffffff14;color:#fff}
-.app-tabs{display:flex;align-items:flex-end;gap:2px;padding:4px clamp(16px,2.5vw,32px) 0;overflow-x:auto;scrollbar-width:none}
-.app-tabs::-webkit-scrollbar{display:none}
-.app-tab{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;height:44px;padding:0 18px;border:0;border-radius:10px 10px 0 0;background:transparent;color:#a9c7ba;font:inherit;font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer;transition:background-color .15s,color .15s}
-.app-tab:hover{color:#fff;background:#ffffff0d}
-.app-tab[aria-current=page]{background:var(--pi-paper);color:var(--pi-pine);font-weight:700}
-.app-tab-divider{flex-shrink:0;align-self:center;width:1px;height:20px;margin:0 8px;background:#ffffff2a}
-.app-header :is(a,button,select):focus-visible{outline:2px solid #8fe0bd;outline-offset:2px}
+/* Header: like the Word screens, one light bar. Left: mark and the screen's own title; middle: the screen's main actions; right: cohort, navigation, language, account. */
+.app-header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;min-height:64px;padding:8px clamp(16px,2.5vw,32px);background:#fffffff2;border-bottom:1px solid var(--pi-line);color:var(--pi-ink)}
+.app-brand{display:flex;flex-shrink:0;text-decoration:none}
+.app-heading{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0;overflow:hidden}
+.app-heading-slot>:not(.app-page-heading){flex-shrink:0}
+.app-heading .app-page-heading{min-width:0;max-width:100%}
+.app-heading-default,.app-page-heading{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.app-heading-default strong,.app-page-heading strong{font-size:15px;font-weight:700;color:var(--pi-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-heading-default small,.app-page-heading small{font-size:12px;font-weight:600;color:var(--pi-emerald);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-heading:has(.app-heading-slot:not(:empty)) .app-heading-default{display:none}
+.app-heading-slot{display:contents}
+.app-stage{flex-shrink:0;font-size:12px;font-weight:600;color:var(--pi-amber);border:1px solid #a3520855;border-radius:999px;padding:1px 9px}
+.app-page-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.app-page-actions>*{flex-shrink:0}.app-page-actions>.pi-segmented{flex-shrink:1;min-width:0}
+.app-page-actions:empty{display:none}
+.app-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.app-stage{flex-shrink:0}
+.app-page-actions:not(:empty)+.app-header-actions{margin-left:4px;padding-left:12px;border-left:1px solid var(--pi-line)}
+.app-class-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--pi-muted)}
+.app-class-picker{appearance:none;max-width:220px;min-width:0;height:36px;padding:0 32px 0 12px;border:1px solid var(--pi-line);border-radius:var(--pi-radius-sm);color:var(--pi-ink);font:inherit;font-size:13px;font-weight:600;text-overflow:ellipsis;cursor:pointer;
+ background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%2356675f' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center}
+.app-class-picker:hover{border-color:#b9cbc2}
+.app-language{display:inline-flex;padding:3px;border:1px solid var(--pi-line);border-radius:999px;background:#fff}
+.app-language button{min-width:34px;height:28px;padding:0 9px;border:0;border-radius:999px;background:transparent;color:var(--pi-muted);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.app-language button[aria-pressed=true]{background:var(--pi-pine);color:#fff}
+.app-menu{position:relative}
+.app-menu>summary{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;border:1px solid var(--pi-line);border-radius:var(--pi-radius-sm);background:#fff;color:var(--pi-ink);font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;list-style:none}
+.app-menu>summary::-webkit-details-marker{display:none}
+.app-menu>summary:hover{border-color:#b9cbc2}
+.app-menu[open]>summary{border-color:var(--pi-emerald)}
+.app-menu-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:60;display:grid;gap:2px;min-width:240px;padding:8px;background:#fff;border:1px solid var(--pi-line);border-radius:var(--pi-radius);box-shadow:var(--pi-shadow-overlay)}
+.app-menu-panel nav{display:grid;gap:2px}
+.app-menu-group{padding:8px 10px 2px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--pi-muted)}
+.app-menu-item{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 10px;border:0;border-radius:var(--pi-radius-sm);background:transparent;color:var(--pi-ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.app-menu-item:hover{background:var(--pi-paper)}
+.app-menu-item[aria-current=page]{background:var(--pi-mint);color:var(--pi-pine);font-weight:700}
+.app-account>summary{height:40px;padding:0 8px 0 4px;border-color:transparent}
+.app-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--pi-mint);color:var(--pi-pine);font-size:12px;font-weight:700}
+.app-account-name{display:flex;flex-direction:column;line-height:1.2;text-align:left;max-width:160px}
+.app-account-name strong{font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.app-account-name small{font-size:11px;font-weight:600;color:var(--pi-emerald);overflow:hidden;text-overflow:ellipsis}
+.app-header :is(a,button,select,summary):focus-visible{outline:2px solid var(--pi-emerald);outline-offset:2px}
 .app-content{min-width:0;outline:none}
-@media(max-width:1180px){.app-header-button span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.app-header-button{width:40px;justify-content:center;padding:0}}
+@media(max-width:1600px){.app-account-name,.app-nav>summary span,.app-class-label>span,.app-wide-label{display:none}}
+@media(max-width:1280px){.app-header{flex-wrap:wrap;row-gap:8px}}
 @media(max-width:760px){
- .app-header{position:static}
- .app-header-row{flex-wrap:wrap;row-gap:8px;padding:10px 16px 4px}
- .app-class-picker{order:5;flex:1 1 100%;height:44px;margin:0}
- .app-header-button{width:44px;height:44px}
+ .app-header{position:static;padding:10px 16px}
+ .app-page-actions{order:5;flex:1 1 100%;margin:0}
+ .app-header-actions{flex-wrap:wrap}
+ .app-class-label{flex:1 1 100%}.app-class-label select{flex:1;max-width:none;height:44px}
+ .app-menu>summary{height:44px}
  .app-language button{height:36px}
- .app-tabs{padding:4px 16px 0}
- .app-tab{height:46px;padding:0 14px}
 }
-@media (prefers-reduced-motion:reduce){.app-tab,.app-header-button{transition:none}}
 
 /* Page headers that the staff screens carry over from their source designs: one quiet toolbar under the app bar. */
 .workspace-shell [data-source-ui]>div>header{position:static;background:var(--pi-paper);border-bottom:1px solid var(--pi-line);backdrop-filter:none}
@@ -103,7 +122,8 @@
 
 /* Light context for blocks ported from dark designs (page intros, governance toolbar): their white/slate text utilities
    are remapped to ink and muted, decorative glow shapes are dropped. Scoped to two semantic classes only. */
-.workspace-shell .pi-intro{background:var(--pi-surface);border:1px solid var(--pi-line)}
+/* Source heroes keep the Word screens' dark banner, in pine. */
+.workspace-shell .pi-intro{background:var(--pi-pine);border:1px solid var(--pi-pine);color:#e8f3ee}
 .workspace-shell .pi-intro>.absolute,.workspace-shell .pi-intro [class*="blur-"]{display:none}
 .workspace-shell .pi-on-light :is(.text-white,.text-slate-50,.text-slate-100,.text-slate-200){color:var(--pi-ink)}
 .workspace-shell .pi-on-light :is(.text-slate-300,.text-slate-400,.text-slate-500){color:var(--pi-muted)}
@@ -116,3 +136,25 @@
 /* Slots rendered inside a source screen share its content width. */
 .workspace-shell .pi-slot{width:100%;max-width:1600px;margin:0 auto;padding:20px clamp(16px,2.2vw,32px) 0}
 .workspace-shell .pi-slot>*{margin:0}
+
+/* Small header facts a screen adds next to its actions (counts, access tier). */
+.app-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--pi-mint);color:var(--pi-pine);font-size:11px;font-weight:700}
+.app-tier{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--pi-line);border-radius:999px;font-size:12px;color:var(--pi-muted)}
+.app-tier strong{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--pi-ink)}
+.app-heading>:not(.app-heading-slot),.app-heading-slot>*,.app-page-actions>*{white-space:nowrap}
+/* A panel slotted inside a source section (UI-09 hint requests) lines up with the section's own boxes. */
+.workspace-shell [data-source-ui] main .pi-slot{max-width:none;padding:0}
+.workspace-shell [data-source-ui] main .pi-slot .prod-card{margin:0;max-width:none;padding:16px;border-radius:16px;background:#f3f6f4}
+/* UI-12 and UI-14 panels below the source layout share its 1280px column, and nothing pushes them to the page bottom. */
+.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"])>div{justify-content:flex-start}
+.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"]) .prod-card,.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"])~.prod-card{width:calc(100% - 2rem);max-width:76rem;margin:24px auto}
+/* Manage cohorts opens from the header menu in a dialog, outside the page shell, so it carries its own panel styles. */
+.prod-modal-overlay>.prod-card.app-cohort-dialog{max-width:720px;max-height:90dvh;overflow:auto;padding:24px 28px;background:#fff;border:1px solid #d6e1dc;border-radius:16px;color:#15231e;font-family:'Be Vietnam Pro',Inter,system-ui,sans-serif;text-align:left}
+.app-cohort-dialog details>summary{font-size:18px;font-weight:700;list-style:none;margin-bottom:12px}
+.app-cohort-dialog details>summary::-webkit-details-marker{display:none}
+.app-cohort-dialog h3{margin:20px 0 8px;font-size:15px;font-weight:700}
+.app-cohort-dialog p{margin:0 0 12px;color:#56675f;font-size:14px}
+.app-cohort-dialog label{display:grid;gap:6px;margin:0 0 14px;font-size:13px;font-weight:600}
+.app-cohort-dialog input{width:100%;min-height:40px;padding:8px 12px;border:1px solid #c3d2cb;border-radius:8px;font:inherit;font-size:14px;font-weight:400}
+.app-cohort-dialog .prod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 16px;margin:0 0 16px}.app-cohort-dialog .prod-grid>label{margin:0}
+.app-cohort-dialog .prod-chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}

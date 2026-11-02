@@ -91,3 +91,16 @@
 .learner-v7.revised-hub progress::-webkit-progress-bar{background:#e3ece8;border-radius:999px}
 .learner-v7.revised-hub progress::-webkit-progress-value{background:#047857;border-radius:999px}
 .learner-v7.revised-hub progress::-moz-progress-bar{background:#047857;border-radius:999px}
+
+/* Word UI-04 layout (01/11): dark workshop banner under the hero, tier badge on the right of each card, status pill bottom-left. */
+.learner-v7.revised-hub .hub-assigned{font-size:12px;font-weight:600;color:#cfe5da;margin-left:8px}
+.learner-v7.revised-hub .hub-welcome-copy p strong{color:#9ee6c4}
+.learner-v7.revised-hub .hub-workshop{background:#1d5c4a;border-color:#1d5c4a;color:#e8f3ee}
+.learner-v7.revised-hub .hub-workshop h2{color:#fff}.learner-v7.revised-hub .hub-workshop p{color:#cfe5da}
+.learner-v7.revised-hub .hub-workshop-links a.lv-chip{background:#ffffff14;border-color:#ffffff33;color:#fff}
+.learner-v7.revised-hub .hub-lab-tags .lv-eyebrow{margin-right:auto}
+.learner-v7.revised-hub .hub-tier{padding:1px 8px;border:1px solid var(--lv-line);border-radius:6px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.learner-v7.revised-hub .hub-lab-footer .hub-lab-status{margin-left:0;padding:3px 10px;border-radius:999px;background:#eef3f0;color:#56675f}
+.learner-v7.revised-hub .hub-lab-footer .hub-lab-status:before{display:none}
+.learner-v7.revised-hub .hub-lab-footer .hub-lab-status.status-completed{background:#e1f4eb;color:#065f46}
+.learner-v7.revised-hub .hub-lab-footer .hub-lab-status.status-in_progress{background:#fdf0dc;color:#8a4606}

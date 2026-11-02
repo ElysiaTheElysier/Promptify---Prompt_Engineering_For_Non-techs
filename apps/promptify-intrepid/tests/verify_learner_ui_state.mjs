@@ -28,7 +28,8 @@ const attempt={id:'a1',lesson_ref_id:'l1',attempt_number:1,prompt_text:'original
 let prompt='edited';
 const props={snapshot:{profile:{role:'learner'},selectedClass:{id:'c1',department:'Tech'},attempts:[attempt],sops:[],controls:{state:'active'},learnerContexts:[],promptLibrary:[]},lesson:{id:'l1',title:'Task',lesson_key:'B1',scenario:'Exercise',task_goal:'Goal'},get prompt(){return prompt;},setPrompt:value=>{prompt=value;},promptRef:{current:null},insert:()=>{},run:(settings,contextIds)=>{execution={settings,contextIds};},busy:false,attempt,scoreCard:()=>null,unlock:()=>{},onAction:async(name,payload)=>{action={name,payload};},navigate:()=>{},drawer:false,setDrawer:()=>{},query:'',setQuery:()=>{},results:[],search:async()=>{},searching:false,searchError:'',signals:[],draftStatus:'saved',resolveDraft:async()=>{}};
 const render=()=>{cursor=0;return module.exports.default(props);};
-const all=node=>{if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(all);return [node,...all(node.props?.children)];};
+// ShellHeader carries the workspace header actions in props, so walk those slots too.
+const all=node=>{if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(all);return [node,...all(node.props?.children),...all(node.props?.heading),...all(node.props?.actions)];};
 const text=node=>{if(Array.isArray(node))return node.map(text).join('');if(node===null||node===undefined||typeof node==='boolean')return '';if(typeof node==='object')return text(node.props?.children);return String(node);};
 let tree=render();
 const stop=all(tree).find(n=>n.type==='input'&&n.props.placeholder==='END, STOP');
