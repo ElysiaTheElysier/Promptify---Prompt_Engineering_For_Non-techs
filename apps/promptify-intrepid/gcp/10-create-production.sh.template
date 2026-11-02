@@ -22,7 +22,7 @@ gcloud secrets create intrepid-prod-db-password --replication-policy=automatic -
 for name in promptify-prod-api promptify-prod-worker promptify-prod-scheduler; do
  gcloud iam service-accounts create "$name" --project="$project"
 done
-gcloud tasks queues create promptify-judge-prod --location="$region" --max-concurrent-dispatches=3 --max-attempts=4 --min-backoff=30s --project="$project"
+gcloud tasks queues create promptify-judge-prod --location="$region" --max-concurrent-dispatches=10 --max-attempts=4 --min-backoff=30s --project="$project"
 # Hosting site of its own; the existing Firebase project (and its Auth users) is shared with staging.
-firebase hosting:sites:create "${project}-intrepid-prod" --project="$project"
+# firebase CLI is not installed on the release machine: create site "${project}-intrepid-prod" in the Firebase console (Hosting > Add site).
 echo 'Created. Next (runbook steps 4-7): apply gcp/sql 001..021 to promptify-prod, runtime role/password, IAM (03 template with the prod names), build/deploy with gcp/production.env, alerts (11 template).'

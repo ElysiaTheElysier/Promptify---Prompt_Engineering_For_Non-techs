@@ -4,6 +4,48 @@ Trạng thái: **chuẩn bị, chưa chạy bước nào trên cloud.** Quyết 
 
 Không đổi model `gemini-3.8-flash`, Judge `parallel-v1`, scoring `weighted-v1`, ngưỡng hay quota.
 
+## Câu trả lời của owner (02/11)
+
+| Câu hỏi | Trả lời | Áp vào |
+| --- | --- | --- |
+| Quy mô | ~100 học viên, dùng rải rác (không phải 100 lần bấm cùng một giây) | Bảng capacity bên dưới |
+| Ngân sách / load test | Không trả lời | Không chạy load test trả phí; budget alert mặc định 200 USD/tháng |
+| Người nhận alert | `ducvo@intrepid.asia` (chưa rõ trong giờ hay 24/7) | `ALERT_EMAIL` ở bước 8 |
+| RPO / RTO | Tính sau | PITR + 14 bản backup vẫn bật; diễn tập restore vẫn làm để biết RTO thực tế |
+| Lưu dữ liệu | Giữ hết trong DB, kể cả khi nhân viên nghỉ | Không có job xoá; roster bỏ người thì chỉ thu hồi quyền (hành vi hiện tại) |
+| Gói Basic | Chưa có, bản riêng Intrepid | `DISABLE_PUBLIC_BASIC=true` |
+| Gmail cá nhân | Được, nếu có trong roster | Domain của client Intrepid: `intrepid.asia` **và** `gmail.com` |
+| Hạn mức phiên | Để team đề xuất | **Chặn mềm** `SESSION_TOKEN_CAP=50000`/bài/phiên: kiểm trước Run, trừ sau Run; nhiều tab cùng lúc có thể vượt thêm 1 lần Run. Chặn cứng chỉ cần nếu token bị tính tiền theo đầu người |
+| Drive/Sheets ngày đầu | **Bắt buộc** | Go/no-go thêm: import SOP từ Drive (PDF, DOCX, XLSX, Google Doc) và roster từ Sheet phải PASS trên production |
+| Chứng chỉ cho HR | Để sau | Chứng chỉ chỉ mang tính ghi nhận |
+| Go-live | Tối 02/11 | Xem "Lộ trình tối nay" |
+
+## Capacity cho ~100 học viên dùng rải rác
+
+Ước tính: một buổi 60 phút, mỗi học viên 6 Run + 6 AI Judge → ~600 lần chấm/giờ, trung bình chưa tới 2 lần chấm chạy cùng lúc. Lúc nguy hiểm là khi giảng viên bảo cả lớp "bấm chấm đi": 30–50 lần chấm trong 1 phút.
+
+| Thiết lập | Staging hiện tại | Production | Lý do |
+| --- | --- | --- | --- |
+| Queue Judge `maxConcurrentDispatches` | 3 | **10** | 50 job dồn một lúc: ~2 phút chờ với 3, ~35 s với 10 (mỗi lần chấm 5–7 s) |
+| Cloud Run `maxScale` / `containerConcurrency` | 100 / 80 | **10 / 40** | 10 × pool 5 = 50 kết nối DB, nằm trong giới hạn Cloud SQL 2 vCPU |
+| `PGPOOL_MAX` | 5 | 5 | I01 đã sửa nên pool 5 không còn bị giữ chéo |
+| Hàng đợi provider toàn hệ thống (013) | tắt | **tắt** | Chưa deploy/kiểm ở đâu; bật tối nay là rủi ro lớn hơn lợi ích |
+
+**Chưa chứng minh:** chưa có load test cho cấu hình này. Đã đo chắc chắn: 33 lần chấm liên tiếp, 0 lỗi (26/10). Quota Vertex là dùng chung (Dynamic Shared Quota); khi bị 429, Judge tự thử lại từng tiêu chí. Khuyến nghị cho buổi đầu: giảng viên **cho từng nhóm 20–30 người bấm chấm**, không cho cả 100 người bấm cùng lúc.
+
+## Lộ trình tối nay (thứ tự tối thiểu)
+
+| # | Việc | Ai | Ước tính |
+| --- | --- | --- | --- |
+| T1 | ⚠ Build image từ HEAD, deploy lên **staging** (revision mới, chưa nhận traffic), kiểm `/readyz`, rồi chuyển traffic | Claude, sau khi owner duyệt | 30–45 phút |
+| T2 | E2E đăng nhập trên staging: owner tự đăng nhập trong browser pane, Claude chạy các bước; thêm Drive/Sheets | Owner + Claude | 60–90 phút |
+| T3 | ⚠ Tạo tài nguyên production (bước 3–5), áp schema 001–021 (cần owner credential) | Owner duyệt từng bước | 45–60 phút (Cloud SQL REGIONAL mất ~15 phút để tạo) |
+| T4 | ⚠ Deploy API + Hosting production (bước 6–7), alert (bước 8) | Claude, owner duyệt | 30 phút |
+| T5 | Seed client/domain/lớp, sync roster thật, smoke (bước 10–11) | Admin | 30 phút |
+| T6 | Diễn tập restore (bước 9) | Owner duyệt | 30 phút; có thể làm sáng mai **trước** buổi học đầu tiên |
+
+Nếu T2 còn FAIL ở luồng chính (đăng nhập, Run, Judge, SOP, roster), **dời go-live**, không làm tiếp T3.
+
 ## Production tách khỏi staging ở đâu
 
 | Tài nguyên | Staging | Production |
@@ -32,7 +74,7 @@ Không đổi model `gemini-3.8-flash`, Judge `parallel-v1`, scoring `weighted-v
 | `DISABLE_PUBLIC_BASIC=true` | Chặn đăng ký gói Basic công khai (ngoài phạm vi Phase 1, TM-005) |
 | `ACCESS_EXPIRY_MODE=enforce` | Hết hạn → chỉ đọc. Từ 02/11, nếu thiếu migration 016 thì từ chối (503) thay vì cho qua (I03) |
 | `INJECTION_GUARD=block` | Giống staging hiện tại |
-| `SESSION_TOKEN_CAP` | **Chưa đặt**, chờ owner quyết (I04) |
+| `SESSION_TOKEN_CAP=50000` | Chặn mềm theo bài/phiên (owner giao team đề xuất, 02/11) |
 
 ## Các bước
 
@@ -45,7 +87,7 @@ Không đổi model `gemini-3.8-flash`, Judge `parallel-v1`, scoring `weighted-v
 7. ⚠ **Deploy Hosting:** tạo `.env.production` với `VITE_STREAM_API_URL=<URL Cloud Run prod>`; trong `firebase.json` thêm target `prod` có rewrite `/api/**` → `promptify-intrepid-api-prod`; deploy site `…-intrepid-prod`. Kiểm `/api/product` khi chưa đăng nhập → 401.
 8. ⚠ **Monitoring:** `ALERT_EMAIL=… BILLING_ACCOUNT=… bash gcp/11-production-alerts.sh.template --execute`. Gửi thông báo test và xác nhận người nhận đã thấy.
 9. ⚠ **Diễn tập restore (bắt buộc trước khi có học viên):** clone PITR `promptify-prod` sang `promptify-prod-restore-test`, đọc số dòng 5 bảng chính, ghi thời gian khôi phục (RTO thực tế), rồi xoá instance clone.
-10. **Seed dữ liệu:** Admin thêm domain cho từng client (vì `DOMAIN_POLICY=require`), tạo khoá/lớp, sync roster thật. Share Sheet roster cho SA workspace.
+10. **Seed dữ liệu:** Admin thêm domain `intrepid.asia` và `gmail.com` cho client Intrepid (vì `DOMAIN_POLICY=require`), tạo khoá/lớp, sync roster thật. Share Sheet roster cho SA workspace.
 11. **Smoke production** với 1 admin + 1 learner test: đăng nhập, Run, AI Judge, mở SOP, Analytics.
 12. **Mở pilot** cho số người owner đã chốt; theo dõi alert 48 giờ đầu.
 
@@ -62,8 +104,9 @@ Không đổi model `gemini-3.8-flash`, Judge `parallel-v1`, scoring `weighted-v
 | Check offline pass trên commit được tag | ✅ ở local (89/89, smoke pass), chưa tag |
 | E2E 4 vai PASS trên staging | ⬜ |
 | I01, I02, I03, I05, I10 đã sửa | ✅ CODE + OFFLINE, chưa deploy |
-| I04 hạn mức phiên | ⬜ chờ owner |
-| Capacity cho số người đã chốt | ⬜ chờ owner trả lời; pilot ≤ 2–3 lần chấm cùng lúc là mức đã đo |
-| Alert có người nhận + test notification | ⬜ |
+| I04 hạn mức phiên | ✅ chọn chặn mềm 50k (cấu hình, không cần sửa code) |
+| Capacity cho ~100 học viên rải rác | 🟡 cấu hình đã chọn; chưa load test; giảng viên chia nhóm khi cho bấm chấm |
+| Drive/Sheets: import SOP PDF/DOCX/XLSX/Google Doc + roster Sheet trên production | ⬜ |
+| Alert gửi `ducvo@intrepid.asia` + test notification | ⬜ |
 | Diễn tập restore | ⬜ |
 | Owner ký duyệt | ⬜ |
