@@ -1,0 +1,126 @@
+# Nghiệm thu trước release — Promptify Intrepid (02/11/2026)
+
+Tổng hợp từ code hiện tại, check offline chạy hôm nay, và evidence staging đã lưu (`docs/`, `apps/promptify-intrepid/outputs/`, TRACKER điều phối). **Không** đọc lại cloud live, **không** đăng nhập staging, **không** gọi AI trong lần nghiệm thu này.
+
+Mức bằng chứng: **LIVE** = đã chạy trên staging, có evidence (ghi ngày) · **OFFLINE** = test offline · **CODE** = chỉ có source · **[?]** = chưa có bằng chứng.
+
+## Kết luận
+
+**Chưa release được cho người dùng thật ở quy mô rộng.** Luồng chính của học viên (đăng nhập → làm lab → Run → AI Judge) và của giảng viên (tạo lab, rubric, sync roster thủ công) đã chạy thật trên staging. Nhưng còn 7 nhóm blocker: capacity chưa chứng minh, lỗi độ tin cậy đã tái hiện còn mở, bản đang chạy không dựng lại được từ git, chưa có alert/restore, chưa có production, hầu hết bản UI từ 25/10 chưa được kiểm khi đăng nhập, và các quyết định sản phẩm còn treo.
+
+Có thể cân nhắc **pilot nhỏ, có giám sát, trên staging** sau khi làm xong "Bước A" ở cuối file.
+
+## Môi trường (theo evidence 01/11, chưa đọc lại live)
+
+| Thành phần | Bản đang chạy | Ghi chú |
+| --- | --- | --- |
+| API Cloud Run | `promptify-intrepid-api-auth1-1101` (100%) | Image dựng bằng overlay file, không phải từ một commit |
+| Hosting | `a1567a0774ab4ab5` (01/11) | Dựng từ source **chưa commit** (24 file đang sửa trong `git status` hôm nay) |
+| Cloud SQL | migration tới 021 | Có backup + PITR, **chưa diễn tập restore** |
+| Scheduler roster | PAUSED | Roster theo lịch chưa chạy live |
+| Monitoring | 0 alert, 0 uptime check | |
+| Production | **Không có** | Chỉ staging `ai-transformation-510302` |
+
+## Check offline hôm nay (02/11, OFFLINE)
+
+| Check | Kết quả |
+| --- | --- |
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS, 0 lỗi, 1 warning đã biết (cycle `ProductionWorkspace` ↔ `ProductionWorkspaceV7`) |
+| `npm run test:boundaries` | PASS |
+| `npm run build` | PASS, warning chunk > 500 kB đã biết |
+| `npm test` | **87/87 PASS** |
+| `npm run test:smoke` | Không chạy lần này |
+
+Test offline pass không có nghĩa tính năng chạy đúng trên staging.
+
+## Chức năng theo vai
+
+Ký hiệu: ✅ LIVE pass · 🟡 một phần / LIVE cũ, sau đó UI đã đổi · ⬜ chỉ OFFLINE/CODE · ❌ lỗi đã thấy hoặc thiếu
+
+### Học viên (Learner)
+
+| Chức năng | Trạng thái | Bằng chứng / giới hạn |
+| --- | --- | --- |
+| Đăng nhập Google + đối chiếu roster | 🟡 | LIVE 21/10. Bản phân loại lỗi đăng nhập (01/11) chỉ kiểm khi chưa đăng nhập. Gmail cá nhân có trong roster vẫn vào được |
+| Xác nhận profile, sửa phòng ban (UI02) | 🟡 | Một phần LIVE. 01/11 đổi Employee ID/Office thành chỉ đọc, chưa kiểm khi đăng nhập |
+| Hub, tiến độ (UI04) | 🟡 | LIVE 19/10; layout đổi 01/11, chưa kiểm khi đăng nhập |
+| Run prompt (Generation) | ✅ | LIVE 28/10, trả lời đúng ngôn ngữ học viên. Run vẫn đồng bộ |
+| AI Judge stream từng tiêu chí | ✅ | LIVE 26/10: 33 lần chấm, 0 lỗi, p95 6,9 s (5 tiêu chí). 28/10 với rubric động: p95 17,5 s (3 tiêu chí) → 37,6 s (8 tiêu chí) |
+| Refresh / tab 2 / bấm trùng chỉ tạo 1 job | ✅ | LIVE 26/10 |
+| So sánh / khôi phục attempt (UI06) | ❌ | LIVE 28/10: bấm Compare không chuyển màn. 01/11 thêm nút Single/Compare ở header, chưa kiểm |
+| Biến prompt, scaffold, mask PII | ⬜ | OFFLINE |
+| Thư viện prompt cá nhân | 🟡 | LIVE phần cá nhân (cũ) |
+| Chia sẻ prompt → Head duyệt → đồng nghiệp thấy | ⬜ | OFFLINE, chưa có luồng thật giữa 2 người |
+| Xem SOP + tải bản gốc | ✅ | LIVE 21/10, hash khớp. Quay lại bài lab giữ nháp: chỉ kiểm local |
+| Xin gợi ý / nhận broadcast, gợi ý riêng | ⬜ | OFFLINE. **Lỗi race giới hạn 5 gợi ý chờ** (I10, tái hiện offline) |
+| Chứng chỉ PDF, badge | 🟡 | Tạo PDF: OFFLINE pass. Cấp chứng chỉ thật: chưa kiểm |
+| Xin quyền Advanced | ⬜ | Chưa kiểm |
+
+### Giảng viên (Instructor)
+
+| Chức năng | Trạng thái | Bằng chứng / giới hạn |
+| --- | --- | --- |
+| Studio: tạo lab, lưu các tab, chuyển Active | ✅ | LIVE 28/10. Lỗi nhỏ 28/10: nút "Create draft" không có chữ; "Key Practice Objectives" không có ô nhập; placeholder tiếng Việt khi đang EN (chưa kiểm lại) |
+| Rubric động 1–8 tiêu chí | ✅ | LIVE 28/10 (giới hạn 8, chặn tên trống, cân 100%) |
+| Sandbox chấm thử | 🟡 | LIVE QA 18/10. Sandbox không trừ ngân sách AI |
+| Quản lý lớp (cohort) | 🟡 | Sửa lỗi không hiện (28/10) đã lên Hosting; 01/11 chuyển vào dialog ở header, chưa kiểm khi đăng nhập |
+| Roster "Sync now" thêm/sửa/xoá | ✅ | LIVE 21/10 và 28/10, chỉ với Sheet giả lập |
+| Roster theo lịch | ❌ | Chưa chạy live, Scheduler PAUSED |
+| Workshop: pulse, broadcast, gợi ý riêng, Inspector (UI09/10) | ⬜ | OFFLINE; Inspector scorecard chỉ thấy ở dữ liệu cũ |
+| Đóng góp SOP: upload/Drive/duyệt/index | 🟡 | LIVE chỉ với 4 file TXT giả. PDF/DOCX/XLSX/Google Doc chưa kiểm live |
+| Nâng học viên thành facilitator | 🟡 | Có release 23/10; chưa có lần kiểm theo E2E guide |
+
+### Trưởng phòng (Head)
+
+| Chức năng | Trạng thái | Bằng chứng / giới hạn |
+| --- | --- | --- |
+| Analytics theo lớp, lọc ngày | 🟡 | Chưa nghiệm thu bộ lọc/heatmap live. Số liệu snapshot chỉ tính 200 attempt gần nhất (I11) |
+| Export CSV / Print PDF | ⬜ | Chưa kiểm |
+| Chỉ thấy lớp được cấp | 🟡 | Có bằng chứng từ chối URL lớp lạ (cũ); lỗi báo nhầm "không có trong roster" đã sửa 01/11, chưa kiểm khi đăng nhập |
+| Duyệt prompt chia sẻ | ⬜ | Chưa kiểm |
+
+### Quản trị (Admin)
+
+| Chức năng | Trạng thái | Bằng chứng / giới hạn |
+| --- | --- | --- |
+| Domain whitelist thêm/tắt/bật | ✅ | LIVE 28/10. Lỗi: thẻ đếm domain hiện 0 |
+| Audit log | 🟡 | Có ghi, nhưng cột Actor chỉ hiện UUID |
+| Cấp/thu hồi quyền lớp | ⬜ | 28/10 bị chặn khi test, chưa kiểm |
+| Duyệt yêu cầu truy cập | ⬜ | Chưa kiểm |
+| Rotation credential | ⬜ | CODE; không được thử |
+
+### So với test log tham chiếu (còn thiếu)
+
+Rate limit 20/phút; hạn mức 50k token/phiên (có cờ nhưng **không chặn được khi chạy đồng thời**, I04); chế độ chỉ đọc khi hết hạn (một phần); ma trận test đối kháng prompt injection.
+
+## Blocker release
+
+| # | Blocker | Bằng chứng | Cần làm |
+| --- | --- | --- | --- |
+| B1 | **Capacity chưa chứng minh.** 100 pipeline đồng thời chỉ xong 6/100 (22/10). Hàng đợi provider toàn hệ thống (013) chưa deploy. Queue Judge 3 dispatch song song, pool DB 5. Chưa bao giờ thử quá 2 lần chấm đồng thời | LIVE 22/10, 26/10 | Chủ sản phẩm chốt "bao nhiêu người dùng cùng lúc". Giới hạn pilot theo số đã đo, hoặc deploy 013 + load test có duyệt |
+| B2 | **Lỗi độ tin cậy còn mở trong code** (audit 23/10, chưa sửa): I01 cạn pool DB khi 5 request đồng thời; ~~I02 pool không có handler lỗi idle~~ **đã sửa ở local 02/11, chưa deploy** (handler `sql_pool_idle_error` chỉ log mã lỗi; client ROLLBACK lỗi bị huỷ thay vì trả về pool; test `verify_sql_pool_errors.ts`, OFFLINE 88/88); I03 safeguard cho qua khi thiếu schema; I04 hạn mức phiên không atomic; I05 worker trễ không kiểm lại hết hạn/thu hồi; I10 race giới hạn gợi ý | CODE + OFFLINE | Sửa I02 (nhỏ), I01, I10 trước pilot; I03–I05 trước production |
+| B3 | **Bản đang chạy không dựng lại được từ git.** Hosting 01/11 từ source chưa commit; API là image overlay; source local chứa phần chưa deploy (013–015, identity memo) | `git status`, RESULT 01/11 | Commit + tag đúng source của Hosting `a1567a07` và API `auth1-1101`; ghi manifest revision/image/migration |
+| B4 | **Chưa vận hành được:** 0 alert, 0 uptime check, chưa diễn tập restore, chưa có RPO/RTO, chưa có người nhận alert | `01_CURRENT_STATE.md` | Chỉ định người nhận; tạo alert 5xx/503/tuổi job Judge/chi phí Vertex; diễn tập restore 1 lần |
+| B5 | **Chưa nghiệm thu khi đăng nhập** cho phần lớn release từ 25/10, gồm thay đổi UI lớn 01/11 (header mới, UI02/04/05/09/11/12/14/15) | Mọi RESULT từ 25/10 ghi "Not checked signed in" | Chạy [E2E guide](../E2E_TEST_GUIDE_2026-10-28.md) đủ 4 vai trên bản hiện tại |
+| B6 | **Bảo mật** (threat model 31/10): TM-002 lọc domain cho qua khi client chưa cấu hình domain (high); TM-003 gắn danh tính theo email tái cấp; TM-006 API mở `allUsers` + pool 5 dễ bị DoS; TM-007 parser file chạy chung process API; chưa chạy `npm audit` | `evidence/promptify-intrepid-threat-model.md` | Đổi TM-002 sang fail-closed; chạy `npm audit`; quyết định chấp nhận rủi ro TM-003/006/007 cho pilot |
+| B7 | **Quyết định sản phẩm còn treo:** Basic/Public có trong code nhưng ngoài phạm vi Phase 1; nghĩa của "100 người đồng thời" và ngân sách; ai nhận alert; RPO/RTO; Drive/Sheets có bắt buộc lúc launch; thời gian lưu dữ liệu; cho phép Gmail cá nhân trong roster | `05_OPEN_ISSUES.md` | Gửi bộ câu hỏi cho chủ sản phẩm (đã soạn, chưa gửi) |
+| B8 | Chưa có môi trường production | | Sau B1–B7 |
+
+## Lộ trình tối thiểu
+
+**Bước A — trước pilot nhỏ trên staging (vài chục học viên, có người trực):**
+1. Commit + tag source khớp bản live (B3).
+2. Sửa I02, I10 và các lỗi UI 28/10 (Compare attempts, Actor UUID, đếm domain, nút Create draft, ô Key Practice Objectives, placeholder EN, lớp Northstar không thấy).
+3. Chạy E2E guide đủ 4 vai, ghi PASS/FAIL (B5).
+4. Tạo alert tối thiểu + uptime check, có người nhận (B4).
+5. Tắt Basic/Public nếu ngoài phạm vi; TM-002 fail-closed.
+6. Giới hạn số người chạy AI cùng lúc theo mức đã đo (≤ 2–3 lần chấm đồng thời), báo trước cho học viên.
+
+**Bước B — trước production:** hàng đợi provider 013 + load test có duyệt (B1); sửa I01, I03–I05; diễn tập restore; roster theo lịch chạy live; kiểm SOP thật PDF/DOCX/XLSX/Google Doc; review chất lượng chấm của Judge với người chấm; dựng project production.
+
+## Giới hạn của lần nghiệm thu này
+
+- Không đăng nhập staging: việc nhập mật khẩu tài khoản phải do người dùng làm. Mọi ô "chưa kiểm khi đăng nhập" cần người có tài khoản test chạy E2E guide.
+- Không đọc lại cấu hình cloud live; bảng môi trường lấy từ evidence 01/11.
+- Không xác minh lại từng lỗi UI 28/10 trong code mới; có thể một phần đã được sửa trong đợt UI 01/11.
