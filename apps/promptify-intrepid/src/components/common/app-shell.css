@@ -159,3 +159,7 @@
 .app-cohort-dialog input{width:100%;min-height:40px;padding:8px 12px;border:1px solid #c3d2cb;border-radius:8px;font:inherit;font-size:14px;font-weight:400}
 .app-cohort-dialog .prod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 16px;margin:0 0 16px}.app-cohort-dialog .prod-grid>label{margin:0}
 .app-cohort-dialog .prod-chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px}
+/* Prompt library cards on staff screens keep their own card layout; the generic staff row rule above stripped padding and stretched the status badge. */
+.workspace-shell .prod-card>article.lv-resource{display:block;padding:16px;border:1px solid var(--pi-line);border-radius:12px;margin:10px 0}
+.workspace-shell .prod-card>article.lv-resource>.lv-badge{display:inline-block;margin-left:8px}
+.workspace-shell .prod-card>article.lv-resource>p{margin:6px 0 0}
