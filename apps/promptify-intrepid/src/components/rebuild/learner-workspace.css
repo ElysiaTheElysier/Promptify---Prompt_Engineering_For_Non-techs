@@ -157,3 +157,5 @@
  .lv-revised-grid textarea#learner-prompt{min-height:120px}
  .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 16px);top:calc(var(--app-header-h,64px) + 8px)}
 }
+/* The lab fills the viewport below the app header, not a full extra viewport (page was header + 100dvh + footer tall). */
+.workspace-shell .learner-v7{min-height:calc(100dvh - var(--app-header-h,64px))}
