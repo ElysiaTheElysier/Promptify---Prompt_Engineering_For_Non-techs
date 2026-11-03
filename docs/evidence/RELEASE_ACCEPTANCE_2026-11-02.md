@@ -195,3 +195,18 @@ Lỗi nhỏ ghi nhận: nhãn "STUCK (>5 fails)" cho học viên đã 10/10; th�
 - Không đăng nhập staging: việc nhập mật khẩu tài khoản phải do người dùng làm. Mọi ô "chưa kiểm khi đăng nhập" cần người có tài khoản test chạy E2E guide.
 - Không đọc lại cấu hình cloud live; bảng môi trường lấy từ evidence 01/11.
 - Không xác minh lại từng lỗi UI 28/10 trong code mới; có thể một phần đã được sửa trong đợt UI 01/11.
+
+## E2E đợt 3 trên staging (03/11, LIVE: API `roster-1103`, Hosting `4874f7ae`)
+
+| Mục | Kết quả |
+| --- | --- |
+| Roster đồng bộ theo lịch | ✅ Scheduler `promptify-roster-staging-qa` ENABLED `*/5`, OIDC vào `/internal/roster` của API hiện tại. 11:10:03 tự chạy: success, processed 5, không ai bấm |
+| Học viên B được tự thêm từ Sheet | ✅ `manhmanh100127@gmail.com` (dòng có sẵn trong tab `ScheduledQA20261022`, owner bổ sung Department/Country) vào thẳng Northstar |
+| B không thấy gợi ý riêng của A | ✅ B chỉ thấy broadcast WHOLE CLASS |
+| Giảng viên thật `lhbjune101@gmail.com` | ✅ được cấp Instructor/Editor, bật auto sync được; `?ui=14` bị chặn. Màn bị chặn đã đổi thành thông báo gọn trong khung app (trước: màn REJECTED đỏ) |
+| Export Head | ✅ CSV (Excel, chống chèn công thức) + Print/PDF thay cho JSON. **Chưa bấm thử khi đăng nhập Head** |
+| STUCK, chứng chỉ vs badge, thông báo Drive, nút lưu prompt, "Uploaded “”" | ✅ đã sửa; đã thấy live: chứng chỉ trong thẻ chứng chỉ, badge đếm 1 |
+| Log sync Added/Removed | ✅ đã sửa ánh xạ (`added+reactivated`, `removed`); log cũ hiện "—" |
+| Mật độ giao diện | ✅ prompt 14px/1.6, thẻ 16px, 3 cột vừa khít màn ở 1280×720 và 1536×864 (ảnh chụp), header 1 hàng ở ≥1600px, avatar luôn phải. **Owner cần xem lại trên máy thật** |
+
+Còn lại: chưa có chức năng thu hồi quyền giảng viên/Head; production chưa có migration 022 và các bản sửa này (T4).
