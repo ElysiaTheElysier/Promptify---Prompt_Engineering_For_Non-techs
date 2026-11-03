@@ -219,8 +219,10 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
   }};
   });
   // Actor/RLS reads run after the service connection is released (I01).
+  // The inbox RPC raises for a completed/archived class; a closed class keeps its read-only history, not live messages.
+  const liveClass=['active','upcoming'].includes(selectedClass.status);
   const [messages,privateHints]=await Promise.all([
-    c.profile.role==='learner'?result<any[]>(c.reader.rpc('rebuild_workshop_inbox',{p_class:selectedClass.id})):Promise.resolve([]),
+    c.profile.role==='learner'&&liveClass?result<any[]>(c.reader.rpc('rebuild_workshop_inbox',{p_class:selectedClass.id})):Promise.resolve([]),
     learnerId?result<any[]>(c.reader.from('trainer_hints').select('id,message,created_at').eq('class_id',selectedClass.id).eq('learner_id',learnerId).order('created_at',{ascending:false}).limit(20)):Promise.resolve([])
   ]);
   return {...data,messages,privateHints};

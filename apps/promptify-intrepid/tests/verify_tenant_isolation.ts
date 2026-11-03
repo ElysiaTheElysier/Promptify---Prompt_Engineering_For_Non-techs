@@ -130,6 +130,11 @@ const report=await call('head-a',{action:'analytics'});
 assert.ok((report.classes||[]).every((row:any)=>row.id!==id(B.cls)),'head A analytics exclude class B');
 
 assert.deepEqual(await companyB(),before,'no probe changed any company B row');
+// A completed class stays readable for its learner (history, awards); live inbox is skipped instead of failing the snapshot.
+await db.query("UPDATE classes SET status='completed' WHERE id=$1",[id(A.cls)]);
+const closed=await call('learner-a',{action:'snapshot',classId:id(A.cls)});
+assert.equal(closed.selectedClass?.id,id(A.cls),'completed class snapshot loads');assert.deepEqual(closed.messages,[]);
+await db.query("UPDATE classes SET status='active' WHERE id=$1",[id(A.cls)]);
 // TM-002: a client with no domain configured stays visible by default and is hidden under DOMAIN_POLICY=require.
 await db.query('DELETE FROM product_domains WHERE client_id=$1',[id(A.client)]);
 assert.deepEqual((await call('learner-a',{action:'snapshot'})).classes.map((row:any)=>row.id),[id(A.cls)],'no domain configured: allowed by default');
