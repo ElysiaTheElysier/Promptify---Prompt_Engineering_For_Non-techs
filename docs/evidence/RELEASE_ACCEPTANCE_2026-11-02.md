@@ -168,6 +168,25 @@ Owner tự đăng nhập trong browser pane; Claude thao tác. 1 lần Run + 1 l
 
 Chưa kiểm: Head đăng nhập riêng (Analytics theo grant, export CSV, duyệt thư viện prompt), giảng viên duyệt gợi ý, cấp/thu hồi quyền lớp, chứng chỉ PDF, SOP PDF/DOCX/XLSX/Google Doc.
 
+## E2E đợt 2 trên staging (02–03/11, LIVE, API `rel2-1102`, Hosting `198d9a75`)
+
+| # | Mục | Kết quả |
+| --- | --- | --- |
+| — | Analytics sửa nhãn | ✅ thẻ lớn = bảng = 8.95/10; "lần đầu → mới nhất 10 → 8.07 (2 bài)"; thanh theo bài hiện |
+| — | Header tràn ngang | ✅ 443/443 px (trước 767) |
+| — | Roster "15 phút" | ✅ sửa chữ (chưa xem live khi đăng nhập giảng viên) |
+| — | Landing khi đăng xuất | ✅ không còn bảng giá/Basic/Agribank |
+| 1 | SOP Drive PDF/XLSX/DOCX/Google Doc | ✅ sau khi sửa API (`b70c7c5`): file trong thư mục đã duyệt được chấp nhận; cả 4 đọc đúng canary, duyệt + index, hiện trong Studio |
+| 2 | Giảng viên duyệt gợi ý | ✅; học viên thấy "Approved" (bài chưa có nội dung gợi ý soạn sẵn) |
+| 3 | Broadcast + gợi ý riêng → học viên A | ✅ thấy cả hai, Got it/Mark as read hoạt động. Học viên B (`manhmanh100127@gmail.com`) **không thuộc lớp Northstar** → chưa kiểm được "B không thấy" |
+| 4 | Head | ✅ cấp quyền Head cho `kangseobi123@gmail.com`; **đăng nhập Head chưa kiểm** |
+| 5 | Thu hồi quyền lớp | ❌ **chưa có chức năng** (UI/API/SQL chỉ có cấp) |
+| 6 | Studio: tạo lab, rubric 3 tiêu chí, sandbox, publish | ✅; học viên chấm theo đúng 3 tiêu chí (4.2/2.9/2.9) |
+| 7 | Badge + chứng chỉ | ❌ → **đã sửa ở local (migration 022, `8d746e5`)**: 010 làm lab tạo từ Studio không bao giờ được phát thưởng. Học viên A đạt 4/4 lab (TB 9.8) mà không có chứng chỉ. **Chưa áp lên staging** (cần duyệt). Badge mới tạo mặc định DRAFT, phải bật ACTIVE |
+| 8 | Đóng lớp | ⬜ chưa làm |
+
+Lỗi nhỏ ghi nhận: nhãn "STUCK (>5 fails)" cho học viên đã 10/10; thông báo "Folder submission stopped" không tự xoá; "Uploaded “”" tên rỗng; 2 file .txt gửi lại đang chờ duyệt.
+
 ## Giới hạn của lần nghiệm thu này
 
 - Không đăng nhập staging: việc nhập mật khẩu tài khoản phải do người dùng làm. Mọi ô "chưa kiểm khi đăng nhập" cần người có tài khoản test chạy E2E guide.
