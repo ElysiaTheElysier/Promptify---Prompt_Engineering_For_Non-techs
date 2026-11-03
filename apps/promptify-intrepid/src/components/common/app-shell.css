@@ -172,3 +172,9 @@
 .workspace-shell .prod-card>article.lv-resource{display:block;padding:16px;border:1px solid var(--pi-line);border-radius:12px;margin:10px 0}
 .workspace-shell .prod-card>article.lv-resource>.lv-badge{display:inline-block;margin-left:8px}
 .workspace-shell .prod-card>article.lv-resource>p{margin:6px 0 0}
+/* Print / PDF of a staff report: the page content only, no app chrome or controls. */
+@media print{
+ .app-header,.app-skip,.analytics-print-hide,.workspace-shell [role=status].toast,.prod-card>details{display:none!important}
+ .workspace-shell,.app-content{background:#fff}
+ .source-ui section,.source-ui article{break-inside:avoid}
+}
