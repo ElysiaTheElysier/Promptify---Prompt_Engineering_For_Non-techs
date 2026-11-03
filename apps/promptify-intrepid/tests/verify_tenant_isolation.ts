@@ -4,6 +4,7 @@ import {PGlite} from '@electric-sql/pglite';
 import {configureSqlPoolForTests} from '../src/services/cloudPostgresService';
 import {configureFirebaseVerifierForTests} from '../src/services/firebaseServerIdentityService';
 import {handleProductRequest} from '../src/services/productionServerService';
+import {createRebuildRunService} from '../src/services/rebuildRunService';
 
 // TM-001 (docs/evidence/promptify-intrepid-threat-model.md): company A actors must never read or change company B.
 // Real SQL (all migrations PGlite can load: 004 needs pgvector, 007 uses CREATE INDEX CONCURRENTLY), offline verifier.
@@ -134,6 +135,9 @@ assert.deepEqual(await companyB(),before,'no probe changed any company B row');
 await db.query("UPDATE classes SET status='completed' WHERE id=$1",[id(A.cls)]);
 const closed=await call('learner-a',{action:'snapshot',classId:id(A.cls)});
 assert.equal(closed.selectedClass?.id,id(A.cls),'completed class snapshot loads');assert.deepEqual(closed.messages,[]);
+let providerCalls=0;const runs=createRebuildRunService(undefined as any,(async()=>{providerCalls++;throw Error('no provider');}) as any);
+await assert.rejects(()=>runs.generateSavedRun('Bearer learner-a',{classId:id(A.cls),lessonId:id(A.lesson),prompt:'Prompt',requestId:id(90)}),(e:any)=>e.statusCode===403&&e.code==='class_closed','ended class refuses Runs with a clear reason');
+assert.equal(providerCalls,0);
 await db.query("UPDATE classes SET status='active' WHERE id=$1",[id(A.cls)]);
 // TM-002: a client with no domain configured stays visible by default and is hidden under DOMAIN_POLICY=require.
 await db.query('DELETE FROM product_domains WHERE client_id=$1',[id(A.client)]);

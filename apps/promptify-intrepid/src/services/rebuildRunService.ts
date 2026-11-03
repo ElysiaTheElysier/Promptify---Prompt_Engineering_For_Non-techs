@@ -33,8 +33,11 @@ async function context(authorization: string, classId: string, lessonId: string)
   const { data: studio, error: studioError } = await server.from('product_studio').select('config,revision').eq('class_id', classId).eq('lesson_id', lessonId).maybeSingle();
   if (studioError) throw new ApiAccessError('Production curriculum schema is unavailable.', 503);
   Object.assign(lesson,resolveClassLesson(lesson,studio?.config));
-  const {data:classInfo,error:classError}=await server.from('classes').select('class_code').eq('id',classId).single();
+  const {data:classInfo,error:classError}=await server.from('classes').select('class_code,status').eq('id',classId).single();
   if(classError||!classInfo)throw new ApiAccessError('Class configuration unavailable.',503);
+  // Ended classes stay readable; say so instead of letting the SOP RPC fail as "service not ready".
+  if(classInfo.status==='upcoming')throw Object.assign(new ApiAccessError('This class has not started yet. Runs open when the class becomes active.',403),{code:'class_not_started'});
+  if(classInfo.status!=='active')throw Object.assign(new ApiAccessError('This class has ended. Your saved work stays available to review; new Runs are closed.',403),{code:'class_closed'});
   if(!codelabAvailable(lesson.status,studio?.config,Date.now(),classInfo.class_code==='PUBLIC-BASIC'?'BASIC Free':'ADVANCE Paid'))throw new ApiAccessError('This Codelab is outside its published schedule.',403);
   const {data:sops,error:sopError}=await reader.rpc('rebuild_class_sops',{p_class:classId,p_lesson:lessonId});
   if(sopError)throw new ApiAccessError('Chưa tải được SOP canonical. Kiểm tra schema và quyền truy cập.',503);

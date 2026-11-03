@@ -9,10 +9,13 @@ export function sessionBudget(snapshot:ProductSnapshot,lessonId:string){
  const row=snapshot.aiSessions?.find(session=>session.lessonId===lessonId);
  return {cap,used:row?.tokensUsed||0,sessionNo:row?.sessionNo||1};
 }
-/** Run stays disabled when access expired (TC-AUTH-04) or the session budget is spent (TC-SEC-03). */
+/** A completed or archived class keeps its history readable but takes no new AI work. */
+export function classClosed(snapshot:ProductSnapshot){return !!snapshot.selectedClass&&!['active','upcoming'].includes(snapshot.selectedClass.status);}
+const classNotStarted=(snapshot:ProductSnapshot)=>snapshot.selectedClass?.status==='upcoming';
+/** Run stays disabled when the class has ended, access expired (TC-AUTH-04) or the session budget is spent (TC-SEC-03). */
 export function learnerRunBlocked(snapshot:ProductSnapshot,lessonId:string){
  const budget=sessionBudget(snapshot,lessonId);
- return !!snapshot.learnerAccess?.readOnly||!!budget&&budget.used>=budget.cap;
+ return classClosed(snapshot)||classNotStarted(snapshot)||!!snapshot.learnerAccess?.readOnly||!!budget&&budget.used>=budget.cap;
 }
 type Action=(name:string,payload?:Record<string,unknown>,after?:(value:any)=>void)=>Promise<void>;
 /** TC-AUTH-04 trainer control: per-learner access expiry for the selected class. Shown only when expiry is enforced. */
@@ -38,6 +41,8 @@ export default function LearnerSafeguards({snapshot,lessonId,busy,onAction}:Prop
  const daysLeft=expires?Math.max(0,Math.ceil((expires.getTime()-Date.now())/86400000)):Infinity;
  const number=(value:number)=>value.toLocaleString(lang==='en'?'en-US':'vi-VN');
  return <>
+  {classNotStarted(snapshot)&&<p role="status" className="lv-warning"><strong>{p('Class not started','Lớp chưa bắt đầu')}</strong> · {p('Runs open when your facilitator starts the class.','Bạn có thể chạy AI khi giảng viên mở lớp.')}</p>}
+  {classClosed(snapshot)&&<p role="alert" className="lv-warning lv-readonly"><strong>{p('Class ended','Lớp đã kết thúc')}</strong> · {p('This class is closed. You can review your saved prompts, outputs, grades and awards, but you cannot run AI or submit new work.','Lớp này đã đóng. Bạn vẫn xem được prompt, kết quả, điểm và chứng nhận đã lưu nhưng không thể chạy AI hay nộp bài mới.')}</p>}
   {access?.readOnly&&<p role="alert" className="lv-warning lv-readonly"><strong>{p('Read-only access','Chế độ chỉ đọc')}</strong> · {p(`Your access to this class expired on ${when}. You can review saved prompts, outputs and grades, but you cannot run AI or submit new work. Contact your L&D administrator to extend access.`,`Quyền truy cập lớp này đã hết hạn lúc ${when}. Bạn vẫn xem được prompt, kết quả và điểm đã lưu nhưng không thể chạy AI hay nộp bài mới. Liên hệ quản trị L&D để gia hạn.`)}</p>}
   {access&&!access.readOnly&&expires&&daysLeft<=access.warningDays&&<p role="status" className="lv-warning">{p(`Your access to this class expires on ${when} (${daysLeft} day${daysLeft===1?'':'s'} left). After that the workspace becomes read-only.`,`Quyền truy cập lớp này hết hạn lúc ${when} (còn ${daysLeft} ngày). Sau thời điểm đó không gian làm việc chuyển sang chỉ đọc.`)}</p>}
   {budget&&<div className="lv-session-budget" role="status">
