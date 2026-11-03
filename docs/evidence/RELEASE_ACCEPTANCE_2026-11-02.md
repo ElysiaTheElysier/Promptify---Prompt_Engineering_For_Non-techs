@@ -237,3 +237,5 @@ Còn lại: production chưa có migration 022 và các bản sửa này (T4).
 | Nhãn đồng bộ roster | ❌ → sửa local: luôn ghi "manual sync" vì `vite.config.ts` không cho `VITE_ROSTER_SCHEDULER_ACTIVE` vào bản build; thẻ "Sync Interval" viết cứng |
 
 Các bản sửa ở commit `79fd3ed` (OFFLINE: `npm test` 92/92, build có cờ), **chưa deploy Hosting**. Chưa kiểm: chữ nút lưu prompt (cần đăng nhập học viên), mật độ giao diện trên máy thật.
+
+**Deploy 03/11 tối:** Hosting `5104d53c` (rel1103j, commit `79fd3ed`, API giữ `rel5-1103`). LIVE: Roster ghi "Every 15 minutes · Scheduled" và "15-minute scheduled sync" (lần sync tự động 19:40); heatmap học viên Demo hiện 9.13/10 thay cho "—/10". Chưa kiểm live: danh sách quyền tự làm mới ngay sau khi nâng quyền (không nâng thêm tài khoản để thử).
