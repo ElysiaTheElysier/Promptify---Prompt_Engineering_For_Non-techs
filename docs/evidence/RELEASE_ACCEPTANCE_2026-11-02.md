@@ -220,3 +220,20 @@ Còn lại: production chưa có migration 022 và các bản sửa này (T4).
 - **LIVE staging 03/11:** backup `before-023-revoke-class-access-20261103` → áp 023 bằng `gcloud sql import` (kiểm: hàm tồn tại, `authenticated` gọi được, `anon` không; quyền tạm bucket đã gỡ). API `promptify-intrepid-api-rel5-1103` (image `sha256:5fba939e…`, commit `3b96a5b`) 100% traffic, health/readyz 200, không token 401, giữ `gemini-3.8-flash`/`parallel-v1`/biến roster; rollback = `roster-1103`. Hosting `ed33bc9e` (rel1103i).
 - **Bấm thử khi đăng nhập Admin** (lớp Juniper): danh sách hiện 2 giảng viên của khoá; cấp Head cho `revoke-test-1103@example.test` → hiện ngay trong danh sách; Thu hồi → hộp xác nhận khoá nút tới khi nhập lý do → "Saved on the server", dòng biến mất; audit có `access.grant` 19:09:27 và `access.revoke` 19:09:50 do Admin. Tài khoản thử còn lại trong `users` (vai trò head, không lớp nào).
 - Chưa kiểm LIVE: thu hồi giảng viên thật (cố ý không đụng tài khoản thật); người bị thu hồi đăng nhập lại thấy thông báo không có quyền (đã có test offline cho luồng không lớp).
+
+## Test nốt khi đăng nhập Admin (03/11 tối, LIVE staging: API `rel5-1103`, Hosting `ed33bc9e`)
+
+| Mục | Kết quả |
+| --- | --- |
+| Export CSV (Analytics, Northstar) | ✅ file `promptify-learning-report-2026-11-03.csv`, có BOM UTF-8, số khớp màn hình (7 ghi danh, 1 hoàn thành, 8.94, 9.14 → 8.42, 4 lab) |
+| Print / PDF | ✅ gọi hộp in của trình duyệt; CSS in ẩn header |
+| Lọc Analytics theo ngày | ❌ **không có trên màn đang dùng**; bộ lọc chỉ có ở màn cũ không còn hiển thị. API đã nhận `start`/`end` |
+| Heatmap (Workshop) | ✅ có ma trận tiến độ theo học viên |
+| STUCK | ✅ 0 bị đánh dấu là đúng: lab có 6 lượt trượt nhưng đã có 3 lượt đạt |
+| Điểm học viên ở heatmap | ❌ → sửa local: hiện "—/10" khi lượt mới nhất chưa chấm; giờ lấy lượt đã chấm gần nhất |
+| Yêu cầu hỗ trợ truy cập | ✅ gửi từ màn từ chối (mã `10827d63`) → hiện ở Roster → Mark resolved → "Resolved" |
+| Nâng học viên lên giảng viên | ✅ `learner03@juniper.example.test` (giả lập) → viewer; danh sách quyền chỉ cập nhật sau 15 giây → sửa local |
+| Thu hồi giảng viên | ✅ thu hồi Gray Fiction (giả lập) kèm lý do; biến khỏi danh sách |
+| Nhãn đồng bộ roster | ❌ → sửa local: luôn ghi "manual sync" vì `vite.config.ts` không cho `VITE_ROSTER_SCHEDULER_ACTIVE` vào bản build; thẻ "Sync Interval" viết cứng |
+
+Các bản sửa ở commit `79fd3ed` (OFFLINE: `npm test` 92/92, build có cờ), **chưa deploy Hosting**. Chưa kiểm: chữ nút lưu prompt (cần đăng nhập học viên), mật độ giao diện trên máy thật.
