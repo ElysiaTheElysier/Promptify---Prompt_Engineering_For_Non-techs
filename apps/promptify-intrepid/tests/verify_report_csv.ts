@@ -13,4 +13,6 @@ assert.ok(csv.includes('Average AI Judge score (all graded attempts),8.94'));
 assert.ok(csv.includes('NORTHSTAR,Ops,6,1,50,8.94,6'));
 assert.ok(csv.includes("'=cmd lab,2,8.28"),'lab titles are injection-guarded');
 assert.ok(analyticsCsv({},'vi').includes('Điểm AI Judge trung bình'),'Vietnamese headers');
+assert.ok(analyticsCsv({},'en','2026-10-01 → 2026-10-31').split('\r\n')[1]==='Period,2026-10-01 → 2026-10-31','report period is the second row');
+assert.ok(!analyticsCsv({},'en').includes('Period'),'no period row without a filter');
 console.log('verify_report_csv: PASS');

@@ -10,10 +10,11 @@ export function toCsv(rows:Cell[][]){
 }
 
 /** Head/Admin analytics export: summary, cohorts and labs, in the dashboard's own metrics. BOM keeps Excel on UTF-8. */
-export function analyticsCsv(data:any,lang:'en'|'vi'){
+export function analyticsCsv(data:any,lang:'en'|'vi',period?:string){
  const t=(en:string,vi:string)=>lang==='en'?en:vi;
  const rows:Cell[][]=[
   [t('Promptify learning report','Báo cáo học tập Promptify'),new Date().toISOString()],
+  ...(period?[[t('Period','Khoảng thời gian'),period]]:[]),
   [],
   [t('Metric','Chỉ số'),t('Value','Giá trị')],
   [t('Enrolled learners','Học viên ghi danh'),data?.enrolled],
