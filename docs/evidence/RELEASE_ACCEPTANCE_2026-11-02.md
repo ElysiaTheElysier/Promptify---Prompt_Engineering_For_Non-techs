@@ -179,10 +179,10 @@ Chưa kiểm: Head đăng nhập riêng (Analytics theo grant, export CSV, duy�
 | 1 | SOP Drive PDF/XLSX/DOCX/Google Doc | ✅ sau khi sửa API (`b70c7c5`): file trong thư mục đã duyệt được chấp nhận; cả 4 đọc đúng canary, duyệt + index, hiện trong Studio |
 | 2 | Giảng viên duyệt gợi ý | ✅; học viên thấy "Approved" (bài chưa có nội dung gợi ý soạn sẵn) |
 | 3 | Broadcast + gợi ý riêng → học viên A | ✅ thấy cả hai, Got it/Mark as read hoạt động. Học viên B (`manhmanh100127@gmail.com`) **không thuộc lớp Northstar** → chưa kiểm được "B không thấy" |
-| 4 | Head | ✅ cấp quyền Head cho `kangseobi123@gmail.com`; **đăng nhập Head chưa kiểm** |
+| 4 | Head | ✅ (owner test trên điện thoại 03/11) chỉ thấy 2 lớp được cấp (Northstar + lớp QA cấp từ 19/10); thẻ 8.94 = bảng = report; −7.91% đúng (8.42 − 9.14)/9.14; export tải được nhưng là **JSON** (checklist muốn CSV/PDF); duyệt prompt chia sẻ → "Department shared" + lý do lưu. Lỗi bố cục thẻ prompt và dòng "not audited ROI" lạc chỗ → đã sửa, Hosting `42d51b13` (chưa xem lại khi đăng nhập Head) |
 | 5 | Thu hồi quyền lớp | ❌ **chưa có chức năng** (UI/API/SQL chỉ có cấp) |
 | 6 | Studio: tạo lab, rubric 3 tiêu chí, sandbox, publish | ✅; học viên chấm theo đúng 3 tiêu chí (4.2/2.9/2.9) |
-| 7 | Badge + chứng chỉ | ❌ → **đã sửa ở local (migration 022, `8d746e5`)**: 010 làm lab tạo từ Studio không bao giờ được phát thưởng. Học viên A đạt 4/4 lab (TB 9.8) mà không có chứng chỉ. **Chưa áp lên staging** (cần duyệt). Badge mới tạo mặc định DRAFT, phải bật ACTIVE |
+| 7 | Badge + chứng chỉ | ✅ chứng chỉ sau khi áp **migration 022 lên staging 03/11** (owner duyệt; backup trước; kiểm hàm mới): học viên A nhận chứng chỉ, PDF 1,2 MB tạo được. Chứng chỉ bị đếm vào "My Digital Badges". Badge mới tạo mặc định DRAFT, chưa bật ACTIVE nên chưa kiểm badge |
 | 8 | Đóng lớp | ⬜ chưa làm |
 
 Lỗi nhỏ ghi nhận: nhãn "STUCK (>5 fails)" cho học viên đã 10/10; thông báo "Folder submission stopped" không tự xoá; "Uploaded “”" tên rỗng; 2 file .txt gửi lại đang chờ duyệt.
