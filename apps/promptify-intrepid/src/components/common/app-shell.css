@@ -22,7 +22,9 @@
 .app-account{flex-shrink:0;margin-left:auto}
 .app-page-actions:not(:empty)+.app-account{margin-left:4px;padding-left:12px;border-left:1px solid var(--pi-line)}
 .app-brand{display:flex;flex-shrink:0;text-decoration:none}
-.app-heading{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0;overflow:hidden}
+/* Basis 0 + a minimum: the title shrinks (ellipsis) instead of pushing the stage pill and account onto new lines;
+   only the screen actions wrap below when the bar runs out of room. */
+.app-heading{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:min(260px,100%);overflow:hidden}
 .app-heading-slot>:not(.app-page-heading){flex-shrink:0}
 .app-heading .app-page-heading{min-width:0;max-width:100%}
 .app-heading-default,.app-page-heading{display:flex;flex-direction:column;min-width:0;line-height:1.25}
@@ -69,8 +71,9 @@
  /* Screen actions drop below the title; the account stays at the end of the first line. */
  .app-page-actions:not(:empty)+.app-account{margin-left:auto;padding-left:0;border-left:0}
  .app-header-actions{flex:1 1 100%}
+ .app-heading{min-width:0}
  /* min-width:0 lets the cohort select shrink below its longest class code instead of widening the page. */
- .app-class-label{flex:1 1 100%;min-width:0}.app-class-label select{flex:1;min-width:0;width:100%;max-width:none;height:44px;text-overflow:ellipsis}
+ .app-class-label{flex:1 1 220px;min-width:0}.app-class-label select{flex:1;min-width:0;width:100%;max-width:none;height:44px;text-overflow:ellipsis}
  .app-menu>summary{height:44px}
  .app-language button{height:36px}
 }
