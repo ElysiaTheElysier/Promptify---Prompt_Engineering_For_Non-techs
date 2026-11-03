@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Desktop density (owner feedback 03/11): laptop and 1080p-class screens render the production app at 90%,
+   like browser zoom. Viewport heights go through --app-vh, which undoes the zoom so full-height layouts still fit.
+   Phones/tablets (<1024px) and >=1920px screens stay at 100%. main.tsx sets data-density for the production app only. */
+@media (min-width: 1024px) and (max-width: 1919.98px) {
+  html[data-density='compact'] { --app-vh: calc(100dvh / 0.9); }
+  html[data-density='compact'] body { zoom: 0.9; }
+}
+
 @layer base {
   body {
     font-family: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;

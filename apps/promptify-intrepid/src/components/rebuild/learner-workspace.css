@@ -1,4 +1,4 @@
-.learner-v7{--lv-green:#047857;--lv-text:#102d32;--lv-muted:#52676b;--lv-line:#d5e3df;background:#f4f8f6;color:var(--lv-text);font-family:'Be Vietnam Pro',Inter,system-ui,sans-serif;font-size:15px;line-height:1.65;min-height:100dvh}
+.learner-v7{--lv-green:#047857;--lv-text:#102d32;--lv-muted:#52676b;--lv-line:#d5e3df;background:#f4f8f6;color:var(--lv-text);font-family:'Be Vietnam Pro',Inter,system-ui,sans-serif;font-size:15px;line-height:1.65;min-height:var(--app-vh,100dvh)}
 .learner-v7 *{box-sizing:border-box}.learner-v7 button,.learner-v7 input,.learner-v7 textarea{font:inherit}.learner-v7 button{cursor:pointer}.learner-v7 button:disabled{cursor:not-allowed;opacity:.55}.learner-v7 :focus-visible{outline:3px solid #059669;outline-offset:3px}.learner-v7 h2{font-size:19px;font-weight:750;line-height:1.4;margin:0 0 14px}.learner-v7 h3{font-size:15px;font-weight:700;margin:20px 0 10px}.learner-v7 p{margin:10px 0}.learner-v7 small{font-size:12px}.learner-v7 a{color:#046b50;text-decoration:underline;text-underline-offset:3px}.learner-v7 summary{cursor:pointer;font-weight:650}.learner-v7 details{padding:14px 0;border-top:1px solid var(--lv-line)}
 .learner-toolbar{padding:18px 28px;background:#fff;border-bottom:1px solid var(--lv-line);display:flex;align-items:center;gap:18px;flex-wrap:wrap}.lv-lab-title{display:flex;align-items:center;gap:12px;flex:1;min-width:230px}.lv-lab-title strong{display:block;font-size:17px}.lv-lab-title small{display:block;color:var(--lv-muted)}.lv-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
 .learner-v7 .lv-primary,.learner-v7 .lv-secondary,.learner-v7 .lv-chip,.learner-v7 .lv-icon-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-radius:12px;padding:10px 16px;font-size:14px;font-weight:650;border:1px solid var(--lv-line);line-height:1.4}.learner-v7 .lv-primary{background:var(--lv-green);color:#fff!important;border-color:var(--lv-green);box-shadow:none}.learner-v7 .lv-primary:hover:not(:disabled){background:#065f46}.learner-v7 .lv-secondary,.learner-v7 .lv-icon-button{background:#fff;color:var(--lv-text)}.learner-v7 .lv-secondary:hover{background:#ecf7f1}.learner-v7 .lv-chip{background:#edf7f2;color:#065f46;padding:8px 12px}.learner-v7 .lv-chip[aria-pressed=true]{background:#047857;color:white}.lv-full{width:100%;margin-top:12px}
@@ -127,7 +127,7 @@
 .lv-results .lv-section-heading h2{margin:0;font-size:17px}
 .lv-results .ui-btn-row{margin:0}.lv-results .lv-output-meta{margin:12px 0}
 @media(min-width:981px){
- .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 24px);min-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-gutter:stable;position:sticky;top:calc(var(--app-header-h,64px) + 12px)}
+ .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(var(--app-vh,100dvh) - var(--app-header-h,64px) - 24px);min-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-gutter:stable;position:sticky;top:calc(var(--app-header-h,64px) + 12px)}
  .lv-revised-grid .lv-compose{min-height:100%;flex-shrink:0;display:flex;flex-direction:column}
  .lv-revised-grid textarea#learner-prompt{flex:1;min-height:300px}
  .lv-revised-grid .lv-brief{min-height:100%}
@@ -145,7 +145,7 @@
  .lv-revised-grid textarea#learner-prompt{font-size:14px;line-height:1.6;padding:12px 14px;min-height:160px}
  .lv-revised-grid .lv-compose>.lv-run-row{margin:0 -16px -16px;padding:10px 16px}
  .lv-revised-grid .lv-tabs{margin:0 0 12px}
- .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 24px);min-height:360px}
+ .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(var(--app-vh,100dvh) - var(--app-header-h,64px) - 24px);min-height:360px}
  .learner-inbox{margin:8px 16px 0;padding:8px 16px;border-radius:12px}
  .learner-inbox h2{font-size:13px;margin:0 0 4px}
  .learner-inbox-item{padding:4px 0;font-size:13px}
@@ -155,7 +155,7 @@
  .lv-revised-grid .lv-card{padding:12px}
  .lv-revised-grid .lv-compose>.lv-run-row{margin:0 -12px -12px;padding:8px 12px}
  .lv-revised-grid textarea#learner-prompt{min-height:120px}
- .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(100dvh - var(--app-header-h,64px) - 16px);top:calc(var(--app-header-h,64px) + 8px)}
+ .lv-revised-grid>.lv-context-rail,.lv-revised-grid .lv-prompt-panel,.lv-revised-grid .lv-results{height:calc(var(--app-vh,100dvh) - var(--app-header-h,64px) - 16px);top:calc(var(--app-header-h,64px) + 8px)}
 }
 /* The lab fills the viewport below the app header, not a full extra viewport (page was header + 100dvh + footer tall). */
-.workspace-shell .learner-v7{min-height:calc(100dvh - var(--app-header-h,64px))}
+.workspace-shell .learner-v7{min-height:calc(var(--app-vh,100dvh) - var(--app-header-h,64px))}
