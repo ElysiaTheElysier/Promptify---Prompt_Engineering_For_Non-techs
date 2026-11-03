@@ -183,7 +183,7 @@ Chưa kiểm: Head đăng nhập riêng (Analytics theo grant, export CSV, duy�
 | 5 | Thu hồi quyền lớp | ❌ **chưa có chức năng** (UI/API/SQL chỉ có cấp) |
 | 6 | Studio: tạo lab, rubric 3 tiêu chí, sandbox, publish | ✅; học viên chấm theo đúng 3 tiêu chí (4.2/2.9/2.9) |
 | 7 | Badge + chứng chỉ | ✅ chứng chỉ sau khi áp **migration 022 lên staging 03/11** (owner duyệt; backup trước; kiểm hàm mới): học viên A nhận chứng chỉ, PDF 1,2 MB tạo được. Chứng chỉ bị đếm vào "My Digital Badges". Badge mới tạo mặc định DRAFT, chưa bật ACTIVE nên chưa kiểm badge |
-| 8 | Đóng lớp | ✅ sau 2 bản sửa (API `rel4-1103`, Hosting `215e3618`): ban đầu học viên bị **sập cả trang** (inbox RPC lỗi → 409 chung) và Run báo nhầm "service not ready". Giờ: trang vẫn mở, banner "Class ended", Run khoá; server trả 403 `class_closed`, 0 lời gọi AI |
+| 8 | Đóng lớp → mở lại | ✅ sau 2 bản sửa (API `rel4-1103`, Hosting `215e3618`): ban đầu học viên bị **sập cả trang** (inbox RPC lỗi → 409 chung) và Run báo nhầm "service not ready". Giờ: trang vẫn mở, banner "Class ended", Run khoá; server trả 403 `class_closed`, 0 lời gọi AI. Mở lại Active → học viên Run được ngay (2,33 s) |
 | 7b | Badge | ✅ sau khi owner bật ACTIVE: học viên A nhận "Escalation Pro (E2E)". Nút DRAFT thay bằng công tắc "Award to learners" có mô tả |
 | — | Header | ✅ 2 hàng cố định, avatar luôn góc phải (kiểm 375 / 704 / 1440 px), nền đặc |
 | — | Bảng Codelab Studio, nút "Credential handling policy" | đã sửa (`b592569`); **chưa xem lại khi đăng nhập Admin** |
