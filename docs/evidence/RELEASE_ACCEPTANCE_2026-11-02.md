@@ -68,7 +68,7 @@ Ký hiệu: ✅ LIVE pass · 🟡 một phần / LIVE cũ, sau đó UI đã đ�
 | Roster "Sync now" thêm/sửa/xoá | ✅ | LIVE 21/10 và 28/10, chỉ với Sheet giả lập |
 | Roster theo lịch | ❌ | Chưa chạy live, Scheduler PAUSED |
 | Workshop: pulse, broadcast, gợi ý riêng, Inspector (UI09/10) | ⬜ | OFFLINE; Inspector scorecard chỉ thấy ở dữ liệu cũ |
-| Đóng góp SOP: upload/Drive/duyệt/index | 🟡 | LIVE chỉ với 4 file TXT giả. PDF/DOCX/XLSX/Google Doc chưa kiểm live |
+| Đóng góp SOP: upload/Drive/duyệt/index | ✅ | 02/11: PDF, DOCX, XLSX, Google Doc từ Drive đọc đúng, duyệt và index (xem E2E đợt 2, mục 1) |
 | Nâng học viên thành facilitator | 🟡 | Có release 23/10; chưa có lần kiểm theo E2E guide |
 
 ### Trưởng phòng (Head)
