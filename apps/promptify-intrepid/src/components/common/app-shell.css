@@ -15,7 +15,12 @@
 .app-skip:focus{top:12px}
 
 /* Header: like the Word screens, one light bar. Left: mark and the screen's own title; middle: the screen's main actions; right: cohort, navigation, language, account. */
-.app-header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;min-height:64px;padding:8px clamp(16px,2.5vw,32px);background:#fffffff2;border-bottom:1px solid var(--pi-line);color:var(--pi-ink)}
+/* Two fixed rows (AppShell): the bar keeps the account at the far right of row 1 on every screen; row 2 holds cohort, navigation and language.
+   Opaque background: scrolled content must not show through the sticky header. */
+.app-header{position:sticky;top:0;z-index:40;display:flex;flex-direction:column;gap:8px;padding:8px clamp(16px,2.5vw,32px);background:#fff;border-bottom:1px solid var(--pi-line);color:var(--pi-ink)}
+.app-header-bar{display:flex;align-items:center;gap:12px;min-width:0;min-height:48px}
+.app-account{flex-shrink:0;margin-left:auto}
+.app-page-actions:not(:empty)+.app-account{margin-left:4px;padding-left:12px;border-left:1px solid var(--pi-line)}
 .app-brand{display:flex;flex-shrink:0;text-decoration:none}
 .app-heading{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0;overflow:hidden}
 .app-heading-slot>:not(.app-page-heading){flex-shrink:0}
@@ -29,9 +34,8 @@
 .app-page-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
 .app-page-actions>*{flex-shrink:0}.app-page-actions>.pi-segmented{flex-shrink:1;min-width:0}
 .app-page-actions:empty{display:none}
-.app-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:auto}
+.app-header-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
 .app-stage{flex-shrink:0}
-.app-page-actions:not(:empty)+.app-header-actions{margin-left:4px;padding-left:12px;border-left:1px solid var(--pi-line)}
 .app-class-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--pi-muted)}
 .app-class-picker{appearance:none;max-width:220px;min-width:0;height:36px;padding:0 32px 0 12px;border:1px solid var(--pi-line);border-radius:var(--pi-radius-sm);color:var(--pi-ink);font:inherit;font-size:13px;font-weight:600;text-overflow:ellipsis;cursor:pointer;
  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%2356675f' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center}
@@ -58,11 +62,13 @@
 .app-header :is(a,button,select,summary):focus-visible{outline:2px solid var(--pi-emerald);outline-offset:2px}
 .app-content{min-width:0;outline:none}
 @media(max-width:1600px){.app-account-name,.app-nav>summary span,.app-class-label>span,.app-wide-label{display:none}}
-@media(max-width:1280px){.app-header{flex-wrap:wrap;row-gap:8px}}
+@media(max-width:1280px){.app-header-bar{flex-wrap:wrap;row-gap:8px}}
 @media(max-width:760px){
  .app-header{position:static;padding:10px 16px}
  .app-page-actions{order:5;flex:1 1 100%;margin:0;flex-wrap:wrap}
- .app-header-actions{flex-wrap:wrap;flex:1 1 100%;min-width:0;margin-left:0}
+ /* Screen actions drop below the title; the account stays at the end of the first line. */
+ .app-page-actions:not(:empty)+.app-account{margin-left:auto;padding-left:0;border-left:0}
+ .app-header-actions{flex:1 1 100%}
  /* min-width:0 lets the cohort select shrink below its longest class code instead of widening the page. */
  .app-class-label{flex:1 1 100%;min-width:0}.app-class-label select{flex:1;min-width:0;width:100%;max-width:none;height:44px;text-overflow:ellipsis}
  .app-menu>summary{height:44px}

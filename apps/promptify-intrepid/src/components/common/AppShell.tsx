@@ -26,19 +26,28 @@ function Menu({className,label,summary,children}:{className:string;label:string;
  return <details ref={ref} className={'app-menu '+className}><summary aria-label={label}>{summary}<ChevronDown size={15} aria-hidden/></summary><div className="app-menu-panel">{children(close)}</div></details>;
 }
 
-/** Signed-in frame for every role: one light header with the screen's own title and actions, then cohort, navigation, language and account. */
+/** Signed-in frame for every role. Header row 1: mark, the screen's own title and actions, account at the far right.
+ * Row 2: cohort, navigation and language. Two fixed rows keep the account in the same corner on every screen and width. */
 export function AppShell({items,current,onNavigate,onHome,staging,title,user,classPicker,onLanguage,onProfile,onManageCohorts,onSignOut,children}:Props){
  const language=useProductLanguage(),p=(en:string,vi:string)=>language==='en'?en:vi;
- const [heading,setHeading]=useState<HTMLElement|null>(null),[actions,setActions]=useState<HTMLElement|null>(null);
+ const [heading,setHeading]=useState<HTMLElement|null>(null),[actions,setActions]=useState<HTMLElement|null>(null),header=useRef<HTMLElement>(null);
+ // Sticky learner columns size themselves from the real header height.
+ useEffect(()=>{const node=header.current;if(!node||typeof ResizeObserver==='undefined')return;const root=document.documentElement,observer=new ResizeObserver(()=>root.style.setProperty('--app-header-h',node.offsetHeight+'px'));observer.observe(node);return()=>{observer.disconnect();root.style.removeProperty('--app-header-h');};},[]);
  useEffect(()=>{document.title=title+' · Promptify';},[title]);
  const initials=user.name.split(/\s+/).filter(Boolean).map(part=>part[0]).slice(-2).join('').toUpperCase()||'P';
  return <HeaderSlots.Provider value={{heading,actions}}><div className="workspace-shell">
   <a className="app-skip" href="#app-main">{p('Skip to main content','Bỏ qua tới nội dung chính')}</a>
-  <header className="app-header">
+  <header ref={header} className="app-header">
+   <div className="app-header-bar">
    <a className="app-brand" href="/" translate="no" aria-label="Promptify" onClick={event=>{event.preventDefault();onHome();}}><PromptifyMark className="!h-8 !w-8"/></a>
    <div className="app-heading"><span className="app-heading-default"><strong translate="no">Promptify</strong><small>{title}</small></span><div ref={setHeading} className="app-heading-slot"/></div>
    {staging&&<span className="app-stage" translate="no">Staging</span>}
    <div ref={setActions} className="app-page-actions"/>
+   <Menu className="app-account" label={p('Account','Tài khoản')} summary={<><span className="app-avatar" aria-hidden>{initials}</span><span className="app-account-name"><strong>{user.name}</strong><small>{user.detail}</small></span></>}>{close=><>
+    <button type="button" className="app-menu-item" onClick={()=>{close();onProfile();}}><UserRound size={17} aria-hidden/><span>{p('My profile','Hồ sơ của tôi')}</span></button>
+    <button type="button" className="app-menu-item" onClick={()=>{close();onSignOut();}}><LogOut size={17} aria-hidden/><span>{p('Sign out','Đăng xuất')}</span></button>
+   </>}</Menu>
+   </div>
    <div className="app-header-actions">
     {classPicker&&<label className="app-class-label"><span>{p('Cohort:','Lớp:')}</span>{classPicker}</label>}
     {(items.length>1||onManageCohorts)&&<Menu className="app-nav" label={p('Workspace navigation','Điều hướng không gian làm việc')} summary={<><LayoutGrid size={17} aria-hidden/><span>{items.find(item=>item.id===current)?.label||p('Menu','Danh mục')}</span></>}>{close=><nav aria-label={p('Workspace navigation','Điều hướng không gian làm việc')}>
@@ -49,10 +58,6 @@ export function AppShell({items,current,onNavigate,onHome,staging,title,user,cla
      {onManageCohorts&&<><span className="app-menu-group">{p('Cohort','Lớp học')}</span><button type="button" className="app-menu-item" onClick={()=>{close();onManageCohorts();}}><CalendarRange size={17} aria-hidden/><span>{p('Manage cohorts','Quản lý lớp')}</span></button></>}
     </nav>}</Menu>}
     <div className="app-language" role="group" aria-label={p('Language','Ngôn ngữ')}>{(['vi','en'] as const).map(code=><button type="button" key={code} aria-pressed={language===code} onClick={()=>onLanguage(code)}>{code.toUpperCase()}</button>)}</div>
-    <Menu className="app-account" label={p('Account','Tài khoản')} summary={<><span className="app-avatar" aria-hidden>{initials}</span><span className="app-account-name"><strong>{user.name}</strong><small>{user.detail}</small></span></>}>{close=><>
-     <button type="button" className="app-menu-item" onClick={()=>{close();onProfile();}}><UserRound size={17} aria-hidden/><span>{p('My profile','Hồ sơ của tôi')}</span></button>
-     <button type="button" className="app-menu-item" onClick={()=>{close();onSignOut();}}><LogOut size={17} aria-hidden/><span>{p('Sign out','Đăng xuất')}</span></button>
-    </>}</Menu>
    </div>
   </header>
   <div id="app-main" tabIndex={-1} className="app-content">{children}</div>
