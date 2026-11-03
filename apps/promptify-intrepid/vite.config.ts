@@ -94,7 +94,7 @@ export default defineConfig(({ mode }) => {
     // Expose only explicit browser configuration; never legacy VITE_* AI secrets.
     envPrefix: ['VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY', 'VITE_REBUILD_PRODUCTION',
       'VITE_FIREBASE_API_KEY', 'VITE_FIREBASE_AUTH_DOMAIN', 'VITE_FIREBASE_PROJECT_ID', 'VITE_FIREBASE_APP_ID',
-      'VITE_FIREBASE_AUTH_EMULATOR', 'VITE_FIRESTORE_EMULATOR', 'VITE_STREAM_API_URL'],
+      'VITE_FIREBASE_AUTH_EMULATOR', 'VITE_FIRESTORE_EMULATOR', 'VITE_STREAM_API_URL', 'VITE_ROSTER_SCHEDULER_ACTIVE'],
     plugins: [react(), apiDevServerPlugin()],
     build: {rollupOptions:{input:mode==='staging'?{app:'index.html',stagingAccessQa:'staging-access-qa.html',stagingWorkspaceQa:'staging-workspace-qa.html'}:'index.html'}},
     server: {
