@@ -267,7 +267,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     const published=ids.length?await result<any[]>(c.server.from('product_sop_contributions').select('class_id').in('class_id',ids).eq('status','published').gte('created_at',start.toISOString()).lt('created_at',end.toISOString())):[];
     return {...report,feedback,published_sops:published.length,classes:(report.classes||[]).map((row:any)=>({...row,published_sops:published.filter(source=>source.class_id===row.id).length}))};
   }
-  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner'].includes(body.action));
+  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess'].includes(body.action));
   if(c.profile.role==='learner'&&accessExpiryEnabled()&&READ_ONLY_BLOCKED.has(body.action))await assertWritableAccess(c.profile.id,cls.id);
   switch (body.action) {
     case 'accessRequests':return accessInbox(cls.id,c.profile.role==='admin');
@@ -388,6 +388,20 @@ export async function handleProductRequest(authorization: string, body: any) {
         throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.',409);
       }
       return {userId:data};
+    }
+    case 'revokeAccess': {
+      // Admin-only, audited (023). Instructor access is per course, head access per class; the account itself stays.
+      if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);
+      const {error}=await c.reader.rpc('product_revoke_class_access',{p_class:cls.id,p_user:uuid(body.userId),p_role:body.role,p_reason:text(body.reason,500)});
+      if(error){
+        const message=String(error.message||'');
+        if(/administrator required/i.test(message))throw new ApiAccessError('System administrator required.',403);
+        if(/Access not found/.test(message))throw new ApiAccessError('This access was already removed. Refresh the list.',404);
+        if(/Invalid access role|Reason must be/.test(message))throw new ApiAccessError(message.slice(message.search(/Invalid access role|Reason must be/)),422);
+        if(['PGRST202','42883'].includes(error.code))throw new ApiAccessError('The access revoke schema upgrade (023) has not been applied.',503);
+        throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.',409);
+      }
+      return {revoked:true};
     }
     case 'setAccess':return result(c.reader.rpc('product_set_class_access',{p_class:cls.id,p_email:text(body.email,254).toLowerCase(),p_role:body.role,p_permission:body.permission}));
     case 'saveClass':{
@@ -610,7 +624,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     }
     case 'governance': {
       if (c.profile.role !== 'admin') throw new ApiAccessError('System administrator required.', 403);
-      return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at,actor:users(full_name,email)').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };
+      return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), access:{instructors:await result(c.server.from('course_instructors').select('user_id,permission,user:users(full_name,email)').eq('course_id',cls.course_id)),heads:await result(c.server.from('product_class_grants').select('user_id,permission,user:users(full_name,email)').eq('class_id',cls.id))}, audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at,actor:users(full_name,email)').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };
     }
     default: throw new ApiAccessError('This action has no production handler.', 422);
   }

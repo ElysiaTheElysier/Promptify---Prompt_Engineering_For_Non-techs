@@ -90,7 +90,8 @@
     "verify_learner_safeguards.ts",
     "verify_generation_stream.ts",
     "verify_workshop_messaging.ts",
-    "verify_learner_promotion.ts"
+    "verify_learner_promotion.ts",
+    "verify_class_access_revoke.ts"
   ],
   "policy": "Explicit offline allowlist; credentials stripped, no .env loading or real provider/DB tests allowed."
 }

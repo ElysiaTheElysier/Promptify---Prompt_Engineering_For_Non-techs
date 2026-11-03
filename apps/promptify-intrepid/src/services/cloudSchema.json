@@ -2830,6 +2830,27 @@
         }
       ],
       "many": false
+    },
+    "product_revoke_class_access": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_user",
+          "type": "uuid"
+        },
+        {
+          "name": "p_role",
+          "type": "text"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
     }
   }
 }

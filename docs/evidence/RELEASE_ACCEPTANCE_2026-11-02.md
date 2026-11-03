@@ -209,4 +209,12 @@ Lỗi nhỏ ghi nhận: nhãn "STUCK (>5 fails)" cho học viên đã 10/10; th�
 | Log sync Added/Removed | ✅ đã sửa ánh xạ (`added+reactivated`, `removed`); log cũ hiện "—" |
 | Mật độ giao diện | ✅ prompt 14px/1.6, thẻ 16px, 3 cột vừa khít màn ở 1280×720 và 1536×864 (ảnh chụp), header 1 hàng ở ≥1600px, avatar luôn phải. **Owner cần xem lại trên máy thật** |
 
-Còn lại: chưa có chức năng thu hồi quyền giảng viên/Head; production chưa có migration 022 và các bản sửa này (T4).
+Còn lại: production chưa có migration 022 và các bản sửa này (T4).
+
+## Thu hồi quyền lớp (03/11, CODE + OFFLINE, chưa lên staging)
+
+- Migration `023_revoke_class_access.sql` (+ rollback): `product_revoke_class_access(class,user,role,reason)`, chỉ Admin, bắt buộc lý do, ghi audit `access.revoke`. Giảng viên bị thu hồi theo **khoá học** (mọi lớp của khoá), Head theo **lớp**. Vai trò tài khoản và dữ liệu cũ giữ nguyên; người bị thu hồi thấy thông báo không có quyền.
+- API `revokeAccess` (Admin, phạm vi quản lý lớp); payload governance có danh sách người đang có quyền.
+- Quản trị → Class access: danh sách "People with access" + nút Thu hồi có hộp xác nhận nhập lý do.
+- Test `verify_class_access_revoke.ts` (SQL thật trong PGlite qua adapter RPC): chặn non-admin, kiểm vai trò/lý do, thu hồi theo khoá vs lớp, thu hồi lần 2 báo "Access not found", audit, cấp lại được, rollback. `npm test` 92/92.
+- Chưa: áp 023 lên staging, deploy API/Hosting, bấm thử khi đăng nhập Admin.
