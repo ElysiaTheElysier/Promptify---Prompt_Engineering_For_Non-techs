@@ -1,6 +1,17 @@
 # Bàn giao: Slide bài giảng theo lớp–lab (04/11/2026)
 
-Theo [proposal](../proposals/CLASS_LAB_SLIDES_2026-11-04.md). Điểm dừng: **CODE + OFFLINE**. Chưa push, chưa áp migration thật, chưa đổi cloud, chưa deploy. Nguồn chưa commit.
+Theo [proposal](../proposals/CLASS_LAB_SLIDES_2026-11-04.md). Commit `e245253` (chưa push).
+
+## 0. Release staging (04/11, theo yêu cầu của chủ dự án)
+
+| Thành phần | Trạng thái | Rollback |
+|---|---|---|
+| Bucket `ai-transformation-510302-intrepid-slides-staging` | Mới: asia-southeast1, uniform access, chặn public; CORS GET/PUT/HEAD cho origin Hosting staging + localhost:5195; `promptify-api` chỉ có `objectCreator` + `objectViewer` trên bucket này | Không cần (bucket rỗng ngoài dữ liệu thử) |
+| Cloud SQL `promptify-staging` | 024 đã áp bằng `gcloud sql import` (user postgres); verify SQL PASS; backup `before-024-lesson-slides-20261104`. Quyền tạm `objectViewer` của SA Cloud SQL trên bucket SOP đã thu hồi, file import đã xóa | `rollback/024_lesson_slides.sql` (sau khi đưa API về `rel5-1103`) |
+| API | `promptify-intrepid-api-slides-1104` 100% (image `app:rel-20261104-e245253`, `sha256:8a6aba12…`, build từ commit, không overlay); env chỉ thêm `GCP_SLIDES_BUCKET` | `rel5-1103` |
+| Hosting | Version `94e6c5040961f13e` (33 file, `/` no-store) | `ae77df02f9952ac2` |
+
+LIVE (không đăng nhập): `/health`, `/readyz` 200; `/api/product` không token 401 (cả qua Hosting); chunk `pdf-*.js`, `pdf.worker.min-*.mjs`, `LessonSlidesViewer`, `ClassSlideDecks` phục vụ 200 `text/javascript` từ origin Hosting; bucket: GET ẩn danh 403, preflight CORS trả đúng origin. Nghiệm thu khi đăng nhập (admin LamHaiDuong, lớp giả lập `STAGING-SYNTHETIC-20261020-NORTHSTAR`, PDF giả, AI 0) — **LIVE PASS**: upload riêng tư qua signed URL + CORS; server đếm 30 trang; viewer xem trước render trên origin Hosting (pdf.js + worker); Publish; Make default (hộp xác nhận liệt kê 4 lab kế thừa); Studio `PRACTICE-DELIVERY-02` chặn 13–40 ("This deck has 30 pages"), lưu 13–24, xem trước mở trang 13 với "Part of this lab: 13–24"; Replace bằng PDF 20 trang → "Pages: 30 → 20", lab 02 "Beyond page 20", Publish bị chặn, Cancel giữ bản 30 trang (bản nháp 20 trang còn lại, chưa xuất bản). Lỗi nhỏ thấy được: nút chọn file gốc hiện trong "Replace PDF" (CSS `.prod-app input{display:block}`), đã sửa ở local, chưa deploy. **Chưa kiểm phía học viên** (workspace chỉ cho vai learner). Evidence local: `apps/promptify-intrepid/outputs/staging-release-2026-11-04-slides*/`.
 
 Mức bằng chứng: **CODE** = chỉ có source · **OFFLINE** = test offline / PGlite / harness local · **LIVE** = chưa có.
 
