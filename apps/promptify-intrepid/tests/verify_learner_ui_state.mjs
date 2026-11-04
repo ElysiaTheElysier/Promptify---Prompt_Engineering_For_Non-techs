@@ -75,21 +75,19 @@ all(tree).find(n=>n.type==='button'&&text(n)==='5 Standard Elements Framework').
 assert.ok(prompt.startsWith('[Role]: Keep this custom persona\n[Task]: Keep this custom task'));assert.equal(recognition.exports.recognizedScaffolds(prompt,recognition.exports.CORE_SCAFFOLDS).length,5);assert.equal((prompt.match(/\[Role\]/g)||[]).length,1);
 prompt='[Role]: Existing role';tree=render();all(tree).find(n=>n.type==='button'&&text(n)==='Quick Fix: Context').props.onClick();tree=render();assert.ok(text(tree).includes('Output impact'));all(tree).find(n=>n.type==='button'&&text(n)==='Insert scaffold').props.onClick();assert.ok(prompt.startsWith('[Role]: Existing role'));assert.ok(prompt.includes('\n[Context]:'));assert.equal(recognition.exports.recognizedScaffolds(prompt,recognition.exports.CORE_SCAFFOLDS).length,2,'Inserted Quick Fix must be recognized as a separate core element');
 
-// Prompt | Slides (024): only when the lab has published slides; the editor stays mounted (hidden) so the draft,
-// cursor, attempt and output survive; the viewer stays mounted after first open so its page survives too.
+// Slides (024) live in the left rail tabs, only when the lab has published slides. The prompt editor is never hidden,
+// and the viewer stays mounted after first open so its page survives switching to another rail tab.
+const railTab=label=>all(all(tree).find(n=>n.type==='nav'&&n.props.className==='lv-tabs')).find(n=>n.type==='button'&&text(n)===label);
 prompt='my unsaved draft';states=[];props.lesson={...props.lesson,slides:null};tree=render();
-assert.equal(all(tree).some(n=>n.props?.role==='tablist'&&n.props['aria-label']==='Prompt or lecture slides'),false,'no tab without slides');
-assert.equal(all(tree).find(n=>n.props?.id==='center-pane-prompt').props.hidden,false);
+assert.equal(railTab('Slides'),undefined,'no Slides tab without slides');
 states=[];props.lesson={...props.lesson,slides:{deckId:'d1',versionId:'v1',title:'Week 1',pageCount:30,startPage:13,endPage:24,ranged:true}};tree=render();
-const centerTab=label=>all(tree).find(n=>n.props?.role==='tab'&&n.props.id==='center-tab-'+label);
-assert.equal(centerTab('prompt').props['aria-selected'],true,'Prompt opens first');
+assert.ok(railTab('Exercise')&&railTab('Slides'),'Slides sits beside Exercise/Theory/Hints/Resources');
 assert.equal(all(tree).some(n=>n.type==='LazySlidesViewer'),false,'PDF viewer is not loaded before Slides is clicked');
-centerTab('slides').props.onClick();tree=render();
+railTab('Slides').props.onClick();tree=render();
 const viewer=all(tree).find(n=>n.type==='LazySlidesViewer');assert.ok(viewer,'viewer mounts on Slides');assert.equal(viewer.props.title,'Week 1');
-assert.equal(all(tree).find(n=>n.props?.id==='center-pane-prompt').props.hidden,true,'editor hidden, not unmounted');
-assert.equal(all(tree).find(n=>n.type==='textarea'&&n.props.id==='learner-prompt').props.value,'my unsaved draft');
-centerTab('prompt').props.onClick();tree=render();
-assert.equal(all(tree).find(n=>n.props?.id==='center-pane-slides').props.hidden,true,'viewer kept mounted while hidden');
-assert.equal(all(tree).find(n=>n.props?.id==='center-pane-prompt').props.hidden,false);
+assert.equal(railTab('Slides').props['aria-current'],'page');
+assert.equal(all(tree).find(n=>n.type==='textarea'&&n.props.id==='learner-prompt').props.value,'my unsaved draft','editor stays visible');
+railTab('Exercise').props.onClick();tree=render();
+assert.equal(all(tree).find(n=>n.props?.className==='lv-slides-pane').props.hidden,true,'viewer kept mounted while another tab shows');
 assert.equal(prompt,'my unsaved draft');
-console.log('Prompt | Slides tabs PASS: lazy viewer, draft and viewer state kept across switches.');
+console.log('Slides rail tab PASS: lazy viewer, editor untouched, viewer state kept across tabs.');
