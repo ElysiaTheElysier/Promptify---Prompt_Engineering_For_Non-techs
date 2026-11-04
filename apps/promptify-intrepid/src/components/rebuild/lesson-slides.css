@@ -11,8 +11,11 @@
 .slides-hint{font-size:12px;color:#5b726d;margin:0}
 .slides-viewer:fullscreen,.slides-viewer-full{background:#0f1f1c;padding:12px 16px;color:white}
 .slides-viewer-full:not(:fullscreen){position:fixed;inset:0;z-index:200}
-/* Lift the rail holding a full-window viewer above the sticky prompt panel and the results column. */
-.lv-context-rail:has(.slides-viewer-full){z-index:200}
+/* The sticky center panel is its own stacking context; lift it so the overlay also covers the results column. */
+.lv-prompt-panel:has(.slides-viewer-full){z-index:200}
+/* Slides is a toggle beside the rail tabs; pressed looks like the selected tab. */
+.lv-tabs button[aria-pressed=true]{background:white;color:#047857;box-shadow:0 1px 5px #183b2910}
+.lv-revised-grid .lv-tabs button[aria-pressed=true]{box-shadow:none;border-bottom-color:var(--lv-green)}
 .slides-viewer:fullscreen .slides-count,.slides-viewer-full .slides-count,.slides-viewer:fullscreen .slides-hint,.slides-viewer-full .slides-hint{color:white}
 .slides-viewer:fullscreen .slides-stage,.slides-viewer-full .slides-stage{flex:1;background:#0f1f1c;border:0;align-items:center}
 .lv-slides-pane[hidden]{display:none!important}

@@ -75,19 +75,28 @@ all(tree).find(n=>n.type==='button'&&text(n)==='5 Standard Elements Framework').
 assert.ok(prompt.startsWith('[Role]: Keep this custom persona\n[Task]: Keep this custom task'));assert.equal(recognition.exports.recognizedScaffolds(prompt,recognition.exports.CORE_SCAFFOLDS).length,5);assert.equal((prompt.match(/\[Role\]/g)||[]).length,1);
 prompt='[Role]: Existing role';tree=render();all(tree).find(n=>n.type==='button'&&text(n)==='Quick Fix: Context').props.onClick();tree=render();assert.ok(text(tree).includes('Output impact'));all(tree).find(n=>n.type==='button'&&text(n)==='Insert scaffold').props.onClick();assert.ok(prompt.startsWith('[Role]: Existing role'));assert.ok(prompt.includes('\n[Context]:'));assert.equal(recognition.exports.recognizedScaffolds(prompt,recognition.exports.CORE_SCAFFOLDS).length,2,'Inserted Quick Fix must be recognized as a separate core element');
 
-// Slides (024) live in the left rail tabs, only when the lab has published slides. The prompt editor is never hidden,
-// and the viewer stays mounted after first open so its page survives switching to another rail tab.
-const railTab=label=>all(all(tree).find(n=>n.type==='nav'&&n.props.className==='lv-tabs')).find(n=>n.type==='button'&&text(n)===label);
+// Slides (024): the toggle sits beside the left rail tabs; the deck shows in the center in place of the editor.
+// The editor stays mounted (hidden) so draft and cursor survive; the viewer stays mounted so its page survives.
+const railButton=label=>all(all(tree).find(n=>n.type==='nav'&&n.props.className==='lv-tabs')).find(n=>n.type==='button'&&text(n)===label);
+const pane=id=>all(tree).find(n=>n.props?.id===id);
 prompt='my unsaved draft';states=[];props.lesson={...props.lesson,slides:null};tree=render();
-assert.equal(railTab('Slides'),undefined,'no Slides tab without slides');
+assert.equal(railButton('Slides'),undefined,'no Slides button without slides');
+assert.equal(pane('center-pane-prompt').props.hidden,false);
 states=[];props.lesson={...props.lesson,slides:{deckId:'d1',versionId:'v1',title:'Week 1',pageCount:30,startPage:13,endPage:24,ranged:true}};tree=render();
-assert.ok(railTab('Exercise')&&railTab('Slides'),'Slides sits beside Exercise/Theory/Hints/Resources');
+assert.ok(railButton('Exercise')&&railButton('Slides'),'Slides sits beside Exercise/Theory/Hints/Resources');
+assert.equal(railButton('Slides').props['aria-pressed'],false,'Prompt shows first');
 assert.equal(all(tree).some(n=>n.type==='LazySlidesViewer'),false,'PDF viewer is not loaded before Slides is clicked');
-railTab('Slides').props.onClick();tree=render();
-const viewer=all(tree).find(n=>n.type==='LazySlidesViewer');assert.ok(viewer,'viewer mounts on Slides');assert.equal(viewer.props.title,'Week 1');
-assert.equal(railTab('Slides').props['aria-current'],'page');
-assert.equal(all(tree).find(n=>n.type==='textarea'&&n.props.id==='learner-prompt').props.value,'my unsaved draft','editor stays visible');
-railTab('Exercise').props.onClick();tree=render();
-assert.equal(all(tree).find(n=>n.props?.className==='lv-slides-pane').props.hidden,true,'viewer kept mounted while another tab shows');
+railButton('Slides').props.onClick();tree=render();
+assert.equal(railButton('Slides').props['aria-pressed'],true);
+assert.equal(railButton('Exercise').props['aria-current'],'page','rail keeps its own tab');
+const viewer=all(tree).find(n=>n.type==='LazySlidesViewer');assert.ok(viewer,'viewer mounts in the center');assert.equal(viewer.props.title,'Week 1');
+assert.equal(pane('center-pane-slides').props.hidden,false);
+assert.equal(pane('center-pane-prompt').props.hidden,true,'editor hidden, not unmounted');
+assert.equal(all(tree).find(n=>n.type==='textarea'&&n.props.id==='learner-prompt').props.value,'my unsaved draft');
+all(tree).find(n=>n.type==='button'&&text(n)==='Back to prompt').props.onClick();tree=render();
+assert.equal(pane('center-pane-slides').props.hidden,true,'viewer kept mounted while hidden');
+assert.equal(pane('center-pane-prompt').props.hidden,false);
+railButton('Slides').props.onClick();tree=render();railButton('Slides').props.onClick();tree=render();
+assert.equal(pane('center-pane-prompt').props.hidden,false,'Slides toggles back to the prompt');
 assert.equal(prompt,'my unsaved draft');
-console.log('Slides rail tab PASS: lazy viewer, editor untouched, viewer state kept across tabs.');
+console.log('Slides toggle PASS: button in the rail, deck in the center, draft and viewer state kept.');
