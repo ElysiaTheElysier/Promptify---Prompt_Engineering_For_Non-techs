@@ -15,6 +15,8 @@ LIVE (không đăng nhập): `/health`, `/readyz` 200; `/api/product` không tok
 
 Lỗi tìm thấy khi nghiệm thu và đã sửa (commit `a2d686b`, Hosting `8507d632`, rollback `94e6c504`): lớp phủ toàn màn hình nằm dưới cột kết quả (panel giữa `position: sticky` tạo stacking context) — kiểm lại LIVE: phủ kín, Esc thoát; nút chọn file gốc hiện trong "Replace PDF" — đã sửa CSS, **chưa kiểm lại bằng tài khoản editor**.
 
+**Đổi bố cục theo yêu cầu chủ dự án (commit `202b0f9`, Hosting `5a1a266a`, rollback `8507d632`):** tab Slides chuyển vào dải tab cột trái (Exercise · Theory · Hints · Resources · Slides), chỉ hiện khi lab có slide đã xuất bản; cột giữa trở lại nguyên bản (trình soạn prompt luôn hiện, không bị ẩn khi xem slide). LIVE PASS (learner Demo): mở trang 13 với "Part of this lab: 13–24", editor vẫn hiện song song; đổi trang → Exercise → Slides giữ trang 15; toàn màn hình phủ kín header + cột giữa + cột phải; Esc thoát, giữ trang; pdf.js chưa tải trước khi bấm Slides; không cuộn ngang ở 1366×800. Offline 93/93.
+
 Chưa kiểm LIVE: học viên lớp khác bị từ chối (chỉ OFFLINE), Google Slides/Drive (lớp chưa có thư mục Drive được duyệt chứa file Slides), hai editor xuất bản đồng thời trên Cloud SQL thật. Dữ liệu thử còn lại trên staging: bộ `QA-fictional-deck-30p` (mặc định của Northstar, 4 lab dùng; lab 02 đặt 13–24) và một bản nháp 20 trang chưa xuất bản. Evidence local: `apps/promptify-intrepid/outputs/staging-release-2026-11-04-slides*/`.
 
 Mức bằng chứng: **CODE** = chỉ có source · **OFFLINE** = test offline / PGlite / harness local · **LIVE** = chưa có.
