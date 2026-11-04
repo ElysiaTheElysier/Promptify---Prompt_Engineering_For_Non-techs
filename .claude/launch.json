@@ -12,6 +12,24 @@
       ],
       "port": 5195,
       "url": "http://127.0.0.1:5195"
+    },
+    {
+      "name": "intrepid-slides-harness",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "apps/promptify-intrepid",
+        "exec",
+        "--",
+        "vite",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5197",
+        "--strictPort"
+      ],
+      "port": 5197,
+      "url": "http://127.0.0.1:5197"
     }
   ]
 }

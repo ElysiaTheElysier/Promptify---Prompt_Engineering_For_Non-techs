@@ -9,7 +9,7 @@ export function driveFolderId(url:string){
 export function supportedDriveSource(file:{name:string;mimeType:string;size?:string}){
  return Number(file.size||0)<=25*1024*1024&&(['application/vnd.google-apps.document','application/vnd.google-apps.spreadsheet'].includes(file.mimeType)||/\.(pdf|docx|xlsx|md|csv|txt)$/i.test(file.name));
 }
-export async function listDriveFolder(url:string):Promise<{files:DriveSource[];skipped:number}> {
+export async function listDriveFolder(url:string,accept:(file:{name:string;mimeType:string;size?:string})=>boolean=supportedDriveSource):Promise<{files:DriveSource[];skipped:number}> {
  const root=driveFolderId(url),headers={Authorization:`Bearer ${await googleAccessToken('https://www.googleapis.com/auth/drive.readonly')}`};
  const deadline=Date.now()+30000;
  const queue=[{id:root,depth:0}],seen=new Set<string>(),files:DriveSource[]=[];let skipped=0;
@@ -26,12 +26,12 @@ export async function listDriveFolder(url:string):Promise<{files:DriveSource[];s
    if(f.mimeType==='application/vnd.google-apps.folder'){
     if(folder.depth>=2)throw new ApiAccessError('Choose a Drive folder with at most 3 levels.',422);
     queue.push({id:f.id,depth:folder.depth+1});
-   }else if(supportedDriveSource(f)){
+   }else if(accept(f)){
     if(!files.some(row=>row.id===f.id))files.push({id:f.id,name:f.name,mimeType:f.mimeType,url:'https://drive.google.com/file/d/'+f.id+'/view'});
     if(files.length>20)throw new ApiAccessError('Choose a smaller Drive folder: at most 20 supported files.',422);
    }else skipped++;
   }
  }
- if(!files.length)throw new ApiAccessError('No supported SOP files found in the shared Drive folder.',422);
+ if(!files.length&&accept===supportedDriveSource)throw new ApiAccessError('No supported SOP files found in the shared Drive folder.',422);
  return {files,skipped};
 }

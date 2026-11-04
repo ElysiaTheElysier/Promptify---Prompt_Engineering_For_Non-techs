@@ -2,9 +2,12 @@ import {Storage} from '@google-cloud/storage';
 import {createHash} from 'node:crypto';
 const storage=new Storage();
 const maxOriginalBytes=25*1024*1024;
-function object(path:string){const bucket=process.env.GCP_SOP_BUCKET;if(!bucket)throw Error('Private SOP bucket is not configured');if(!path||path.startsWith('/')||path.split('/').some(x=>/^\.\.$/.test(x)||x===''))throw Error('Invalid storage path');return storage.bucket(bucket).file(path);}
+// Lesson slides live in their own private bucket so SOP and slide access never share a path or IAM grant.
+const buckets:Record<string,string>={'product-sop-originals':'GCP_SOP_BUCKET','product-lesson-slides':'GCP_SLIDES_BUCKET'};
+function bucketObject(path:string,logicalBucket:string){const bucket=process.env[buckets[logicalBucket]];if(!bucket)throw Error('Private '+logicalBucket+' bucket is not configured');if(!path||path.startsWith('/')||path.split('/').some(x=>/^\.\.$/.test(x)||x===''))throw Error('Invalid storage path');return storage.bucket(bucket).file(path);}
 export const cloudStorage={from:(logicalBucket:string)=>{
- if(logicalBucket!=='product-sop-originals')throw Error('Storage bucket not allowed');
+ if(!buckets[logicalBucket])throw Error('Storage bucket not allowed');
+ const object=(path:string)=>bucketObject(path,logicalBucket);
  return {
   async createSignedUrl(path:string,seconds:number,options?:{download?:boolean|string}){try{
    const filename=typeof options?.download==='string'?options.download:path.split('/').pop()||'source';
@@ -30,7 +33,7 @@ export const cloudStorage={from:(logicalBucket:string)=>{
     return {data:{path,...(metadata.generation?{generation:String(metadata.generation)}:{})},error:null};
    }catch(error){return {data:null,error};}
   },
-  async download(path:string){try{const file=object(path),[meta]=await file.getMetadata();if(Number(meta.size)>25*1024*1024)throw Error('File too large');const [bytes]=await file.download({validation:'crc32c'});if(bytes.length>25*1024*1024)throw Error('File too large');return {data:new Blob([new Uint8Array(bytes)]),error:null};}catch(error){return {data:null,error};}}
+  async download(path:string){try{const file=object(path),[meta]=await file.getMetadata();if(Number(meta.size)>25*1024*1024)throw Error('File too large');const [bytes]=await file.download({validation:'crc32c'});if(bytes.length>25*1024*1024)throw Error('File too large');return {data:new Blob([new Uint8Array(bytes)]),error:null,...(meta.generation?{generation:String(meta.generation)}:{})};}catch(error){return {data:null,error};}}
  };
 }};
 

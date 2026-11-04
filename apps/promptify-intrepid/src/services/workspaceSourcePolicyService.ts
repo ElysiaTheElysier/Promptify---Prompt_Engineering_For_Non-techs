@@ -10,14 +10,17 @@ export function requireWorkspaceSource(classId:string,kind:'sheets'|'folders'|'f
  if(!Array.isArray(ids)||!ids.every(id=>typeof id==='string'&&/^[A-Za-z0-9_-]+$/.test(id))||!ids.includes(sourceId))throw new ApiAccessError('This Workspace source is not approved for this class. Ask an administrator to configure its source binding.',403);
 }
 
+/** Drive folder IDs approved for this class (empty when none or unconfigured). */
+export function approvedFolders(classId:string,configuration=process.env.WORKSPACE_SOURCE_BINDINGS_JSON):string[]{
+ let entry:any;try{entry=(JSON.parse(configuration||'{}') as Record<string,any>)[classId];}catch{return [];}
+ return Array.isArray(entry?.folders)?entry.folders.filter((id:unknown)=>typeof id==='string'&&/^[A-Za-z0-9_-]+$/.test(id)):[];
+}
 type FolderLister=(folderUrl:string)=>Promise<{files:Array<{id:string}>}>;
 /** A file is approved when its ID is bound to the class, or when Drive itself lists it inside a folder bound to the class.
  * The folder check asks Drive (never trusts the supplied ID), so new files dropped into an approved folder need no redeploy. */
 export async function requireWorkspaceFile(classId:string,fileId:string,listFolder:FolderLister,configuration=process.env.WORKSPACE_SOURCE_BINDINGS_JSON){
  try{requireWorkspaceSource(classId,'files',fileId,configuration);return;}catch(error){if((error as any)?.statusCode!==403)throw error;}
- const entry=(JSON.parse(configuration||'{}') as Record<string,any>)[classId];
- const folders=Array.isArray(entry?.folders)?entry.folders.filter((id:unknown)=>typeof id==='string'&&/^[A-Za-z0-9_-]+$/.test(id)):[];
- for(const folder of folders){if((await listFolder('https://drive.google.com/drive/folders/'+folder)).files.some(file=>file.id===fileId))return;}
+ for(const folder of approvedFolders(classId,configuration)){if((await listFolder('https://drive.google.com/drive/folders/'+folder)).files.some(file=>file.id===fileId))return;}
  throw new ApiAccessError('This Workspace source is not approved for this class. Ask an administrator to configure its source binding.',403);
 }
 export async function requireWorkspaceFileUrl(classId:string,url:string,listFolder:FolderLister){

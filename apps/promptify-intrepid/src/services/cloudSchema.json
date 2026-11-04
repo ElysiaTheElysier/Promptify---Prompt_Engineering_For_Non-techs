@@ -504,6 +504,43 @@
       "result": "jsonb",
       "view": "jsonb",
       "created_at": "timestamptz"
+    },
+    "product_slide_decks": {
+      "id": "uuid",
+      "class_id": "uuid",
+      "title": "text",
+      "is_default": "bool",
+      "published_version_id": "uuid",
+      "created_by": "uuid",
+      "created_at": "timestamptz",
+      "updated_at": "timestamptz"
+    },
+    "product_slide_versions": {
+      "id": "uuid",
+      "deck_id": "uuid",
+      "class_id": "uuid",
+      "request_id": "uuid",
+      "source_kind": "text",
+      "drive_file_id": "text",
+      "storage_path": "text",
+      "storage_generation": "text",
+      "size_bytes": "int4",
+      "sha256": "text",
+      "page_count": "int4",
+      "created_by": "uuid",
+      "created_at": "timestamptz",
+      "published_at": "timestamptz"
+    },
+    "product_lesson_slides": {
+      "class_id": "uuid",
+      "lesson_id": "uuid",
+      "mode": "text",
+      "deck_id": "uuid",
+      "start_page": "int4",
+      "end_page": "int4",
+      "revision": "int4",
+      "updated_by": "uuid",
+      "updated_at": "timestamptz"
     }
   },
   "relations": [
@@ -2848,6 +2885,147 @@
         {
           "name": "p_reason",
           "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_slide_add_version": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_request",
+          "type": "uuid"
+        },
+        {
+          "name": "p_deck",
+          "type": "uuid"
+        },
+        {
+          "name": "p_title",
+          "type": "text"
+        },
+        {
+          "name": "p_source",
+          "type": "text"
+        },
+        {
+          "name": "p_drive_file",
+          "type": "text"
+        },
+        {
+          "name": "p_path",
+          "type": "text"
+        },
+        {
+          "name": "p_generation",
+          "type": "text"
+        },
+        {
+          "name": "p_size",
+          "type": "integer"
+        },
+        {
+          "name": "p_sha256",
+          "type": "text"
+        },
+        {
+          "name": "p_pages",
+          "type": "integer"
+        }
+      ],
+      "many": false
+    },
+    "product_slide_publish": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_version",
+          "type": "uuid"
+        },
+        {
+          "name": "p_expected",
+          "type": "uuid"
+        },
+        {
+          "name": "p_ranges",
+          "type": "jsonb"
+        },
+        {
+          "name": "p_title",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_slide_set_default": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_deck",
+          "type": "uuid"
+        }
+      ],
+      "many": false
+    },
+    "product_slide_save_lesson": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_lesson",
+          "type": "uuid"
+        },
+        {
+          "name": "p_expected_revision",
+          "type": "integer"
+        },
+        {
+          "name": "p_mode",
+          "type": "text"
+        },
+        {
+          "name": "p_deck",
+          "type": "uuid"
+        },
+        {
+          "name": "p_start",
+          "type": "integer"
+        },
+        {
+          "name": "p_end",
+          "type": "integer"
+        }
+      ],
+      "many": false
+    },
+    "product_slide_remove_deck": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_deck",
+          "type": "uuid"
+        },
+        {
+          "name": "p_replacement",
+          "type": "uuid"
+        },
+        {
+          "name": "p_confirm_off",
+          "type": "boolean"
         }
       ],
       "many": false

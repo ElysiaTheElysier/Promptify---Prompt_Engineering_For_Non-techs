@@ -33,7 +33,7 @@ export async function extractSop(bytes:Buffer,filename:string):Promise<Extracted
  const chunks=chunkSop(pages);const content=pages.map(p=>(p.page?`[Page ${p.page}]\n`:'')+p.text.trim()).join('\n\n');
  return {content,chunks,metadata:{filename,type:extension!.toUpperCase(),pages:totalPages,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')}};
 }
-async function boundedBody(response:Response){
+export async function boundedBody(response:Response){
  if(!response.ok||Number(response.headers.get('content-length')||0)>maxBytes)throw new ApiAccessError('Drive file cannot be read or exceeds 25 MB.',422);
  const reader=response.body?.getReader();if(!reader)throw new ApiAccessError('Drive file is empty.',422);
  const parts:Uint8Array[]=[];let length=0;try{for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>maxBytes)throw new ApiAccessError('Drive file exceeds 25 MB.',422);parts.push(value);}}finally{await reader.cancel();}

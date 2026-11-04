@@ -1,5 +1,5 @@
 import {generationAsyncEnabled} from './generationQueueService';
-import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl} from './workspaceSourcePolicyService';
+import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl,approvedFolders} from './workspaceSourcePolicyService';
 import {driveFolderId} from './driveFolderService';
 import {withServiceScope,sqlTransaction} from './cloudPostgresService';
 import {bindPromptVariables} from './promptVariableService';
@@ -32,6 +32,7 @@ import { productionGenerate, productionEvaluate } from './productionAiService.js
 import {extractSop,extractDriveSop,embedSopChunks} from './sopIngestionService.js';
 import {indexPendingContribution} from './sopIndexingService.js';
 import {inspectWorkspaceSource} from './workspaceInspectionService';
+import {SLIDES_BUCKET,MAX_SLIDE_BYTES,resolveLessonSlides,readClassSlides,inspectSlidePdf,slideUploadPath,slideDrivePath,supportedSlideSource,listClassDriveSlides,fetchDriveSlidePdf} from './lessonSlidesService.js';
 
 type Context = { reader: CloudDatabaseClient; server: CloudDatabaseClient; profile: ProductProfile; classList?:Promise<any[]> };
 const uuid = (value: unknown): string => {
@@ -75,6 +76,27 @@ async function result<T = any>(request: PromiseLike<{ data: T | null; error: any
     throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.', 409);
   }
   return data as T;
+}
+/** Lecture-slide management needs class edit scope; only openSlides is a learner read. */
+const SLIDE_EDITOR_ACTIONS=new Set(['slideDecks','prepareSlideUpload','completeSlideUpload','listDriveSlides','importDriveSlides','previewSlideVersion','publishSlideVersion','setDefaultSlideDeck','saveLessonSlides','removeSlideDeck']);
+// Slide RPC refusals are user decisions (fix the range, reload, choose a replacement), so their message is shown as is.
+const SLIDE_REFUSALS=/^(Assigned editor required|Slide request conflict|Slide deck changed; reload|Revision conflict|Page range exceeds deck|Invalid page ranges?|Invalid slide mode|Deck title required|Lesson outside course|Slide (deck|version) outside class|Choose a published deck of this class|Choose another published deck of this class|Choose a replacement deck or confirm turning slides off|Publish the deck before making it the default)$/;
+async function slideRpc(c:Context,name:string,args:Record<string,unknown>){
+  const {data,error}=await c.reader.rpc(name,args);
+  if(error?.code==='P0001'&&SLIDE_REFUSALS.test(error.message))throw new ApiAccessError(error.message,error.message==='Assigned editor required'?403:/conflict|changed/.test(error.message)?409:422);
+  return result(Promise.resolve({data,error}));
+}
+async function addSlideVersion(c:Context,classId:string,requestId:string,body:any,source:{kind:string;driveFileId:string|null;path:string;generation?:string;bytes:Uint8Array}){
+  const pdf=await inspectSlidePdf(source.bytes);
+  return slideRpc(c,'product_slide_add_version',{p_class:classId,p_request:requestId,p_deck:body.deckId?uuid(body.deckId):null,p_title:body.deckId?null:text(body.title,160),p_source:source.kind,p_drive_file:source.driveFileId,p_path:source.path,p_generation:source.generation||null,p_size:pdf.size,p_sha256:pdf.sha256,p_pages:pdf.pages});
+}
+async function signSlide(c:Context,classId:string,versionId:string){
+  const version=await result<any>(c.server.from('product_slide_versions').select('storage_path').eq('class_id',classId).eq('id',versionId).maybeSingle());
+  if(!version)throw new ApiAccessError('Slides are not available for this lesson.',404);
+  // Signed URLs are never stored or logged; each open re-checks access and the URL works until expiresAt.
+  const signed=await c.server.storage.from(SLIDES_BUCKET).createSignedUrl(version.storage_path,300);
+  if(signed.error||!signed.data)throw new ApiAccessError('Slides are temporarily unavailable.',503);
+  return {url:signed.data.signedUrl,expiresAt:new Date(Date.now()+300000).toISOString()};
 }
 // TM-002: a client without a domain policy still admits every assigned user (fail-open by product decision).
 // Warn once per client per instance so administrators can add the missing domain before this becomes fail-closed.
@@ -218,6 +240,9 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
     analytics: { enrolled: enrollmentRows.length, attempts: attempts.length, evaluated: totals.length, average_score: totals.length ? totals.reduce((a, b) => a + b, 0) / totals.length : null, data_limit: 200, truncated: attempts.length === 200 },
   }};
   });
+  // Read outside the service scope: before 024 is applied the failed read must not abort the snapshot transaction.
+  const slideState=await readClassSlides(c.server,selectedClass.id,true).catch(()=>null);
+  for(const lesson of data.lessons as any[])lesson.slides=slideState?resolveLessonSlides(lesson.id,slideState.decks,slideState.versions,slideState.assignments):null;
   // Actor/RLS reads run after the service connection is released (I01).
   // The inbox RPC raises for a completed/archived class; a closed class keeps its read-only history, not live messages.
   const liveClass=['active','upcoming'].includes(selectedClass.status);
@@ -267,7 +292,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     const published=ids.length?await result<any[]>(c.server.from('product_sop_contributions').select('class_id').in('class_id',ids).eq('status','published').gte('created_at',start.toISOString()).lt('created_at',end.toISOString())):[];
     return {...report,feedback,published_sops:published.length,classes:(report.classes||[]).map((row:any)=>({...row,published_sops:published.filter(source=>source.class_id===row.id).length}))};
   }
-  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess'].includes(body.action));
+  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess'].includes(body.action)||SLIDE_EDITOR_ACTIONS.has(body.action));
   if(c.profile.role==='learner'&&accessExpiryEnabled()&&READ_ONLY_BLOCKED.has(body.action))await assertWritableAccess(c.profile.id,cls.id);
   switch (body.action) {
     case 'accessRequests':return accessInbox(cls.id,c.profile.role==='admin');
@@ -622,6 +647,51 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(pending.class_id!==cls.id)throw new ApiAccessError('Rotation class scope denied.',403);
       return result(c.reader.rpc('product_approve_rotation',{p_request:body.rotationId}));
     }
+    case 'slideDecks':return {...await readClassSlides(c.server,cls.id,false),driveConfigured:approvedFolders(cls.id).length>0};
+    case 'prepareSlideUpload':{
+      const requestId=uuid(body.requestId);
+      if(!Number.isInteger(body.size)||body.size<=0||body.size>MAX_SLIDE_BYTES)throw new ApiAccessError('Choose a PDF up to 25 MB.',422);
+      if(!await result<boolean>(c.server.rpc('product_take_budget',{p_actor:c.profile.id,p_operation:'slides.upload',p_limit:20})))throw new ApiAccessError('Upload quota exceeded.',429);
+      const path=slideUploadPath(c.profile.id,cls.id,requestId);
+      const signed=await c.server.storage.from(SLIDES_BUCKET).createSignedUploadUrl(path,{upsert:false,size:body.size});
+      if(signed.error||!signed.data)throw new ApiAccessError('Private upload is unavailable.',503);
+      return {bucket:SLIDES_BUCKET,path,token:signed.data.token};
+    }
+    case 'completeSlideUpload':{
+      // The path is rebuilt from the verified actor, class and request: an upload session cannot be claimed by another editor.
+      const requestId=uuid(body.requestId),path=slideUploadPath(c.profile.id,cls.id,requestId);
+      const download=await c.server.storage.from(SLIDES_BUCKET).download(path) as {data:Blob|null;error:any;generation?:string};
+      if(download.error||!download.data)throw new ApiAccessError('The uploaded PDF was not received. Upload it again.',422);
+      return addSlideVersion(c,cls.id,requestId,body,{kind:'upload',driveFileId:null,path,generation:download.generation,bytes:new Uint8Array(await download.data.arrayBuffer())});
+    }
+    case 'listDriveSlides':return listClassDriveSlides(cls.id);
+    case 'importDriveSlides':{
+      const requestId=uuid(body.requestId),fileId=typeof body.fileId==='string'&&/^[A-Za-z0-9_-]{1,200}$/.test(body.fileId)?body.fileId:'';
+      if(!fileId)throw new ApiAccessError('Choose a Drive file.',422);
+      const prior=await result<any>(c.server.from('product_slide_versions').select('id,deck_id,page_count').eq('class_id',cls.id).eq('request_id',requestId).maybeSingle());
+      if(prior)return {deckId:prior.deck_id,versionId:prior.id,pageCount:prior.page_count};
+      // Checked on every import and refresh: the file must still be inside a folder approved for this class.
+      await requireWorkspaceFile(cls.id,fileId,url=>listDriveFolder(url,supportedSlideSource));
+      const file=await fetchDriveSlidePdf(fileId),pdf=await inspectSlidePdf(file.bytes),path=slideDrivePath(cls.id,requestId);
+      const stored=await c.server.storage.from(SLIDES_BUCKET).putImmutableOriginal(path,Buffer.from(file.bytes),{sha256:pdf.sha256,contentType:'application/pdf'});
+      if(stored.error||!stored.data)throw new ApiAccessError('Private slide storage is unavailable.',503);
+      return addSlideVersion(c,cls.id,requestId,body,{kind:file.sourceKind,driveFileId:fileId,path,generation:stored.data.generation,bytes:file.bytes});
+    }
+    case 'previewSlideVersion':return signSlide(c,cls.id,uuid(body.versionId));
+    case 'openSlides':{
+      // Same visibility as the lab itself (class read access, lifecycle, schedule, tier); only the published version.
+      const lessonId=uuid(body.lessonId),lesson=(await snapshot(c,cls.id)).lessons.find((l:any)=>l.id===lessonId) as any;
+      if(!lesson)throw new ApiAccessError('Lesson scope denied.',403);
+      if(!lesson.slides)throw new ApiAccessError('Slides are not available for this lesson.',404);
+      return {...lesson.slides,...await signSlide(c,cls.id,lesson.slides.versionId)};
+    }
+    case 'publishSlideVersion':return slideRpc(c,'product_slide_publish',{p_class:cls.id,p_version:uuid(body.versionId),p_expected:body.expectedVersionId?uuid(body.expectedVersionId):null,p_ranges:Array.isArray(body.ranges)?body.ranges:[],p_title:typeof body.title==='string'&&body.title.trim()?text(body.title,160):null});
+    case 'setDefaultSlideDeck':return slideRpc(c,'product_slide_set_default',{p_class:cls.id,p_deck:body.deckId?uuid(body.deckId):null});
+    case 'saveLessonSlides':{
+      const page=(value:unknown)=>{if(value===null||value===undefined||value==='')return null;if(!Number.isInteger(value))throw new ApiAccessError('Invalid page range',422);return value;};
+      return slideRpc(c,'product_slide_save_lesson',{p_class:cls.id,p_lesson:uuid(body.lessonId),p_expected_revision:Number.isInteger(body.expectedRevision)?body.expectedRevision:-1,p_mode:body.mode,p_deck:body.mode==='deck'?uuid(body.deckId):null,p_start:page(body.startPage),p_end:page(body.endPage)});
+    }
+    case 'removeSlideDeck':return slideRpc(c,'product_slide_remove_deck',{p_class:cls.id,p_deck:uuid(body.deckId),p_replacement:body.replacementDeckId?uuid(body.replacementDeckId):null,p_confirm_off:body.confirmOff===true});
     case 'governance': {
       if (c.profile.role !== 'admin') throw new ApiAccessError('System administrator required.', 403);
       return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), access:{instructors:await result(c.server.from('course_instructors').select('user_id,permission,user:users(full_name,email)').eq('course_id',cls.course_id)),heads:await result(c.server.from('product_class_grants').select('user_id,permission,user:users(full_name,email)').eq('class_id',cls.id))}, audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at,actor:users(full_name,email)').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };

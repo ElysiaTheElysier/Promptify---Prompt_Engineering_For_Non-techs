@@ -6,7 +6,7 @@ const source=fs.readFileSync('src/components/rebuild/ProductionWorkspaceV7.tsx',
 const compiled=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.React,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 let states=[],cursor=0,download,execution,action,language,copied;
 const defaults={temperature:.3,topP:.95,maxOutputTokens:4096,stopSequences:[],searchGrounding:false,personalInstruction:''};
-const React={createElement:(type,props,...children)=>({type,props:{...props,children}}),useState(initial){const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;return [states[i],value=>{states[i]=typeof value==='function'?value(states[i]):value;}];},useRef:()=>({current:null})};
+const React={createElement:(type,props,...children)=>({type,props:{...props,children}}),useState(initial){const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;return [states[i],value=>{states[i]=typeof value==='function'?value(states[i]):value;}];},useRef:()=>({current:null}),lazy:()=>'LazySlidesViewer',Suspense:'Suspense'};
 const recognition={exports:{}};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/services/scaffoldRecognitionService.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{module:recognition,exports:recognition.exports});
 const learning={exports:{}};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/services/promptLearningService.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{module:learning,exports:learning.exports,require:()=>recognition.exports});
 const settingsService={exports:{}};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/services/learnerSettingsService.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,{module:settingsService,exports:settingsService.exports});
@@ -23,7 +23,7 @@ const require=name=>{
  if(name.includes('LearnerSafeguards'))return {default:()=>null,learnerRunBlocked:()=>false};
  return new Proxy({}, {get:(_,key)=>String(key)});
 };
-vm.runInNewContext(compiled,{module,exports:module.exports,require,Blob,URL:{createObjectURL:blob=>{download=blob;return 'blob:test';},revokeObjectURL:()=>{}},document:{createElement:()=>({click(){}})},setTimeout:()=>{},crypto:{randomUUID:()=> 'test'},navigator:{clipboard:{writeText:async value=>{copied=value;}}}});
+vm.runInNewContext(compiled,{module,exports:module.exports,require,Blob,URL:{createObjectURL:blob=>{download=blob;return 'blob:test';},revokeObjectURL:()=>{}},document:{createElement:()=>({click(){}})},setTimeout:()=>{},requestAnimationFrame:callback=>callback(),crypto:{randomUUID:()=> 'test'},navigator:{clipboard:{writeText:async value=>{copied=value;}}}});
 const attempt={id:'a1',lesson_ref_id:'l1',attempt_number:1,prompt_text:'original',ai_output:'result',model:'model',latency_ms:1000,evaluation_json:{total:9},settings:{...defaults,temperature:.8,maxOutputTokens:2048,stopSequences:['DONE']},contextIds:['private-old']};
 let prompt='edited';
 const props={snapshot:{profile:{role:'learner'},selectedClass:{id:'c1',department:'Tech'},attempts:[attempt],sops:[],controls:{state:'active'},learnerContexts:[],promptLibrary:[]},lesson:{id:'l1',title:'Task',lesson_key:'B1',scenario:'Exercise',task_goal:'Goal'},get prompt(){return prompt;},setPrompt:value=>{prompt=value;},promptRef:{current:null},insert:()=>{},run:(settings,contextIds)=>{execution={settings,contextIds};},busy:false,attempt,scoreCard:()=>null,unlock:()=>{},onAction:async(name,payload)=>{action={name,payload};},navigate:()=>{},drawer:false,setDrawer:()=>{},query:'',setQuery:()=>{},results:[],search:async()=>{},searching:false,searchError:'',signals:[],draftStatus:'saved',resolveDraft:async()=>{}};
@@ -74,3 +74,22 @@ prompt='[Role]: Keep this custom persona\n[Task]: Keep this custom task';props.i
 all(tree).find(n=>n.type==='button'&&text(n)==='5 Standard Elements Framework').props.onClick();
 assert.ok(prompt.startsWith('[Role]: Keep this custom persona\n[Task]: Keep this custom task'));assert.equal(recognition.exports.recognizedScaffolds(prompt,recognition.exports.CORE_SCAFFOLDS).length,5);assert.equal((prompt.match(/\[Role\]/g)||[]).length,1);
 prompt='[Role]: Existing role';tree=render();all(tree).find(n=>n.type==='button'&&text(n)==='Quick Fix: Context').props.onClick();tree=render();assert.ok(text(tree).includes('Output impact'));all(tree).find(n=>n.type==='button'&&text(n)==='Insert scaffold').props.onClick();assert.ok(prompt.startsWith('[Role]: Existing role'));assert.ok(prompt.includes('\n[Context]:'));assert.equal(recognition.exports.recognizedScaffolds(prompt,recognition.exports.CORE_SCAFFOLDS).length,2,'Inserted Quick Fix must be recognized as a separate core element');
+
+// Prompt | Slides (024): only when the lab has published slides; the editor stays mounted (hidden) so the draft,
+// cursor, attempt and output survive; the viewer stays mounted after first open so its page survives too.
+prompt='my unsaved draft';states=[];props.lesson={...props.lesson,slides:null};tree=render();
+assert.equal(all(tree).some(n=>n.props?.role==='tablist'&&n.props['aria-label']==='Prompt or lecture slides'),false,'no tab without slides');
+assert.equal(all(tree).find(n=>n.props?.id==='center-pane-prompt').props.hidden,false);
+states=[];props.lesson={...props.lesson,slides:{deckId:'d1',versionId:'v1',title:'Week 1',pageCount:30,startPage:13,endPage:24,ranged:true}};tree=render();
+const centerTab=label=>all(tree).find(n=>n.props?.role==='tab'&&n.props.id==='center-tab-'+label);
+assert.equal(centerTab('prompt').props['aria-selected'],true,'Prompt opens first');
+assert.equal(all(tree).some(n=>n.type==='LazySlidesViewer'),false,'PDF viewer is not loaded before Slides is clicked');
+centerTab('slides').props.onClick();tree=render();
+const viewer=all(tree).find(n=>n.type==='LazySlidesViewer');assert.ok(viewer,'viewer mounts on Slides');assert.equal(viewer.props.title,'Week 1');
+assert.equal(all(tree).find(n=>n.props?.id==='center-pane-prompt').props.hidden,true,'editor hidden, not unmounted');
+assert.equal(all(tree).find(n=>n.type==='textarea'&&n.props.id==='learner-prompt').props.value,'my unsaved draft');
+centerTab('prompt').props.onClick();tree=render();
+assert.equal(all(tree).find(n=>n.props?.id==='center-pane-slides').props.hidden,true,'viewer kept mounted while hidden');
+assert.equal(all(tree).find(n=>n.props?.id==='center-pane-prompt').props.hidden,false);
+assert.equal(prompt,'my unsaved draft');
+console.log('Prompt | Slides tabs PASS: lazy viewer, draft and viewer state kept across switches.');

@@ -46,7 +46,35 @@ export function criterionLabel(key: string, label: string | undefined, locale = 
   const pair = templateCriteria.includes(key) ? messages[key as ProductMessageKey] : undefined;
   return pair && (!label || pair.includes(label as never)) ? pair[locale === 'en' ? 0 : 1] : label || key;
 }
+// Lecture-slide refusals are decisions the editor can act on, so the specific reason is shown (EN, VI).
+const SLIDE_ERRORS:Record<string,[string,string]>={
+  'Page range exceeds deck':['A lab page range is beyond the last page of this deck. Fix the range first.','Có khoảng trang của lab vượt quá số trang của bộ slide. Hãy sửa khoảng trang trước.'],
+  'Slide deck changed; reload':['Another editor changed this deck. Reload and review again.','Một giảng viên khác vừa thay đổi bộ slide này. Hãy tải lại và rà soát lại.'],
+  'Revision conflict':['This lab was changed by someone else. Reload before saving.','Lab này vừa được người khác thay đổi. Hãy tải lại trước khi lưu.'],
+  'Invalid page range':['Check the page range: pages start at 1 and the end cannot be before the start.','Kiểm tra khoảng trang: trang bắt đầu từ 1 và trang cuối không được nhỏ hơn trang đầu.'],
+  'Invalid page ranges':['Check the page ranges: pages start at 1 and the end cannot be before the start.','Kiểm tra các khoảng trang: trang bắt đầu từ 1 và trang cuối không được nhỏ hơn trang đầu.'],
+  'Choose a published deck of this class':['Choose a published deck of this class.','Hãy chọn một bộ slide đã xuất bản của lớp này.'],
+  'Choose another published deck of this class':['Choose another published deck of this class as the replacement.','Hãy chọn một bộ slide khác đã xuất bản của lớp này để thay thế.'],
+  'Choose a replacement deck or confirm turning slides off':['This deck is in use. Choose a replacement or confirm turning slides off for those labs.','Bộ slide đang được dùng. Hãy chọn bộ thay thế hoặc xác nhận tắt slide ở các lab đó.'],
+  'Publish the deck before making it the default':['Publish the deck before making it the class default.','Hãy xuất bản bộ slide trước khi đặt làm mặc định của lớp.'],
+  'Slide deck outside class':['This deck does not belong to this class.','Bộ slide này không thuộc lớp này.'],
+  'Slide version outside class':['This slide version does not belong to this class.','Phiên bản slide này không thuộc lớp này.'],
+  'Deck title required':['Enter a display name for the deck.','Hãy nhập tên hiển thị cho bộ slide.'],
+  'Slide request conflict':['This upload was already used for another file. Choose the file again.','Lượt tải lên này đã dùng cho một file khác. Hãy chọn lại file.'],
+  'This file is not a PDF.':['This file is not a PDF. For PowerPoint, export a PDF or open it as Google Slides first.','File này không phải PDF. Với PowerPoint, hãy xuất PDF hoặc mở bằng Google Slides trước.'],
+  'This PDF is password-protected. Export it without a password and upload again.':['This PDF is password-protected. Export it without a password and upload again.','PDF này có mật khẩu. Hãy xuất lại không mật khẩu rồi tải lên.'],
+  'This PDF cannot be read. Export it again and upload the new file.':['This PDF cannot be read. Export it again and upload the new file.','Không đọc được PDF này. Hãy xuất lại và tải file mới lên.'],
+  'A slide PDF needs 1-2000 pages.':['A slide PDF needs 1–2000 pages.','PDF slide cần từ 1 đến 2000 trang.'],
+  'Choose a PDF up to 25 MB.':['Choose a PDF up to 25 MB.','Hãy chọn PDF tối đa 25 MB.'],
+  'The uploaded PDF was not received. Upload it again.':['The uploaded PDF was not received. Upload it again.','Máy chủ chưa nhận được PDF. Hãy tải lên lại.'],
+  'Drive PDF exceeds 25 MB.':['This Drive PDF exceeds 25 MB.','PDF trên Drive vượt quá 25 MB.'],
+  'Google Slides can export at most 10 MB. Download it as PDF from Google Slides and upload the PDF from your computer.':['Google Slides can export at most 10 MB. Download it as PDF from Google Slides and upload the PDF from your computer.','Google Slides chỉ xuất được tối đa 10 MB. Hãy tải về dạng PDF từ Google Slides rồi tải PDF lên từ máy.'],
+  'Promptify can no longer read this Drive file (deleted or unshared). The published version stays in use.':['Promptify can no longer read this Drive file (deleted or unshared). The published version stays in use.','Promptify không còn đọc được file Drive này (đã xóa hoặc bỏ chia sẻ). Bản đã xuất bản vẫn được dùng.'],
+  'Choose a PDF or Google Slides file. For PowerPoint, export a PDF or open it as Google Slides first.':['Choose a PDF or Google Slides file. For PowerPoint, export a PDF or open it as Google Slides first.','Hãy chọn PDF hoặc Google Slides. Với PowerPoint, hãy xuất PDF hoặc mở bằng Google Slides trước.'],
+  'Slides are not available for this lesson.':['Slides are not available for this lesson.','Bài này chưa có slide.'],
+};
 export function productErrorText(status: number, locale = language, detail?:unknown) {
+  if(typeof detail==='string'&&SLIDE_ERRORS[detail])return SLIDE_ERRORS[detail][locale==='en'?0:1];
   if(status===429&&detail==='Your AI run limit has been reached (40 per hour, 200 per day). Try again after the limit resets.')return productText('runQuota',locale);
   if(status===403&&detail==='This Workspace source is not approved for this class. Ask an administrator to configure its source binding.')return productText('workspaceSourceUnapproved',locale);
   const key: ProductMessageKey = status === 0 ? 'unknownOutcome' : status === 401 ? 'unauthorized' : status === 403 ? 'forbidden' : status === 409 ? 'conflict' : status === 422 || status === 400 ? 'invalid' : status === 429 ? 'capacity' : status === 503 ? 'unavailable' : status === 502 || status === 504 ? 'incomplete' : 'serverError';
