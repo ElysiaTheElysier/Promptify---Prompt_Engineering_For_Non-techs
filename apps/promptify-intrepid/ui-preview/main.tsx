@@ -28,6 +28,7 @@ import ProductionSopSource from '../src/components/rebuild/ProductionSopSource';
 import ProductionGovernanceSource from '../src/components/rebuild/ProductionGovernanceSource';
 import PromoteLearnerForm from '../src/components/rebuild/PromoteLearnerForm';
 import {ConfirmHost,Toast,confirmAction} from '../src/components/common/UiFeedback';
+import {PageLoader} from '../src/components/common/PageLoader';
 import {AppShell} from '../src/components/common/AppShell';
 import {ProductDialog} from '../src/components/common/ProductDialog';
 import {setProductLanguage,useProductLanguage} from '../src/services/productI18nService';
@@ -88,6 +89,7 @@ const screens:Record<string,[string,()=>React.ReactNode]>={
  sop:['Đóng góp SOP (UI13)',()=><ProductionSopSource snapshot={base('instructor')} busy={false} onAction={noop as any}/>],
  governance:['Admin · Quản trị (UI14)',()=><><ProductionGovernanceSource snapshot={base('admin')} busy={false} onAction={noop as any}/><PromoteLearnerForm snapshot={base('admin')} busy={false} onAction={noop as any}/><DepartmentCorrectionLog/></>],
  feedback:['Dialogs',()=><Feedback/>],
+ loading:['Loading',()=><PageLoader/>],
 };
 function Feedback(){
  const en=useProductLanguage()==='en',p=(a:string,b:string)=>en?a:b;
@@ -112,7 +114,7 @@ const meta:Record<string,[number,string,string,string,string]>={
  inspector:[10,'Learner inspector','Kiểm tra bài làm','Facilitator','Giảng viên'],studio:[11,'Curriculum Studio','Studio giáo trình','Facilitator','Giảng viên'],
  sop:[13,'SOP contribution','Đóng góp SOP','Facilitator','Giảng viên'],analytics:[12,'Learning analytics','Phân tích học tập','Administration','Quản trị'],
  governance:[14,'System governance','Quản trị hệ thống','Administration','Quản trị'],roster:[15,'Roster connections','Kết nối danh sách học viên','Administration','Quản trị'],
- feedback:[99,'Dialogs & toasts','Hộp thoại & thông báo','Preview','Xem trước'],
+ feedback:[99,'Dialogs & toasts','Hộp thoại & thông báo','Preview','Xem trước'],loading:[98,'Page loading','Đang tải trang','Preview','Xem trước'],
 };
 function Preview(){
  const lang=useProductLanguage(),en=lang==='en';
@@ -120,7 +122,7 @@ function Preview(){
  const pick=(k:string)=>{setKey(k);history.replaceState(null,'','?screen='+k+'&lang='+lang);};
  const keys=Object.keys(screens);
  // Signed-out and entry screens render without the shell, exactly as in the app.
- const bare:Record<string,()=>React.ReactNode>={landing:()=><ProductionLanding/>,signin:()=><ProductionEntry1 email={undefined}/>,profile:()=><ProductionEntry2 {...({snapshot:{...base('learner'),profile:{...base('learner').profile,profile_confirmed_at:null}},email:'duonglh@intrepid.asia',onConfirmed:async()=>{}} as any)}/>,denied:()=><ProductionEntry3 {...({email:'someone@gmail.com',viewDenied:false,onHome:()=>{}} as any)}/>};
+ const bare:Record<string,()=>React.ReactNode>={boot:()=><PageLoader fill="screen"/>,landing:()=><ProductionLanding/>,signin:()=><ProductionEntry1 email={undefined}/>,profile:()=><ProductionEntry2 {...({snapshot:{...base('learner'),profile:{...base('learner').profile,profile_confirmed_at:null}},email:'duonglh@intrepid.asia',onConfirmed:async()=>{}} as any)}/>,denied:()=><ProductionEntry3 {...({email:'someone@gmail.com',viewDenied:false,onHome:()=>{}} as any)}/>};
  if(bare[key])return <Guard key={key}>{bare[key]()}</Guard>;
  return <AppShell items={keys.map(k=>({id:meta[k][0],label:meta[k][en?1:2],group:meta[k][en?3:4]}))} current={meta[key]?.[0]} onNavigate={id=>pick(keys.find(k=>meta[k][0]===id)||'learner')} onHome={()=>pick('hub')} user={{name:'FICTIONAL Admin',detail:'Admin'}} staging title={meta[key]?.[en?1:2]||'Promptify'}
   classPicker={<select className="app-class-picker" aria-label={en?'Cohort':'Lớp học'} value="c1" onChange={()=>{}}><option value="c1" title="Prompting cho CSKH">NS-CSKH-01 · CSKH</option></select>}

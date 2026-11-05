@@ -1,0 +1,12 @@
+/* Page loading state: always centred, the brand mark breathes inside a soft ring. */
+.page-loader{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;width:100%;padding:24px;text-align:center;color:#047857;font:600 15px/1.5 'Be Vietnam Pro',Inter,system-ui,sans-serif}
+.page-loader-screen{min-height:var(--app-vh,100dvh);background:#f3f6f4}
+/* Inside the shell: the viewport minus the 64px header, so the mark sits in the middle of what the user sees. */
+.page-loader-area{min-height:calc(var(--app-vh,100dvh) - 64px)}
+.page-loader-logo{position:relative;display:grid;place-items:center;width:88px;height:88px}
+.page-loader-logo::before{content:'';position:absolute;inset:0;border-radius:50%;border:3px solid #d6e1dc;border-top-color:#047857;animation:page-loader-spin 1.1s linear infinite}
+.page-loader .page-loader-mark{width:52px;height:52px;animation:page-loader-breathe 1.6s ease-in-out infinite}
+.page-loader-label{color:#56675f;font-size:14px;font-weight:600}
+@keyframes page-loader-spin{to{transform:rotate(360deg)}}
+@keyframes page-loader-breathe{0%,100%{transform:scale(.9);opacity:.75}50%{transform:scale(1.04);opacity:1}}
+@media (prefers-reduced-motion:reduce){.page-loader-logo::before,.page-loader .page-loader-mark{animation:none}}
