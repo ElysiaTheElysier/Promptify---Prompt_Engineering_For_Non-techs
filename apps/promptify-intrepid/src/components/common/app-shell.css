@@ -155,9 +155,16 @@
 /* A panel slotted inside a source section (UI-09 hint requests) lines up with the section's own boxes. */
 .workspace-shell [data-source-ui] main .pi-slot{max-width:none;padding:0}
 .workspace-shell [data-source-ui] main .pi-slot .prod-card{margin:0;max-width:none;padding:16px;border-radius:16px;background:#f3f6f4}
-/* UI-12 and UI-14 panels below the source layout share its 1280px column, and nothing pushes them to the page bottom. */
-.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"])>div{justify-content:flex-start}
-.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"]) .prod-card,.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"])~.prod-card{width:calc(100% - 2rem);max-width:76rem;margin:24px auto}
+/* UI-12, UI-14 and UI-15 panels below the source layout share its 1280px column, and nothing pushes them to the page bottom. */
+.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"])>div{justify-content:flex-start}
+.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"]) .prod-card,.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"])~.prod-card{width:calc(100% - 2rem);max-width:76rem;margin:24px auto}
+@media(min-width:1024px){.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"]) .prod-card,.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"])~.prod-card{width:calc(100% - 4rem)}}
+/* UI-11 Studio uses a 1600px column (1536px content); its preferences panel below lines up with it. */
+.workspace-shell [data-source-ui="UI-11"]{justify-content:flex-start}
+.workspace-shell .revised-studio~.prod-card{width:calc(100% - 2rem);max-width:96rem;margin:24px auto}
+@media(min-width:1024px){.workspace-shell .revised-studio~.prod-card{width:calc(100% - 4rem)}}
+/* A source screen with panels below it ends at its content, so no viewport-tall empty band sits above those panels. */
+.workspace-shell .source-ui:has(~.prod-card),.workspace-shell .source-ui:has(~.prod-card)>div{min-height:0}
 /* Manage cohorts opens from the header menu in a dialog, outside the page shell, so it carries its own panel styles. */
 .prod-modal-overlay>.prod-card.app-cohort-dialog{max-width:720px;max-height:90dvh;overflow:auto;padding:24px 28px;background:#fff;border:1px solid #d6e1dc;border-radius:16px;color:#15231e;font-family:'Be Vietnam Pro',Inter,system-ui,sans-serif;text-align:left}
 .app-cohort-dialog details>summary{font-size:18px;font-weight:700;list-style:none;margin-bottom:12px}

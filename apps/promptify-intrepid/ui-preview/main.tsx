@@ -122,7 +122,7 @@ function Preview(){
  // Signed-out and entry screens render without the shell, exactly as in the app.
  const bare:Record<string,()=>React.ReactNode>={landing:()=><ProductionLanding/>,signin:()=><ProductionEntry1 email={undefined}/>,profile:()=><ProductionEntry2 {...({snapshot:{...base('learner'),profile:{...base('learner').profile,profile_confirmed_at:null}},email:'duonglh@intrepid.asia',onConfirmed:async()=>{}} as any)}/>,denied:()=><ProductionEntry3 {...({email:'someone@gmail.com',viewDenied:false,onHome:()=>{}} as any)}/>};
  if(bare[key])return <Guard key={key}>{bare[key]()}</Guard>;
- return <AppShell items={keys.map(k=>({id:meta[k][0],label:meta[k][en?1:2],group:meta[k][en?3:4]}))} current={meta[key]?.[0]} onNavigate={id=>pick(keys.find(k=>meta[k][0]===id)||'learner')} onHome={()=>pick('hub')} staging title={meta[key]?.[en?1:2]||'Promptify'}
+ return <AppShell items={keys.map(k=>({id:meta[k][0],label:meta[k][en?1:2],group:meta[k][en?3:4]}))} current={meta[key]?.[0]} onNavigate={id=>pick(keys.find(k=>meta[k][0]===id)||'learner')} onHome={()=>pick('hub')} user={{name:'FICTIONAL Admin',detail:'Admin'}} staging title={meta[key]?.[en?1:2]||'Promptify'}
   classPicker={<select className="app-class-picker" aria-label={en?'Cohort':'Lớp học'} value="c1" onChange={()=>{}}><option value="c1" title="Prompting cho CSKH">NS-CSKH-01 · CSKH</option></select>}
   onLanguage={code=>{setProductLanguage(code);history.replaceState(null,'','?screen='+key+'&lang='+code);}} onProfile={()=>{}} onSignOut={()=>{}}>
   <Guard key={key}>{screens[key]?.[1]()}</Guard><ConfirmHost/></AppShell>;

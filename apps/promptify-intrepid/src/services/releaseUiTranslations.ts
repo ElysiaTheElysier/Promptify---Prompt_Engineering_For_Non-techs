@@ -327,10 +327,10 @@ Kết nối Sheet mới|Connect New Sheet
 Tổng dòng học viên|Total Learner Rows
 Đồng bộ gần nhất|Last Sync
 Đồng bộ ngay|Sync Now
-Ánh xạ tiêu đề cột Sheet sang dữ liệu Supabase|Google Sheet Header → Supabase Database Mapping
+Ánh xạ tiêu đề cột Sheet sang trường dữ liệu Promptify|Google Sheet Header → Promptify Field Mapping
 Ánh xạ tiêu đề cột Google Sheet sang các trường dữ liệu Promptify.|Maps custom column titles in your Google Sheet to Promptify's target PostgreSQL user schema.
 Tiêu đề cột Google Sheet|Google Sheet Column Header
-Trường dữ liệu đích (Supabase)|Target DB Field (Supabase)
+Trường dữ liệu Promptify|Promptify Field
 Ràng buộc trường|Field Constraint
 Mẫu xem trước dữ liệu|Data Preview Sample
 Trạng thái ánh xạ|Mapping Status

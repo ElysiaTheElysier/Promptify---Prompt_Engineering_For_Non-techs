@@ -30,6 +30,24 @@
       ],
       "port": 5197,
       "url": "http://127.0.0.1:5197"
+    },
+    {
+      "name": "intrepid-ui-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "apps/promptify-intrepid",
+        "run",
+        "dev",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5198",
+        "--strictPort"
+      ],
+      "port": 5198,
+      "url": "http://127.0.0.1:5198"
     }
   ]
 }

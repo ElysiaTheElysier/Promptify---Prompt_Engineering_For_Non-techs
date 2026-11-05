@@ -22,6 +22,12 @@
   }
 }
 
+/* One visible text-selection colour on every surface (the old mint selection matched the page background). */
+::selection {
+  background: #a7f3d0;
+  color: #052e1f;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
