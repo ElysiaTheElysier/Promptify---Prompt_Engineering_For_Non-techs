@@ -159,10 +159,11 @@
 .workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"])>div{justify-content:flex-start}
 .workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"]) .prod-card,.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"])~.prod-card{width:calc(100% - 2rem);max-width:76rem;margin:24px auto}
 @media(min-width:1024px){.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"]) .prod-card,.workspace-shell :is([data-source-ui="UI-12"],[data-source-ui="UI-14"],[data-source-ui="UI-15"])~.prod-card{width:calc(100% - 4rem)}}
-/* UI-11 Studio uses a 1600px column (1536px content); its preferences panel below lines up with it. */
+/* UI-11 Studio content spans the full width (revised-studio.css lifts its 1600px cap) inside px-4 / lg:px-8 gutters; the preferences panel below matches it. */
 .workspace-shell [data-source-ui="UI-11"]{justify-content:flex-start}
-.workspace-shell .revised-studio~.prod-card{width:calc(100% - 2rem);max-width:96rem;margin:24px auto}
+.workspace-shell .revised-studio~.prod-card{width:calc(100% - 2rem);max-width:none;margin:24px auto}
 @media(min-width:1024px){.workspace-shell .revised-studio~.prod-card{width:calc(100% - 4rem)}}
+@media(max-width:980px){.workspace-shell .revised-studio~.prod-card{width:calc(100% - 48px)}}
 /* A source screen with panels below it ends at its content, so no viewport-tall empty band sits above those panels. */
 .workspace-shell .source-ui:has(~.prod-card),.workspace-shell .source-ui:has(~.prod-card)>div{min-height:0}
 /* Manage cohorts opens from the header menu in a dialog, outside the page shell, so it carries its own panel styles. */
