@@ -1,5 +1,51 @@
 # 05 — Vấn đề mở, blocker và việc còn lại
 
+## Hiện trạng 09/11/2026 (thay thế các mục cũ bên dưới khi mâu thuẫn)
+
+Phạm vi: chỉ staging. Production chưa được động tới (theo quyết định owner 09/11). Chi tiết và bằng chứng: [handoffs/UPDATES_2026-11-09_RAG.md](handoffs/UPDATES_2026-11-09_RAG.md).
+
+**Đã đóng trên staging (LIVE 09/11):**
+
+- API crash khi Cloud SQL ngắt client đang dùng (11 lần trong 04–06/11). Commit `c8c6700`.
+- Capacity: max 10 instance, min 1 instance ấm, pool 15. Queue Judge 100 lượt song song, 50 lượt/giây (trước: 3 lượt song song, 1 lượt/giây).
+- Load test Judge với Gemini thật: 50 và 100 lượt đồng thời đều 0 lỗi; p90 khoảng 13 s ở mức 100 lượt.
+- RAG pgvector bật thật (`text-multilingual-embedding-002`, 18 chunk đã đánh chỉ mục lại).
+- Kiểm tra trích dẫn: `CITATION_GATE=on`, commit `4336bbf`, API `rel3-1109`, Hosting `7ddf53ed`.
+- `DISABLE_PUBLIC_BASIC=true` (TM-005).
+- Diễn tập restore PITR: RTO 8,6 phút, số dòng khớp, đã xoá clone.
+- Scheduler roster ENABLED; 2 uptime check và 2 alert policy.
+
+**Còn mở, cần người có tài khoản test:**
+
+- E2E có đăng nhập: `docs/e2e-kit-2026-11-05/KICH-BAN-E2E.md`. Ưu tiên:
+  - UI06 Compare (❌ 28/10);
+  - chia sẻ prompt → Head duyệt;
+  - xin quyền Advanced;
+  - thu hồi Head → Head tải lại;
+  - Google Slides import;
+  - một lượt Run thật có `rag_status=pgvector` và thông báo trích dẫn.
+- Mật độ giao diện 90% trên máy thật.
+
+**Còn mở, kỹ thuật:**
+
+- Load test xuyên qua server (Cloud Tasks → Cloud Run → SQL) với danh tính thật: chưa làm. Đã sửa các nút cổ chai cấu hình đo được.
+- Bảo mật:
+  - TM-002: staging cố ý fail-open vì 11/12 client chưa có domain; prod dùng `DOMAIN_POLICY=require`.
+  - TM-003: chưa có bước admin xác nhận khi gắn danh tính.
+  - TM-004: chưa quét output trước khi chấm.
+  - TM-006: không có rate limit/Cloud Armor.
+  - TM-007: parser chạy trong process API.
+  - TM-008: allowlist nằm trong env.
+  - TM-009: chưa quét chunk SOP.
+- I04 (chặn mềm token phiên), I11 (snapshot 200 attempt), I13 (thiếu số đo retry/token).
+- Real-time: không worker nào ghi Firestore; UI poll 5–15 s.
+- Trích dẫn thừa: AI trích thêm nguồn hợp lệ nhưng không liên quan; chưa có cách phát hiện. Pha 2 (đưa vào chấm điểm) cần owner duyệt.
+- Chất lượng AI Judge chưa được người chấm đối chiếu. Bắt buộc nếu chứng chỉ dùng cho HR.
+
+**Quyết định owner:** số người bấm cùng lúc (SLO), chứng chỉ có dùng cho HR không, real-time, người ký nghiệm thu, thời điểm làm production.
+
+---
+
 Cập nhật 22/10/2026. Mỗi mục ghi rõ nguồn bằng chứng. Thứ tự gần đúng theo mức ưu tiên.
 
 ## Blocker

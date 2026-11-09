@@ -1,5 +1,20 @@
 # 01 — Hiện trạng Promptify Intrepid
 
+## Staging đọc live 09/11/2026
+
+| Thành phần | Trạng thái |
+| --- | --- |
+| API | `promptify-intrepid-api-rel3-1109` nhận 100% traffic. Image `rel-20261109-4336bbf`, build từ commit, không overlay. Max 10 instance, min 1, concurrency 80, pool 15. Rollback: `rel2-1109` → `rel1-1109` → `rag1-1109` → `slides-1104` |
+| Hosting staging | `7ddf53ed74d8d0cd`, rollback `b1cc6c4052c86e36` |
+| Cờ | `JUDGE_MODE=async`, `JUDGE_STREAM`, `GENERATION_STREAM`, `GCP_VECTOR_MODE=pgvector`, `EMBEDDING_MODEL=text-multilingual-embedding-002`, `CITATION_GATE=on`, `DISABLE_PUBLIC_BASIC=true`, `ACCESS_EXPIRY_MODE=enforce`, `INJECTION_GUARD=block`. Admission 013, Generation async 014 và fencing 015 vẫn tắt |
+| Queue Judge | `promptify-judge-staging`: 100 lượt song song, 50 lượt/giây, 3 lần thử |
+| Cloud SQL | `promptify-staging` PG18 ZONAL, migration tới 024. Backup `before-rag-reindex-20261109`. Đã diễn tập restore PITR: RTO 8,6 phút |
+| Scheduler / Monitoring | Roster `*/5` ENABLED. 2 uptime check, 2 alert policy |
+| Production | Đã có SQL `promptify-prod`, queue `promptify-judge-prod`, bucket, secret, SA, site Hosting. **Chưa có API và chưa có release Hosting**; chưa được động tới |
+| Git | Nhánh `test/tm-001-tenant-isolation` đã push lên GitHub, có mọi commit tới `4336bbf` |
+
+Vấn đề mở: [05_OPEN_ISSUES.md](05_OPEN_ISSUES.md). Chi tiết: [handoffs/UPDATES_2026-11-09_RAG.md](handoffs/UPDATES_2026-11-09_RAG.md).
+
 ## Local architecture candidate — 2026-10-23
 
 **CODE + OFFLINE; chưa deploy/áp migration trong phiên này.** Bản ứng viên có global SQL provider admission013, durable async Generation/RAG014, async Judge dispatch fencing015, worker isolation và metrics. Mặc định các flag mới tắt; migration012 và async Judge hiện có được giữ nguyên. Không thay model/scoring, identity quotas, IAM/billing hoặc cloud resources.

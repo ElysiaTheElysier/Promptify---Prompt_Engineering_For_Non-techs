@@ -57,6 +57,38 @@ Retrieval trả 5/5 chunk, tất cả thuộc SOP của bài. Khi hỏi 11 versi
 - **Judge 14 ngày (log LIVE):** 42 lượt, 42 chấm xong, 0 lỗi, 0 dispatch lại. Evaluate p50 3,4 s, p90 4,9 s, max 18,1 s. Chờ trong queue khoảng 0,1 s.
 - **Đã kiểm sau deploy:** `/readyz` 200, `/api/product` không token 401, preflight `/api/judge-stream` 204, Hosting `/` 200.
 
+## Load test, restore, trích dẫn (09/11 chiều, LIVE staging)
+
+**Load test AI Judge.** Code `productionEvaluate` thật, Gemini thật, chạy từ máy local. Mỗi lượt chấm có deadline 270 s và được thử lại khi gặp 429/503/504 như queue.
+
+| Kịch bản | Thành công | Thử lại (provider) | Thời gian chấm p50/p90/max | Người dùng chờ p50/p90/max |
+| --- | --- | --- | --- | --- |
+| 10 lượt cùng lúc | 10/10 | 0 | 3,4 / 4,9 / 4,9 s | như cột trước |
+| 50 lượt, queue 10 | 50/50 | 0 | 3,7 / 5,2 / 8,0 s | 12,3 / 20,3 / 22,1 s |
+| 50 lượt, 50 song song | 50/50 | 5 | 6,3 / 10,0 / 14,3 s | như cột trước |
+| 100 lượt, 50 song song | 100/100 | 26 | 4,6 / 12,7 / 16,7 s | 10,0 / 13,4 / 20,6 s |
+| 100 lượt, 100 song song | 100/100 | 36 | 5,3 / 12,9 / 13,9 s | như cột trước |
+
+Kết luận: Vertex chịu được 600 lời gọi đồng thời; các lỗi 429 đều được thử lại thành công. Nút cổ chai là queue (10 lượt song song, 1 lượt/giây). Đã đổi thành 100 lượt song song và 50 lượt/giây. Chưa load test xuyên qua Cloud Tasks → Cloud Run → SQL bằng danh tính thật.
+
+**Diễn tập restore.** Clone PITR `promptify-staging` → `promptify-staging-restore-1109` (thời điểm cách 10 phút). Đọc được sau **8,6 phút**. Số dòng 7 bảng (users 1262, classes 45, enrollments 1261, prompt_attempts 88, rebuild_runs 91, product_sop_chunks 18, product_judge_jobs 54) khớp bản gốc. Clone thừa hưởng chế độ chống xoá; đã tắt riêng trên clone rồi xoá.
+
+**Kiểm tra trích dẫn (Pha 1 của thiết kế 01/11), commit `4336bbf`:**
+- `citationService.ts`: `decideCitation` + `verifyCitations`, 0 lời gọi AI, không sửa output, không đụng Judge.
+- Quyết định được đóng băng trong snapshot; báo cáo nằm ở `result.citations` (cả luồng sync và async).
+- `CITATION_GATE=on`: workspace hiển thị "n/m trích dẫn khớp SOP của bài" và liệt kê thẻ sai phiên bản hoặc không thuộc bài.
+- Test `verify_citations.ts`. Offline 94/94; lint, typecheck, boundaries, build, smoke PASS.
+- Harness local (`tmp/citation-harness`, bị ignore) hiển thị đúng EN/VI, 4 tình huống.
+
+**Deploy:**
+- API `rel3-1109`: image `sha256:7884064a…`, thêm `CITATION_GATE=on`, `DISABLE_PUBLIC_BASIC=true`. `enrollBasic` giờ trả "Public Basic enrollment is not available.".
+- Hosting `7ddf53ed` (config copy từ version live, rollback `b1cc6c40`). Asset live khớp bản build; `/` no-store; `/api/product` không token 401.
+
+**Rà bảo mật (CODE):**
+- TM-001: có `verify_tenant_isolation.ts` (ma trận từ chối truy cập, SQL thật trên PGlite) trong `npm test`.
+- TM-002: không bật trên staging, vì 11/12 client chưa có domain và sẽ ẩn 47 lớp.
+- TM-003, 004, 006, 007, 008, 009: còn mở như threat model 31/10. Chi tiết xem `05_OPEN_ISSUES.md`.
+
 ## Lưu ý
 
 - Mọi SOP tải lên từ nay được embed bằng `text-multilingual-embedding-002` (Vertex, asia-southeast1), cùng model với production.
