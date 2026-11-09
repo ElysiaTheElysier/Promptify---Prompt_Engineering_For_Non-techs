@@ -47,6 +47,16 @@ Retrieval trả 5/5 chunk, tất cả thuộc SOP của bài. Khi hỏi 11 versi
 - Judge với toàn bộ SOP: 5195 ms, **504 timeout** (35 s, 2 lần gọi treo), 14730 ms. Judge với RAG: 12624 / 4214 / 6473 ms.
 - Cả 6 output đều trích đúng nguồn target, nhưng mỗi output trích thêm 4 nguồn khác. Một output RAG không chứa chuỗi "2000" (chưa kiểm do định dạng số hay sai).
 
+## Sửa crash API và tăng capacity staging (09/11, LIVE)
+
+- **Lỗi:** Cloud Run log 04–06/11 có 11 lần `Connection terminated unexpectedly`, `Emitted 'error' event on Client instance`. Node crash nên instance khởi động lại, và mọi request đang chạy (Run, Judge) đều lỗi theo. Pool chỉ nghe lỗi của client rảnh; client đang được dùng thì không ai nghe.
+- **Sửa:** commit `c8c6700`. Mỗi client của pool có listener `'error'`, chỉ log mã lỗi. Query đang chạy vẫn bị reject, và `sqlTransaction` huỷ client hỏng. Test `verify_sql_pool_errors.ts` tái hiện lỗi; offline 93/93, lint, typecheck, boundaries, build, smoke đều PASS.
+- **Image:** `app:rel-20261109-c8c6700` (`sha256:381c3310…`), Cloud Build `ff96340f` build từ `git archive` của commit, không overlay.
+- **Revision:** `promptify-intrepid-api-rel1-1109` nhận 100% traffic. Giữ nguyên 31 biến môi trường (có RAG). Service `maxInstanceCount` 1 → 10, `minInstanceCount` 1 (1 instance luôn ấm). Rollback: chuyển traffic về `promptify-intrepid-api-rag1-1109`.
+- **Queue** `promptify-judge-staging`: `maxConcurrentDispatches` 3 → 10.
+- **Judge 14 ngày (log LIVE):** 42 lượt, 42 chấm xong, 0 lỗi, 0 dispatch lại. Evaluate p50 3,4 s, p90 4,9 s, max 18,1 s. Chờ trong queue khoảng 0,1 s.
+- **Đã kiểm sau deploy:** `/readyz` 200, `/api/product` không token 401, preflight `/api/judge-stream` 204, Hosting `/` 200.
+
 ## Lưu ý
 
 - Mọi SOP tải lên từ nay được embed bằng `text-multilingual-embedding-002` (Vertex, asia-southeast1), cùng model với production.
