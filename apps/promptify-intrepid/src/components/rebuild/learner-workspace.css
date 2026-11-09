@@ -162,3 +162,5 @@
 }
 /* The lab fills the viewport below the app header, not a full extra viewport (page was header + 100dvh + footer tall). */
 .workspace-shell .learner-v7{min-height:calc(var(--app-vh,100dvh) - var(--app-header-h,64px))}
+
+.lv-citations{background:#f1f7f4;color:#173333;border:1px solid #cfe3da;padding:10px 12px;border-radius:10px;font-size:13px;margin-top:12px}.lv-citations p{margin:0}.lv-citations ul{margin:6px 0 0;padding-left:18px}.lv-citations code{font-size:12px;overflow-wrap:anywhere}

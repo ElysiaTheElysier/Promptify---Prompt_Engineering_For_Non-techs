@@ -14,6 +14,7 @@ import { productionGenerate, productionGenerateStream, productionEvaluate } from
 import type {JudgeHooks,JudgeStageStore,CriterionProgress} from './parallelJudgeService.js';
 import {preflightRun,chargeSession,runTokens,sessionTokenCap,accessExpiryEnabled,userIdForSubject,assertWritableAccess,assertDelayedJobAccess} from './learnerSafeguardService';
 import { piiSignals } from './piiGuardService.js';
+import { citationMode, decideCitation, withCitations } from './citationService.js';
 import { DEFAULT_RUBRIC, validateRubric } from './weightedRubricService.js';
 import { createJudgeTask, newJudgeToken, judgeTokenSha, JUDGE_JOB_DEADLINE_MS, JUDGE_JOB_LEASE_SECONDS, JUDGE_JOB_TTL_SECONDS, JUDGE_MAX_DISPATCHES, type JudgeTask } from './judgeQueueService.js';
 
@@ -198,6 +199,8 @@ async function generateSavedRun(authorization: string, body: any, queueOnly=fals
   // A claimed run freezes its final retrieved context below, before calling the provider.
   c.lesson.actual_generation_context=inputContext;
   c.lesson.actual_generation_context_hash=createHash('sha256').update(inputContext,'utf8').digest('hex');
+  // Frozen with the snapshot so a replay or the leased async worker reuses the same decision.
+  if(citationMode()!=='off')c.lesson.citation_decision=decideCitation(c.lesson,prompt);
   const key = body.requestId;
   if (!/^[0-9a-f-]{36}$/i.test(key || '')) throw new ApiAccessError('Thiếu request ID.', 422);
   if(!queueOnly){
@@ -238,7 +241,7 @@ async function generateSavedRun(authorization: string, body: any, queueOnly=fals
     return {async:true,status:job.status,requestId:key};
   }
   const request={ prompt, lessonId: body.lessonId, classId: body.classId, systemInstruction: c.lesson.system_instruction || undefined, settings, inputContext };
-  const result = await withProviderScope({tenant:c.subject,correlationId:key},()=>onDelta?(options.streamGenerate||productionGenerateStream)(request,onDelta):generate(request));
+  const result = withCitations(await withProviderScope({tenant:c.subject,correlationId:key},()=>onDelta?(options.streamGenerate||productionGenerateStream)(request,onDelta):generate(request)),c.lesson);
   const { data: saved, error } = await c.server.rpc('rebuild_finish_run', { p_subject: c.subject, p_request: key, p_result: result });
   if (error || !saved?.attempt) throw new ApiAccessError('AI đã tạo kết quả nhưng chưa lưu được. Không tự chạy lại để tránh gọi AI trùng; liên hệ trainer với request ID.', 503);
   if(safeguardUser)await chargeSession(safeguardUser,body.classId,body.lessonId,key,runTokens(result,prompt,inputContext));
@@ -536,6 +539,7 @@ async function runGenerationJob(token:string,subject:string,requestId:string):Pr
   const remaining=Math.min(240000,Date.parse(lease.lease_until)-now()-15000);
   if(!Number.isFinite(remaining)||remaining<1000)throw new ApiAccessError('Generation lease has insufficient time remaining.',503);
   result=await withProviderScope({tenant:subject,correlationId:requestId},()=>generate({prompt:lease.prompt,classId:lease.class_id,lessonId:lease.lesson_id,settings:s.generation_settings,inputContext,systemInstruction:s.system_instruction||undefined},remaining));
+  result=withCitations(result,s);
   usage=runTokens(result,lease.prompt,inputContext);
  }catch(cause){
   const code=(cause as any)?.statusCode;

@@ -1,4 +1,5 @@
 import {generationAsyncEnabled} from './generationQueueService';
+import {citationMode} from './citationService';
 import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl,approvedFolders} from './workspaceSourcePolicyService';
 import {driveFolderId} from './driveFolderService';
 import {withServiceScope,sqlTransaction} from './cloudPostgresService';
@@ -227,7 +228,7 @@ async function snapshot(c: Context, classId?: string, onboarding = false) {
   const isLearner=c.profile.role==='learner';
   const [access,sessions,expiries,supportQueue,ownHintRequests]=await Promise.all([isLearner?learnerAccess(c.profile.id,selectedClass.id):Promise.resolve(undefined),isLearner?aiSessions(c.profile.id,selectedClass.id):Promise.resolve([]),selectedClass.can_manage&&accessExpiryEnabled()?classAccessExpiries(selectedClass.id):Promise.resolve({} as Record<string,string>),selectedClass.can_manage?classHintRequests(selectedClass.id):Promise.resolve([]),learnerId?learnerHintRequests(learnerId,selectedClass.id):Promise.resolve([])]);
   const totals = attempts.map(a => a.evaluation_json?.total).filter(v => typeof v === 'number');
-  return {learnerId,data:{ ...empty, lockedLessons,promptLibrary,learnerContexts,modelInfo:{name:process.env.GEMINI_MODEL||'gemini-2.5-flash',allowed:[process.env.GEMINI_MODEL||'gemini-2.5-flash',process.env.GEMINI_FALLBACK_MODEL].filter(Boolean)},awards,attendance,contributions,syncLogs,trainerNotes,drafts,progress, controls: controls || { state: 'active', revision: 0 }, attempts: c.profile.role === 'head' ? [] : attempts, learners:learners.map(row=>({...row,access_expires_at:expiries[row.id]||null})), sops, learnerAccess:access&&{...access,warningDays:ACCESS_EXPIRY_WARNING_DAYS}, aiSessions:sessions, aiSessionCap:isLearner?sessionTokenCap():0, accessExpiryEnabled:selectedClass.can_manage&&accessExpiryEnabled(), supportRequests:supportQueue, hintRequests:ownHintRequests, connections,
+  return {learnerId,data:{ ...empty, lockedLessons,promptLibrary,learnerContexts,modelInfo:{name:process.env.GEMINI_MODEL||'gemini-2.5-flash',allowed:[process.env.GEMINI_MODEL||'gemini-2.5-flash',process.env.GEMINI_FALLBACK_MODEL].filter(Boolean),citationGate:citationMode()},awards,attendance,contributions,syncLogs,trainerNotes,drafts,progress, controls: controls || { state: 'active', revision: 0 }, attempts: c.profile.role === 'head' ? [] : attempts, learners:learners.map(row=>({...row,access_expires_at:expiries[row.id]||null})), sops, learnerAccess:access&&{...access,warningDays:ACCESS_EXPIRY_WARNING_DAYS}, aiSessions:sessions, aiSessionCap:isLearner?sessionTokenCap():0, accessExpiryEnabled:selectedClass.can_manage&&accessExpiryEnabled(), supportRequests:supportQueue, hintRequests:ownHintRequests, connections,
     lessons: lessons.map(l => {
       const config = configs.find(r => r.lesson_id === l.id);
       const { improved_prompt: solution, hints, system_instruction: system, ...safeLesson } = l;
