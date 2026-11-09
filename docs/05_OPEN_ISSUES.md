@@ -42,7 +42,12 @@ Phạm vi: chỉ staging. Production chưa được động tới (theo quyết 
 - Trích dẫn thừa: AI trích thêm nguồn hợp lệ nhưng không liên quan; chưa có cách phát hiện. Pha 2 (đưa vào chấm điểm) cần owner duyệt.
 - Chất lượng AI Judge chưa được người chấm đối chiếu. Bắt buộc nếu chứng chỉ dùng cho HR.
 
-**Quyết định owner:** số người bấm cùng lúc (SLO), chứng chỉ có dùng cho HR không, real-time, người ký nghiệm thu, thời điểm làm production.
+**Quyết định owner 09/11 (D45–D47):**
+- SLO là 100 người/buổi.
+- Chứng chỉ không dùng cho HR, nên không cần người chấm đối chiếu AI Judge.
+- Real-time không cần (poll 5–15 s là đủ).
+
+Còn chờ: người ký nghiệm thu, thời điểm làm production.
 
 ---
 

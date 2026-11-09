@@ -26,9 +26,9 @@ Không đổi model `gemini-3.8-flash`, Judge `parallel-v1`, scoring `weighted-v
 
 | Thiết lập | Staging hiện tại | Production | Lý do |
 | --- | --- | --- | --- |
-| Queue Judge `maxConcurrentDispatches` | 3 | **10** | 50 job dồn một lúc: ~2 phút chờ với 3, ~35 s với 10 (mỗi lần chấm 5–7 s) |
-| Cloud Run `maxScale` / `containerConcurrency` | 100 / 80 | **10 / 40** | 10 × pool 5 = 50 kết nối DB, nằm trong giới hạn Cloud SQL 2 vCPU |
-| `PGPOOL_MAX` | 5 | 5 | I01 đã sửa nên pool 5 không còn bị giữ chéo |
+| Queue Judge `maxConcurrentDispatches` / `maxDispatchesPerSecond` | 100 / 50 (staging từ 09/11) | **100 / 50** | Cập nhật 09/11 theo D45 (100 người/buổi). Load test 100 lượt Judge đồng thời: 0 lỗi, p90 13 s. Với 10 lượt song song và 1 lượt/giây, người cuối phải chờ hơn 40 s |
+| Cloud Run max / min instance / `containerConcurrency` | 10 / 1 / 80 (staging từ 09/11) | **10 / 1 / 40** | Min 1 để không có khởi động lạnh (lượt đầu từng mất 7 s) |
+| `PGPOOL_MAX` | 15 (staging từ 09/11) | **15** | 10 × 15 = 150 kết nối, dưới giới hạn `max_connections=400` |
 | Hàng đợi provider toàn hệ thống (013) | tắt | **tắt** | Chưa deploy/kiểm ở đâu; bật tối nay là rủi ro lớn hơn lợi ích |
 
 **Chưa chứng minh:** chưa có load test cho cấu hình này. Đã đo chắc chắn: 33 lần chấm liên tiếp, 0 lỗi (26/10). Quota Vertex là dùng chung (Dynamic Shared Quota); khi bị 429, Judge tự thử lại từng tiêu chí. Khuyến nghị cho buổi đầu: giảng viên **cho từng nhóm 20–30 người bấm chấm**, không cho cả 100 người bấm cùng lúc.

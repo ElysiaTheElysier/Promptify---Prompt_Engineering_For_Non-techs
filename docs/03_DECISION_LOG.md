@@ -75,7 +75,11 @@ Thêm hai trạng thái: **IMPLEMENTED** = có trong code/staging kèm evidence,
 | D41 — Workspace V7 ba cột (context/prompt/result) | IMPLEMENTED | [parity 22/10](evidence/STAGING_FEATURE_DOC_PARITY_2026-10-22.md) | Thay yêu cầu dual-pane của test log |
 | D42 — Roster: Google Sheets read-only, sync thủ công đã chạy live; thu hồi enrollment khi người học vắng mặt trong snapshot đầy đủ | IMPLEMENTED (staging) | [lifecycle 21/10](STAGING_LIFECYCLE_LEARNER_ACCEPTANCE_2026-10-21.md) | Thực hiện D33. Sync theo lịch vẫn OPEN (Scheduler PAUSED) |
 | D43 — Hàng đợi provider toàn hệ thống / thiết kế lại Judge | OPEN | [proposal 22/10](proposals/STAGING_GEMINI_CAPACITY_LATENCY_PROPOSAL_2026-10-22.md) | Cần SLO và ngân sách trước khi làm |
-| D44 — Public/Basic tier (migration 040/041, `enrollBasic`) | OPEN | Code so với D11 | Có trong code dù D11 xếp ngoài Phase 1; cần chủ sản phẩm quyết định |
+| D44 — Public/Basic tier (migration 040/041, `enrollBasic`) | CONFIRMED tắt | Owner 02/11 ("chưa có"); `DISABLE_PUBLIC_BASIC=true` trên staging từ 09/11 | Code vẫn giữ; production bật cùng cờ |
+| D45 — SLO tải: **100 người trong một buổi học** có thể bấm Run/AI Judge cùng lúc | CONFIRMED (owner 09/11) | Chỉ dẫn owner trong phiên 09/11 | Load test Judge 100 lượt đồng thời: 100/100, người chờ p90 13 s (Gemini thật, LIVE 09/11). Cấu hình đi kèm: queue 100 song song / 50 mỗi giây, max 10 instance, min 1, pool 15. Áp cho cả production khi dựng |
+| D46 — Chứng chỉ **không** dùng cho HR, chỉ để ghi nhận việc học | CONFIRMED (owner 09/11) | Chỉ dẫn owner trong phiên 09/11 | Không bắt buộc người chấm đối chiếu AI Judge trước launch. Nếu sau này dùng cho HR thì phải làm lại việc đó |
+| D47 — Cập nhật màn hình chậm vài giây (poll 5–15 s) là chấp nhận được; không cần real-time | CONFIRMED (owner 09/11) | Chỉ dẫn owner trong phiên 09/11 | Không chạy projection worker ghi Firestore. Listener Firestore trong UI giữ nguyên (vô hại) |
+| D43 (cập nhật 09/11) | Một phần | D45 | SLO đã có. Queue Judge + retry đã đáp ứng 100 lượt mà không cần admission 013; 013 vẫn tắt |
 
 
 ## Cách dùng và archive
