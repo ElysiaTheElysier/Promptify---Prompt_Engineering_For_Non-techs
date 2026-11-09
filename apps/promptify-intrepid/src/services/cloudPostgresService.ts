@@ -23,6 +23,9 @@ export function getSqlPool():SqlPool {
  const created=new Pool({connectionString:process.env.DATABASE_URL,host:process.env.PGHOST,database:process.env.PGDATABASE,user:process.env.PGUSER,password:process.env.PGPASSWORD,max:Number(process.env.PGPOOL_MAX||5),connectionTimeoutMillis:10000,idleTimeoutMillis:30000,statement_timeout:55000});
  // pg drops the broken idle client itself; without a listener the 'error' event would crash the process. Log only the code.
  created.on('error',error=>console.error(JSON.stringify({event:'sql_pool_idle_error',code:(error as any)?.code||'unknown'})));
+ // A checked-out client is outside the pool's idle listener; unhandled, its 'error' kills the process (LIVE 04–06/11).
+ // The in-flight query still rejects, and sqlTransaction destroys the client when ROLLBACK fails.
+ created.on('connect',client=>client.on('error',error=>console.error(JSON.stringify({event:'sql_client_error',code:(error as any)?.code||'unknown'}))));
  pool=Object.assign(created,{supportsServiceScope:true});}
  return pool;
 }

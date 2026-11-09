@@ -11,6 +11,13 @@ try{
  pool.emit('error',Object.assign(new Error('Connection terminated unexpectedly password=secret'),{code:'57P01'}));
  assert.deepEqual(logged.map(line=>JSON.parse(line)),[{event:'sql_pool_idle_error',code:'57P01'}]);
  assert.ok(!logged.join().includes('secret'),'message is not logged');
+ // LIVE 04–06/11: Cloud SQL terminated a checked-out client; with no client listener Node crashed the instance.
+ const {EventEmitter}=await import('node:events');
+ const checkedOut=new EventEmitter();
+ pool.emit('connect',checkedOut);
+ assert.doesNotThrow(()=>checkedOut.emit('error',Object.assign(new Error('Connection terminated unexpectedly password=secret'),{code:'57P01'})),'checked-out client error must not crash');
+ assert.deepEqual(JSON.parse(logged[1]),{event:'sql_client_error',code:'57P01'});
+ assert.ok(!logged.join().includes('secret'),'message is not logged');
 }finally{console.error=originalError;}
 await closeSqlPool();
 
