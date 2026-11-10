@@ -6,7 +6,7 @@ Tài liệu này dẫn bạn đi một vòng ngắn, theo đúng thứ tự thao
 - Tài liệu mẫu nằm trong `materials/`. Toàn bộ là **giả lập**, thuộc công ty hư cấu Northstar Paperworks.
 - Trang test: **https://ai-transformation-510302-intrepid-staging.web.app**. Đây là staging, không đụng tới dữ liệu thật.
 
-> **Điều kiện:** bản ngày 10/11 (migration 025, 026 và API mới) phải được deploy lên staging trước. Trong bản này, Admin tự duyệt Sheet và Drive ngay trong app, không cần Claude deploy cho từng lớp nữa. Nếu chưa deploy, hãy dùng bước 2.5 trong kịch bản cũ.
+> Bản ngày 10/11 đã có trên staging (API `rel1-1110`, Hosting `ddeff54b`). Trong bản này, Admin tự duyệt Sheet và Drive ngay trong app, không cần Claude deploy cho từng lớp nữa.
 
 ---
 

@@ -1,8 +1,8 @@
 # 05 — Vấn đề mở, blocker và việc còn lại
 
-## Cập nhật 10/11/2026: sửa offline, chưa commit, chưa deploy
+## Cập nhật 10/11/2026: đã deploy staging (commit `c9c41f2`)
 
-Kết quả kiểm: npm test 98/98; typecheck, lint, boundaries, build, smoke đều PASS (OFFLINE). Chưa chạy trên staging (LIVE).
+Kết quả kiểm: npm test 98/98; typecheck, lint, boundaries, build, smoke đều PASS (OFFLINE). Đã lên staging: migration 025–026, API `rel1-1110`, Hosting `ddeff54b`. LIVE mới kiểm khi chưa đăng nhập; các luồng có đăng nhập kiểm theo hướng dẫn E2E.
 
 | Mục | Đã làm | Còn lại |
 | --- | --- | --- |
@@ -16,7 +16,7 @@ Kết quả kiểm: npm test 98/98; typecheck, lint, boundaries, build, smoke đ
 | I04 | Chưa làm | Owner phải chọn trần token phiên là mềm hay cứng (đụng quota) |
 | I11 | Chưa làm | Cần đo snapshot trên staging trước khi sửa |
 
-Thứ tự deploy: migration 025, rồi 026, rồi API và Hosting. Rollback: `gcp/sql/rollback/025_*.sql` và `026_*.sql`.
+Rollback: chuyển traffic về `rel3-1109`, release lại Hosting `7ddf53ed`, rồi chạy `gcp/sql/rollback/026_*.sql` và `025_*.sql` (hoặc restore backup `before-025-026-20261110`).
 
 Hướng dẫn test cho người mới: [e2e-kit-2026-11-05/HUONG-DAN-TUNG-BUOC.md](e2e-kit-2026-11-05/HUONG-DAN-TUNG-BUOC.md).
 

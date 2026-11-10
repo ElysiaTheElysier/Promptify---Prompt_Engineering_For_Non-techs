@@ -1,5 +1,16 @@
 # 01 — Hiện trạng Promptify Intrepid
 
+## Staging 10/11/2026 (thay các dòng tương ứng của bảng 09/11 bên dưới)
+
+| Thành phần | Trạng thái (LIVE 10/11) |
+| --- | --- |
+| API | `promptify-intrepid-api-rel1-1110` nhận 100% traffic. Image `rel-20261110-c9c41f2` (`sha256:2bc3abda…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel3-1109` (giữ tag) |
+| Hosting staging | `ddeff54b04f928a1`, rollback `7ddf53ed74d8d0cd` |
+| Cloud SQL | Migration tới 026 (025 nguồn Workspace, 026 duyệt danh tính). Áp bằng Cloud SQL import (user postgres). Backup trước khi áp: `before-025-026-20261110` |
+| Kiểm tra | `/health`, `/readyz` 200; `/api/product` không token 401 (cả qua Hosting); bundle live có màn duyệt nguồn và duyệt đăng nhập. **Chưa kiểm khi đăng nhập** |
+
+Tài khoản staging lúc áp 026: 1/1 admin, 5/6 instructor, 2/3 head đã gắn danh tính. Tài khoản staff chưa gắn sẽ cần Admin duyệt ở lần đăng nhập đầu tiên.
+
 ## Staging đọc live 09/11/2026
 
 | Thành phần | Trạng thái |
