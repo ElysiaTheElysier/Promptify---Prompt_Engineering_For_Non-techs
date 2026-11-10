@@ -283,6 +283,21 @@ export async function handleProductRequest(authorization: string, body: any) {
   if(body.action==='departmentCorrections'){if(c.profile.role!=='admin')throw new ApiAccessError('L&D administrator access required.',403);return result(c.server.from('product_profile_corrections').select('id,reason,status,assigned_department,requested_department,auto_approved,created_at,user:users(full_name,email)').order('created_at',{ascending:false}).limit(100));}
   if(body.action==='profileCorrection'&&body.department!==undefined)return result(c.reader.rpc('product_auto_correct_department',{p_request:uuid(body.requestId),p_source:uuid(body.sourceClassId),p_department:text(body.department,120),p_reason:text(body.reason,1800),p_full_name:text(body.fullName,120)}));
   if (body.action === 'profileCorrection') return result(c.reader.rpc('product_request_correction', { p_request: uuid(body.requestId), p_reason: text(body.reason) }));
+  if(body.action==='createCourse'){
+    // 027: admin-only, audited. A course is created with its first class (the app works per selected class).
+    if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);
+    const start=new Date(body.start),end=new Date(body.end);
+    if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime()))throw new ApiAccessError('Invalid schedule',422);
+    const {data,error}=await c.reader.rpc('product_create_course',{p_client:body.clientId?uuid(body.clientId):null,p_client_name:body.clientId?null:text(body.clientName,200),p_title:text(body.title,200),p_code:text(body.code,80),p_department:text(body.department,120),p_start:start.toISOString(),p_end:end.toISOString()});
+    if(error){
+      const message=String(error.message||'');
+      const known=message.match(/System administrator required|Course title must be[^"]*|Class code must be[^"]*|Department must be[^"]*|Invalid schedule|Choose an existing client or enter a new client name|Class code already exists|Client not found|Client name must be[^"]*/);
+      if(known)throw new ApiAccessError(known[0],known[0]==='System administrator required'?403:known[0]==='Class code already exists'?409:known[0]==='Client not found'?404:422);
+      if(['PGRST202','42883'].includes(error.code)||/RPC not allowed/.test(message))throw new ApiAccessError('The course creation schema upgrade (027) has not been applied.',503);
+      throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.',409);
+    }
+    return {classId:data};
+  }
   if(body.action==='analytics'){
     if(c.profile.role==='learner')throw new ApiAccessError('Department reporting access required.',403);
     const allowed=await classes(c),ids=body.classId?[ (await classScope(c,body.classId)).id ]:allowed.filter(row=>!body.clientId||row.client_id===body.clientId).map(row=>row.id);

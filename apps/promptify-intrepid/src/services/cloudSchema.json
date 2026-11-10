@@ -3074,6 +3074,39 @@
         }
       ],
       "many": false
+    },
+    "product_create_course": {
+      "args": [
+        {
+          "name": "p_client",
+          "type": "uuid"
+        },
+        {
+          "name": "p_client_name",
+          "type": "text"
+        },
+        {
+          "name": "p_title",
+          "type": "text"
+        },
+        {
+          "name": "p_code",
+          "type": "text"
+        },
+        {
+          "name": "p_department",
+          "type": "text"
+        },
+        {
+          "name": "p_start",
+          "type": "timestamp with time zone"
+        },
+        {
+          "name": "p_end",
+          "type": "timestamp with time zone"
+        }
+      ],
+      "many": false
     }
   }
 }

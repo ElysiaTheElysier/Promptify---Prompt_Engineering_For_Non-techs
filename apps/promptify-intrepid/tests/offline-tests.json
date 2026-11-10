@@ -97,7 +97,8 @@
     "verify_workspace_sources_db.ts",
     "verify_source_injection.ts",
     "verify_identity_link_approval.ts",
-    "verify_sop_parser_worker.ts"
+    "verify_sop_parser_worker.ts",
+    "verify_create_course.ts"
   ],
   "policy": "Explicit offline allowlist; credentials stripped, no .env loading or real provider/DB tests allowed."
 }
