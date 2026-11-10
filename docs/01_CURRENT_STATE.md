@@ -5,7 +5,7 @@
 | Thành phần | Trạng thái (LIVE 10/11) |
 | --- | --- |
 | API | `promptify-intrepid-api-rel2-1110` nhận 100% traffic. Image `rel-20261110-a631cea` (`sha256:33810f95…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel1-1110` (giữ tag), rồi `rel3-1109` |
-| Hosting staging | `252262f6a20b2031`, rollback `ddeff54b04f928a1`, rồi `7ddf53ed74d8d0cd` |
+| Hosting staging | `3ee504929e3a2723` (sửa giao diện Governance, commit `ea6456d`), rollback `252262f6a20b2031`, rồi `ddeff54b04f928a1` |
 | Cloud SQL | Migration tới 027 (025 nguồn Workspace, 026 duyệt danh tính, 027 Admin tạo khoá học + lớp đầu tiên). Áp bằng Cloud SQL import (user postgres). Backup: `before-025-026-20261110`, `before-027-20261110` |
 | Kiểm tra | `/health`, `/readyz` 200; `/api/product` không token 401 (cả qua Hosting); bundle live có màn duyệt nguồn và duyệt đăng nhập. **Chưa kiểm khi đăng nhập** |
 
