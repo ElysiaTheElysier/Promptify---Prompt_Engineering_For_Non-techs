@@ -1,5 +1,25 @@
 # 05 — Vấn đề mở, blocker và việc còn lại
 
+## Cập nhật 10/11/2026: sửa offline, chưa commit, chưa deploy
+
+Kết quả kiểm: npm test 98/98; typecheck, lint, boundaries, build, smoke đều PASS (OFFLINE). Chưa chạy trên staging (LIVE).
+
+| Mục | Đã làm | Còn lại |
+| --- | --- | --- |
+| TM-008 | Migration 025: Admin duyệt Sheet/thư mục/file Drive cho từng lớp ngay trong màn Governance, có ghi audit. Server gộp danh sách này với `WORKSPACE_SOURCE_BINDINGS_JSON` | Tách SA hoặc Shared Drive theo khách hàng |
+| TM-003 | Migration 026: lần đăng nhập Google đầu tiên của admin/giảng viên/Head phải chờ Admin duyệt (có audit). Học viên và admin đầu tiên không bị ảnh hưởng | — |
+| TM-004 | Quét output trước khi chấm: có tín hiệu thì gắn `integritySignals` và hiện cảnh báo cho giảng viên. Điểm không đổi (weighted-v1) | Muốn chặn hoặc trừ điểm thì cần owner duyệt |
+| TM-009 | Chặn SOP và ngữ cảnh học viên có chỉ dẫn ẩn khi `INJECTION_GUARD=block` (lúc tải lên và lúc duyệt) | — |
+| TM-006 | Kết quả kiểm tra thu hồi token được cache 60 giây cho mỗi instance | Rate limit theo IP cần Cloud Armor hoặc load balancer (tốn chi phí, owner quyết định) |
+| TM-007 | Đọc file SOP trong tiến trình con: heap 512 MB, deadline 60 giây, không mang theo secret trong env | Cô lập hoàn toàn cần service riêng với SA tối thiểu |
+| I13 | Log `provider_send` cho mỗi lần gửi tới Gemini (kể cả retry), không phụ thuộc cờ admission | Token usage trên mỗi transport |
+| I04 | Chưa làm | Owner phải chọn trần token phiên là mềm hay cứng (đụng quota) |
+| I11 | Chưa làm | Cần đo snapshot trên staging trước khi sửa |
+
+Thứ tự deploy: migration 025, rồi 026, rồi API và Hosting. Rollback: `gcp/sql/rollback/025_*.sql` và `026_*.sql`.
+
+Hướng dẫn test cho người mới: [e2e-kit-2026-11-05/HUONG-DAN-TUNG-BUOC.md](e2e-kit-2026-11-05/HUONG-DAN-TUNG-BUOC.md).
+
 ## Hiện trạng 09/11/2026 (thay thế các mục cũ bên dưới khi mâu thuẫn)
 
 Phạm vi: chỉ staging. Production chưa được động tới (theo quyết định owner 09/11). Chi tiết và bằng chứng: [handoffs/UPDATES_2026-11-09_RAG.md](handoffs/UPDATES_2026-11-09_RAG.md).

@@ -7,6 +7,7 @@ import { AiServerError, type GenerateRequestBody, type EvaluateRequestBody } fro
 import { validateRubric, validateWeightedEvaluation } from './weightedRubricService.js';
 import type { RubricCriterion } from '../types/production.js';
 import {piiSignals} from './piiGuardService.js';
+import {injectionSignals} from './promptInjectionService';
 import {evaluateParallel,JUDGE_STRATEGIES,type JudgeStrategy,type JudgeHooks} from './parallelJudgeService.js';
 
 /** Provider capacity retry wait: Retry-After (capped at 5s) or 0.8–1.6s jitter. */
@@ -138,7 +139,15 @@ export async function productionGenerateStream(body: GenerateRequestBody & {sett
   const data=await readGenerationStream(response.body,onDelta);
   return { ...interpretResponse(data,model), latencyMs: Math.round(performance.now() - started), streamed:true };
 }
+/** TM-004: output text that tries to steer the grader is flagged for the trainer and logged (names only, no text).
+ * The score is unchanged: weighted-v1 and parallel-v1 stay as approved. */
 export async function productionEvaluate(body: EvaluateRequestBody & {language?:'en'|'vi'}, deadlineMs = 50000, hooks:JudgeHooks={}) {
+  const integritySignals=injectionSignals(body.generatedOutput);
+  if(integritySignals.length)console.warn(JSON.stringify({event:'security_event',kind:'output_injection',action:'flagged',signals:integritySignals}));
+  const evaluation=await evaluateOutput(body,deadlineMs,hooks);
+  return integritySignals.length?{...evaluation,integritySignals}:evaluation;
+}
+async function evaluateOutput(body: EvaluateRequestBody & {language?:'en'|'vi'}, deadlineMs: number, hooks:JudgeHooks) {
   const rubric = validateRubric(body.lessonRubric as RubricCriterion[]);
   const strategy=process.env.JUDGE_STRATEGY as JudgeStrategy;
   // parallel-v1 (A) is production; consolidated-v1 (B) / integrated-v1 (C) are benchmark candidates with the same weighted-v1 contract.

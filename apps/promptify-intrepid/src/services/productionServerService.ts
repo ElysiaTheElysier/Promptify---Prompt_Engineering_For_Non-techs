@@ -1,6 +1,6 @@
 import {generationAsyncEnabled} from './generationQueueService';
 import {citationMode} from './citationService';
-import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl,approvedFolders} from './workspaceSourcePolicyService';
+import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl,approvedFolders,listWorkspaceSources,workspaceSourceId} from './workspaceSourcePolicyService';
 import {driveFolderId} from './driveFolderService';
 import {withServiceScope,sqlTransaction} from './cloudPostgresService';
 import {bindPromptVariables} from './promptVariableService';
@@ -17,10 +17,11 @@ import {codelabAvailable} from './codelabLifecycleService.js';
 import {createHash} from 'node:crypto';
 import {validateStudioShape} from './studioValidationService.js';
 import {classHintRequests,learnerHintRequests,createHintRequest,reviewHintRequest} from './workshopSupportService';
-import {accessExpiryEnabled,assertWritableAccess,learnerAccess,aiSessions,sessionTokenCap,resetAiSession,setAccessExpiry,classAccessExpiries,lessonInClass,ACCESS_EXPIRY_WARNING_DAYS} from './learnerSafeguardService';
+import {screenSourceInjection,accessExpiryEnabled,assertWritableAccess,learnerAccess,aiSessions,sessionTokenCap,resetAiSession,setAccessExpiry,classAccessExpiries,lessonInClass,ACCESS_EXPIRY_WARNING_DAYS} from './learnerSafeguardService';
 /** TC-AUTH-04: learner actions refused once class access has expired (reads, drafts and telemetry stay available). */
 const READ_ONLY_BLOCKED=new Set(['generate','judge','savePromptLibrary','uploadLearnerContext','submitSop','prepareSopUpload','requestSopSync','unlockSupport','recordOutcome','resetAiSession','requestHint']);
 import {createDatabaseClient,requireCloudDatabase,type CloudDatabaseClient} from './cloudDatabaseService';
+import {pendingIdentityLinks} from './firebaseServerIdentityService';
 import { ApiAccessError, identityError } from './apiAuthorizationService.js';
 import { generateSavedRun, evaluateSavedRun, enqueueJudge, judgeStatus, generationStatus } from './rebuildRunService.js';
 import { judgeAsyncEnabled } from './judgeQueueService.js';
@@ -293,7 +294,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     const published=ids.length?await result<any[]>(c.server.from('product_sop_contributions').select('class_id').in('class_id',ids).eq('status','published').gte('created_at',start.toISOString()).lt('created_at',end.toISOString())):[];
     return {...report,feedback,published_sops:published.length,classes:(report.classes||[]).map((row:any)=>({...row,published_sops:published.filter(source=>source.class_id===row.id).length}))};
   }
-  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess'].includes(body.action)||SLIDE_EDITOR_ACTIONS.has(body.action));
+  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess','saveWorkspaceSource','approveIdentityLink'].includes(body.action)||SLIDE_EDITOR_ACTIONS.has(body.action));
   if(c.profile.role==='learner'&&accessExpiryEnabled()&&READ_ONLY_BLOCKED.has(body.action))await assertWritableAccess(c.profile.id,cls.id);
   switch (body.action) {
     case 'accessRequests':return accessInbox(cls.id,c.profile.role==='admin');
@@ -327,6 +328,7 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(!state.lessons.some((l:any)=>l.id===lessonId))throw new ApiAccessError('Lesson scope denied.',403);
       if(typeof body.base64!=='string'||body.base64.length>2800000||! /^[A-Za-z0-9+/]*={0,2}$/.test(body.base64))throw new ApiAccessError('Upload a supported file up to 2 MB.',422);
       const source=await extractSop(Buffer.from(body.base64,'base64'),text(body.filename,160));
+      screenSourceInjection('learner_context',source.chunks.map(chunk=>chunk.content));
       if(piiSignals(source.content).length)throw new ApiAccessError('Remove personal information from the uploaded file.',422);
       const hash=createHash('sha256').update(source.content).digest('hex');const previous=await result<any>(c.server.from('product_learner_context').select('id,title,created_at').eq('owner_id',c.profile.id).eq('class_id',cls.id).eq('lesson_id',lessonId).eq('content_hash',hash).maybeSingle());if(previous)return previous;
       if(!await result<boolean>(c.server.rpc('product_take_budget',{p_actor:c.profile.id,p_operation:'context.upload',p_limit:10})))throw new ApiAccessError('Upload quota exceeded.',429);
@@ -429,6 +431,35 @@ export async function handleProductRequest(authorization: string, body: any) {
       }
       return {revoked:true};
     }
+    case 'saveWorkspaceSource': {
+      // TM-008: admin-only, audited approval of a Sheet / Drive folder / Drive file for this class (025). No redeploy needed.
+      if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);
+      const sourceId=workspaceSourceId(text(body.source,1000));
+      if(!sourceId||!['sheets','folders','files'].includes(body.kind)||typeof body.approved!=='boolean')throw new ApiAccessError('Enter a Google Sheet, Drive folder or Drive file link (or its ID).',422);
+      const {data,error}=await c.reader.rpc('product_set_workspace_source',{p_class:cls.id,p_kind:body.kind,p_source:sourceId,p_approved:body.approved,p_reason:text(body.reason,500)});
+      if(error){
+        const message=String(error.message||'');
+        if(/administrator required/i.test(message))throw new ApiAccessError('System administrator required.',403);
+        if(/Invalid source|Reason must be/.test(message))throw new ApiAccessError(message.slice(message.search(/Invalid source|Reason must be/)),422);
+        if(['PGRST202','42883','42P01'].includes(error.code)||/RPC not allowed/.test(message))throw new ApiAccessError('The Workspace source schema upgrade (025) has not been applied.',503);
+        throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.',409);
+      }
+      return {changed:data===true,sourceId};
+    }
+    case 'approveIdentityLink': {
+      // TM-003: admin confirms a staff account's first Google sign-in (026, audited); the next sign-in binds it.
+      if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);
+      const {error}=await c.reader.rpc('product_approve_identity_link',{p_user:uuid(body.userId),p_reason:text(body.reason,500)});
+      if(error){
+        const message=String(error.message||'');
+        if(/administrator required/i.test(message))throw new ApiAccessError('System administrator required.',403);
+        if(/Request not found/.test(message))throw new ApiAccessError('This sign-in was already approved or is no longer pending. Refresh the list.',404);
+        if(/Reason must be/.test(message))throw new ApiAccessError(message.slice(message.search(/Reason must be/)),422);
+        if(['PGRST202','42883'].includes(error.code)||/RPC not allowed/.test(message))throw new ApiAccessError('The identity approval schema upgrade (026) has not been applied.',503);
+        throw new ApiAccessError('The database operation was not confirmed. Refresh before retrying.',409);
+      }
+      return {approved:true};
+    }
     case 'setAccess':return result(c.reader.rpc('product_set_class_access',{p_class:cls.id,p_email:text(body.email,254).toLowerCase(),p_role:body.role,p_permission:body.permission}));
     case 'saveClass':{
       if(!['active','upcoming','completed','archived'].includes(body.status))throw new ApiAccessError('Invalid cohort lifecycle.',422);
@@ -458,7 +489,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     }
     case 'listDriveFolder':{
       if(!cls.can_manage)throw new ApiAccessError('Assigned editor required to browse a Drive folder.',403);
-      const url=text(body.url,1000);requireWorkspaceSource(cls.id,'folders',driveFolderId(url));
+      const url=text(body.url,1000);await requireWorkspaceSource(cls.id,'folders',driveFolderId(url));
       return listDriveFolder(url);
     }
     case 'submitSop':{
@@ -480,6 +511,7 @@ export async function handleProductRequest(authorization: string, body: any) {
         source.metadata.storageBucket='product-sop-originals';source.metadata.storagePath=path;
       }
       else{if(typeof body.base64!=='string'||body.base64.length>2800000||! /^[A-Za-z0-9+/]*={0,2}$/.test(body.base64))throw new ApiAccessError('Invalid file payload.',422);source=await extractSop(Buffer.from(body.base64,'base64'),text(body.filename,160));}
+      screenSourceInjection('sop',source.chunks.map(chunk=>chunk.content));
       if(body.versionTag)source.metadata.versionTag=text(body.versionTag,80);
       if(body.documentId){const doc=await result<any>(c.server.from('rebuild_sop_documents').select('id').eq('class_id',cls.id).eq('id',uuid(body.documentId)).maybeSingle());if(!doc)throw new ApiAccessError('Source document scope denied.',403);}
       const row=await result<any>(c.server.from('product_sop_contributions').insert({actor_id:c.profile.id,request_id:requestId,class_id:cls.id,lesson_id:lessonId,document_id:body.documentId||null,title,...source}).select('id').single());
@@ -510,6 +542,7 @@ export async function handleProductRequest(authorization: string, body: any) {
           source={...source,metadata:{...source.metadata,...pointer}};
         }
       }
+      screenSourceInjection('sop',(source.chunks||[]).map((chunk:any)=>chunk.content));
       const chunks=await indexPendingContribution(c.server,source);
       return {versionId:await result(c.reader.rpc('product_publish_contribution',{p_contribution:id,p_chunks:chunks}))};
     }
@@ -605,7 +638,7 @@ export async function handleProductRequest(authorization: string, body: any) {
       if (!target) throw new ApiAccessError('Attempt is outside this class.', 403);
       return result(c.reader.rpc('rebuild_record_trainer_action', { p_attempt: target.id, p_request: uuid(body.requestId), p_action: body.kind, p_reason: text(body.reason) }));
     }
-    case 'publishSop': return result(c.reader.rpc('rebuild_publish_sop', { p_class: cls.id, p_document: body.documentId ? uuid(body.documentId) : null, p_title: text(body.title, 160), p_content: text(body.content, 100000), p_lesson: uuid(body.lessonId) }));
+    case 'publishSop': screenSourceInjection('sop',[text(body.content,100000)]);return result(c.reader.rpc('rebuild_publish_sop', { p_class: cls.id, p_document: body.documentId ? uuid(body.documentId) : null, p_title: text(body.title, 160), p_content: text(body.content, 100000), p_lesson: uuid(body.lessonId) }));
     case 'inspectWorkspaceSource':{
       if(c.profile.role!=='admin')throw new ApiAccessError('Administrator required to inspect company Workspace sources.',403);
       return inspectWorkspaceSource(text(body.url,1000),text(body.tab,100));
@@ -613,7 +646,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     case 'saveSheet': {
       const match = String(body.url).match(/^https:\/\/docs\.google\.com\/spreadsheets\/d\/([A-Za-z0-9_-]+)(?:\/|$)/);
       if (!match) throw new ApiAccessError('A Google Sheets URL is required.', 422);
-      requireWorkspaceSource(cls.id,'sheets',match[1]);
+      await requireWorkspaceSource(cls.id,'sheets',match[1]);
       return result(c.reader.rpc('product_save_sheet', { p_class: cls.id, p_sheet: match[1], p_name: text(body.name, 160), p_mapping: body.mapping }));
     }
     case 'setSheetAutoSync': {
@@ -622,7 +655,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     }
     case 'syncSheet': {
       const connection = await result<any>(c.server.from('product_sheet_connections').select('id,sheet_id,column_mapping').eq('id', uuid(body.connectionId)).eq('class_id', cls.id).single());
-      requireWorkspaceSource(cls.id,'sheets',connection.sheet_id);
+      await requireWorkspaceSource(cls.id,'sheets',connection.sheet_id);
       const requestId=uuid(body.requestId),prior=await result<any>(c.server.from('product_sync_logs').select('*').eq('actor_id',c.profile.id).eq('request_id',requestId).maybeSingle());
       if(prior){if(prior.connection_id!==connection.id)throw new ApiAccessError('Sync request conflict.',409);if(prior.status==='success')return prior.result;throw new ApiAccessError('Sync request is processing or failed; inspect the saved log.',409);}
       const log=await result<any>(c.server.from('product_sync_logs').insert({connection_id:connection.id,class_id:cls.id,actor_id:c.profile.id,request_id:requestId,status:'running'}).select('id').single());
@@ -648,7 +681,7 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(pending.class_id!==cls.id)throw new ApiAccessError('Rotation class scope denied.',403);
       return result(c.reader.rpc('product_approve_rotation',{p_request:body.rotationId}));
     }
-    case 'slideDecks':return {...await readClassSlides(c.server,cls.id,false),driveConfigured:approvedFolders(cls.id).length>0};
+    case 'slideDecks':return {...await readClassSlides(c.server,cls.id,false),driveConfigured:(await approvedFolders(cls.id)).length>0};
     case 'prepareSlideUpload':{
       const requestId=uuid(body.requestId);
       if(!Number.isInteger(body.size)||body.size<=0||body.size>MAX_SLIDE_BYTES)throw new ApiAccessError('Choose a PDF up to 25 MB.',422);
@@ -695,7 +728,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     case 'removeSlideDeck':return slideRpc(c,'product_slide_remove_deck',{p_class:cls.id,p_deck:uuid(body.deckId),p_replacement:body.replacementDeckId?uuid(body.replacementDeckId):null,p_confirm_off:body.confirmOff===true});
     case 'governance': {
       if (c.profile.role !== 'admin') throw new ApiAccessError('System administrator required.', 403);
-      return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), access:{instructors:await result(c.server.from('course_instructors').select('user_id,permission,user:users(full_name,email)').eq('course_id',cls.course_id)),heads:await result(c.server.from('product_class_grants').select('user_id,permission,user:users(full_name,email)').eq('class_id',cls.id))}, audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at,actor:users(full_name,email)').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };
+      return { telemetry:await readGenerationTelemetry(c.server,cls.id),rotations:await result(c.server.from('product_rotation_requests').select('id,provider,status,requested_by,reason,created_at,applied_at,deployment_id,approvals:product_rotation_approvals(user_id,created_at)').eq('class_id',cls.id).order('created_at',{ascending:false}).limit(30)),ai: { configured: Boolean(vertexEnabled()||process.env.GEMINI_API_KEY),credentialMode:vertexEnabled()?'iam':'secret',projectId:process.env.GOOGLE_CLOUD_PROJECT||null, model: process.env.GEMINI_MODEL || null,fallback:process.env.GEMINI_FALLBACK_MODEL||null }, sheets: { configured: Boolean(process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||process.env.GOOGLE_SERVICE_ACCOUNT_JSON),credentialMode:process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT?'iam':'secret' }, secrets: 'server-only', domains:await result(c.server.from('product_domains').select('client_id,domain,active,updated_at').eq('client_id',cls.client_id)),controls: await result(c.server.from('product_session_controls').select('class_id,state,revision,updated_at').eq('class_id',cls.id)), access:{instructors:await result(c.server.from('course_instructors').select('user_id,permission,user:users(full_name,email)').eq('course_id',cls.course_id)),heads:await result(c.server.from('product_class_grants').select('user_id,permission,user:users(full_name,email)').eq('class_id',cls.id))}, workspaceSources:await listWorkspaceSources(cls.id), identityLinks:await pendingIdentityLinks(), audit: await result(c.server.from('product_audit').select('id,class_id,actor_id,action,reason,created_at,actor:users(full_name,email)').eq('class_id',cls.id).order('created_at', { ascending: false }).limit(100)) };
     }
     default: throw new ApiAccessError('This action has no production handler.', 422);
   }

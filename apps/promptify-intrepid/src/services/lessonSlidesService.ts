@@ -59,7 +59,7 @@ export function supportedSlideSource(file:{name:string;mimeType:string;size?:str
 }
 /** PDFs and Google Slides inside the folders approved for this class. An unconfigured class gets an empty, explained list. */
 export async function listClassDriveSlides(classId:string){
- const folders=approvedFolders(classId),files:DriveSource[]=[];
+ const folders=await approvedFolders(classId),files:DriveSource[]=[];
  for(const folder of folders)for(const file of (await listDriveFolder('https://drive.google.com/drive/folders/'+folder,supportedSlideSource)).files)if(!files.some(f=>f.id===file.id))files.push(file);
  return {configured:folders.length>0,files};
 }

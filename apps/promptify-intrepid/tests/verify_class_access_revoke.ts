@@ -64,7 +64,7 @@ assert.equal((await grant('trainer@example.test','instructor')).error,null);asse
 
 // Server action wiring: admin-only guard, manage scope, access list in the governance payload, UI list rendered.
 const server=fs.readFileSync('src/services/productionServerService.ts','utf8');
-assert.ok(server.includes("'promoteLearner','revokeAccess'].includes(body.action)"),'revokeAccess requires class management scope');
+assert.ok(/const cls = await classScope\(c, body\.classId, \[[^\]]*'revokeAccess'[^\]]*\]\.includes\(body\.action\)/.test(server),'revokeAccess requires class management scope');
 assert.ok(/case 'revokeAccess': \{\r?\n.*\r?\n      if\(c\.profile\.role!=='admin'\)throw new ApiAccessError\('System administrator required\.',403\);/.test(server));
 assert.ok(server.includes("access:{instructors:await result(c.server.from('course_instructors')"));
 assert.ok(fs.readFileSync('src/components/rebuild/ProductionGovernanceSource.tsx','utf8').includes('<ClassAccessList access={data.access}'));

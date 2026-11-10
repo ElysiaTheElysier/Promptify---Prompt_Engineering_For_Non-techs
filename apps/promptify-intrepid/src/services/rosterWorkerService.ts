@@ -28,7 +28,7 @@ export async function runRosterWorker(nonce:string) {
     try {
       const scope=await db.from('product_sync_logs').select('class_id').eq('id',task.logId).single();
       if(scope.error||!scope.data?.class_id)throw new Error('Roster task scope unavailable.');
-      requireWorkspaceSource(scope.data.class_id,'sheets',task.sheetId);
+      await requireWorkspaceSource(scope.data.class_id,'sheets',task.sheetId);
       const bundle=await readRosterSource(task.sheetId,task.mapping,task.department);
       const rows=bundle?.rows||await readRoster(task.sheetId,task.mapping,task.department);
       if(bundle){await finishWorkbookSync(task.logId,rows,bundle);successful++;continue;}
@@ -59,7 +59,7 @@ export async function runStagingRosterWorker() {
       if(!expected)throw new Error('Staging roster scope rejected.');
       const scope=await db.from('product_sync_logs').select('class_id').eq('id',task.logId).single();
       if(scope.error||scope.data?.class_id!==expected.classId)throw new Error('Staging roster task scope unavailable.');
-      requireWorkspaceSource(expected.classId,'sheets',expected.sheetId);
+      await requireWorkspaceSource(expected.classId,'sheets',expected.sheetId);
       const bundle=await readRosterSource(expected.sheetId,task.mapping as any,task.department);
       const rows=bundle?.rows||await readRoster(expected.sheetId,task.mapping as any,task.department);
       if(bundle)await finishWorkbookSync(task.logId,rows,bundle);

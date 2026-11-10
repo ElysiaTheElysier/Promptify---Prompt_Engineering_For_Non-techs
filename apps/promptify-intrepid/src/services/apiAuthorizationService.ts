@@ -14,6 +14,8 @@ export class ApiAccessError extends Error {
 /** A definitive identity rejection is 401. Firebase or Cloud SQL being unavailable is 503 (still denied), so the
  * client retries instead of treating a valid account as signed out or off-roster. */
 export function identityError(error: unknown, message: string): ApiAccessError {
+  // TM-003: a staff sign-in waiting for administrator approval keeps its own message and code (not a sign-out).
+  if ((error as any)?.code === 'identity_link_pending') return Object.assign(new ApiAccessError((error as Error).message, 403), { code: 'identity_link_pending' });
   return !error || isIdentityRejection(error)
     ? new ApiAccessError(message, 401)
     : new ApiAccessError('Identity service is temporarily unavailable. Retry without signing out.', 503);

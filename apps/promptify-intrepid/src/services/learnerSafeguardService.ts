@@ -90,6 +90,16 @@ export async function recordSecurityEvent(event:{userId:string;classId:string;le
  try{await rows('INSERT INTO public.product_security_events(user_id,class_id,lesson_id,request_id,kind,action,signals,prompt_sha256) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[event.userId,event.classId,event.lessonId,event.requestId||null,'prompt_injection',event.action,event.signals,promptSha]);}
  catch(error){if(!schemaMissing(error))throw error;}
 }
+/** TM-009: reference text (SOP chunks, learner context) that tries to instruct the AI. With INJECTION_GUARD=block it is
+ * refused before indexing; with log it is only logged. Only the signal names and chunk positions are logged, never text. */
+export function screenSourceInjection(source:'sop'|'learner_context',parts:string[]){
+ const mode=injectionGuardMode();if(mode==='off')return;
+ const flagged=parts.map((part,index)=>({part:index+1,signals:injectionSignals(part)})).filter(row=>row.signals.length);
+ if(!flagged.length)return;
+ const signals=[...new Set(flagged.flatMap(row=>row.signals))];
+ console.warn(JSON.stringify({event:'security_event',kind:'source_injection',source,action:mode==='block'?'blocked':'logged',signals,parts:flagged.map(row=>row.part)}));
+ if(mode==='block')throw Object.assign(new ApiAccessError(`This document contains text that tries to give the AI instructions (${signals.join(', ')}) in part ${flagged.map(row=>row.part).join(', ')}. Remove that text and upload the document again.`,422),{code:'source_injection_blocked'});
+}
 /** TC-SEC-04. Lessons whose Studio enables adversarial practice log the attempt but still run. */
 export async function screenPromptInjection(input:{userId:string;classId:string;lessonId:string;requestId?:string;prompt:string;instruction?:string;allowPractice:boolean}){
  const mode=injectionGuardMode();if(mode==='off')return [];

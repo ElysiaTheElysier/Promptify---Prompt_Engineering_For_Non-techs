@@ -59,7 +59,7 @@ assert.deepEqual((await db.query('SELECT permission FROM course_instructors WHER
 
 // Server action wiring: admin-only guard, manage scope, and readable error mapping.
 const server=fs.readFileSync('src/services/productionServerService.ts','utf8');
-assert.ok(server.includes("'reviewHintRequest','promoteLearner','revokeAccess'].includes(body.action)"),'promoteLearner requires class management scope');
+assert.ok(/const cls = await classScope\(c, body\.classId, \[[^\]]*'promoteLearner'[^\]]*\]\.includes\(body\.action\)/.test(server),'promoteLearner requires class management scope');
 assert.ok(server.includes("case 'promoteLearner':")&&server.includes("if(c.profile.role!=='admin')throw new ApiAccessError('System administrator required.',403);"));
 // The form lives in Governance tab 3 (Domain Guard & Tenant Whitelist) since 01/11.
 assert.ok(fs.readFileSync('src/components/rebuild/ProductionGovernanceSource.tsx','utf8').includes('<PromoteLearnerForm snapshot={snapshot} busy={busy} onAction={(name,payload,after)=>onAction(name,payload,value=>{after?.(value);void refresh();})}/>'));

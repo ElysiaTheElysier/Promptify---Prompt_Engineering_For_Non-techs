@@ -24,6 +24,7 @@ const messages = {
   invalid: ['Check the required fields and try again.', 'Kiểm tra các trường bắt buộc rồi thử lại.'],
   runQuota: ['Your AI run limit is 40 per hour and 200 per day. Wait for the limit to reset.', 'Bạn đã chạm giới hạn 40 lượt AI mỗi giờ hoặc 200 lượt mỗi ngày. Vui lòng đợi hạn mức đặt lại.'],
   workspaceSourceUnapproved: ['This Sheet or Drive source has not been approved for this class. Contact your administrator.', 'Nguồn Sheet hoặc Drive này chưa được duyệt cho lớp. Vui lòng liên hệ quản trị viên.'],
+  identityLinkPending: ['Your staff account is waiting for an administrator to confirm this Google sign-in. Ask your L&D administrator to approve it in System governance, then sign in again.', 'Tài khoản quản lý của bạn đang chờ quản trị viên xác nhận lần đăng nhập Google này. Hãy nhờ quản trị viên duyệt trong mục Quản trị hệ thống, rồi đăng nhập lại.'],
   capacity: ['AI capacity is currently unavailable. Contact your trainer.', 'AI hiện chưa đủ hạn mức xử lý. Vui lòng liên hệ giảng viên.'],
   unavailable: ['The service is not ready. Contact your administrator.', 'Dịch vụ chưa sẵn sàng. Vui lòng liên hệ quản trị viên.'],
   incomplete: ['The provider returned no confirmed, complete result.', 'Nhà cung cấp chưa trả về kết quả hoàn chỉnh được xác nhận.'],
@@ -77,6 +78,7 @@ export function productErrorText(status: number, locale = language, detail?:unkn
   if(typeof detail==='string'&&SLIDE_ERRORS[detail])return SLIDE_ERRORS[detail][locale==='en'?0:1];
   if(status===429&&detail==='Your AI run limit has been reached (40 per hour, 200 per day). Try again after the limit resets.')return productText('runQuota',locale);
   if(status===403&&detail==='This Workspace source is not approved for this class. Ask an administrator to configure its source binding.')return productText('workspaceSourceUnapproved',locale);
+  if(status===403&&typeof detail==='string'&&detail.startsWith('Your staff account is waiting for an administrator'))return productText('identityLinkPending',locale);
   const key: ProductMessageKey = status === 0 ? 'unknownOutcome' : status === 401 ? 'unauthorized' : status === 403 ? 'forbidden' : status === 409 ? 'conflict' : status === 422 || status === 400 ? 'invalid' : status === 429 ? 'capacity' : status === 503 ? 'unavailable' : status === 502 || status === 504 ? 'incomplete' : 'serverError';
   return productText(key, locale);
 }

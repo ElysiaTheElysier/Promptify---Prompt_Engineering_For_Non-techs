@@ -541,6 +541,13 @@
       "revision": "int4",
       "updated_by": "uuid",
       "updated_at": "timestamptz"
+    },
+    "product_workspace_sources": {
+      "class_id": "uuid",
+      "kind": "text",
+      "source_id": "text",
+      "created_by": "uuid",
+      "created_at": "timestamptz"
     }
   },
   "relations": [
@@ -3026,6 +3033,44 @@
         {
           "name": "p_confirm_off",
           "type": "boolean"
+        }
+      ],
+      "many": false
+    },
+    "product_set_workspace_source": {
+      "args": [
+        {
+          "name": "p_class",
+          "type": "uuid"
+        },
+        {
+          "name": "p_kind",
+          "type": "text"
+        },
+        {
+          "name": "p_source",
+          "type": "text"
+        },
+        {
+          "name": "p_approved",
+          "type": "boolean"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
+        }
+      ],
+      "many": false
+    },
+    "product_approve_identity_link": {
+      "args": [
+        {
+          "name": "p_user",
+          "type": "uuid"
+        },
+        {
+          "name": "p_reason",
+          "type": "text"
         }
       ],
       "many": false

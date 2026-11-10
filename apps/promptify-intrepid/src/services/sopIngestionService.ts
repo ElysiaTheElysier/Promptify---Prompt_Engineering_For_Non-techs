@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {ApiAccessError} from './apiAuthorizationService.js';
 import {googleAccessToken} from './googleRosterService.js';
 import {cloudStorage} from './cloudStorageService.js';
+import {parseInWorker} from './sopParserWorker';
 export type SopChunk={position:number;page:number|null;content:string;embedding?:number[];model?:string;taskType?:string};
 function indexingFailure(message:string,status:number){return Object.assign(new ApiAccessError(message,status),{indexingOutcome:'known-failure'});}
 export type ExtractedSop={content:string;chunks:SopChunk[];metadata:{filename:string;type:string;pages:number|null;bytes:number;sha256:string;storageBucket?:string;storagePath?:string;driveFileId?:string;versionTag?:string;sourceMimeType?:string;snapshotKind?:'drive-original'|'google-doc-export-txt'|'google-sheet-export-xlsx';snapshotGeneration?:string}};
@@ -17,19 +18,8 @@ export function chunkSop(pages:Array<{page:number|null;text:string}>):SopChunk[]
 export async function extractSop(bytes:Buffer,filename:string):Promise<ExtractedSop>{
  if(!bytes.length||bytes.length>maxBytes||filename.length>160)throw new ApiAccessError('SOP file exceeds the 25 MB limit.',422);
  const extension=filename.toLowerCase().split('.').pop();if(['docx','xlsx'].includes(extension||''))validateArchiveSize(bytes);let pages:Array<{page:number|null;text:string}>,totalPages:number|null=null;
- try{
-  if(extension==='pdf'){
-   if(bytes.subarray(0,5).toString()!=='%PDF-')throw new Error('Invalid PDF');
-   const {PDFParse}=await import('pdf-parse');const parser=new PDFParse({data:new Uint8Array(bytes)});
-   try{const result=await parser.getText();if(result.total>100)throw new Error('Too many pages');pages=result.pages.map(p=>({page:p.num,text:p.text}));totalPages=result.total;}finally{await parser.destroy();}
-  }else if(extension==='docx'){
-   const mammoth=await import('mammoth');const result=await mammoth.extractRawText({buffer:bytes});pages=[{page:null,text:result.value}];
-  }else if(extension==='xlsx'){
-   const {default:ExcelJS}=await import('exceljs');const workbook=new ExcelJS.Workbook();await workbook.xlsx.load(bytes as any);
-   let count=0;pages=workbook.worksheets.map(sheet=>{const rows:string[]=[];sheet.eachRow(row=>{if(++count>5000)throw new Error('Too many rows');rows.push((row.values as any[]).slice(1).map(cell=>typeof cell==='object'?cell?.text??cell?.result??'':cell??'').join(' | '));});return {page:null,text:`Sheet: ${sheet.name}\n${rows.join('\n')}`};});
-  }else if(['md','txt','csv'].includes(extension||'')){pages=[{page:null,text:new TextDecoder('utf-8',{fatal:true}).decode(bytes)}];}
-  else throw new Error('Unsupported format');
- }catch(error){if(error instanceof ApiAccessError)throw error;throw new ApiAccessError('SOP extraction failed. Use a readable PDF, DOCX, XLSX, Markdown, CSV or text file.',422);}
+ try{({pages,totalPages}=await parseInWorker(bytes,extension||''));}
+ catch(error){if(error instanceof ApiAccessError)throw error;throw new ApiAccessError('SOP extraction failed. Use a readable PDF, DOCX, XLSX, Markdown, CSV or text file.',422);}
  const chunks=chunkSop(pages);const content=pages.map(p=>(p.page?`[Page ${p.page}]\n`:'')+p.text.trim()).join('\n\n');
  return {content,chunks,metadata:{filename,type:extension!.toUpperCase(),pages:totalPages,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')}};
 }
