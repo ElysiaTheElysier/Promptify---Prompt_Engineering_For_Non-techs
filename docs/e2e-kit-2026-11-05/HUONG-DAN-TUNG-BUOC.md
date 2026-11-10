@@ -6,7 +6,7 @@ Tài liệu này dẫn bạn đi một vòng ngắn, theo đúng thứ tự thao
 - Tài liệu mẫu nằm trong `materials/`. Toàn bộ là **giả lập**, thuộc công ty hư cấu Northstar Paperworks.
 - Trang test: **https://ai-transformation-510302-intrepid-staging.web.app**. Đây là staging, không đụng tới dữ liệu thật.
 
-> Bản ngày 10/11 đã có trên staging (API `rel1-1110`, Hosting `ddeff54b`). Trong bản này, Admin tự duyệt Sheet và Drive ngay trong app, không cần Claude deploy cho từng lớp nữa.
+> Bản ngày 10/11 đã có trên staging (API `rel2-1110`, Hosting `252262f6`). Trong bản này, Admin tự duyệt Sheet và Drive ngay trong app, không cần Claude deploy cho từng lớp nữa.
 
 ---
 
@@ -36,16 +36,25 @@ Ghi lại 4 giá trị sau, vì các bước sau sẽ cần:
 
 ---
 
-## Bước 1. Admin đăng nhập và cấp quyền giảng viên (5 phút)
+## Bước 1. Admin tạo khoá học mới và cấp quyền giảng viên (10 phút)
 
 1. Trong **Edge**, mở trang test → **Tiếp tục với Google Workspace** → đăng nhập bằng email Admin.
-2. App tự mở màn **Quản trị hệ thống** (System governance).
-3. Ở bộ chọn lớp phía trên, chọn lớp **Northstar** có sẵn.
-4. Tìm mục **Quyền truy cập lớp**:
+2. App tự mở màn **Quản trị hệ thống**. Bộ chọn lớp phía trên đang chọn lớp nào cũng được.
+3. Kéo xuống mục **Tạo khoá học mới** và điền:
+   - **Tên khoá học:** `Prompting cho CSKH (E2E)`
+   - **Công ty khách hàng:** chọn **Northstar Paperworks (fictional)** có sẵn, hoặc **+ Khách hàng mới** rồi gõ tên
+   - **Mã lớp đầu tiên:** `NS-CC-2611`
+   - **Phòng ban:** `Customer Care`. Phải gõ đúng từng chữ, vì roster so khớp chính xác.
+   - **Bắt đầu / Kết thúc:** để mặc định (hôm nay → 30 ngày sau)
+4. Bấm **Tạo khoá học**. ✅ Thấy "Đã tạo. Chọn lớp NS-CC-2611…".
+5. Ở bộ chọn lớp, chọn **NS-CC-2611**. Nếu chưa thấy, bấm **Làm mới**. Chép **classId** trên thanh địa chỉ vào file ghi chép.
+6. Vẫn ở lớp NS-CC-2611, tìm mục **Quyền truy cập lớp**:
    - nhập email giảng viên;
    - chọn vai **Giảng viên**, quyền **Editor**;
    - bấm **Lưu**.
-5. ✅ Email giảng viên xuất hiện trong danh sách **Người đang có quyền**.
+7. ✅ Email giảng viên hiện trong danh sách **Người đang có quyền**.
+
+> Khoá học mới là khoá **trống**: chưa có bài nào. Bài CC-01 sẽ được tạo ở bước 8. Quyền giảng viên cấp theo khoá học, nên giảng viên quản lý được mọi lớp của khoá này.
 
 ---
 
@@ -64,18 +73,12 @@ Ghi lại 4 giá trị sau, vì các bước sau sẽ cần:
 
 ---
 
-## Bước 3. Giảng viên tạo lớp mới (5 phút)
+## Bước 3. Giảng viên mở lớp mới (2 phút)
 
-1. Ở bộ chọn lớp, chọn lớp **Northstar**.
-2. Bấm menu trên thanh đầu trang → **Quản lý lớp** (Manage cohorts).
-3. Ở mục **Create a cohort in this course**, nhập:
-   - Mã lớp: `NS-CC-2611`
-   - Phòng ban: `Customer Care`. Phải gõ đúng từng chữ, vì roster so khớp chính xác.
-   - Bắt đầu: hôm nay. Kết thúc: 30 ngày sau.
-4. Bấm **Create cohort**. ✅ Lớp mới hiện trong bộ chọn lớp, trạng thái **Upcoming** (sắp diễn ra).
-5. Chọn lớp mới, rồi chép **classId** trên thanh địa chỉ vào file ghi chép.
+1. Trong **Edge InPrivate (giảng viên)**, ở bộ chọn lớp, chọn **NS-CC-2611**.
+2. ✅ Lớp hiện trạng thái **Upcoming** (sắp diễn ra), và khoá học chưa có bài nào.
 
-> Bài học (lab) thuộc khoá học, không thuộc lớp. Vì vậy lớp mới tự có các bài sẵn có của khoá Northstar.
+> Muốn thêm một lớp nữa cho **cùng khoá** này (ví dụ đợt 2), dùng **Quản lý lớp → Create a cohort in this course** khi đang chọn lớp NS-CC-2611. Lớp mới sẽ dùng chung bài với lớp này.
 
 ---
 

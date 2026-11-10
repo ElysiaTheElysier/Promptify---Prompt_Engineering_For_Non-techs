@@ -9,10 +9,10 @@ Follow @AGENTS.md. It holds the repository rules, invariants and safety constrai
 
 ## Quick facts (09/11/2026)
 - Single app: Promptify Intrepid on GCP project `ai-transformation-510302`, `asia-southeast1`. Staging serves. Production resources partly exist (SQL `promptify-prod`, queue, bucket, Hosting site) but no prod API or Hosting release; owner said staging only for now.
-- Staging (10/11): API `promptify-intrepid-api-rel1-1110` (image built from commit `c9c41f2`, 1–10 instances, min 1, pool 15), Hosting `ddeff54b`. Rollback: `rel3-1109`, Hosting `7ddf53ed`.
-- 10/11 added: admin approves Workspace sources in Governance (025, no per-class redeploy), staff first sign-in needs admin approval (026), SOP/output injection screening, SOP parser child process. See top of `docs/05_OPEN_ISSUES.md`. Flags: Judge async + stream, RAG `GCP_VECTOR_MODE=pgvector` with `text-multilingual-embedding-002`, `CITATION_GATE=on`, `DISABLE_PUBLIC_BASIC=true`. Judge queue 100 concurrent, 50/s.
+- Staging (10/11): API `promptify-intrepid-api-rel2-1110` (image built from commit `a631cea`, 1–10 instances, min 1, pool 15), Hosting `252262f6`. Rollback: `rel1-1110` then `rel3-1109`; Hosting `ddeff54b` then `7ddf53ed`.
+- 10/11 added: admin approves Workspace sources in Governance (025, no per-class redeploy), staff first sign-in needs admin approval (026), SOP/output injection screening, SOP parser child process, admin "create course" with first class (027). See top of `docs/05_OPEN_ISSUES.md`. Flags: Judge async + stream, RAG `GCP_VECTOR_MODE=pgvector` with `text-multilingual-embedding-002`, `CITATION_GATE=on`, `DISABLE_PUBLIC_BASIC=true`. Judge queue 100 concurrent, 50/s.
 - API: `src/services/cloudRunServer.ts` → `productionServerService.ts` (`POST /api/product {action}`). AI: `productionAiService.ts`, `parallelJudgeService.ts`, `rebuildRunService.ts`, `citationService.ts`.
-- Schema: `gcp/sql/001…026`.
+- Schema: `gcp/sql/001…027`.
 - Owner decisions: 100 learners per session may press Run/Judge at once (D45); certificates are not used by HR (D46); a few seconds of UI refresh delay is fine, no real-time (D47).
 - Cloud access: `gcloud` CLI and Cloud Console ask `demo.biz@intrepid.asia` to re-authenticate; Application Default Credentials still work. Staging ops scripts: `apps/promptify-intrepid/tmp/staging-ops/` (git-ignored, see its README).
 
