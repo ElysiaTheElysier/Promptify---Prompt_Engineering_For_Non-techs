@@ -65,7 +65,7 @@ assert.ok((await createDatabaseClient('Bearer trainer').from('product_workspace_
 const server=fs.readFileSync('src/services/productionServerService.ts','utf8');
 assert.ok(/const cls = await classScope\(c, body\.classId, \[[^\]]*'saveWorkspaceSource'[^\]]*\]\.includes\(body\.action\)/.test(server),'saveWorkspaceSource requires class management scope');
 assert.ok(server.includes('workspaceSources:await listWorkspaceSources(cls.id)'));
-assert.ok(fs.readFileSync('src/components/rebuild/ProductionGovernanceSource.tsx','utf8').includes('<WorkspaceSourceList sources={data.workspaceSources}'));
+assert.ok(fs.readFileSync('src/components/rebuild/ProductionGovernanceSource.tsx','utf8').includes('<WorkspaceSourceList sources={data.workspaceSources} classCode='));
 
 // Rollback: DB approvals disappear, env approvals stay.
 await db.exec(fs.readFileSync('gcp/sql/rollback/025_workspace_sources.sql','utf8'));

@@ -16,10 +16,10 @@ export default function IdentityLinkRequests({requests,busy,onAction,onChanged}:
  return <div className="mt-5" data-testid="identity-link-requests">
   <h4 className="font-bold">{p('Staff sign-ins waiting for approval','Đăng nhập của nhân sự đang chờ duyệt')}</h4>
   <ul className="mt-2 space-y-2">{requests.map(row=><li key={row.user_id} className="border rounded-xl p-3 flex items-center justify-between gap-3 flex-wrap">
-   <span className="min-w-0"><strong>{row.full_name||row.email}</strong><span className="ml-2 text-m3-on-surface-variant">{row.email}</span>
-    <span className="ml-2 px-2.5 py-0.5 rounded-full border text-xs font-bold whitespace-nowrap">{row.role}</span>
-    <span className="ml-2 text-xs">{new Date(row.requested_at).toLocaleString(lang==='en'?'en-GB':'vi-VN')}</span></span>
-   <button type="button" className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>void approve(row)}>{p('Approve','Duyệt')}</button>
+   <span className="min-w-0 flex flex-wrap items-center gap-x-2 gap-y-1"><strong>{row.full_name||row.email}</strong><span className="text-m3-on-surface-variant break-all">{row.email}</span>
+    <span className="px-2.5 py-0.5 rounded-full border text-xs font-bold whitespace-nowrap">{row.role}</span>
+    <span className="text-xs whitespace-nowrap">{new Date(row.requested_at).toLocaleString(lang==='en'?'en-GB':'vi-VN')}</span></span>
+   <button type="button" className="ui-btn ui-btn-primary ui-btn-sm shrink-0" disabled={busy} onClick={()=>void approve(row)}>{p('Approve','Duyệt')}</button>
   </li>)}</ul>
  </div>;
 }
