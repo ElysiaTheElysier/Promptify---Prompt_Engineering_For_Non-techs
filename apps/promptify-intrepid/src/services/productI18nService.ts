@@ -74,8 +74,22 @@ const SLIDE_ERRORS:Record<string,[string,string]>={
   'Choose a PDF or Google Slides file. For PowerPoint, export a PDF or open it as Google Slides first.':['Choose a PDF or Google Slides file. For PowerPoint, export a PDF or open it as Google Slides first.','Hãy chọn PDF hoặc Google Slides. Với PowerPoint, hãy xuất PDF hoặc mở bằng Google Slides trước.'],
   'Slides are not available for this lesson.':['Slides are not available for this lesson.','Bài này chưa có slide.'],
 };
+// Six-tab roster workbook (rosterWorkbookService / parseRoster): name the broken tab instead of the generic 422 text.
+const ROSTER_ERRORS:Record<string,[string,string]>={
+  'Workbook header changed. Use template v1.':['A header in row 1 was changed, a tab was renamed, or a tab has more than 500 rows. Keep row 1 and tab names as in the template.','Dòng tiêu đề (dòng 1) của một tab bị sửa, tên tab bị đổi, hoặc một tab quá 500 dòng. Giữ nguyên dòng 1 và tên tab như file mẫu.'],
+  'Department tab must list each department once.':['The Department tab must include this class department, each department listed once.','Tab Department phải có phòng ban của lớp này, và mỗi phòng ban chỉ ghi một lần.'],
+  'Unknown user department.':['Someone in the Users tab has a department that is not in the Department tab.','Có người ở tab Users ghi phòng ban không có trong tab Department.'],
+  'Roster contains invalid required fields.':['A row in the Users tab is missing Email, Full Name (2+ characters), Department or Country, or has an invalid email.','Một dòng ở tab Users thiếu Email, Full Name (từ 2 ký tự), Department hoặc Country, hoặc email sai dạng.'],
+  'Roster contains duplicate emails.':['The Users tab lists the same email twice.','Tab Users có email bị trùng.'],
+  'Invalid SOP reference.':['Each SOPs row needs a Title, a department from the Department tab and a link starting with https://.','Mỗi dòng ở tab SOPs cần Title, phòng ban có trong tab Department và link bắt đầu bằng https://.'],
+  'Invalid Main PIC contact.':['Each Main PIC row needs a Name, a valid Email and a department from the Department tab.','Mỗi dòng ở tab Main PIC cần Name, Email hợp lệ và phòng ban có trong tab Department.'],
+  'Invalid report URL.':['Each Report URL must start with https://.','Mỗi Report URL phải bắt đầu bằng https://.'],
+};
 export function productErrorText(status: number, locale = language, detail?:unknown) {
   if(typeof detail==='string'&&SLIDE_ERRORS[detail])return SLIDE_ERRORS[detail][locale==='en'?0:1];
+  if(status===422&&typeof detail==='string'&&ROSTER_ERRORS[detail])return ROSTER_ERRORS[detail][locale==='en'?0:1];
+  const badSync=status===422&&typeof detail==='string'?detail.match(/^Sync tab: "(.*)" is not a valid time/):null;
+  if(badSync)return locale==='en'?detail as string:`Tab Sync: "${badSync[1]}" không phải giờ hợp lệ. Ghi dạng 12/11/2026 08:00 (giờ Việt Nam), hoặc để trống tab Sync để tự đồng bộ mỗi 15 phút.`;
   if(status===429&&detail==='Your AI run limit has been reached (40 per hour, 200 per day). Try again after the limit resets.')return productText('runQuota',locale);
   if(status===403&&detail==='This Workspace source is not approved for this class. Ask an administrator to configure its source binding.')return productText('workspaceSourceUnapproved',locale);
   if(status===403&&typeof detail==='string'&&detail.startsWith('Your staff account is waiting for an administrator'))return productText('identityLinkPending',locale);
