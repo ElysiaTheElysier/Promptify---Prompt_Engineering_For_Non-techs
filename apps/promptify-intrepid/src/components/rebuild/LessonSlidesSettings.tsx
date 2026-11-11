@@ -29,16 +29,16 @@ export default function LessonSlidesSettings({snapshot,lessonId}:{snapshot:Produ
  return <section className="slides-admin bg-white rounded-2xl border border-m3-outline-variant p-6" aria-labelledby="lab-slides-heading">
   <h2 id="lab-slides-heading" className="font-bold text-base">{p('Lecture slides','Slide bài giảng')}{dirty&&<span className="slides-badge">{p('Unsaved','Chưa lưu')}</span>}</h2>
   {!published.length&&<p>{p('This class has no published deck yet. Add one in Manage cohorts → Lecture slides.','Lớp chưa có bộ slide đã xuất bản. Hãy thêm trong Quản lý lớp → Slide bài giảng.')}</p>}
-  <fieldset><legend>{p('Slides for this lab','Slide cho bài này')}</legend>
-   {([['inherit',p('Class default','Theo mặc định của lớp')+(fallback?` (${fallback.title})`:` (${p('none set','chưa đặt')})`)],['deck',p('Choose another deck','Chọn bộ khác')],['off',p('Off for this lab','Tắt cho bài này')]] as const).map(([mode,label])=><label key={mode}><input type="radio" name={'slides-mode-'+lessonId} checked={current.mode===mode} onChange={()=>change({mode})}/> {label}</label>)}
-   {current.mode==='deck'&&<label>{p('Deck','Bộ slide')}<select value={current.deckId} onChange={e=>change({deckId:e.target.value})}><option value="">{p('— choose —','— chọn —')}</option>{published.map(d=><option key={d.id} value={d.id}>{d.title}</option>)}</select></label>}
-   {current.mode!=='off'&&<div className="slides-row-actions">
-    <label>{p('Start page','Trang bắt đầu')}<input type="number" min={1} max={pages} value={current.start} onChange={e=>change({start:e.target.value})}/></label>
-    <label>{p('End page','Trang kết thúc')}<input type="number" min={1} max={pages} value={current.end} onChange={e=>change({end:e.target.value})}/></label>
-    <span>{pages?p(`of ${pages}. Leave both empty for the whole deck; only a start means to the end.`,`trên ${pages}. Bỏ trống cả hai để dùng cả bộ; chỉ nhập trang đầu nghĩa là tới cuối bộ.`):''}</span>
-   </div>}
-   {issue&&<p className="slides-error" role="alert">{issue}</p>}
+  <fieldset className="slides-modes-box"><legend className="slides-field-label">{p('Slides for this lab','Slide cho bài này')}</legend>
+   <div className="slides-modes">{([['inherit',p('Class default','Theo mặc định của lớp'),fallback?fallback.title:p('none set','chưa đặt')],['deck',p('Another deck','Chọn bộ khác'),''],['off',p('Off','Tắt'),p('no slides in this lab','bài này không có slide')]] as const).map(([mode,label,hint])=><label key={mode} className="slides-mode"><input type="radio" name={'slides-mode-'+lessonId} checked={current.mode===mode} onChange={()=>change({mode})}/><span>{label}{hint&&<small>{hint}</small>}</span></label>)}</div>
   </fieldset>
+  {current.mode!=='off'&&<div className="slides-fields">
+   {current.mode==='deck'&&<label className="slides-field">{p('Deck','Bộ slide')}<select value={current.deckId} onChange={e=>change({deckId:e.target.value})}><option value="">{p('— choose —','— chọn —')}</option>{published.map(d=><option key={d.id} value={d.id}>{d.title}</option>)}</select></label>}
+   <label className="slides-field slides-page">{p('Start page','Trang bắt đầu')}<input type="number" min={1} max={pages} placeholder="1" value={current.start} onChange={e=>change({start:e.target.value})}/></label>
+   <label className="slides-field slides-page">{p('End page','Trang kết thúc')}<input type="number" min={1} max={pages} placeholder={pages?String(pages):''} value={current.end} onChange={e=>change({end:e.target.value})}/></label>
+   {pages&&<p className="slides-hint">{p(`Deck has ${pages} pages. Leave empty for the whole deck; a start page alone runs to the end.`,`Bộ có ${pages} trang. Để trống = cả bộ; chỉ nhập trang đầu = tới hết bộ.`)}</p>}
+  </div>}
+  {issue&&<p className="slides-error" role="alert">{issue}</p>}
   {error&&<p role="alert" className="slides-warning">{error}</p>}{notice&&<p role="status">{notice}</p>}
   <div className="slides-row-actions">
    <button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy||!dirty||!!issue} onClick={()=>void save()}>{busy?p('Saving…','Đang lưu…'):p('Save slides','Lưu slide')}</button>
