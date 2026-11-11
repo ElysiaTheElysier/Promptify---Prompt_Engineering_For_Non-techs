@@ -1,5 +1,14 @@
 # 01 — Hiện trạng Promptify Intrepid
 
+## Staging 11/11/2026 (thay các dòng tương ứng của bảng 10/11 bên dưới)
+
+| Thành phần | Trạng thái (LIVE 11/11) |
+| --- | --- |
+| API | `promptify-intrepid-api-rel1-1111` nhận 100% traffic. Image `rel-20261111-65314d3` (`sha256:dfaab83a…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel2-1110` (giữ tag), rồi `rel1-1110` |
+| Hosting staging | `f4ec7ad252879f07` (commit `65314d3`), rollback `1aed6d56fe3bab5e` (`38efc12`), rồi `3ee504929e3a2723` |
+| Thay đổi | Roster: workbook 6 tab là mặc định; tab Sync được để trống (đồng bộ mỗi 15 phút) và nhận `12/11/2026 08:00` là giờ Việt Nam; lỗi sync và lỗi tải SOP nói rõ nguyên nhân; file mẫu có tab Hướng dẫn, tiêu đề, dòng hướng dẫn, màu, danh sách chọn Department. Parser tìm dòng tên cột trong 5 dòng đầu (Sheet cũ vẫn chạy). Không có migration |
+| Kiểm tra | `/readyz` 200 trên tag mới; `/api/product` không token 401 (cả qua Hosting); bundle live có file mẫu mới. **Chưa kiểm khi đăng nhập, chưa sync thử Sheet theo mẫu mới** |
+
 ## Staging 10/11/2026 (thay các dòng tương ứng của bảng 09/11 bên dưới)
 
 | Thành phần | Trạng thái (LIVE 10/11) |
