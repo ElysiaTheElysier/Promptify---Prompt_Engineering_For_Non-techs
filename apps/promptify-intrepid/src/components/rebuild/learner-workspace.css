@@ -164,3 +164,24 @@
 .workspace-shell .learner-v7{min-height:calc(var(--app-vh,100dvh) - var(--app-header-h,64px))}
 
 .lv-citations{background:#f1f7f4;color:#173333;border:1px solid #cfe3da;padding:10px 12px;border-radius:10px;font-size:13px;margin-top:12px}.lv-citations p{margin:0}.lv-citations ul{margin:6px 0 0;padding-left:18px}.lv-citations code{font-size:12px;overflow-wrap:anywhere}
+
+/* 11/11 density pass: Judge scorecard, quick fixes, scaffold dialog, writing guide. */
+.learner-v7 .lv-rubric-summary li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:8px 0;font-size:13px;line-height:1.35}
+.learner-v7 .lv-score{min-width:52px;text-align:center;padding:3px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.learner-v7 .lv-score-zero{background:#fdecec;color:#b42318}
+.learner-v7 .lv-score-part{background:#fff4dc;color:#93590b}
+.learner-v7 .lv-score-full{background:#e3f6ec;color:#047857}
+.learner-v7 .lv-fix-btn{min-height:32px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:650;border:1px solid #b8d5c8;white-space:nowrap}
+.learner-v7 .lv-fix-btn:hover{background:#edf7f2}
+.learner-v7 .lv-quick-fix{gap:6px;padding:12px 0}
+.learner-v7 .lv-quick-fix h3{margin:0 0 2px;font-size:13px}
+.learner-v7 .lv-full{min-height:40px;font-size:13px}
+.learner-v7 .lv-diagnostics>summary,.learner-v7 .lv-judge-details>summary{font-size:14px}
+.learner-v7 .lv-scaffold .lv-chip{min-height:32px;padding:4px 12px;font-size:12px;font-weight:650}
+.learner-v7 .lv-scaffold-heading{flex-wrap:wrap}
+.learner-v7 .lv-framework-btn{min-height:32px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:650;border:1px solid #b8d5c8}
+.lv-dialog h2{margin:0 0 12px}
+.lv-dialog h3{margin:16px 0 4px;font-size:14px}
+.lv-dialog .lv-snippet{display:block;padding:12px 14px;border-radius:10px;background:#f4f8f6;border:1px solid #d5e3df;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.lv-dialog .lv-dialog-meta{margin:10px 0 0;font-size:13px;color:#52676b}
+.lv-dialog .lv-dialog-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
