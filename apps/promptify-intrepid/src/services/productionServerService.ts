@@ -1,6 +1,6 @@
 import {generationAsyncEnabled} from './generationQueueService';
 import {citationMode} from './citationService';
-import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceFileUrl,approvedFolders,listWorkspaceSources,workspaceSourceId} from './workspaceSourcePolicyService';
+import {requireWorkspaceSource,requireWorkspaceFile,requireWorkspaceSheet,requireWorkspaceFileUrl,approvedFolders,listWorkspaceSources,workspaceSourceId} from './workspaceSourcePolicyService';
 import {driveFolderId} from './driveFolderService';
 import {withServiceScope,sqlTransaction} from './cloudPostgresService';
 import {bindPromptVariables} from './promptVariableService';
@@ -28,7 +28,7 @@ import { judgeAsyncEnabled } from './judgeQueueService.js';
 import { validateRubric, DEFAULT_RUBRIC } from './weightedRubricService.js';
 import type { ProductProfile } from '../types/production.js';
 import { readRoster,workspaceServiceAccount } from './googleRosterService.js';
-import {listDriveFolder} from './driveFolderService.js';
+import {listDriveFolder,listFolderSheets} from './driveFolderService.js';
 import {awardData,renderCertificate} from './awardDocumentService.js';
 import { productionGenerate, productionEvaluate } from './productionAiService.js';
 import {extractSop,extractDriveSop,embedSopChunks} from './sopIngestionService.js';
@@ -661,7 +661,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     case 'saveSheet': {
       const match = String(body.url).match(/^https:\/\/docs\.google\.com\/spreadsheets\/d\/([A-Za-z0-9_-]+)(?:\/|$)/);
       if (!match) throw new ApiAccessError('A Google Sheets URL is required.', 422);
-      await requireWorkspaceSource(cls.id,'sheets',match[1]);
+      await requireWorkspaceSheet(cls.id,match[1],listFolderSheets);
       return result(c.reader.rpc('product_save_sheet', { p_class: cls.id, p_sheet: match[1], p_name: text(body.name, 160), p_mapping: body.mapping }));
     }
     case 'setSheetAutoSync': {
@@ -670,7 +670,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     }
     case 'syncSheet': {
       const connection = await result<any>(c.server.from('product_sheet_connections').select('id,sheet_id,column_mapping').eq('id', uuid(body.connectionId)).eq('class_id', cls.id).single());
-      await requireWorkspaceSource(cls.id,'sheets',connection.sheet_id);
+      await requireWorkspaceSheet(cls.id,connection.sheet_id,listFolderSheets);
       const requestId=uuid(body.requestId),prior=await result<any>(c.server.from('product_sync_logs').select('*').eq('actor_id',c.profile.id).eq('request_id',requestId).maybeSingle());
       if(prior){if(prior.connection_id!==connection.id)throw new ApiAccessError('Sync request conflict.',409);if(prior.status==='success')return prior.result;throw new ApiAccessError('Sync request is processing or failed; inspect the saved log.',409);}
       const log=await result<any>(c.server.from('product_sync_logs').insert({connection_id:connection.id,class_id:cls.id,actor_id:c.profile.id,request_id:requestId,status:'running'}).select('id').single());

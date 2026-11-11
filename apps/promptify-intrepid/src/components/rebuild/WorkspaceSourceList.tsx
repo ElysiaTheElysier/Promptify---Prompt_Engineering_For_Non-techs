@@ -22,7 +22,7 @@ export default function WorkspaceSourceList({sources,serviceAccount,classCode,bu
  };
  return <section className="mt-6 border rounded-2xl p-5" data-testid="workspace-sources">
   <h3 className="font-bold text-lg">{p('Approved Google sources','Nguồn Google được duyệt')}{classCode&&<span className="ml-2 text-sm font-normal text-m3-on-surface-variant">{p('class','lớp')} {classCode}</span>}</h3>
-  <p className="mt-1 text-sm text-m3-on-surface-variant">{p('Share the file or folder with the Promptify service account (Viewer) first. Files added later to an approved folder need no new approval.','Trước tiên hãy chia sẻ file hoặc thư mục cho service account của Promptify (quyền Viewer). File bỏ thêm vào thư mục đã duyệt dùng được ngay.')}</p>
+  <p className="mt-1 text-sm text-m3-on-surface-variant">{p('Share the file or folder with the Promptify service account (Viewer) first. Sheets, slides and SOP files added later to an approved folder need no new approval.','Trước tiên hãy chia sẻ file hoặc thư mục cho service account của Promptify (quyền Viewer). Sheet roster, slide, SOP bỏ thêm vào thư mục đã duyệt dùng được ngay, không cần duyệt lại.')}</p>
   <ServiceAccountEmail email={serviceAccount}/>
   {sources.length?<ul className="mt-4 space-y-2">{sources.map(row=><li key={row.origin+row.kind+row.source_id} className="border rounded-xl p-3 flex flex-wrap items-center gap-x-3 gap-y-2">
    <span className="shrink-0 px-2.5 py-0.5 rounded-full border text-xs font-bold whitespace-nowrap">{label(row.kind)}</span>

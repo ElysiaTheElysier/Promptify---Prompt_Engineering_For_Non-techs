@@ -9,6 +9,8 @@ export function driveFolderId(url:string){
 export function supportedDriveSource(file:{name:string;mimeType:string;size?:string}){
  return Number(file.size||0)<=25*1024*1024&&(['application/vnd.google-apps.document','application/vnd.google-apps.spreadsheet'].includes(file.mimeType)||/\.(pdf|docx|xlsx|md|csv|txt)$/i.test(file.name));
 }
+/** Google Sheets inside a Drive folder (roster approval through an approved folder). */
+export const listFolderSheets=(url:string)=>listDriveFolder(url,file=>file.mimeType==='application/vnd.google-apps.spreadsheet');
 export async function listDriveFolder(url:string,accept:(file:{name:string;mimeType:string;size?:string})=>boolean=supportedDriveSource):Promise<{files:DriveSource[];skipped:number}> {
  const root=driveFolderId(url),headers={Authorization:`Bearer ${await googleAccessToken('https://www.googleapis.com/auth/drive.readonly')}`};
  const deadline=Date.now()+30000;

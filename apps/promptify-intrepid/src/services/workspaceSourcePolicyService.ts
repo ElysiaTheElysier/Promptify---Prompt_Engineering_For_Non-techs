@@ -38,9 +38,16 @@ type FolderLister=(folderUrl:string)=>Promise<{files:Array<{id:string}>}>;
 /** A file is approved when its ID is bound to the class, or when Drive itself lists it inside a folder bound to the class.
  * The folder check asks Drive (never trusts the supplied ID), so new files dropped into an approved folder need no redeploy. */
 export async function requireWorkspaceFile(classId:string,fileId:string,listFolder:FolderLister,configuration?:string){
+ await requireBoundOrInFolder(classId,'files',fileId,listFolder,configuration);
+}
+/** Roster Sheets: approved by their own ID, or found by Drive inside a folder approved for the class (pass a spreadsheet-only lister). */
+export async function requireWorkspaceSheet(classId:string,sheetId:string,listSheets:FolderLister,configuration?:string){
+ await requireBoundOrInFolder(classId,'sheets',sheetId,listSheets,configuration);
+}
+async function requireBoundOrInFolder(classId:string,kind:'files'|'sheets',id:string,listFolder:FolderLister,configuration?:string){
  const bindings=await classBindings(classId,configuration);
- if(bindings.files.includes(fileId))return;
- for(const folder of bindings.folders){if((await listFolder('https://drive.google.com/drive/folders/'+folder)).files.some(file=>file.id===fileId))return;}
+ if(bindings[kind].includes(id))return;
+ for(const folder of bindings.folders){if((await listFolder('https://drive.google.com/drive/folders/'+folder)).files.some(file=>file.id===id))return;}
  throw notApproved();
 }
 export async function requireWorkspaceFileUrl(classId:string,url:string,listFolder:FolderLister){
