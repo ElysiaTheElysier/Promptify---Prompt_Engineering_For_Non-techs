@@ -60,3 +60,7 @@ picker.props.onChange({target:{value:'tone'}});
 assert.equal(saveButton().props.disabled,false);saveButton().props.onClick();
 assert.equal(calls[0].name,'saveStudio');assert.equal(calls[0].payload.config.awards.badges[0].criterionKey,'tone');
 console.log('Studio badge PASS: orphaned criterion badge is flagged, blocks saving and is saved only after the trainer re-selects.');
+// product_save_studio rejects a save without lesson fields (title); every caller, including the Workshop state change, sends them.
+for(const file of fs.readdirSync('src/components/rebuild').filter(f=>f.endsWith('.tsx'))){
+ for(const call of fs.readFileSync('src/components/rebuild/'+file,'utf8').match(/onAction\('saveStudio',\{[^;]*/g)||[])assert.match(call,/fields/,file+': saveStudio without lesson fields');
+}
