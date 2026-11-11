@@ -59,3 +59,22 @@
 /* Slides pane header: title left, a compact Back button right, never touching the card edge. */
 .lv-slides-pane>.lv-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .lv-slides-pane>.lv-section-heading h2{min-width:0;margin:0;overflow-wrap:anywhere}
+
+/* Class deck manager: one card per deck, a short meta line, actions on the right; review actions sit at the top. */
+.slides-admin .slides-note{margin:0;font-size:13px;color:#64748b;line-height:1.5}
+.slides-admin .slides-decks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.slides-admin .slides-deck{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:14px 16px;border:1px solid #d6e5df;border-radius:14px;background:#fff}
+.slides-admin .slides-deck-main{min-width:0;display:grid;gap:2px}
+.slides-admin .slides-deck-title{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:15px}
+.slides-admin .slides-deck-title .slides-badge{margin-left:0}
+.slides-admin .slides-badge-draft{color:#93590b;background:#fff4dc}
+.slides-admin .slides-deck-meta{font-size:13px;color:#64748b}
+.slides-admin .slides-deck .slides-row-actions{align-items:center}
+.slides-admin .slides-deck-upload{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:10px;border-top:1px dashed #d6e5df;font-size:13px}
+.slides-admin .slides-deck-upload>span{min-width:0;overflow-wrap:anywhere;font-weight:600}
+.slides-admin .slides-danger{color:#b42318}
+.slides-admin .slides-review{display:grid;gap:12px;padding:16px;border:1px solid #f0d9a8;border-radius:14px;background:#fffdf7}
+.slides-admin .slides-review-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 16px}
+.slides-admin .slides-review-head h4{margin:0 0 2px;font-size:15px}
+.slides-admin .slides-review table input[type=number]{width:80px;min-height:36px;padding:6px 10px;border:1px solid #c3d2cb;border-radius:8px;background:#fff}
+.slides-admin fieldset>legend{padding:0 6px;font-size:14px;font-weight:700}

@@ -75,20 +75,22 @@ export default function ClassSlideDecks({snapshot}:{snapshot:ProductSnapshot}){
  if(!state)return <section className="slides-admin"><h3>{p('Lecture slides','Slide bài giảng')} · {cls.class_code}</h3>{loadError?<p role="alert">{loadError} <button className="ui-btn ui-btn-secondary ui-btn-sm" onClick={()=>void reload()}>{p('Retry','Thử lại')}</button></p>:<p role="status">{p('Loading slides…','Đang tải slide…')}</p>}</section>;
  return <section className="slides-admin" aria-labelledby="class-slides-heading">
   <h3 id="class-slides-heading">{p('Lecture slides','Slide bài giảng')} · {cls.class_code}</h3>
-  <p>{p('Learners who can open a deck can view the whole PDF; page ranges only guide navigation. Split the file if some pages hold answers or notes for another class.','Học viên mở được bộ slide sẽ xem được toàn bộ PDF; khoảng trang chỉ để điều hướng. Hãy tách file nếu có trang chứa đáp án hoặc ghi chú cho lớp khác.')}</p>
+  <p className="slides-note">{p('Learners can view the whole PDF; page ranges only guide navigation.','Học viên xem được cả file PDF; khoảng trang chỉ để điều hướng.')}</p>
   {error&&<p role="alert" className="slides-warning">{error}</p>}{notice&&<p role="status">{notice}</p>}
-  {state.decks.length?<table><thead><tr><th>{p('Deck','Bộ slide')}</th><th>{p('Pages','Số trang')}</th><th>{p('In use','Đang dùng')}</th><th>{p('Labs','Số lab')}</th><th/></tr></thead><tbody>{state.decks.map(deck=>{const latest=state.versions.find(v=>v.deck_id===deck.id),draft=latest&&latest.id!==deck.published_version_id&&!latest.published_at?latest:undefined;return <tr key={deck.id}>
-   <td><strong>{deck.title}</strong>{deck.is_default&&<span className="slides-badge">{p('Default','Mặc định')}</span>}{draft&&<div><button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>openReview({deckId:deck.id,versionId:draft.id,pageCount:draft.page_count})}>{p('Review unpublished draft','Rà soát bản nháp chưa xuất bản')}</button></div>}</td>
-   <td>{pagesOf(deck.published_version_id)??'—'}</td>
-   <td>{deck.published_version_id?new Date(state.versions.find(v=>v.id===deck.published_version_id)?.published_at||'').toLocaleDateString(language==='en'?'en-US':'vi-VN'):p('Not published','Chưa xuất bản')}</td>
-   <td>{deckUsers(deck,snapshot.lessons,state.assignments).length}</td>
-   <td><div className="slides-row-actions">
-    {deck.published_version_id&&<button className="ui-btn ui-btn-secondary ui-btn-sm" disabled={busy} onClick={()=>void setDefault(deck.is_default?null:deck)}>{deck.is_default?p('Unset default','Bỏ mặc định'):p('Make default','Đặt mặc định')}</button>}
-    <label className="ui-btn ui-btn-secondary ui-btn-sm">{p('Replace PDF','Thay file PDF')}<input type="file" accept="application/pdf,.pdf" hidden disabled={busy} onChange={e=>{const chosen=e.target.files?.[0];e.target.value='';if(chosen){setFile(chosen);setReplaceFor(deck.id);}}}/></label>
-    {file&&replaceFor===deck.id&&<button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>void upload(deck.id)}>{p(`Upload “${file.name}” as new draft`,`Tải “${file.name}” lên làm bản nháp mới`)}</button>}
+  {state.decks.length?<ul className="slides-decks">{state.decks.map(deck=>{const latest=state.versions.find(v=>v.deck_id===deck.id),draft=latest&&latest.id!==deck.published_version_id&&!latest.published_at?latest:undefined,pages=pagesOf(deck.published_version_id),labs=deckUsers(deck,snapshot.lessons,state.assignments).length,published=state.versions.find(v=>v.id===deck.published_version_id)?.published_at;return <li key={deck.id} className="slides-deck">
+   <div className="slides-deck-main">
+    <div className="slides-deck-title"><strong>{deck.title}</strong>{deck.is_default&&<span className="slides-badge">{p('Default','Mặc định')}</span>}{draft&&<span className="slides-badge slides-badge-draft">{p('Draft waiting to publish','Bản nháp chờ xuất bản')}</span>}</div>
+    <div className="slides-deck-meta">{pages?p(`${pages} pages`,`${pages} trang`):p('Not published','Chưa xuất bản')}{published&&<> · {p('published','xuất bản')} {new Date(published).toLocaleDateString(language==='en'?'en-US':'vi-VN')}</>} · {labs} lab</div>
+   </div>
+   <div className="slides-row-actions">
+    {draft&&<button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>openReview({deckId:deck.id,versionId:draft.id,pageCount:draft.page_count})}>{p('Review & publish','Rà soát & xuất bản')}</button>}
+    <label className="ui-btn ui-btn-secondary ui-btn-sm">{p('Replace PDF','Thay PDF')}<input type="file" accept="application/pdf,.pdf" hidden disabled={busy} onChange={e=>{const chosen=e.target.files?.[0];e.target.value='';if(chosen){setFile(chosen);setReplaceFor(deck.id);}}}/></label>
     {latest?.drive_file_id&&<button className="ui-btn ui-btn-secondary ui-btn-sm" disabled={busy} onClick={()=>void importDrive(latest.drive_file_id!,deck.id)}>{p('Get latest from Drive','Lấy bản mới từ Drive')}</button>}
-    <button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>setRemoving(deck)}>{p('Remove','Gỡ')}</button>
-   </div></td></tr>;})}</tbody></table>:<p>{p('No slide decks yet. Labs work as before until you add one.','Chưa có bộ slide. Các lab vẫn hoạt động như cũ cho tới khi bạn thêm slide.')}</p>}
+    {deck.published_version_id&&<button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>void setDefault(deck.is_default?null:deck)}>{deck.is_default?p('Unset default','Bỏ mặc định'):p('Make default','Đặt mặc định')}</button>}
+    <button className="ui-btn ui-btn-ghost ui-btn-sm slides-danger" disabled={busy} onClick={()=>setRemoving(deck)}>{p('Remove','Gỡ')}</button>
+   </div>
+   {file&&replaceFor===deck.id&&<div className="slides-deck-upload"><span>{file.name}</span><button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>void upload(deck.id)}>{busy?p('Uploading…','Đang tải lên…'):p('Upload as draft','Tải lên làm bản nháp')}</button><button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>{setFile(null);setReplaceFor(null);}}>{p('Cancel','Hủy')}</button></div>}
+  </li>;})}</ul>:<p>{p('No slide decks yet. Labs work as before until you add one.','Chưa có bộ slide. Các lab vẫn hoạt động như cũ cho tới khi bạn thêm slide.')}</p>}
   {removing&&(()=>{const users=deckUsers(removing,snapshot.lessons,state.assignments),others=state.decks.filter(d=>d.id!==removing.id&&d.published_version_id);return <fieldset><legend>{p('Remove','Gỡ')} “{removing.title}”</legend>
    <p>{users.length?p(`Used by: ${users.map(u=>u.lesson.lesson_key).join(', ')}.`,`Đang dùng ở: ${users.map(u=>u.lesson.lesson_key).join(', ')}.`):p('No lab uses this deck.','Không lab nào dùng bộ slide này.')}</p>
    {(users.length>0||removing.is_default)&&<><label>{p('Replacement deck','Bộ thay thế')}<select value={replacement} onChange={e=>{setReplacement(e.target.value);setConfirmOff(false);}}><option value="">{p('— none —','— không —')}</option>{others.map(d=><option key={d.id} value={d.id}>{d.title}</option>)}</select></label>
@@ -103,14 +105,18 @@ export default function ClassSlideDecks({snapshot}:{snapshot:ProductSnapshot}){
    {drive?.configured&&!drive.files.length&&<p>{p('No PDF or Google Slides in the approved folders. PowerPoint files must be exported to PDF or opened as Google Slides first.','Không có PDF hoặc Google Slides trong thư mục được phép. File PowerPoint cần xuất PDF hoặc mở bằng Google Slides trước.')}</p>}
    {drive?.files.map(f=><div key={f.id} className="slides-row-actions"><span>{f.name} · {f.mimeType==='application/pdf'?'PDF':'Google Slides'}</span><button className="ui-btn ui-btn-secondary ui-btn-sm" disabled={busy} onClick={()=>void importDrive(f.id,undefined,(title.trim()||f.name.replace(/\.pdf$/i,'')).slice(0,160))}>{p('Import and preview','Nhập và xem trước')}</button></div>)}
   </fieldset>}
-  {review&&deckOfReview&&<fieldset><legend>{p('Review before publishing','Rà soát trước khi xuất bản')} · {deckOfReview.title}</legend>
-   <p>{oldPages?p(`Pages: ${oldPages} → ${review.pageCount}.`,`Số trang: ${oldPages} → ${review.pageCount}.`):p(`${review.pageCount} pages.`,`${review.pageCount} trang.`)} {oldPages&&p('Content may have moved even if the count is the same: check every range below.','Nội dung có thể đã dời trang dù tổng số trang không đổi: hãy kiểm tra từng khoảng trang bên dưới.')} {p('Learners keep the current version until this publish succeeds.','Học viên vẫn xem bản hiện tại cho tới khi xuất bản thành công.')}</p>
-   {affected.length>0&&<table><thead><tr><th>{p('Lab','Lab')}</th><th>{p('Start','Trang đầu')}</th><th>{p('End','Trang cuối')}</th><th/></tr></thead><tbody>{affected.map(({lesson,row})=><tr key={lesson.id}><td>{lesson.lesson_key} · {lesson.title}</td>{row?<>
+  {review&&deckOfReview&&(()=>{const ranged=affected.filter(u=>u.row),whole=affected.length-ranged.length;return <section className="slides-review" aria-labelledby="slides-review-heading">
+   <div className="slides-review-head">
+    <div><h4 id="slides-review-heading">{p('Review draft','Rà soát bản nháp')} · {deckOfReview.title}</h4>
+     <p className="slides-note">{oldPages?p(`${oldPages} → ${review.pageCount} pages.`,`${oldPages} → ${review.pageCount} trang.`):p(`${review.pageCount} pages.`,`${review.pageCount} trang.`)} {p('Learners keep the current version until you publish.','Học viên vẫn xem bản cũ tới khi bạn xuất bản.')}</p></div>
+    <div className="slides-row-actions"><button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>void publish()}>{busy?p('Publishing…','Đang xuất bản…'):p('Publish','Xuất bản')}</button><button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>setReview(null)}>{p('Cancel','Hủy')}</button></div>
+   </div>
+   {ranged.length>0&&<><p className="slides-note">{p('Labs with their own slide setting: check the page range against the new file.','Lab có cài đặt slide riêng: kiểm tra khoảng trang với file mới.')}</p><table><thead><tr><th>{p('Lab','Lab')}</th><th>{p('Start','Trang đầu')}</th><th>{p('End','Trang cuối')}</th><th/></tr></thead><tbody>{ranged.map(({lesson})=><tr key={lesson.id}><td>{lesson.lesson_key}</td>
     <td><input type="number" min={1} max={review.pageCount} aria-label={p('Start page','Trang đầu')} value={ranges[lesson.id]?.start||''} onChange={e=>setRanges(r=>({...r,[lesson.id]:{start:e.target.value,end:r[lesson.id]?.end||''}}))}/></td>
     <td><input type="number" min={1} max={review.pageCount} aria-label={p('End page','Trang cuối')} value={ranges[lesson.id]?.end||''} onChange={e=>setRanges(r=>({...r,[lesson.id]:{start:r[lesson.id]?.start||'',end:e.target.value}}))}/></td>
-    <td className="slides-error">{rangeIssue(lesson.id)}</td></>:<td colSpan={3}>{p('Whole deck (set a range in Studio)','Cả bộ (đặt khoảng trang trong Studio)')}</td>}</tr>)}</tbody></table>}
+    <td className="slides-error">{rangeIssue(lesson.id)}</td></tr>)}</tbody></table></>}
+   {whole>0&&<p className="slides-note">{p(`${whole} other lab(s) show the whole deck.`,`${whole} lab khác dùng cả bộ.`)}</p>}
    <Suspense fallback={<p role="status">{p('Loading preview…','Đang tải bản xem trước…')}</p>}><LessonSlidesViewer key={review.versionId} title={deckOfReview.title} load={async()=>({...await productRequest<{url:string}>('previewSlideVersion',{classId:cls.id,versionId:review.versionId}),pageCount:review.pageCount,startPage:1,endPage:review.pageCount,ranged:false})}/></Suspense>
-   <div className="slides-row-actions"><button className="ui-btn ui-btn-primary ui-btn-sm" disabled={busy} onClick={()=>void publish()}>{p('Publish','Xuất bản')}</button><button className="ui-btn ui-btn-ghost ui-btn-sm" disabled={busy} onClick={()=>setReview(null)}>{p('Cancel (keep current version)','Hủy (giữ bản hiện tại)')}</button></div>
-  </fieldset>}
+  </section>;})()}
  </section>;
 }
