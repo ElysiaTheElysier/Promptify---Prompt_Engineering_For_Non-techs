@@ -64,6 +64,12 @@ function guideTab(book:Workbook,vi:boolean,department:string,copies:Record<strin
  const line=(values:(string|undefined)[],style:Record<string,unknown>={},height?:number)=>{const row=sheet.getRow(r++);values.forEach((v,i)=>{if(v!==undefined)Object.assign(row.getCell(i+1),{value:v,...style,alignment:{wrapText:true,vertical:'top'}});});if(height)row.height=height;return row;};
  sheet.mergeCells('A1:D1');Object.assign(sheet.getCell('A1'),{value:t('MẪU ROSTER PROMPTIFY · v1','PROMPTIFY ROSTER TEMPLATE · v1'),font:{bold:true,size:16,color:{argb:C.titleText}},fill:fill(C.title),alignment:{vertical:'middle',indent:1}});sheet.getRow(1).height=34;r=2;
  sheet.mergeCells('A2:D2');line([t(`Lớp thuộc phòng ban: ${department}. Điền các tab bên phải, tải file lên Google Drive và mở bằng Google Sheets, rồi kết nối trong Promptify.`,`Class department: ${department}. Fill in the tabs on the right, upload the file to Google Drive and open it with Google Sheets, then connect it in Promptify.`)],{font:{color:{argb:C.helpText}},fill:fill(C.help)},36);
+ // HR who gets only this file still knows whom to share it with.
+ if(serviceAccount){
+  r++;sheet.mergeCells(`C${r}:D${r}`);
+  const row=line(['',t('CHIA SẺ FILE CHO','SHARE THIS FILE WITH'),serviceAccount],{font:{bold:true,size:13,color:{argb:C.title}},fill:fill('FFDBEAFE'),border:{top:thin,bottom:thin,left:thin,right:thin}},28);row.getCell(2).alignment=row.getCell(3).alignment={vertical:'middle',indent:1};
+  sheet.mergeCells(`C${r}:D${r}`);line(['','',t('Quyền Người xem (Viewer), bỏ tick “Thông báo cho mọi người”. Đây là tài khoản máy của Promptify: chỉ đọc, không ghi vào file.','Viewer access, untick “Notify people”. It is Promptify’s machine account: read-only, it never writes to the file.')],{font:{color:{argb:C.helpText}}},26);
+ }
  r++;line(['',t('Ý NGHĨA MÀU','COLOUR KEY')],{font:{bold:true,size:12}});
  const key=(argb:string,font:string,label:string)=>{sheet.mergeCells(`C${r}:D${r}`);const row=line(['','',label]);Object.assign(row.getCell(2),{fill:fill(argb),border:{top:thin,bottom:thin,left:thin,right:thin}});row.getCell(2).font={color:{argb:font}};};
  key(C.title,C.titleText,t('Tiêu đề tab. Không sửa.','Tab title. Do not edit.'));

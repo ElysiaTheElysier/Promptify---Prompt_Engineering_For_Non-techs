@@ -67,3 +67,4 @@ assert.throws(()=>parseWorkbook(bannerOnly,'Tech'),/header changed/,'header is l
 const guideText=(b:any)=>{const out:string[]=[];b.worksheets[0].eachRow((row:any)=>row.eachCell((cell:any)=>out.push(String(cell.value))));return out.join('\n');};
 assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',true,'sa@example.iam.gserviceaccount.com')),/thêm sa@example\.iam\.gserviceaccount\.com với quyền Người xem/);
 assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',false)),/shown on the Roster screen/);
+assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',true,'sa@example.iam.gserviceaccount.com')),/CHIA SẺ FILE CHO\nsa@example\.iam\.gserviceaccount\.com/,'share-with address stands out near the top for HR');
