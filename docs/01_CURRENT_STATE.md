@@ -5,7 +5,7 @@
 | Thành phần | Trạng thái (LIVE 11/11) |
 | --- | --- |
 | API | `promptify-intrepid-api-rel3-1111` nhận 100% traffic. Image `rel-20261111-9713888` (`sha256:eb9be092…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel2-1111` (giữ tag, `2fc2dbe`), rồi `rel1-1111` |
-| Hosting staging | `cc5d24d82c6f0079` (commit `bb85d1b`: nhật ký provider thành nút nhỏ), rollback `e9711f81f4689608` (`537abcc`, bảng chấm điểm gọn), rồi `60f648765de1d374` (`62bd69e`, zoom slide) |
+| Hosting staging | `59100aff396a915f` (commit `9dd78a1`: quản lý slide của lớp dạng thẻ, nút Xuất bản ở đầu khung rà soát), rollback `cc5d24d82c6f0079` (`bb85d1b`), rồi `e9711f81f4689608` (`537abcc`) |
 | Thay đổi | Roster: workbook 6 tab là mặc định; tab Sync được để trống (đồng bộ mỗi 15 phút) và nhận `12/11/2026 08:00` là giờ Việt Nam; lỗi sync và lỗi tải SOP nói rõ nguyên nhân; file mẫu có tab Hướng dẫn, tiêu đề, dòng hướng dẫn, màu, danh sách chọn Department. Parser tìm dòng tên cột trong 5 dòng đầu (Sheet cũ vẫn chạy). Màn Roster và Quản trị hiện email service account để chia sẻ (nút Copy); file mẫu có ô chọn ngôn ngữ và ghi email ở đầu tab Hướng dẫn. Sheet roster nằm trong thư mục Drive đã duyệt cho lớp thì lưu/đồng bộ được (Drive xác nhận; duyệt từng Sheet vẫn giữ). Không có migration |
 | Kiểm tra | `/readyz` 200 trên tag mới; `/api/product` không token 401 (cả qua Hosting); bundle live có file mẫu mới. **Chưa kiểm khi đăng nhập, chưa sync thử Sheet theo mẫu mới** |
 
