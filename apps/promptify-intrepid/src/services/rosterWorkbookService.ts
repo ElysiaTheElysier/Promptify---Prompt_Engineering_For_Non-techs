@@ -14,9 +14,23 @@ export function parseWorkbook(tabs:Record<string,any[][]>,department:string,now=
  const sops=read('SOPs');if(sops.some(r=>!r.Title||!departments.includes(r.Department)||!validUrl(r.URL)))throw new ApiAccessError('Invalid SOP reference.',422);
  const contacts=read('Main PIC');if(contacts.some(r=>!r.Name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.Email)||!departments.includes(r.Department)))throw new ApiAccessError('Invalid Main PIC contact.',422);
  const reports=read('Report');if(reports.some(r=>!validUrl(r['Report URL'])))throw new ApiAccessError('Invalid report URL.',422);
- const schedule=read('Sync').map(r=>r['Sync At (ISO)']);if(!schedule.length||schedule.some(t=>!/(Z|[+-]\d\d:\d\d)$/.test(t)||!Number.isFinite(Date.parse(t))))throw new ApiAccessError('Sync times require ISO dates with a timezone.',422);
- const sorted=[...new Set(schedule.map(t=>new Date(t).toISOString()))].sort();
- return {rows,departments,sops:sops.filter(r=>r.Department===department),contacts:contacts.filter(r=>r.Department===department),reports,schedule:sorted,nextSync:sorted.find(t=>Date.parse(t)>now)||'infinity'};
+ const sorted=[...new Set(read('Sync').map(r=>syncTime(r['Sync At (ISO)'])))].sort();
+ // Empty Sync tab: re-read every 15 minutes while scheduled sync is on (same cadence as the table layout).
+ const nextSync=sorted.length?sorted.find(t=>Date.parse(t)>now)||'infinity':new Date(now+15*60*1000).toISOString();
+ return {rows,departments,sops:sops.filter(r=>r.Department===department),contacts:contacts.filter(r=>r.Department===department),reports,schedule:sorted,nextSync};
+}
+// shortcut: a time without a timezone is Vietnam time (+07:00); add a per-class timezone when a client outside Vietnam signs.
+const VN_OFFSET=7*3600000;
+/** One Sync cell: ISO with timezone, 2026-11-12 08:00, 12/11/2026 08:00 (day first), or a Sheets date serial. Returns ISO UTC. */
+export function syncTime(raw:string):string{
+ const fail=():never=>{throw new ApiAccessError(`Sync tab: "${raw.slice(0,40)}" is not a valid time. Write it like 12/11/2026 08:00 (Vietnam time), or leave the Sync tab empty to sync every 15 minutes.`,422);};
+ if(/^\d+(\.\d+)?$/.test(raw)){const serial=Number(raw);return serial>=1&&serial<2958466?new Date(Math.round((serial-25569)*86400)*1000-VN_OFFSET).toISOString():fail();}
+ if(/^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d(\.\d+)?)?(Z|[+-]\d\d:\d\d)$/.test(raw)){const t=Date.parse(raw);return Number.isFinite(t)?new Date(t).toISOString():fail();}
+ const iso=raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/),vn=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+ const m=iso||vn||fail(),[y,mo,d]=(iso?[m[1],m[2],m[3]]:[m[3],m[2],m[1]]).map(Number),[h,mi,s]=[m[4],m[5],m[6]].map(v=>Number(v||0));
+ const utc=Date.UTC(y,mo-1,d,h,mi,s),back=new Date(utc);
+ if(back.getUTCFullYear()!==y||back.getUTCMonth()!==mo-1||back.getUTCDate()!==d||h>23||mi>59||s>59)fail();
+ return new Date(utc-VN_OFFSET).toISOString();
 }
 export async function readRosterSource(sheetId:string,mapping:RosterMapping&{templateVersion?:number},department:string):Promise<WorkbookBundle|null>{
  if(mapping.templateVersion===2){
@@ -31,7 +45,12 @@ export async function readRosterSource(sheetId:string,mapping:RosterMapping&{tem
  const names=Object.keys(WORKBOOK_TABS),query=names.map(n=>'ranges='+encodeURIComponent("'"+n+"'!A1:F502")).join('&');
  const response=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchGet?${query}`,{headers:{Authorization:`Bearer ${await googleAccessToken()}`},signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw new ApiAccessError('Workbook could not be read. Check all six tabs and service account access.',503);
- const data=await response.json();return parseWorkbook(Object.fromEntries(names.map((n,i)=>[n,data.valueRanges?.[i]?.values||[]])),department);
+ const data=await response.json(),tabs=Object.fromEntries(names.map((n,i)=>[n,data.valueRanges?.[i]?.values||[]]));
+ // Sync is read again as raw values so a cell Sheets turned into a date arrives as a serial number, not locale-formatted text (12/11 vs 11/12).
+ const sync=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent("'Sync'!A1:A502")}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER`,{headers:{Authorization:`Bearer ${await googleAccessToken()}`},signal:AbortSignal.timeout(15000)});
+ if(!sync.ok)throw new ApiAccessError('Workbook could not be read. Check all six tabs and service account access.',503);
+ tabs.Sync=(await sync.json()).values||[];
+ return parseWorkbook(tabs,department);
 }
 export async function finishWorkbookSync(logId:string,rows:any[],bundle:WorkbookBundle|null){
  try{return await sqlTransaction(undefined,async db=>{

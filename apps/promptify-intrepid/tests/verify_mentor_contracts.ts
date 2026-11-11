@@ -3,7 +3,7 @@ import {codelabAvailable} from '../src/services/codelabLifecycleService';
 import {entryReturnUrl} from '../src/services/entryNavigationService';
 import assert from 'node:assert/strict';
 import {bindPromptVariables} from '../src/services/promptVariableService';
-import {parseWorkbook,WORKBOOK_TABS} from '../src/services/rosterWorkbookService';
+import {parseWorkbook,syncTime,WORKBOOK_TABS} from '../src/services/rosterWorkbookService';
 import {CORE_SCAFFOLDS,scaffoldTag,recognizedScaffolds} from '../src/services/scaffoldRecognitionService';
 const variables=[{name:'ticket',type:'text',sample:'42'},{name:'count',type:'integer',sample:'1'}];
 assert.equal(bindPromptVariables('Handle {{ticket}} and {count}',variables,{ticket:'new ticket',count:'3'}).prompt,'Handle new ticket and 3');
@@ -25,6 +25,11 @@ assert.throws(()=>parseWorkbook(truncated,'Tech'),/header changed/,'overflow sen
 assert.equal(bundle.rows.length,1);assert.equal(bundle.rows[0].employeeId,'E1');assert.equal(bundle.sops.length,1);assert.equal(bundle.nextSync,'2027-01-01T01:00:00.000Z');
 assert.equal(parseWorkbook(tabs,'Tech',Date.parse('2028-01-01')).nextSync,'infinity');
 const changed=structuredClone(tabs);changed.Users[0][0]='Renamed';assert.throws(()=>parseWorkbook(changed,'Tech'),/header changed/);
+// Sync tab: empty = every 15 minutes; friendly formats are Vietnam time; a Sheets date serial is read as Vietnam wall-clock time.
+const noSync=structuredClone(tabs);noSync.Sync=[noSync.Sync[0]];assert.equal(parseWorkbook(noSync,'Tech',Date.parse('2026-11-11T00:00:00Z')).nextSync,'2026-11-11T00:15:00.000Z');
+for(const v of ['12/11/2026 08:00','2026-11-12 08:00','2026-11-12T08:00:00+07:00','2026-11-12T01:00:00Z','46338.333333333336'])assert.equal(syncTime(v),'2026-11-12T01:00:00.000Z',v);
+assert.equal(syncTime('2026-11-12T08:00:00'),'2026-11-12T01:00:00.000Z');assert.equal(syncTime('12/11/2026'),'2026-11-11T17:00:00.000Z');
+for(const v of ['31/02/2026 08:00','12/11/2026 25:00','2026-13-01 08:00','next monday'])assert.throws(()=>syncTime(v),/12\/11\/2026 08:00/,v);
 const unsafe=structuredClone(tabs);unsafe.SOPs[1][2]='javascript:alert(1)';assert.throws(()=>parseWorkbook(unsafe,'Tech'),/SOP reference/);
 console.log('Mentor contracts PASS: variable binding/types, explicit scaffold detection, workbook headers/scope/timezone/URL/schedule. No live calls.');
 
