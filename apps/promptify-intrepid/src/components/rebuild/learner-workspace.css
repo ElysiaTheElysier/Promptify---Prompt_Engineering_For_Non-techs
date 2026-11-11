@@ -185,3 +185,15 @@
 .lv-dialog .lv-snippet{display:block;padding:12px 14px;border-radius:10px;background:#f4f8f6;border:1px solid #d5e3df;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
 .lv-dialog .lv-dialog-meta{margin:10px 0 0;font-size:13px;color:#52676b}
 .lv-dialog .lv-dialog-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+
+/* Provider log: a small toggle on the model/latency line; opens to a light panel below it. */
+.learner-v7 .lv-output-meta-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:4px 0 12px}
+.learner-v7 .lv-output-meta-row .lv-output-meta{margin:0}
+.learner-v7 .lv-output-meta-row details.lv-provider-log{margin:0 0 0 auto;padding:0;border:0;background:transparent;max-height:none;overflow:visible}
+.learner-v7 .lv-output-meta-row .lv-provider-log>summary{min-height:28px;display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:650;color:#047857;cursor:pointer;list-style:none}
+.learner-v7 .lv-output-meta-row .lv-provider-log>summary::-webkit-details-marker{display:none}
+.learner-v7 .lv-output-meta-row .lv-provider-log>summary::after{content:'▸';margin-left:6px}
+.learner-v7 .lv-output-meta-row .lv-provider-log[open]>summary::after{content:'▾'}
+.learner-v7 .lv-output-meta-row .lv-provider-log>summary:hover{background:#edf7f2}
+.learner-v7 .lv-output-meta-row .lv-provider-log[open]{flex-basis:100%;margin:0;padding:10px 12px;border:1px solid var(--lv-line);border-radius:12px;background:#f6faf8;max-height:320px;overflow:auto;font-size:13px}
+.learner-v7 .lv-output-meta-row .lv-provider-log[open]>summary{margin:0 0 8px}
