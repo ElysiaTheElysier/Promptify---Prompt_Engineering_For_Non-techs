@@ -1,12 +1,13 @@
 import React,{useEffect,useRef,useState} from 'react';
-import {ChevronLeft,ChevronRight,Maximize2,Minimize2,Undo2} from 'lucide-react';
+import {ChevronLeft,ChevronRight,Maximize2,Minimize2,Undo2,ZoomIn,ZoomOut} from 'lucide-react';
 import {useProductLanguage} from '../../services/productI18nService';
 import './lesson-slides.css';
+const ZOOMS=[0.5,0.75,1,1.25,1.5,2,3];
 export type OpenedSlides={url:string;pageCount:number;startPage:number;endPage:number;ranged:boolean};
 /** Static PDF pages (no animation, video or speaker notes). pdf.js and its worker load only when this mounts. */
 export default function LessonSlidesViewer({load,title}:{load:()=>Promise<OpenedSlides>;title?:string}){
  const language=useProductLanguage(),p=(en:string,vi:string)=>language==='en'?en:vi;
- const [status,setStatus]=useState<'loading'|'ready'|'error'>('loading'),[error,setError]=useState(''),[info,setInfo]=useState<OpenedSlides|null>(null),[page,setPage]=useState(0),[attempt,setAttempt]=useState(0),[width,setWidth]=useState(0),[full,setFull]=useState(false);
+ const [status,setStatus]=useState<'loading'|'ready'|'error'>('loading'),[error,setError]=useState(''),[info,setInfo]=useState<OpenedSlides|null>(null),[page,setPage]=useState(0),[attempt,setAttempt]=useState(0),[width,setWidth]=useState(0),[full,setFull]=useState(false),[zoom,setZoom]=useState(1);
  const doc=useRef<any>(null),canvas=useRef<HTMLCanvasElement>(null),frame=useRef<HTMLDivElement>(null),stage=useRef<HTMLDivElement>(null);
  useEffect(()=>{let cancelled=false;setStatus('loading');(async()=>{try{
   const [pdfjs,worker,opened]=await Promise.all([import('pdfjs-dist'),import('pdfjs-dist/build/pdf.worker.min.mjs?url'),load()]);
@@ -24,12 +25,14 @@ export default function LessonSlidesViewer({load,title}:{load:()=>Promise<Opened
   if(status!=='ready'||!doc.current||!canvas.current||!width)return;let task:any,cancelled=false;
   (async()=>{const pdfPage=await doc.current.getPage(page);if(cancelled)return;const base=pdfPage.getViewport({scale:1});
    // Fit width; in full screen also fit the height so a whole slide stays visible.
-   const scale=full?Math.min(width/base.width,(window.innerHeight-72)/base.height):width/base.width,ratio=window.devicePixelRatio||1,viewport=pdfPage.getViewport({scale:scale*ratio});
+   // Zoom multiplies the fitted size; the stage scrolls to pan a zoomed page.
+   const scale=(full?Math.min(width/base.width,(window.innerHeight-72)/base.height):width/base.width)*zoom,ratio=window.devicePixelRatio||1,viewport=pdfPage.getViewport({scale:scale*ratio});
    const target=canvas.current!;target.width=Math.floor(viewport.width);target.height=Math.floor(viewport.height);target.style.width=Math.floor(viewport.width/ratio)+'px';target.style.height=Math.floor(viewport.height/ratio)+'px';
    task=pdfPage.render({canvas:target,canvasContext:target.getContext('2d')!,viewport});await task.promise.catch(()=>undefined);})();
   return()=>{cancelled=true;task?.cancel();};
- },[status,page,width,full]);
+ },[status,page,width,full,zoom]);
  const total=info?.pageCount||0,go=(next:number)=>setPage(Math.min(Math.max(1,next),total||1));
+ const zoomStep=(dir:1|-1)=>setZoom(z=>{const i=ZOOMS.indexOf(z);return ZOOMS[Math.min(ZOOMS.length-1,Math.max(0,(i<0?2:i)+dir))];});
  // The full-window overlay applies at once; native full screen is a bonus where the browser allows it (embedded views may not).
  const toggleFull=()=>{if(full){setFull(false);if(document.fullscreenElement)void document.exitFullscreen().catch(()=>undefined);return;}setFull(true);void frame.current?.requestFullscreen?.().catch(()=>undefined);};
  const keys=(event:React.KeyboardEvent)=>{
@@ -37,6 +40,9 @@ export default function LessonSlidesViewer({load,title}:{load:()=>Promise<Opened
   if(['ArrowRight','PageDown'].includes(event.key)){event.preventDefault();go(page+1);}
   else if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();go(page-1);}
   else if(event.key==='Escape'&&full&&!document.fullscreenElement){event.preventDefault();setFull(false);}
+  else if(['+','='].includes(event.key)){event.preventDefault();zoomStep(1);}
+  else if(event.key==='-'){event.preventDefault();zoomStep(-1);}
+  else if(event.key==='0'){event.preventDefault();setZoom(1);}
  };
  return <div ref={frame} className={'slides-viewer'+(full?' slides-viewer-full':'')} tabIndex={0} onKeyDown={keys} role="region" aria-label={(title?title+' · ':'')+p('Lecture slides','Slide bài giảng')} aria-roledescription={p('slide viewer','trình xem slide')}>
   <div className="slides-toolbar">
@@ -45,13 +51,18 @@ export default function LessonSlidesViewer({load,title}:{load:()=>Promise<Opened
    <button type="button" className="ui-btn ui-btn-secondary ui-btn-sm" onClick={()=>go(page+1)} disabled={status!=='ready'||page>=total} aria-label={p('Next page','Trang sau')}><ChevronRight size={16}/></button>
    {info?.ranged&&<span className="slides-part">{p('Part of this lab','Phần của bài')}: {info.startPage}–{info.endPage}</span>}
    {info?.ranged&&<button type="button" className="ui-btn ui-btn-ghost ui-btn-sm" onClick={()=>go(info.startPage)} disabled={page>=info.startPage&&page<=info.endPage}><Undo2 size={15}/>{p('Back to this lab’s part','Về phần của bài')}</button>}
+   <div className="slides-zoom" role="group" aria-label={p('Zoom','Thu phóng')}>
+    <button type="button" className="ui-btn ui-btn-secondary ui-btn-sm" onClick={()=>zoomStep(-1)} disabled={status!=='ready'||zoom<=ZOOMS[0]} aria-label={p('Zoom out (−)','Thu nhỏ (−)')} title={p('Zoom out (−)','Thu nhỏ (−)')}><ZoomOut size={16}/></button>
+    <button type="button" className="slides-zoom-level" onClick={()=>setZoom(1)} disabled={status!=='ready'} title={p('Fit width (0)','Vừa khung (0)')} aria-label={p(`Zoom ${Math.round(zoom*100)}%, fit width`,`Thu phóng ${Math.round(zoom*100)}%, về vừa khung`)}>{Math.round(zoom*100)}%</button>
+    <button type="button" className="ui-btn ui-btn-secondary ui-btn-sm" onClick={()=>zoomStep(1)} disabled={status!=='ready'||zoom>=ZOOMS[ZOOMS.length-1]} aria-label={p('Zoom in (+)','Phóng to (+)')} title={p('Zoom in (+)','Phóng to (+)')}><ZoomIn size={16}/></button>
+   </div>
    <button type="button" className="ui-btn ui-btn-ghost ui-btn-sm slides-full-toggle" onClick={toggleFull} disabled={status!=='ready'} aria-pressed={full}>{full?<Minimize2 size={15}/>:<Maximize2 size={15}/>}{full?p('Exit full screen (Esc)','Thoát toàn màn hình (Esc)'):p('Full screen','Toàn màn hình')}</button>
   </div>
   <div ref={stage} className="slides-stage">
    {status==='loading'&&<p role="status" className="slides-state">{p('Loading slides…','Đang tải slide…')}</p>}
    {status==='error'&&<div role="alert" className="slides-state"><p>{error}</p><button type="button" className="ui-btn ui-btn-primary ui-btn-sm" onClick={()=>setAttempt(n=>n+1)}>{p('Retry','Thử lại')}</button></div>}
-   <canvas ref={canvas} hidden={status!=='ready'} aria-label={p(`Slide page ${page}`,`Trang slide ${page}`)} role="img"/>
+   <canvas ref={canvas} className={zoom>1?'slides-zoomed':undefined} hidden={status!=='ready'} aria-label={p(`Slide page ${page}`,`Trang slide ${page}`)} role="img"/>
   </div>
-  {status==='ready'&&<p className="slides-hint">{p('Tip: click the slide, then use ← → to change pages.','Mẹo: bấm vào slide rồi dùng ← → để đổi trang.')}</p>}
+  {status==='ready'&&<p className="slides-hint">{p('Tip: click the slide, then ← → change pages, + − zoom, 0 fits the width.','Mẹo: bấm vào slide rồi dùng ← → để đổi trang, + − để phóng to/thu nhỏ, 0 để vừa khung.')}</p>}
  </div>;
 }

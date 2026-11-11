@@ -4,8 +4,10 @@
 .slides-count{min-width:96px;text-align:center;font-size:13px;font-weight:650}
 .slides-part{font-size:12px;color:#065f46;background:#e1f5eb;border-radius:999px;padding:4px 10px}
 .slides-full-toggle{margin-left:auto}
-.slides-stage{min-width:0;width:100%;background:#f4f7f6;border:1px solid #d6e5df;border-radius:12px;display:flex;justify-content:center;align-items:flex-start;overflow:auto}
-.slides-stage canvas{display:block;max-width:100%;background:white}
+/* Centre with margin:auto, not justify-content, so a zoomed page can scroll to its left edge. */
+.slides-stage{min-width:0;width:100%;background:#f4f7f6;border:1px solid #d6e5df;border-radius:12px;display:flex;align-items:flex-start;overflow:auto}
+.slides-stage canvas{display:block;max-width:100%;margin:0 auto;background:white}
+.slides-stage canvas.slides-zoomed{max-width:none}
 .slides-stage canvas[hidden]{display:none}
 .slides-state{padding:48px 16px;text-align:center;color:#3d5a55;display:grid;gap:12px;justify-items:center}
 .slides-hint{font-size:12px;color:#5b726d;margin:0}
@@ -48,3 +50,12 @@
 .slides-admin.slides-admin .slides-page input[type=number]{width:110px}
 .slides-admin .slides-hint{flex-basis:100%;margin:0;font-size:12px;color:#64748b}
 .slides-admin>h2{display:flex;align-items:center;gap:8px}
+
+.slides-zoom{display:inline-flex;align-items:center;gap:4px}
+.slides-zoom-level{min-width:52px;padding:4px 6px;border:0;border-radius:8px;background:transparent;font-size:13px;font-weight:650;color:inherit;cursor:pointer}
+.slides-zoom-level:hover:not(:disabled){background:#e1f5eb}
+.slides-zoom-level:focus-visible{outline:2px solid #047857;outline-offset:2px}
+.slides-viewer-full .slides-zoom-level:hover:not(:disabled),.slides-viewer:fullscreen .slides-zoom-level:hover:not(:disabled){background:#ffffff1f}
+/* Slides pane header: title left, a compact Back button right, never touching the card edge. */
+.lv-slides-pane>.lv-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.lv-slides-pane>.lv-section-heading h2{min-width:0;margin:0;overflow-wrap:anywhere}
