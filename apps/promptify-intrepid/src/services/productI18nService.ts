@@ -84,11 +84,16 @@ const ROSTER_ERRORS:Record<string,[string,string]>={
   'Invalid SOP reference.':['Each SOPs row needs a Title, a department from the Department tab and a link starting with https://. A pasted link that Google turned into a smart chip is not read: set the URL column to Plain text and paste the link again.','Mỗi dòng ở tab SOPs cần Title, phòng ban có trong tab Department và link bắt đầu bằng https://. Link bị Google đổi thành thẻ thông minh (chip) sẽ không đọc được: đặt cột URL thành Văn bản thuần tuý rồi dán lại link.'],
   'Invalid Main PIC contact.':['Each Main PIC row needs a Name, a valid Email and a department from the Department tab.','Mỗi dòng ở tab Main PIC cần Name, Email hợp lệ và phòng ban có trong tab Department.'],
   'Invalid report URL.':['Each Report URL must start with https://.','Mỗi Report URL phải bắt đầu bằng https://.'],
+  // SOP upload (sopIngestionService): same generic-422 problem.
+  'SOP must contain searchable text within 100000 characters and 60 chunks.':['This SOP is too long (over about 100,000 characters) or has no searchable text. Split it into smaller SOPs, one topic each.','SOP này quá dài (hơn khoảng 100.000 ký tự) hoặc không có chữ để tìm. Hãy tách thành nhiều SOP nhỏ, mỗi file một chủ đề.'],
+  'SOP extraction failed. Use a readable PDF, DOCX, XLSX, Markdown, CSV or text file.':['This file cannot be read. Use a PDF with selectable text (not a scan), DOCX, XLSX, Markdown, CSV or text.','Không đọc được file này. Hãy dùng PDF có chữ chọn được (không phải bản scan), DOCX, XLSX, Markdown, CSV hoặc TXT.'],
 };
 export function productErrorText(status: number, locale = language, detail?:unknown) {
   if(typeof detail==='string'&&SLIDE_ERRORS[detail])return SLIDE_ERRORS[detail][locale==='en'?0:1];
   if(status===422&&typeof detail==='string'&&ROSTER_ERRORS[detail])return ROSTER_ERRORS[detail][locale==='en'?0:1];
   const badSync=status===422&&typeof detail==='string'?detail.match(/^Sync tab: "(.*)" is not a valid time/):null;
+  const injected=status===422&&typeof detail==='string'?detail.match(/^This document contains text that tries to give the AI instructions \((.*)\) in part (.*)\. Remove/):null;
+  if(injected)return locale==='en'?detail as string:`Tài liệu có đoạn ra lệnh cho AI (${injected[1]}) ở phần ${injected[2]}. Xoá đoạn đó rồi tải lại.`;
   if(badSync)return locale==='en'?detail as string:`Tab Sync: "${badSync[1]}" không phải giờ hợp lệ. Ghi dạng 12/11/2026 08:00 (giờ Việt Nam), hoặc để trống tab Sync để tự đồng bộ mỗi 15 phút.`;
   if(status===429&&detail==='Your AI run limit has been reached (40 per hour, 200 per day). Try again after the limit resets.')return productText('runQuota',locale);
   if(status===403&&detail==='This Workspace source is not approved for this class. Ask an administrator to configure its source binding.')return productText('workspaceSourceUnapproved',locale);

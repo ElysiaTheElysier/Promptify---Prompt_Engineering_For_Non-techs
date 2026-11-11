@@ -46,3 +46,5 @@ const {productErrorText}=await import('../src/services/productI18nService');
 assert.match(productErrorText(422,'vi','Unknown user department.'),/tab Users/);
 assert.match(productErrorText(422,'vi','Sync tab: "abc" is not a valid time. Write it like 12/11/2026 08:00 (Vietnam time), or leave the Sync tab empty to sync every 15 minutes.'),/Tab Sync: "abc"/);
 assert.equal(productErrorText(422,'vi','Something else'),'Kiểm tra các trường bắt buộc rồi thử lại.');
+assert.match(productErrorText(422,'vi','SOP must contain searchable text within 100000 characters and 60 chunks.'),/quá dài/);
+assert.match(productErrorText(422,'vi','This document contains text that tries to give the AI instructions (override) in part 3. Remove that text and upload the document again.'),/ra lệnh cho AI \(override\) ở phần 3/);
