@@ -81,7 +81,7 @@ const ROSTER_ERRORS:Record<string,[string,string]>={
   'Unknown user department.':['Someone in the Users tab has a department that is not in the Department tab.','Có người ở tab Users ghi phòng ban không có trong tab Department.'],
   'Roster contains invalid required fields.':['A row in the Users tab is missing Email, Full Name (2+ characters), Department or Country, or has an invalid email.','Một dòng ở tab Users thiếu Email, Full Name (từ 2 ký tự), Department hoặc Country, hoặc email sai dạng.'],
   'Roster contains duplicate emails.':['The Users tab lists the same email twice.','Tab Users có email bị trùng.'],
-  'Invalid SOP reference.':['Each SOPs row needs a Title, a department from the Department tab and a link starting with https://.','Mỗi dòng ở tab SOPs cần Title, phòng ban có trong tab Department và link bắt đầu bằng https://.'],
+  'Invalid SOP reference.':['Each SOPs row needs a Title, a department from the Department tab and a link starting with https://. A pasted link that Google turned into a smart chip is not read: set the URL column to Plain text and paste the link again.','Mỗi dòng ở tab SOPs cần Title, phòng ban có trong tab Department và link bắt đầu bằng https://. Link bị Google đổi thành thẻ thông minh (chip) sẽ không đọc được: đặt cột URL thành Văn bản thuần tuý rồi dán lại link.'],
   'Invalid Main PIC contact.':['Each Main PIC row needs a Name, a valid Email and a department from the Department tab.','Mỗi dòng ở tab Main PIC cần Name, Email hợp lệ và phòng ban có trong tab Department.'],
   'Invalid report URL.':['Each Report URL must start with https://.','Mỗi Report URL phải bắt đầu bằng https://.'],
 };
