@@ -63,3 +63,7 @@ for(const vi of [true,false]){
 }
 const bannerOnly=structuredClone(tabs);bannerOnly.Users=[['USERS'],['help'],['x'],['y'],['z'],...tabs.Users];
 assert.throws(()=>parseWorkbook(bannerOnly,'Tech'),/header changed/,'header is looked for in the first 5 rows only');
+// The guide names the exact address to share with when the API provides it.
+const guideText=(b:any)=>{const out:string[]=[];b.worksheets[0].eachRow((row:any)=>row.eachCell((cell:any)=>out.push(String(cell.value))));return out.join('\n');};
+assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',true,'sa@example.iam.gserviceaccount.com')),/thêm sa@example\.iam\.gserviceaccount\.com với quyền Người xem/);
+assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',false)),/shown on the Roster screen/);

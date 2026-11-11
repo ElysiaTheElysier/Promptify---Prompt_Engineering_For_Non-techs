@@ -57,7 +57,7 @@ function dataTab(book:Workbook,name:keyof typeof TEMPLATE_TABS,c:Copy,vi:boolean
  return sheet;
 }
 
-function guideTab(book:Workbook,vi:boolean,department:string,copies:Record<string,Copy>){
+function guideTab(book:Workbook,vi:boolean,department:string,copies:Record<string,Copy>,serviceAccount:string){
  const t=(v:string,e:string)=>vi?v:e,sheet=book.addWorksheet(t('Hướng dẫn','Guide'),{properties:{tabColor:{argb:'FFF59E0B'}}});
  sheet.columns=[{width:4},{width:22},{width:16},{width:90}];
  let r=1;
@@ -75,7 +75,7 @@ function guideTab(book:Workbook,vi:boolean,department:string,copies:Record<strin
  r++;line(['',t('CÁC BƯỚC','STEPS')],{font:{bold:true,size:12}});
  [t('Điền tab Department, rồi Users (và SOPs, Main PIC, Report, Sync nếu dùng).','Fill in Department, then Users (and SOPs, Main PIC, Report, Sync if used).'),
   t('Tải file lên Google Drive, mở bằng Google Sheets (Mở bằng → Google Trang tính, rồi Tệp → Lưu dưới dạng Google Trang tính).','Upload to Google Drive and open with Google Sheets (Open with → Google Sheets, then File → Save as Google Sheets).'),
-  t('Chia sẻ Sheet cho service account của Promptify, quyền Người xem (Viewer).','Share the Sheet with the Promptify service account as Viewer.'),
+  serviceAccount?t(`Bấm Chia sẻ, thêm ${serviceAccount} với quyền Người xem (Viewer), bỏ tick “Thông báo cho mọi người”.`,`Click Share, add ${serviceAccount} as Viewer, untick “Notify people”.`):t('Chia sẻ Sheet cho service account của Promptify (email hiện ở màn Roster), quyền Người xem (Viewer).','Share the Sheet with the Promptify service account (shown on the Roster screen) as Viewer.'),
   t('Admin duyệt link Sheet ở Quản trị → Nguồn Google được duyệt.','An admin approves the Sheet link in Governance → Approved Google sources.'),
   t('Trong Promptify: dán link Sheet, chọn bố cục “Workbook 6 tab”, lưu, rồi bấm Đồng bộ.','In Promptify: paste the Sheet link, choose the "Six-tab workbook" layout, save, then Sync.')]
   .forEach((s,i)=>line(['',`${i+1}.`,'',s],{},wrapHeight(s,70)));
@@ -85,9 +85,9 @@ function guideTab(book:Workbook,vi:boolean,department:string,copies:Record<strin
 }
 
 /** Builds the formatted onboarding workbook: a guide tab first, then the six contract tabs with title, instructions and header. */
-export function buildRosterTemplate(Excel:{Workbook:new()=>Workbook},department:string,vi:boolean){
+export function buildRosterTemplate(Excel:{Workbook:new()=>Workbook},department:string,vi:boolean,serviceAccount=''){
  const book=new Excel.Workbook(),copies=copy(vi,department);
- guideTab(book,vi,department,copies);
+ guideTab(book,vi,department,copies,serviceAccount);
  const sheets:Record<string,Worksheet>={};
  for(const name of ['Department','Users','SOPs','Main PIC','Report','Sync'] as const)sheets[name]=dataTab(book,name,copies[name],vi);
  if(department)sheets.Department.getCell(`A${FIRST}`).value=department;

@@ -26,6 +26,11 @@ export function parseRoster(values: unknown[][], mapping: RosterMapping, departm
   if ((!rows.length && !options.allowEmpty) || rows.length > 500) throw new ApiAccessError('The selected department requires a valid roster within 500 rows.', 422);
   return rows;
 }
+/** The Google identity customers share Sheets and Drive files with (Viewer). An address, not a secret. */
+export function workspaceServiceAccount(){
+  if(process.env.GOOGLE_SERVICE_ACCOUNT_JSON){try{return String(JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON).client_email||'');}catch{return '';}}
+  return process.env.GOOGLE_WORKSPACE_SERVICE_ACCOUNT||'';
+}
 const cachedTokens=new Map<string,{email:string;keyId:string;token:string;expires:number}>();
 export async function googleAccessToken(scope='https://www.googleapis.com/auth/spreadsheets.readonly') {
   if(!process.env.GOOGLE_SERVICE_ACCOUNT_JSON){

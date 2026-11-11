@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {useProductLanguage} from '../../services/productI18nService';
 import {confirmAction} from '../common/UiFeedback';
+import ServiceAccountEmail from './ServiceAccountEmail';
 
 type Action=(name:string,payload?:Record<string,unknown>,after?:(value:any)=>void)=>Promise<void>;
 type Source={kind:'sheets'|'folders'|'files';source_id:string;origin:'env'|'db'};
@@ -8,7 +9,7 @@ const kindOf=(link:string)=>/\/spreadsheets\//.test(link)?'sheets':/\/folders\//
 const linkOf=(row:Source)=>row.kind==='sheets'?`https://docs.google.com/spreadsheets/d/${row.source_id}/edit`:row.kind==='folders'?`https://drive.google.com/drive/folders/${row.source_id}`:`https://drive.google.com/file/d/${row.source_id}/view`;
 const field='grid gap-1.5 text-sm font-semibold min-w-0',control='w-full h-12 border border-m3-outline-variant rounded-xl px-3 font-normal bg-white focus:outline-none focus:border-m3-primary focus:ring-2 focus:ring-m3-primary-container';
 /** Governance (admin, TM-008): approve which Google Sheets / Drive folders / Drive files this class may read (migration 025, audited). */
-export default function WorkspaceSourceList({sources,classCode,busy,onAction,onChanged}:{sources?:Source[];classCode?:string;busy:boolean;onAction:Action;onChanged:()=>void}){
+export default function WorkspaceSourceList({sources,serviceAccount,classCode,busy,onAction,onChanged}:{sources?:Source[];serviceAccount?:string;classCode?:string;busy:boolean;onAction:Action;onChanged:()=>void}){
  const lang=useProductLanguage(),p=(en:string,vi:string)=>lang==='en'?en:vi;
  const [link,setLink]=useState(''),[kind,setKind]=useState(''),[reason,setReason]=useState('');
  if(!sources)return null;
@@ -22,6 +23,7 @@ export default function WorkspaceSourceList({sources,classCode,busy,onAction,onC
  return <section className="mt-6 border rounded-2xl p-5" data-testid="workspace-sources">
   <h3 className="font-bold text-lg">{p('Approved Google sources','Nguồn Google được duyệt')}{classCode&&<span className="ml-2 text-sm font-normal text-m3-on-surface-variant">{p('class','lớp')} {classCode}</span>}</h3>
   <p className="mt-1 text-sm text-m3-on-surface-variant">{p('Share the file or folder with the Promptify service account (Viewer) first. Files added later to an approved folder need no new approval.','Trước tiên hãy chia sẻ file hoặc thư mục cho service account của Promptify (quyền Viewer). File bỏ thêm vào thư mục đã duyệt dùng được ngay.')}</p>
+  <ServiceAccountEmail email={serviceAccount}/>
   {sources.length?<ul className="mt-4 space-y-2">{sources.map(row=><li key={row.origin+row.kind+row.source_id} className="border rounded-xl p-3 flex flex-wrap items-center gap-x-3 gap-y-2">
    <span className="shrink-0 px-2.5 py-0.5 rounded-full border text-xs font-bold whitespace-nowrap">{label(row.kind)}</span>
    {/* basis-48: on a narrow screen the ID moves to its own line instead of shrinking to a few characters. */}
