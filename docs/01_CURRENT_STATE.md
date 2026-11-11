@@ -5,7 +5,7 @@
 | Thành phần | Trạng thái (LIVE 11/11) |
 | --- | --- |
 | API | `promptify-intrepid-api-rel3-1111` nhận 100% traffic. Image `rel-20261111-9713888` (`sha256:eb9be092…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel2-1111` (giữ tag, `2fc2dbe`), rồi `rel1-1111` |
-| Hosting staging | `d49203a50dd3fdc4` (commit `d1e4f11`: Workshop đổi trạng thái Codelab gửi kèm nội dung bài, hết lỗi 409), rollback `82a7ad35ca4b2f91` (`9713888`), rồi `b5264c74469c3f81` |
+| Hosting staging | `677fbd956ebc34bc` (commit `199b140`: tab Tài liệu của Studio gọn lại), rollback `d49203a50dd3fdc4` (`d1e4f11`, sửa lỗi 409 khi đổi trạng thái Codelab), rồi `82a7ad35ca4b2f91` |
 | Thay đổi | Roster: workbook 6 tab là mặc định; tab Sync được để trống (đồng bộ mỗi 15 phút) và nhận `12/11/2026 08:00` là giờ Việt Nam; lỗi sync và lỗi tải SOP nói rõ nguyên nhân; file mẫu có tab Hướng dẫn, tiêu đề, dòng hướng dẫn, màu, danh sách chọn Department. Parser tìm dòng tên cột trong 5 dòng đầu (Sheet cũ vẫn chạy). Màn Roster và Quản trị hiện email service account để chia sẻ (nút Copy); file mẫu có ô chọn ngôn ngữ và ghi email ở đầu tab Hướng dẫn. Sheet roster nằm trong thư mục Drive đã duyệt cho lớp thì lưu/đồng bộ được (Drive xác nhận; duyệt từng Sheet vẫn giữ). Không có migration |
 | Kiểm tra | `/readyz` 200 trên tag mới; `/api/product` không token 401 (cả qua Hosting); bundle live có file mẫu mới. **Chưa kiểm khi đăng nhập, chưa sync thử Sheet theo mẫu mới** |
 
