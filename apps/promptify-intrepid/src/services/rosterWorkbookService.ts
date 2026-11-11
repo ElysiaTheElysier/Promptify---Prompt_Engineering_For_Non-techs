@@ -5,7 +5,11 @@ import {parseTableRoster} from './rosterTableService';
 export const WORKBOOK_TABS={Sync:['Sync At (ISO)'],Users:['Email','Full Name','Department','Country','Employee ID','Office Location'],Department:['Department'],SOPs:['Title','Department','URL'], 'Main PIC':['Name','Email','Department'],Report:['Report URL']} as const;
 export type WorkbookBundle={rows:any[];departments:string[];sops:any[];contacts:any[];reports:any[];schedule:string[];nextSync:string};
 function records(values:any[][],headers:readonly string[]){if(values.length>501||values.some(row=>row.some(v=>String(v??'').length>2000))||!values.length||headers.some((h,i)=>values[0][i]!==h))throw new ApiAccessError('Workbook header changed. Use template v1.',422);return values.slice(1).filter(row=>row.some(v=>String(v??'').trim())).map(row=>Object.fromEntries(headers.map((h,i)=>[h,String(row[i]??'').trim()])));}
+// Template v1 may put a title and instructions above the header: rows before the header (first 5 rows) are ignored.
+const HEADER_SCAN=5;
+function fromHeader(values:any[][],headers:readonly string[]){const i=values.slice(0,HEADER_SCAN).findIndex(row=>headers.every((h,j)=>row?.[j]===h));return i<0?[]:values.slice(i);}
 export function parseWorkbook(tabs:Record<string,any[][]>,department:string,now=Date.now()):WorkbookBundle{
+ tabs=Object.fromEntries(Object.entries(WORKBOOK_TABS).map(([name,headers])=>[name,fromHeader(tabs[name]||[],headers)]));
  const read=(name:keyof typeof WORKBOOK_TABS)=>records(tabs[name]||[],WORKBOOK_TABS[name]);
  const departments=read('Department').map(r=>r.Department);if(!departments.includes(department)||new Set(departments).size!==departments.length)throw new ApiAccessError('Department tab must list each department once.',422);
  const users=read('Users');if(users.some(r=>!departments.includes(r.Department)))throw new ApiAccessError('Unknown user department.',422);
@@ -42,12 +46,12 @@ export async function readRosterSource(sheetId:string,mapping:RosterMapping&{tem
  }
  if(mapping.templateVersion!==1)return null;
  if(!/^[A-Za-z0-9_-]+$/.test(sheetId))throw new ApiAccessError('Invalid Sheet ID.',422);
- const names=Object.keys(WORKBOOK_TABS),query=names.map(n=>'ranges='+encodeURIComponent("'"+n+"'!A1:F502")).join('&');
+ const names=Object.keys(WORKBOOK_TABS),query=names.map(n=>'ranges='+encodeURIComponent("'"+n+"'!A1:F506")).join('&');
  const response=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchGet?${query}`,{headers:{Authorization:`Bearer ${await googleAccessToken()}`},signal:AbortSignal.timeout(15000)});
  if(!response.ok)throw new ApiAccessError('Workbook could not be read. Check all six tabs and service account access.',503);
  const data=await response.json(),tabs=Object.fromEntries(names.map((n,i)=>[n,data.valueRanges?.[i]?.values||[]]));
  // Sync is read again as raw values so a cell Sheets turned into a date arrives as a serial number, not locale-formatted text (12/11 vs 11/12).
- const sync=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent("'Sync'!A1:A502")}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER`,{headers:{Authorization:`Bearer ${await googleAccessToken()}`},signal:AbortSignal.timeout(15000)});
+ const sync=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent("'Sync'!A1:A506")}?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=SERIAL_NUMBER`,{headers:{Authorization:`Bearer ${await googleAccessToken()}`},signal:AbortSignal.timeout(15000)});
  if(!sync.ok)throw new ApiAccessError('Workbook could not be read. Check all six tabs and service account access.',503);
  tabs.Sync=(await sync.json()).values||[];
  return parseWorkbook(tabs,department);

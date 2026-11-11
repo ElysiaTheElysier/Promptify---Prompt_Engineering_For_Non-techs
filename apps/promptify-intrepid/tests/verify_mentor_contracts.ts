@@ -48,3 +48,18 @@ assert.match(productErrorText(422,'vi','Sync tab: "abc" is not a valid time. Wri
 assert.equal(productErrorText(422,'vi','Something else'),'Kiểm tra các trường bắt buộc rồi thử lại.');
 assert.match(productErrorText(422,'vi','SOP must contain searchable text within 100000 characters and 60 chunks.'),/quá dài/);
 assert.match(productErrorText(422,'vi','This document contains text that tries to give the AI instructions (override) in part 3. Remove that text and upload the document again.'),/ra lệnh cho AI \(override\) ở phần 3/);
+// Formatted template: guide tab + title/instruction rows above each header; the parser still reads it (rows above the header are ignored).
+const {buildRosterTemplate,TEMPLATE_TABS}=await import('../src/services/rosterTemplateService');
+assert.deepEqual(TEMPLATE_TABS,WORKBOOK_TABS,'template tabs and headers are the parser contract');
+const ExcelJS=(await import('exceljs')).default;
+for(const vi of [true,false]){
+ const book=buildRosterTemplate(ExcelJS,'Tech',vi),grid=(name:string)=>{const out:any[][]=[];book.getWorksheet(name)!.eachRow({includeEmpty:true},(row,n)=>{out[n-1]=Array.from({length:6},(_,i)=>{const v=row.getCell(i+1).value;return v==null?'':String(v);});});while(out.length&&out[out.length-1].every(v=>!v))out.pop();return out;};
+ assert.equal(book.worksheets[0].name,vi?'Hướng dẫn':'Guide');
+ const filled=Object.fromEntries(Object.keys(WORKBOOK_TABS).map(n=>[n,grid(n)]));
+ assert.equal(filled.Department[3][0],'Tech','class department prefilled under the header');
+ filled.Users.push(['one@example.test','One User','Tech','VN','E1','']);
+ const parsed=parseWorkbook(filled,'Tech',Date.parse('2026-11-11T00:00:00Z'));
+ assert.equal(parsed.rows.length,1);assert.equal(parsed.nextSync,'2026-11-11T00:15:00.000Z');
+}
+const bannerOnly=structuredClone(tabs);bannerOnly.Users=[['USERS'],['help'],['x'],['y'],['z'],...tabs.Users];
+assert.throws(()=>parseWorkbook(bannerOnly,'Tech'),/header changed/,'header is looked for in the first 5 rows only');
