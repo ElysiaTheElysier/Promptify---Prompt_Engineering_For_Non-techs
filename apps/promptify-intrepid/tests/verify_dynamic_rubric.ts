@@ -34,7 +34,15 @@ assert.equal(criterionLabel('c_abc','Giọng văn','en'),'Giọng văn','custom 
 {const {validateStudioShape}=await import('../src/services/studioValidationService');
  const badge={id:'b1',name:'Grounding star',icon:'verified',criteria:'',status:'ACTIVE',ruleType:'criterion_score',criterionKey:'groundedness',minimumScore:'9',attemptScope:'any'};
  assert.throws(()=>validateStudioShape({...studioConfig(R3),awards:{badges:[badge]}}),(e:any)=>e.statusCode===422&&/Grounding star.*Choose its criterion again/.test(e.message),'server names the orphaned badge');
- assert.equal(validateStudioShape({...studioConfig(R3),awards:{badges:[{...badge,criterionKey:R3[1].key}]}}).rubric.length,3);}
+ assert.equal(validateStudioShape({...studioConfig(R3),awards:{badges:[{...badge,criterionKey:R3[1].key}]}}).rubric.length,3);
+ // Tester 12/11: a Vietnamese variable name used to fail with a bare "Invalid Studio configuration."
+ const {toVariableName,variableNameProblem}=await import('../src/services/studioVariableName');
+ assert.equal(toVariableName('tên khách hàng'),'ten_khach_hang');assert.equal(toVariableName('Đơn #2'),'Don_2');assert.equal(toVariableName('2 lần'),'_2_lan');
+ assert.equal(variableNameProblem('ten_khach_hang',['ten_khach_hang'],true),'');assert.match(variableNameProblem('a',['a','a'],true),/trùng/);assert.match(variableNameProblem('tên khách',['tên khách'],true),/không dấu/);
+ const variable=(name:string)=>({name,type:'text',sample:'x',mappedTo:''});
+ assert.throws(()=>validateStudioShape({...studioConfig(R3),variables:[variable('tên khách hàng')]}),(e:any)=>e.statusCode===422&&/tên khách hàng.*customer_name/.test(e.message),'server names the bad variable');
+ assert.throws(()=>validateStudioShape({...studioConfig(R3),variables:[variable('a'),variable('a')]}),/same name/);
+ assert.equal(validateStudioShape({...studioConfig(R3),variables:[variable('ten_khach_hang')]}).variables.length,1);}
 
 // 2. Judge workers know nothing but the rubric: 3/5/8 criteria, accuracy of aggregation, fan-out, latency and payload size.
 const reply=(v:unknown)=>({output:JSON.stringify(v),model:'gemini-3.8-flash',tokens:1});

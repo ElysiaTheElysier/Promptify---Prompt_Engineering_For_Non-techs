@@ -1,4 +1,5 @@
 import {ApiAccessError} from './apiAuthorizationService.js';
+import {VARIABLE_NAME} from './studioVariableName.js';
 export function validateStudioShape(config:any){
  const fail=()=>{throw new ApiAccessError('Invalid Studio configuration.',422);};
  if(!config||typeof config!=='object'||Array.isArray(config))fail();
@@ -6,7 +7,9 @@ export function validateStudioShape(config:any){
  for(const key of ['departments','objectives'])if(!Array.isArray(config[key])||config[key].length>100||config[key].some((v:any)=>typeof v!=='string'||v.length>2000))fail();
  const specs:Record<string,string[]>={variables:['name','type','sample','mappedTo'],scaffold:['id','name','tag','rubricKey'],materials:['id','type','name','url','version','updated','log']};
  for(const [key,fields] of Object.entries(specs)){if(!Array.isArray(config[key])||config[key].length>100)fail();for(const row of config[key]){if(!row||fields.some(field=>typeof row[field]!=='string'||row[field].length>20000))fail();if(key==='scaffold'&&typeof row.active!=='boolean')fail();}}
- if(new Set(config.variables.map((v:any)=>v.name)).size!==config.variables.length||config.variables.some((v:any)=>! /^[A-Za-z_][A-Za-z0-9_.-]{0,79}$/.test(v.name)))fail();
+ const badName=config.variables.find((v:any)=>!VARIABLE_NAME.test(v.name));
+ if(badName)throw new ApiAccessError(`Variable name "${String(badName.name).slice(0,80)}" is invalid: use Latin letters, digits, _ . - and no spaces (for example customer_name).`,422);
+ if(new Set(config.variables.map((v:any)=>v.name)).size!==config.variables.length)throw new ApiAccessError('Two prompt variables have the same name.',422);
  if(!config.awards||typeof config.awards!=='object'||Array.isArray(config.awards))fail();
  // TC-SEC-04: lessons that teach injection defence may run adversarial prompts (still logged).
  if(config.allowAdversarialPractice!==undefined&&typeof config.allowAdversarialPractice!=='boolean')fail();

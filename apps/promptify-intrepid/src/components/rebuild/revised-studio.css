@@ -97,3 +97,7 @@
 .studio-badge-status input[role=switch]:checked::after{transform:translateX(18px)}
 .studio-badge-status input[role=switch]:focus-visible{outline:2px solid #047857;outline-offset:2px}
 .studio-badge-status span{display:flex;flex-direction:column;line-height:1.25}.studio-badge-status strong{font-size:12px}.studio-badge-status small{font-size:11px;color:#56675f}
+/* Learner-visible field marker and compact chip criterion select (tester feedback 12/11). */
+.revised-studio .studio-learner-seen{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:#e3f2ea;color:#1f6b45;font-size:11px;font-weight:600;vertical-align:middle;white-space:nowrap}
+.revised-studio .studio-chip-link{flex:1;min-width:0;padding:4px 8px;border:1px solid #c9d6cf;border-radius:10px;background:#fff;font-size:12px}
+.revised-studio .studio-create-scope{margin-top:12px;padding:10px 12px;border-radius:12px;background:#f3f7f5;font-size:13px}
