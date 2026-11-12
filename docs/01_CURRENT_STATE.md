@@ -1,5 +1,14 @@
 # 01 — Hiện trạng Promptify Intrepid
 
+## Staging 12/11/2026 tối (thay dòng API và Hosting bên dưới)
+
+| Thành phần | Trạng thái (LIVE 12/11) |
+| --- | --- |
+| API | `promptify-intrepid-api-rel2-1112` nhận 100% traffic. Image `rel-20261112-6f69105` (`sha256:638269b6…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel1-1112` (giữ tag), rồi `rel3-1111` |
+| Hosting staging | `6a2995087e4e2630` (commit `6f69105`), rollback `59100aff396a915f` |
+| Thay đổi | Studio theo góp ý người test 12/11: tạo Lab hỏi doanh nghiệp + lớp rồi mở thẳng màn sửa; đổi doanh nghiệp của Lab có sẵn = chép sang lớp của doanh nghiệp đó ở trạng thái Nháp (bản cũ giữ nguyên, slide không chép); tên biến tự chuyển `ten_khach_hang`, báo lỗi tại ô và server nêu tên biến sai; Scaffold Chips liệt kê 5 chip chuẩn, thêm/xóa chip riêng, gắn tiêu chí; thêm/xóa mục tiêu; sửa được Yêu cầu bài tập, Prompt mẫu, Dữ liệu mẫu ở Tab 2; ô SLA cùng kiểu; nhãn "Học viên thấy" |
+| Kiểm tra | OFFLINE: `npm test` 99/99, typecheck, lint, boundaries, build, smoke PASS; bấm thử trên trang thử local với dữ liệu giả. LIVE: `/health`, `/readyz` 200 trên tag mới; `/api/product` và `/internal/roster` không token 401 (cả qua Hosting); bundle live có Studio mới. **Chưa kiểm khi đăng nhập** |
+
 ## Staging 12/11/2026 (thay dòng API của bảng 11/11 bên dưới)
 
 | Thành phần | Trạng thái (LIVE 12/11) |
