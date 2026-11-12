@@ -4,7 +4,6 @@ import {readRosterSource,finishWorkbookSync} from './rosterWorkbookService';
 import {createDatabaseClient,requireCloudDatabase} from './cloudDatabaseService';
 import {createHmac,timingSafeEqual} from 'node:crypto';
 import {readRoster} from './googleRosterService.js';
-import {claimStagingRosterSync,STAGING_ROSTER_FIXTURES} from './stagingRosterClaimService';
 
 export function validWorkerSignature(headers:Record<string,unknown>,secret=process.env.ROSTER_WORKER_SECRET,now=Date.now()):boolean {
   const value=headers['x-promptify-signature'],timestamp=headers['x-promptify-timestamp'],nonce=headers['x-promptify-nonce'];
@@ -12,6 +11,28 @@ export function validWorkerSignature(headers:Record<string,unknown>,secret=proce
   if(!/^\d{10}$/.test(timestamp)||Math.abs(now/1000-Number(timestamp))>120||!/^[0-9a-f-]{36}$/i.test(nonce)||!/^[0-9a-f]{64}$/.test(value))return false;
   const incoming=Buffer.from(value,'hex'),expected=createHmac('sha256',secret).update(timestamp+'.'+nonce).digest();
   return incoming.length === expected.length && timingSafeEqual(incoming, expected);
+}
+type ClaimedSync={logId:string;sheetId:string;mapping:any;department:string};
+type Db=ReturnType<typeof createDatabaseClient>;
+/** Reads one claimed source and records the outcome. The class's approved Workspace sources (025) gate every read. */
+async function syncClaimed(db:Db,task:ClaimedSync):Promise<'successful'|'failed'>{
+  try {
+    const scope=await db.from('product_sync_logs').select('class_id').eq('id',task.logId).single();
+    if(scope.error||!scope.data?.class_id)throw new Error('Roster task scope unavailable.');
+    await requireWorkspaceSheet(scope.data.class_id,task.sheetId,listFolderSheets);
+    const bundle=await readRosterSource(task.sheetId,task.mapping,task.department);
+    const rows=bundle?.rows||await readRoster(task.sheetId,task.mapping,task.department);
+    if(bundle)await finishWorkbookSync(task.logId,rows,bundle);
+    else {
+      const done=await db.rpc('product_finish_roster_sync',{p_log:task.logId,p_rows:rows,p_error:null});
+      if(done.error)throw new Error('Roster import rejected.');
+    }
+    return 'successful';
+  } catch {
+    const logged=await db.rpc('product_finish_roster_sync',{p_log:task.logId,p_rows:null,p_error:'roster_read_or_import_failed'});
+    if(logged.error)throw new Error('Worker error recording failed.');
+    return 'failed';
+  }
 }
 export async function runRosterWorker(nonce:string) {
   requireCloudDatabase();
@@ -25,57 +46,22 @@ export async function runRosterWorker(nonce:string) {
     const claim=await db.rpc('product_claim_roster_sync');
     if(claim.error)throw new Error('Worker claim failed.');
     if(!claim.data)break;
-    const task=claim.data;
-    try {
-      const scope=await db.from('product_sync_logs').select('class_id').eq('id',task.logId).single();
-      if(scope.error||!scope.data?.class_id)throw new Error('Roster task scope unavailable.');
-      await requireWorkspaceSheet(scope.data.class_id,task.sheetId,listFolderSheets);
-      const bundle=await readRosterSource(task.sheetId,task.mapping,task.department);
-      const rows=bundle?.rows||await readRoster(task.sheetId,task.mapping,task.department);
-      if(bundle){await finishWorkbookSync(task.logId,rows,bundle);successful++;continue;}
-      const done=await db.rpc('product_finish_roster_sync',{p_log:task.logId,p_rows:rows,p_error:null});
-      if(done.error)throw new Error('Roster import rejected.');
-      successful++;
-    } catch {
-      const logged=await db.rpc('product_finish_roster_sync',{p_log:task.logId,p_rows:null,p_error:'roster_read_or_import_failed'});
-      if(logged.error)throw new Error('Worker error recording failed.');
-      failed++;
-    }
+    if(await syncClaimed(db,claim.data)==='successful')successful++;else failed++;
   }
   return {successful,failed};
 }
 
 /**
- * Staging-only worker path: two fixed synthetic sources, two parallel claims at most,
- * and a five-minute source due interval. The Cloud Run route enforces its OIDC gate.
+ * Staging worker on the API service (the Cloud Run route enforces its OIDC gate): the production due rules
+ * (workbook schedule, 15-minute floor, auto sync on) for every class, two parallel claims at most.
  */
 export async function runStagingRosterWorker() {
   requireCloudDatabase();
-  const claims=await Promise.allSettled([claimStagingRosterSync(),claimStagingRosterSync()]);
-  const tasks=claims.flatMap(result=>result.status==='fulfilled'&&result.value?[result.value]:[]);
   const db=createDatabaseClient();
-  const processed=await Promise.all(tasks.map(async task=>{
-    try {
-      const expected=STAGING_ROSTER_FIXTURES.find(fixture=>fixture.classId===task.classId&&fixture.sheetId===task.sheetId);
-      if(!expected)throw new Error('Staging roster scope rejected.');
-      const scope=await db.from('product_sync_logs').select('class_id').eq('id',task.logId).single();
-      if(scope.error||scope.data?.class_id!==expected.classId)throw new Error('Staging roster task scope unavailable.');
-      await requireWorkspaceSheet(expected.classId,expected.sheetId,listFolderSheets);
-      const bundle=await readRosterSource(expected.sheetId,task.mapping as any,task.department);
-      const rows=bundle?.rows||await readRoster(expected.sheetId,task.mapping as any,task.department);
-      if(bundle)await finishWorkbookSync(task.logId,rows,bundle);
-      else {
-        const done=await db.rpc('product_finish_roster_sync',{p_log:task.logId,p_rows:rows,p_error:null});
-        if(done.error)throw new Error('Staging roster import rejected.');
-      }
-      return 'successful' as const;
-    } catch {
-      const logged=await db.rpc('product_finish_roster_sync',{p_log:task.logId,p_rows:[],p_error:'roster_read_or_import_failed'});
-      if(logged.error)throw new Error('Staging worker error recording failed.');
-      return 'failed' as const;
-    }
-  }));
-  if(claims.some(result=>result.status==='rejected'))throw new Error('Staging roster claim failed.');
+  const claims=await Promise.all([db.rpc('product_claim_roster_sync'),db.rpc('product_claim_roster_sync')]);
+  const tasks=claims.flatMap(claim=>!claim.error&&claim.data?[claim.data as ClaimedSync]:[]);
+  const processed=await Promise.all(tasks.map(task=>syncClaimed(db,task)));
+  if(claims.some(claim=>claim.error))throw new Error('Staging roster claim failed.');
   return {
     claimed:tasks.length,
     successful:processed.filter(result=>result==='successful').length,
