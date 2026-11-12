@@ -9,7 +9,8 @@ Follow @AGENTS.md. It holds the repository rules, invariants and safety constrai
 
 ## Quick facts (09/11/2026)
 - Single app: Promptify Intrepid on GCP project `ai-transformation-510302`, `asia-southeast1`. Staging serves. Production resources partly exist (SQL `promptify-prod`, queue, bucket, Hosting site) but no prod API or Hosting release; owner said staging only for now.
-- Staging (11/11): API `promptify-intrepid-api-rel3-1111` (image built from commit `9713888`, 1–10 instances, min 1, pool 15), Hosting `59100aff` (`9dd78a1`). Rollback: `rel2-1111` then `rel1-1111`; Hosting `cc5d24d8` then `e9711f81`.
+- Staging (12/11): API `promptify-intrepid-api-rel1-1112` (image built from commit `6e2389a`, 1–10 instances, min 1, pool 15), Hosting `59100aff` (`9dd78a1`). Rollback: `rel3-1111` then `rel2-1111`; Hosting `cc5d24d8` then `e9711f81`.
+- 12/11: the staging roster Scheduler syncs every class whose Sheet connection has auto sync on, on the production due rules (workbook schedule, 15-minute floor); before, only the two `STAGING-SYNTHETIC-20261020-*` classes were synced on schedule.
 - 10/11 added: admin approves Workspace sources in Governance (025, no per-class redeploy), staff first sign-in needs admin approval (026), SOP/output injection screening, SOP parser child process, admin "create course" with first class (027). See top of `docs/05_OPEN_ISSUES.md`. Flags: Judge async + stream, RAG `GCP_VECTOR_MODE=pgvector` with `text-multilingual-embedding-002`, `CITATION_GATE=on`, `DISABLE_PUBLIC_BASIC=true`. Judge queue 100 concurrent, 50/s.
 - API: `src/services/cloudRunServer.ts` → `productionServerService.ts` (`POST /api/product {action}`). AI: `productionAiService.ts`, `parallelJudgeService.ts`, `rebuildRunService.ts`, `citationService.ts`.
 - Schema: `gcp/sql/001…027`.

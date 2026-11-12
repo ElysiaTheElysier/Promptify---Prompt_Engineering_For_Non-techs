@@ -1,5 +1,13 @@
 # 01 — Hiện trạng Promptify Intrepid
 
+## Staging 12/11/2026 (thay dòng API của bảng 11/11 bên dưới)
+
+| Thành phần | Trạng thái (LIVE 12/11) |
+| --- | --- |
+| API | `promptify-intrepid-api-rel1-1112` nhận 100% traffic. Image `rel-20261112-6e2389a` (`sha256:9ae75146…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel3-1111` (giữ tag), rồi `rel2-1111` |
+| Thay đổi | Sync roster tự động trên staging chạy cho **mọi lớp** bật auto sync, theo cùng luật với production (lịch ở tab Sync, tối thiểu 15 phút giữa hai lần). Trước đó chỉ 2 lớp `STAGING-SYNTHETIC-20261020-*` được sync tự động, nên NS-CC-2611 không tự sync lúc 08:00 dù màn Roster ghi "Mỗi 15 phút". Mỗi lần đọc vẫn phải qua kiểm tra nguồn đã duyệt cho lớp (025). Không có migration |
+| Kiểm tra | `/readyz` 200 trên tag mới; `/api/product` và `/internal/roster` không token trả 401. **LIVE:** Scheduler tự sync NS-CC-2611 lúc 10:10 12/11 (giờ VN), thành công, +0/−0; lần tới theo tab Sync là 08:00 19/11 |
+
 ## Staging 11/11/2026 (thay các dòng tương ứng của bảng 10/11 bên dưới)
 
 | Thành phần | Trạng thái (LIVE 11/11) |
