@@ -10,8 +10,17 @@ type Deck={id:string;title:string;is_default:boolean;published_version_id:string
 type Version={id:string;deck_id:string;page_count:number;source_kind:string;drive_file_id:string|null;created_at:string;published_at:string|null};
 type Assignment={lesson_id:string;mode:'inherit'|'deck'|'off';deck_id:string|null;start_page:number|null;end_page:number|null;revision:number};
 export type SlideState={decks:Deck[];versions:Version[];assignments:Assignment[];driveConfigured:boolean};
-type Review={deckId:string;versionId:string;pageCount:number};
+export type Review={deckId:string;versionId:string;pageCount:number};
 const MAX_BYTES=25*1024*1024;
+/** Private PDF upload → draft version. Pass the same requestId when retrying one chosen file so no second draft is made. */
+export async function uploadSlidePdf(classId:string,file:File,requestId:string,target:{deckId?:string;title?:string},p:(en:string,vi:string)=>string):Promise<Review>{
+ if(!/\.pdf$/i.test(file.name)&&file.type!=='application/pdf')throw Error(p('Choose a PDF. For PowerPoint, export a PDF or open it as Google Slides first.','Hãy chọn PDF. Với PowerPoint, hãy xuất PDF hoặc mở bằng Google Slides trước.'));
+ if(file.size>MAX_BYTES)throw Error(p('Choose a PDF up to 25 MB.','Hãy chọn PDF tối đa 25 MB.'));
+ const signed=await productRequest<{bucket:string;path:string;token:string}>('prepareSlideUpload',{classId,requestId,size:file.size});
+ const uploaded=await identity.storage.from(signed.bucket).uploadToSignedUrl(signed.path,signed.token,file,{contentType:'application/pdf'});
+ // A retry may find its immutable object already stored (the PUT is refused); the server checks what it actually holds.
+ return productRequest<Review>('completeSlideUpload',{classId,requestId,deckId:target.deckId,title:(target.title||'').trim()}).catch(cause=>{throw uploaded.error?Error(p('Private upload failed. Check the connection and retry.','Tải lên riêng tư thất bại. Kiểm tra kết nối rồi thử lại.')):cause;});
+}
 /** Labs that show a deck: explicit assignments, plus every non-overridden lab when the deck is the class default. */
 export function deckUsers(deck:Deck,lessons:ProductSnapshot['lessons'],assignments:Assignment[]){
  return lessons.filter(l=>{const row=assignments.find(a=>a.lesson_id===l.id);return row?.mode==='deck'?row.deck_id===deck.id:row?.mode!=='off'&&deck.is_default;}).map(l=>({lesson:l,row:assignments.find(a=>a.lesson_id===l.id)}));
@@ -37,14 +46,8 @@ export default function ClassSlideDecks({snapshot}:{snapshot:ProductSnapshot}){
  const openReview=(draft:Review)=>{const deck=state?.decks.find(d=>d.id===draft.deckId);setReview(draft);setRanges(Object.fromEntries((deck?deckUsers(deck,snapshot.lessons,state!.assignments):[]).filter(u=>u.row?.start_page).map(u=>[u.lesson.id,{start:String(u.row!.start_page),end:u.row!.end_page?String(u.row!.end_page):''}])));};
  const upload=(deckId?:string)=>run(async()=>{
   if(!file)return;
-  if(!/\.pdf$/i.test(file.name)&&file.type!=='application/pdf')throw Error(p('Choose a PDF. For PowerPoint, export a PDF or open it as Google Slides first.','Hãy chọn PDF. Với PowerPoint, hãy xuất PDF hoặc mở bằng Google Slides trước.'));
-  if(file.size>MAX_BYTES)throw Error(p('Choose a PDF up to 25 MB.','Hãy chọn PDF tối đa 25 MB.'));
   if(!deckId&&!title.trim())throw Error(p('Enter a display name.','Hãy nhập tên hiển thị.'));
-  const id=requestId([file.name,file.size,file.lastModified,deckId||title].join('|'));
-  const signed=await productRequest<{bucket:string;path:string;token:string}>('prepareSlideUpload',{classId:cls.id,requestId:id,size:file.size});
-  const uploaded=await identity.storage.from(signed.bucket).uploadToSignedUrl(signed.path,signed.token,file,{contentType:'application/pdf'});
-  // A retry may find its immutable object already stored (the PUT is refused); the server checks what it actually holds.
-  const draft=await productRequest<Review>('completeSlideUpload',{classId:cls.id,requestId:id,deckId,title:title.trim()}).catch(cause=>{throw uploaded.error?Error(p('Private upload failed. Check the connection and retry.','Tải lên riêng tư thất bại. Kiểm tra kết nối rồi thử lại.')):cause;});
+  const draft=await uploadSlidePdf(cls.id,file,requestId([file.name,file.size,file.lastModified,deckId||title].join('|')),{deckId,title},p);
   request.current=null;setFile(null);setReplaceFor(null);setTitle('');await reload();openReview(draft);
  });
  const importDrive=(fileId:string,deckId?:string,name?:string)=>run(async()=>{
