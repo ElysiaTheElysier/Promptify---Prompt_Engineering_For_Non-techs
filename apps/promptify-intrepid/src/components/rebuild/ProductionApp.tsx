@@ -108,7 +108,8 @@ export default function ProductionApp() {
   // Faster refresh while a learner waits on a hint request or an editor has requests to review.
   const hintsWaiting=!!snapshot?.hintRequests?.some(r=>r.status==='pending')||!!snapshot?.supportRequests?.some(r=>r.status==='pending');
   useEffect(() => { if(!session||!classId)return; const timer=setInterval(()=>{if(document.visibilityState==='visible'&&!activeWrite.current)void refresh(classId);},ui===9||hintsWaiting?5000:15000);return()=>clearInterval(timer); }, [session?.user.id,classId,refresh,ui,hintsWaiting]);
-  useEffect(()=>{if(!session||!classId)return;return subscribeClassUpdates(classId,()=>{if(!activeWrite.current)void refresh(classId);});},[session?.user.id,classId,refresh]);
+  // A trainer change pings every learner of the class at once: spread the refetches over 0–2 s so 100 screens do not hit the API together.
+  useEffect(()=>{if(!session||!classId)return;let timer:ReturnType<typeof setTimeout>|undefined;const stop=subscribeClassUpdates(classId,()=>{clearTimeout(timer);timer=setTimeout(()=>{if(!activeWrite.current)void refresh(classId);},Math.random()*2000);});return()=>{clearTimeout(timer);stop();};},[session?.user.id,classId,refresh]);
   const action = async (name: string, payload: Record<string, unknown> = {}, after?: (value:any)=>void) => {
     if(snapshot?.selectedClass?.id!==classId&&name!=='confirmProfile'&&name!=='profileCorrection')return;
     if(activeWrite.current)return;activeWrite.current=true;setBusy(true);setError('');setNotice('');

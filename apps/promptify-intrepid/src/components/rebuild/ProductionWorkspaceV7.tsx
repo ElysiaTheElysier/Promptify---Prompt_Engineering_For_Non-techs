@@ -1,6 +1,6 @@
 import ProductionCompareSource from './ProductionCompareSource';
 import {scaffoldSnippet,promptLearning} from '../../services/promptLearningService';
-import {CORE_SCAFFOLDS,lessonScaffolds,scaffoldTag,recognizedScaffolds} from '../../services/scaffoldRecognitionService';
+import {CORE_SCAFFOLDS,scaffoldTag,recognizedScaffolds} from '../../services/scaffoldRecognitionService';
 import OutcomeMeasurement from './OutcomeMeasurement';
 import {ShellHeader} from '../common/AppShell';
 import React,{useState,useRef,Suspense} from 'react';
@@ -34,9 +34,8 @@ export default function ProductionWorkspaceV7(props:WorkspaceProps){
  const [showSlides,setShowSlides]=useState(false),[slidesOpened,setSlidesOpened]=useState(false);
  const closeSlides=()=>{setShowSlides(false);requestAnimationFrame(()=>promptRef.current?.focus());};
  const [comparing,setComparing]=useState(false),[wikiTopic,setWikiTopic]=useState('system instruction'),[libraryOpen,setLibraryOpen]=useState(false),[workspaceTab,setWorkspaceTab]=useState('exercise');
- const allChips=lessonScaffolds(lesson.studio?.scaffold).filter(c=>c.active);
- // Quick Fix opens the chip the trainer linked to the criterion; labs without saved chips keep the old fallback to [Task].
- const quickFix=(key:string)=>allChips.find(ch=>ch.rubricKey===key)||(!lesson.studio?.scaffold?.length?allChips.find(ch=>ch.tag==='Task'):undefined);
+ // Learners see only the chips their trainer created; Quick Fix opens the chip linked to the criterion.
+ const allChips=(lesson.studio?.scaffold||[]).filter(c=>c.active),quickFix=(key:string)=>allChips.find(ch=>ch.rubricKey===key);
  const recognized=recognizedScaffolds(prompt,CORE_SCAFFOLDS),missing=CORE_SCAFFOLDS.filter(c=>!recognized.some(r=>r.id===c.id));
  const showWiki=(topic:string)=>{setWikiTopic(topic);setTab('wiki');setWorkspaceTab('exercise');};
  const restoreAttempt=(value:string,id?:string)=>{const row=snapshot.attempts.find(a=>a.id===id);if(!row)return;props.selectAttempt?.(row.id);setPrompt((row as any).promptTemplate||value);setVariableValues((row as any).variableValues||{});restoreSettings((row as any).settings||DEFAULT_LEARNER_SETTINGS);setContextIds((row as any).contextIds||[]);setWorkspaceTab('prompt');setComparing(false);};

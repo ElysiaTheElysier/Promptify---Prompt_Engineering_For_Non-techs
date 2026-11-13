@@ -56,5 +56,13 @@ assert.match(((await sample('offline-admin','id,item'+String.fromCharCode(10)+'A
 await assert.rejects(()=>sample('offline-admin','Contact: nguyen.van.a@gmail.com, 0912345678'),/personal information/);
 await assert.rejects(()=>sample('offline-admin','x'.repeat(10),'notes.exe'),(error:any)=>error.statusCode===422);
 assert.equal((await db.query('SELECT count(*)::int total FROM product_sop_contributions')).rows[0].total,1,'parsing sample data stores nothing');
+// Real-time notices (13/11): a trainer action pings the Firebase uid of every learner enrolled in the class; others are ignored.
+const {noticeClassChange,configureClassNoticeForTests}=await import('../src/services/classNoticeService');
+await db.query("INSERT INTO gcp_identity_bindings(issuer,external_subject,user_id,legacy_subject) VALUES('firebase','fb-learner',$1,$2)",[id(1),id(15)]);
+const notices:Array<{uids:string[],classId:string}>=[];configureClassNoticeForTests(async(uids,classId)=>{notices.push({uids,classId});});
+await noticeClassChange('saveStudio',id(6));await noticeClassChange('generate',id(6));await noticeClassChange('saveStudio','not-a-class');await noticeClassChange('broadcast',id(16));
+assert.deepEqual(notices,[{uids:['fb-learner'],classId:id(6)}],'only trainer actions on a class with enrolled learners send a notice');
+configureClassNoticeForTests(async()=>{throw Error('firestore down');});const warn=console.warn;console.warn=()=>{};
+try{await noticeClassChange('saveStudio',id(6));}finally{console.warn=warn;}
 await db.close();
 console.log('SOP submission scope PASS: class-bound replay, admitted lesson, paid/scheduled/archived denial; no external calls.');
