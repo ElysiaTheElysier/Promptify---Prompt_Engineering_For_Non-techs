@@ -106,11 +106,13 @@
 /* Compact, collapsible scaffold chip list (tester 13/11). */
 .revised-studio .studio-chip-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none}
 .revised-studio .studio-chip-summary::-webkit-details-marker{display:none}
-.revised-studio .studio-chip-summary::after{content:"▾";font-size:12px;color:#56675f;transition:transform .15s}
-.revised-studio .studio-chip-section:not([open]) .studio-chip-summary::after{transform:rotate(-90deg)}
 .revised-studio .studio-chip-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto auto;gap:6px;align-items:center;padding:6px;border:1px solid #d7e3dc;border-radius:12px;background:#f7faf8;font-size:12px}
 .revised-studio .studio-chip-row.is-off{opacity:.6}
 .revised-studio .studio-chip-row input,.revised-studio .studio-chip-row select{min-width:0;padding:6px 8px;border:1px solid #c9d6cf;border-radius:10px;background:#fff;font-size:12px}
 .revised-studio .studio-chip-row input{font-weight:600}.revised-studio .studio-chip-row input.is-invalid{border-color:#dc2626}
 .revised-studio .studio-chip-toggle{padding:3px 10px;border-radius:999px;font-weight:700;font-size:11px;background:#cbd5e1;color:#334155}.revised-studio .studio-chip-toggle.is-on{background:#059669;color:#fff}
 @media (max-width:520px){.revised-studio .studio-chip-row{grid-template-columns:minmax(0,1fr) auto auto}.revised-studio .studio-chip-row select{grid-column:1/-1;grid-row:2}}
+.revised-studio .studio-collapse-pill{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;padding:6px 12px;border:1px solid #9cc5b0;border-radius:999px;background:#eef6f1;color:#1f6b45;font-size:12px;font-weight:700;white-space:nowrap}
+.revised-studio .studio-chip-summary:hover .studio-collapse-pill{background:#dcefe4}
+.revised-studio .studio-chip-summary:focus-visible{outline:2px solid #047857;outline-offset:4px;border-radius:12px}
+.revised-studio .studio-collapse-caret{display:inline-block;transition:transform .15s;transform:rotate(-90deg)}.revised-studio .studio-collapse-caret.is-open{transform:none}
