@@ -5,7 +5,7 @@
 | Thành phần | Trạng thái (LIVE 13/11) |
 | --- | --- |
 | API | `promptify-intrepid-api-rel2-1113` nhận 100% traffic. Image `rel-20261113-dd94f33` (`sha256:15df45de…`), build từ commit, không overlay. Env giữ nguyên 33 biến. Rollback: `rel1-1113` (giữ tag), rồi `rel2-1112` |
-| Hosting staging | `e205ee1057fe82b6` (commit `7d51b58`: bỏ chip tự sinh của bản 12–13/11 với id `core-*`/`default-*`, nút thu gọn rõ ràng; phát hành lại lần hai để xóa cache CDN), rollback `3d307edbae93368e` (`dd94f33`), rồi `540b5625abb4613f` |
+| Hosting staging | `7f197f04d64fb0cc` (commit `5d6368b`: Tab 3 slide có xem trước bên phải, Mở file, Tải về, Tải slide lên PDF → tạo bộ slide mới của lớp, xuất bản và chọn cho Lab; giảng viên bấm Lưu slide), rollback `e205ee1057fe82b6`. Trước đó `e205ee1057fe82b6` (commit `7d51b58`: bỏ chip tự sinh của bản 12–13/11 với id `core-*`/`default-*`, nút thu gọn rõ ràng; phát hành lại lần hai để xóa cache CDN), rollback `3d307edbae93368e` (`dd94f33`), rồi `540b5625abb4613f` |
 | IAM | Thêm `roles/datastore.user` cho `promptify-api` (để API ghi thông báo Firestore). Không bớt quyền nào |
 | Thay đổi | Real-time (D48): sau thao tác giảng viên, API ghi `userUpdates/{uid}/classes/{classId}` cho học viên của lớp; màn học viên tải lại sau 0–2 s. Chip scaffold không còn tạo sẵn (Studio và học viên chỉ dùng chip giảng viên tạo), mỗi chip một dòng, phần chip thu gọn được |
 | Kiểm tra | OFFLINE: `npm test` 99/99 (có test thông báo lớp), typecheck, lint, boundaries, build, smoke PASS. LIVE: `/health`, `/readyz` 200; `/api/product`, `/internal/roster` không token 401 (cả qua Hosting); bundle live có Studio mới. **Chưa kiểm: học viên nhận cập nhật khi giảng viên lưu (cần đăng nhập hai tài khoản)** |
