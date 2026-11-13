@@ -309,7 +309,7 @@ export async function handleProductRequest(authorization: string, body: any) {
     const published=ids.length?await result<any[]>(c.server.from('product_sop_contributions').select('class_id').in('class_id',ids).eq('status','published').gte('created_at',start.toISOString()).lt('created_at',end.toISOString())):[];
     return {...report,feedback,published_sops:published.length,classes:(report.classes||[]).map((row:any)=>({...row,published_sops:published.filter(source=>source.class_id===row.id).length}))};
   }
-  const cls = await classScope(c, body.classId, ['backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess','saveWorkspaceSource','approveIdentityLink'].includes(body.action)||SLIDE_EDITOR_ACTIONS.has(body.action));
+  const cls = await classScope(c, body.classId, ['extractSampleData','backfillDriveOriginal','saveWorkspacePreferences','accessRequests','reviewAccessRequest','setSheetAutoSync','reviewSopPreview','saveDomain','setAccess','saveClass','reviewSop','sandboxGenerate','sandboxJudge','saveStudio', 'createLesson', 'createCohort', 'sessionControl', 'broadcast', 'privateHint', 'trainerAction', 'saveSheet', 'syncSheet', 'publishSop', 'governance','setAccessExpiry','reviewHintRequest','promoteLearner','revokeAccess','saveWorkspaceSource','approveIdentityLink'].includes(body.action)||SLIDE_EDITOR_ACTIONS.has(body.action));
   if(c.profile.role==='learner'&&accessExpiryEnabled()&&READ_ONLY_BLOCKED.has(body.action))await assertWritableAccess(c.profile.id,cls.id);
   switch (body.action) {
     case 'accessRequests':return accessInbox(cls.id,c.profile.role==='admin');
@@ -337,6 +337,15 @@ export async function handleProductRequest(authorization: string, body: any) {
       if(!['approve','reject'].includes(body.decision))throw new ApiAccessError('Review decision required.',422);
       const row=await result(c.server.from('product_prompt_library').update({status:body.decision==='approve'?'approved':'rejected',reviewed_by:c.profile.id,review_reason:text(body.reason,1000)}).eq('id',uuid(body.entryId)).eq('class_id',cls.id).eq('status','pending').select('id').maybeSingle());
       if(!row)throw new ApiAccessError('Library review is stale.',409);return row;
+    }
+    case 'extractSampleData': {
+      // Studio "Sample data" from a file: parsed in the SOP worker and screened like a SOP; only the text is returned, nothing is stored.
+      if(typeof body.base64!=='string'||body.base64.length>2800000||! /^[A-Za-z0-9+/]*={0,2}$/.test(body.base64))throw new ApiAccessError('Upload a PDF, DOCX, XLSX, CSV, Markdown or text file up to 2 MB.',422);
+      const source=await extractSop(Buffer.from(body.base64,'base64'),text(body.filename,160));
+      screenSourceInjection('sop',source.chunks.map(chunk=>chunk.content));
+      if(piiSignals(source.content).length)throw new ApiAccessError('The file contains personal information. Sample data must be fictional.',422);
+      if(source.content.length>60000)throw new ApiAccessError('The file has more than 60,000 characters of text. Shorten it, or upload it as an SOP instead.',422);
+      return {text:source.content,filename:source.metadata.filename,type:source.metadata.type,pages:source.metadata.pages};
     }
     case 'uploadLearnerContext': {
       const lessonId=uuid(body.lessonId),state=await snapshot(c,cls.id);

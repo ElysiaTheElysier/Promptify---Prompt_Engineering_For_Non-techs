@@ -4,7 +4,7 @@ import {entryReturnUrl} from '../src/services/entryNavigationService';
 import assert from 'node:assert/strict';
 import {bindPromptVariables} from '../src/services/promptVariableService';
 import {parseWorkbook,syncTime,WORKBOOK_TABS} from '../src/services/rosterWorkbookService';
-import {CORE_SCAFFOLDS,scaffoldTag,recognizedScaffolds} from '../src/services/scaffoldRecognitionService';
+import {CORE_SCAFFOLDS,scaffoldTag,recognizedScaffolds,lessonScaffolds} from '../src/services/scaffoldRecognitionService';
 const variables=[{name:'ticket',type:'text',sample:'42'},{name:'count',type:'integer',sample:'1'}];
 assert.equal(bindPromptVariables('Handle {{ticket}} and {count}',variables,{ticket:'new ticket',count:'3'}).prompt,'Handle new ticket and 3');
 assert.throws(()=>bindPromptVariables('{count}',variables,{count:'wrong'}),/numeric/);
@@ -68,3 +68,8 @@ const guideText=(b:any)=>{const out:string[]=[];b.worksheets[0].eachRow((row:any
 assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',true,'sa@example.iam.gserviceaccount.com')),/thêm sa@example\.iam\.gserviceaccount\.com với quyền Người xem/);
 assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',false)),/shown on the Roster screen/);
 assert.match(guideText(buildRosterTemplate(ExcelJS,'Tech',true,'sa@example.iam.gserviceaccount.com')),/CHIA SẺ FILE CHO\nsa@example\.iam\.gserviceaccount\.com/,'share-with address stands out near the top for HR');
+// Tester 13/11: trainers own the chip list; defaults apply only until a list is saved.
+assert.deepEqual(lessonScaffolds([]).map(c=>c.tag),['Role','Context','Task','Guardrail','Format','Example','Prove']);
+assert.equal(lessonScaffolds(null).find(c=>c.tag==='Context')?.rubricKey,'groundedness');
+const toneChip={id:'t',name:'Giọng văn',tag:'Giọng văn',active:true,rubricKey:'c_tone'};
+assert.deepEqual(lessonScaffolds([toneChip]),[toneChip],'a saved list replaces the defaults');

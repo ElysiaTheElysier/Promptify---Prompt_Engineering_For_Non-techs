@@ -26,7 +26,7 @@ try{
 
 // Wiring: every SOP entry point and the learner context upload are screened; Judge flags output without changing the score.
 const server=fs.readFileSync('src/services/productionServerService.ts','utf8');
-assert.equal(server.match(/screenSourceInjection\('sop'/g)?.length,3,'submitSop, reviewSop approve, publishSop');
+assert.equal(server.match(/screenSourceInjection\('sop'/g)?.length,4,'submitSop, reviewSop approve, publishSop, extractSampleData (Studio sample data)');
 assert.ok(server.includes("screenSourceInjection('learner_context'"));
 const ai=fs.readFileSync('src/services/productionAiService.ts','utf8');
 assert.ok(/const integritySignals=injectionSignals\(body\.generatedOutput\);[\s\S]*const evaluation=await evaluateOutput\(body,deadlineMs,hooks\);[\s\S]*\{\.\.\.evaluation,integritySignals\}/.test(ai));

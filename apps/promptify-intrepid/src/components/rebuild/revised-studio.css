@@ -101,3 +101,5 @@
 .revised-studio .studio-learner-seen{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;background:#e3f2ea;color:#1f6b45;font-size:11px;font-weight:600;vertical-align:middle;white-space:nowrap}
 .revised-studio .studio-chip-link{flex:1;min-width:0;padding:4px 8px;border:1px solid #c9d6cf;border-radius:10px;background:#fff;font-size:12px}
 .revised-studio .studio-create-scope{margin-top:12px;padding:10px 12px;border-radius:12px;background:#f3f7f5;font-size:13px}
+.revised-studio .studio-field-label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#30413a}
+.revised-studio .studio-file-button{display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin-top:4px}.revised-studio .studio-file-button.is-disabled{opacity:.5;pointer-events:none}.revised-studio .studio-file-button:focus-within{outline:2px solid #047857;outline-offset:2px}

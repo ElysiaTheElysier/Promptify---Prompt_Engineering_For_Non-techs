@@ -17,6 +17,7 @@ configureSqlPoolForTests({async connect(){
 }});
 const id=(n:number)=>`${String(n).padStart(8,'0')}-0000-4000-8000-000000000001`;
 configureFirebaseVerifierForTests(async token=>{
+  if(token==='offline-admin')return {subject:id(14),email:'admin@example.test',firebaseUid:'offline-admin'};
   if(token!=='offline-learner')throw Error('Unknown offline identity');
   return {subject:id(2),email:'learner@example.test',firebaseUid:'offline-learner'};
 });
@@ -47,5 +48,13 @@ for(const config of [
   await assert.rejects(()=>handleProductRequest('Bearer offline-learner',fresh),(error:any)=>error.statusCode===403&&/Lesson scope denied/.test(error.message),'locked lessons reject before parsing/uploading source');
 }
 assert.equal((await db.query('SELECT count(*)::int total FROM product_sop_contributions')).rows[0].total,1);
+// Studio "Load from file" for sample data (13/11): editors only, parsed text back, fictional data only, nothing stored.
+await db.query("INSERT INTO users(id,email,full_name,role,auth_provider_id,profile_confirmed_at) VALUES($1,'admin@example.test','Offline admin','admin',$2,now())",[id(13),id(14)]);
+const sample=(token:string,content:string,filename='orders.csv')=>handleProductRequest('Bearer '+token,{action:'extractSampleData',classId:id(6),filename,base64:Buffer.from(content).toString('base64')});
+await assert.rejects(()=>sample('offline-learner','id,item'+String.fromCharCode(10)+'1,Paper'),(error:any)=>error.statusCode===403,'learners cannot use the Studio sample parser');
+assert.match(((await sample('offline-admin','id,item'+String.fromCharCode(10)+'A-1,Paper A4')) as any).text,/A-1/);
+await assert.rejects(()=>sample('offline-admin','Contact: nguyen.van.a@gmail.com, 0912345678'),/personal information/);
+await assert.rejects(()=>sample('offline-admin','x'.repeat(10),'notes.exe'),(error:any)=>error.statusCode===422);
+assert.equal((await db.query('SELECT count(*)::int total FROM product_sop_contributions')).rows[0].total,1,'parsing sample data stores nothing');
 await db.close();
 console.log('SOP submission scope PASS: class-bound replay, admitted lesson, paid/scheduled/archived denial; no external calls.');
